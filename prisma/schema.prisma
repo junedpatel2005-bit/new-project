@@ -1,0 +1,912 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model CmsPage {
+  id              Int           @id @default(autoincrement())
+  title           String
+  slug            String        @unique
+  content         String        @default("")
+  metaTitle       String        @default("")
+  metaDescription String        @default("")
+  status          CmsPageStatus @default(DRAFT)
+  pageKey         String        @default("")
+  sections        String        @default("{}")
+  keywords        String        @default("")
+  ogTitle         String        @default("")
+  ogDescription   String        @default("")
+  ogImage         String        @default("")
+  canonicalUrl    String        @default("")
+  createdAt       DateTime
+  updatedAt       DateTime
+
+  @@index([slug])
+  @@index([status])
+  @@map("cms_pages")
+}
+
+model CmsPageVersion {
+  id        Int      @id @default(autoincrement())
+  pageId    Int      @map("page_id")
+  versionNo Int      @map("version_no")
+  content   String
+  createdBy Int?     @map("created_by")
+  createdAt DateTime @map("created_at")
+
+  @@unique([pageId, versionNo])
+  @@index([pageId])
+  @@map("cms_page_versions")
+}
+
+model CmsMedia {
+  id        Int      @id @default(autoincrement())
+  name      String
+  mimeType  String
+  url       String
+  createdBy Int?
+  createdAt DateTime
+
+  @@index([createdAt])
+  @@map("cms_media")
+}
+
+model SQLiteMigrationTableArchive {
+  sourceTable String   @id
+  rows        Json
+  sourceCount Int
+  migratedAt  DateTime @default(now())
+}
+
+model SQLiteMigrationAudit {
+  sourceTable   String   @id
+  sourceCount   Int
+  archivedCount Int
+  migratedAt    DateTime @default(now())
+}
+
+model WebsitePage {
+  pageKey   String        @id @map("pageKey")
+  path      String        @unique
+  title     String
+  content   String        @default("")
+  status    CmsPageStatus @default(DRAFT)
+  updatedAt DateTime
+  css       String        @default("")
+}
+
+model LegalPage {
+  slug      String        @id @map("slug")
+  title     String
+  content   String        @default("")
+  status    CmsPageStatus @default(PUBLISHED)
+  updatedAt DateTime
+}
+
+model ServiceCategory {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  slug        String   @unique
+  description String   @default("")
+  iconName    String   @default("")
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+}
+
+model User {
+  id                                  Int             @id @default(autoincrement())
+  role                                UserRole        @default(CLIENT)
+  firstName                           String
+  lastName                            String
+  email                               String          @unique
+  phone                               String?         @unique
+  passwordHash                        String?
+  googleId                            String?         @unique
+  avatarUrl                           String?
+  companyName                         String?
+  companyWebsite                      String?
+  industry                            String?
+  teamSize                            String?
+  companyDescription                  String?
+  address                             String?
+  professionalCategory                String?
+  professionalCity                    String?
+  professionalSkillsJson              String?
+  experienceYears                     Int?
+  hourlyRate                          Int?
+  fixedRate                           Int?
+  portfolioUrl                        String?
+  workPhotosJson                      String?
+  certificationsJson                  String?
+  tradeLicenseUrl                     String?
+  serviceArea                         String?
+  workMode                            String          @default("both")
+  serviceRadiusKm                     Int?
+  averageRating                       Float           @default(0)
+  reviewCount                         Int             @default(0)
+  isVerified                          Boolean         @default(false)
+  availabilityStatus                  String          @default("available")
+  savedLocationsJson                  String?
+  hiringNeedsJson                     String?
+  authProvider                        String          @default("LOCAL")
+  isActive                            Boolean         @default(true)
+  lastLoginAt                         DateTime?
+  createdAt                           DateTime        @default(now())
+  updatedAt                           DateTime        @updatedAt
+  professionalLatitude                Float?
+  professionalLongitude               Float?
+  biometricEnabled                    Boolean         @default(false)
+  biometricType                       String?
+  browserNotificationsEnabled         Boolean         @default(true)
+  emailNotificationsEnabled           Boolean         @default(true)
+  emailVerifiedAt                     DateTime?
+  projectActivityNotificationsEnabled Boolean         @default(true)
+  clientJobs                          ClientJob[]
+  clientProfiles                      ClientProfile[]
+  favoriteJobs                        FavoriteJob[]
+}
+
+model ClientProfile {
+  id                 Int                   @id @default(autoincrement())
+  userId             Int
+  fullName           String
+  email              String
+  phone              String
+  companyName        String
+  companyWebsite     String?
+  industry           String?
+  teamSize           String?
+  companyDescription String?
+  address            String
+  profilePhotoUrl    String?
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+  hiringNeeds        ClientHiringNeed[]
+  user               User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  savedLocations     ClientSavedLocation[]
+
+  @@index([userId])
+}
+
+model ClientSavedLocation {
+  id              Int           @id @default(autoincrement())
+  clientProfileId Int
+  label           String
+  address         String
+  createdAt       DateTime      @default(now())
+  clientProfile   ClientProfile @relation(fields: [clientProfileId], references: [id], onDelete: Cascade)
+
+  @@index([clientProfileId])
+}
+
+model ClientHiringNeed {
+  id              Int           @id @default(autoincrement())
+  clientProfileId Int
+  value           String
+  createdAt       DateTime      @default(now())
+  clientProfile   ClientProfile @relation(fields: [clientProfileId], references: [id], onDelete: Cascade)
+
+  @@index([clientProfileId])
+}
+
+model ClientJob {
+  id              Int                   @id @default(autoincrement())
+  userId          Int
+  category        String
+  title           String
+  description     String
+  budgetMin       Int?
+  budgetMax       Int?
+  urgency         JobUrgency            @default(MEDIUM)
+  jobDate         DateTime?
+  deadline        DateTime
+  workMode        JobWorkMode           @default(BOTH)
+  locationLabel   String?
+  locationAddress String?
+  locationLat     Float?
+  locationLng     Float?
+  status          JobStatus             @default(OPEN)
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+  hourlyRate      Int?
+  timingType      String                @default("FIXED")
+  user            User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  attachments     ClientJobAttachment[]
+  favoriteJobs    FavoriteJob[]
+
+  @@index([userId])
+  @@index([status])
+}
+
+model FavoriteJob {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  jobId     Int
+  createdAt DateTime  @default(now())
+  job       ClientJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, jobId])
+  @@index([userId])
+  @@index([jobId])
+}
+
+model ClientJobAttachment {
+  id         Int       @id @default(autoincrement())
+  jobId      Int
+  fileName   String
+  fileType   String?
+  fileSize   Int?
+  previewUrl String?
+  createdAt  DateTime  @default(now())
+  job        ClientJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@index([jobId])
+}
+
+model ProjectTransaction {
+  id             Int      @id @default(autoincrement())
+  trackingId     Int
+  milestoneId    Int?
+  completionId   Int?
+  clientId       Int
+  professionalId Int
+  amount         Int
+  currency       String   @default("USD")
+  type           String
+  status         String   @default("COMPLETED")
+  description    String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([trackingId])
+  @@index([clientId])
+  @@index([professionalId])
+  @@index([status])
+  @@map("ProjectTransaction")
+}
+
+model ProjectNegotiation {
+  id                Int      @id @default(autoincrement())
+  requestId         Int
+  jobId             Int
+  clientId          Int
+  professionalId    Int
+  senderId          Int
+  senderRole        String
+  bidAmount         Int?
+  duration          String?
+  message           String
+  createdAt         DateTime @default(now())
+  previousBidAmount Int?
+  previousDuration  String?
+  previousMessage   String?
+
+  @@index([requestId])
+  @@index([clientId])
+  @@index([professionalId])
+  @@map("ProjectNegotiation")
+}
+
+model ProjectReview {
+  id                     Int       @id @default(autoincrement())
+  trackingId             Int       @unique
+  clientId               Int
+  professionalId         Int
+  rating                 Int
+  comment                String?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+  professionalResponse   String?
+  professionalResponseAt DateTime?
+
+  @@index([clientId])
+  @@index([professionalId])
+  @@map("ProjectReview")
+}
+
+model ProjectRequest {
+  id              Int      @id @default(autoincrement())
+  jobId           Int
+  clientId        Int
+  professionalId  Int
+  bidAmount       Int
+  duration        String
+  coverLetter     String
+  status          String   @default("PENDING")
+  attachmentsJson String?  @default("[]")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([jobId])
+  @@index([clientId])
+  @@index([professionalId])
+  @@map("ProjectRequest")
+}
+
+model ProjectTracking {
+  id             Int      @id @default(autoincrement())
+  requestId      Int      @unique
+  jobId          Int
+  clientId       Int
+  professionalId Int
+  status         String   @default("RUNNING")
+  acceptedAt     DateTime @default(now())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([jobId])
+  @@index([clientId])
+  @@index([professionalId])
+  @@map("ProjectTracking")
+}
+
+model ProjectMilestone {
+  id             Int       @id @default(autoincrement())
+  trackingId     Int
+  clientId       Int
+  professionalId Int
+  title          String
+  description    String?
+  amount         Int
+  dueDate        DateTime?
+  status         String    @default("PENDING")
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([trackingId])
+  @@map("ProjectMilestone")
+}
+
+model ProjectWorkUpload {
+  id          Int      @id @default(autoincrement())
+  trackingId  Int
+  roundNumber Int      @default(1)
+  title       String
+  note        String?
+  fileName    String?
+  fileUrl     String?
+  filesJson   String?  @default("[]")
+  createdAt   DateTime @default(now())
+
+  @@index([trackingId])
+  @@map("ProjectWorkUpload")
+}
+
+model HireJob {
+  id          String           @id
+  clientId    String           @map("client_id")
+  title       String
+  description String?
+  budgetMin   Float?           @map("budget_min")
+  budgetMax   Float?           @map("budget_max")
+  currency    String           @default("INR")
+  jobType     String?          @map("job_type")
+  city        String?
+  jobDate     DateTime?        @map("job_date")
+  deadline    DateTime?
+  urgency     String?
+  status      String           @default("draft")
+  createdAt   DateTime         @default(now()) @map("created_at")
+  categoryId  Int?             @map("category_id")
+  contracts   HireContract[]
+  attachments HireAttachment[]
+
+  @@map("hire_jobs")
+}
+
+model HireContract {
+  id              String          @id
+  jobId           String          @map("job_id")
+  clientId        String          @map("client_id")
+  professionalId  String          @map("professional_id")
+  clientProjectId Int?            @map("client_project_id")
+  trackingId      Int?            @map("tracking_id")
+  totalAmount     Float?          @map("total_amount")
+  platformFee     Float?          @map("platform_fee")
+  status          String          @default("pending")
+  startDate       DateTime?       @map("start_date")
+  endDate         DateTime?       @map("end_date")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+  job             HireJob         @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  milestones      HireMilestone[]
+
+  @@index([clientId])
+  @@index([professionalId])
+  @@map("hire_contracts")
+}
+
+model HireAttachment {
+  id         String  @id
+  jobId      String  @map("job_id")
+  fileUrl    String? @map("file_url")
+  fileType   String? @map("file_type")
+  uploadedBy String? @map("uploaded_by")
+  job        HireJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@index([jobId])
+  @@map("hire_job_attachments")
+}
+
+model HireMilestone {
+  id             String       @id
+  contractId     String       @map("contract_id")
+  title          String?
+  amount         Float?
+  dueDate        DateTime?    @map("due_date")
+  status         String       @default("pending")
+  completedProof String?      @map("completed_proof")
+  contract       HireContract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+
+  @@index([contractId])
+  @@map("hire_milestones")
+}
+
+model DirectHireNegotiation {
+  id             Int      @id @default(autoincrement())
+  contractId     String
+  jobId          String
+  clientId       String
+  professionalId String
+  senderId       String
+  senderRole     String
+  bidAmount      Float?
+  duration       String?
+  message        String
+  createdAt      DateTime @default(now())
+
+  @@index([contractId])
+  @@index([professionalId])
+}
+
+model SocketConversation {
+  id             String                    @id
+  userAId        Int
+  userBId        Int
+  userAName      String
+  userBName      String
+  userAAvatarUrl String?
+  userBAvatarUrl String?
+  job            String                    @default("Direct message")
+  createdAt      DateTime                  @default(now())
+  updatedAt      DateTime                  @updatedAt
+  clears         SocketConversationClear[]
+  messages       SocketMessage[]
+
+  @@index([userAId])
+  @@index([userBId])
+}
+
+model SocketMessage {
+  id             String             @id
+  conversationId String
+  senderId       Int
+  receiverId     Int
+  body           String
+  kind           String             @default("text")
+  createdAt      DateTime           @default(now())
+  conversation   SocketConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@index([senderId])
+  @@index([receiverId])
+}
+
+model SocketConversationClear {
+  conversationId String
+  userId         Int
+  clearedAt      DateTime           @default(now())
+  conversation   SocketConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@id([conversationId, userId])
+}
+
+model CallSession {
+  conversationId String   @id
+  startedBy      Int
+  mode           String
+  status         String   @default("PENDING")
+  offerSdp       String?
+  answerSdp      String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model MessageConversation {
+  id             String    @id @default(cuid())
+  clientId       Int
+  professionalId Int
+  contractId     String?
+  jobTitle       String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  lastMessageAt  DateTime?
+  messages       Message[]
+
+  @@index([clientId])
+  @@index([professionalId])
+}
+
+model Message {
+  id             String              @id @default(cuid())
+  conversationId String
+  senderId       Int
+  body           String
+  createdAt      DateTime            @default(now())
+  readAt         DateTime?
+  conversation   MessageConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@index([senderId])
+}
+
+model UserNotification {
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  type        String
+  title       String
+  description String?
+  href        String?
+  createdAt   DateTime  @default(now())
+  readAt      DateTime?
+  clearedAt   DateTime?
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model UserNotificationState {
+  userId          Int
+  notificationKey String
+  readAt          DateTime?
+  clearedAt       DateTime?
+
+  @@id([userId, notificationKey])
+}
+
+model Payment {
+  id                Int      @id @default(autoincrement())
+  clientId          Int
+  professionalId    Int
+  jobId             Int?
+  amount            Int
+  commissionAmount  Int      @default(0)
+  currency          String   @default("USD")
+  provider          String
+  providerReference String?
+  status            String   @default("PENDING")
+  idempotencyKey    String   @unique
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([clientId])
+  @@index([professionalId])
+}
+
+model Wallet {
+  id             Int                 @id @default(autoincrement())
+  userId         Int                 @unique
+  currency       String              @default("USD")
+  balance        Int                 @default(0)
+  pendingBalance Int                 @default(0)
+  updatedAt      DateTime            @updatedAt
+  transactions   WalletTransaction[]
+}
+
+model WalletTransaction {
+  id           Int      @id @default(autoincrement())
+  walletId     Int
+  paymentId    Int?
+  type         String
+  amount       Int
+  status       String
+  description  String
+  metadataJson String?
+  createdAt    DateTime @default(now())
+  wallet       Wallet   @relation(fields: [walletId], references: [id], onDelete: Cascade)
+
+  @@index([walletId])
+}
+
+model ProjectWithdrawal {
+  id               Int      @id @default(autoincrement())
+  professionalId   Int
+  amount           Int
+  currency         String   @default("USD")
+  destinationType  String
+  destinationLabel String?
+  status           String   @default("PENDING")
+  note             String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([professionalId])
+}
+
+model ProjectDispute {
+  id              Int      @id @default(autoincrement())
+  trackingId      Int
+  reporterId      Int
+  reporterRole    String
+  clientId        Int
+  professionalId  Int
+  issueType       String
+  priority        String   @default("MEDIUM")
+  message         String
+  attachmentsJson String?  @default("[]")
+  status          String   @default("OPEN")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([trackingId])
+  @@index([clientId])
+  @@index([professionalId])
+}
+
+model ProjectCompletionRequest {
+  id             Int      @id @default(autoincrement())
+  trackingId     Int
+  clientId       Int
+  professionalId Int
+  note           String?
+  status         String   @default("PENDING")
+  submittedAt    DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([trackingId])
+}
+
+model ProjectRevisionRequest {
+  id             Int      @id @default(autoincrement())
+  trackingId     Int
+  clientId       Int
+  professionalId Int
+  note           String?
+  status         String   @default("PENDING")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([trackingId])
+}
+
+model ProjectReviewRequest {
+  id             Int      @id @default(autoincrement())
+  trackingId     Int
+  clientId       Int
+  professionalId Int
+  note           String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([trackingId])
+}
+
+model ProfessionalVerification {
+  userId             Int      @id
+  governmentIdUrl    String?
+  licenseUrl         String?
+  certificationsJson String?
+  insuranceUrl       String?
+  selfieUrl          String?
+  status             String   @default("PENDING")
+  updatedAt          DateTime @updatedAt
+}
+
+model StoredFile {
+  id         Int      @id @default(autoincrement())
+  ownerId    Int
+  purpose    String
+  fileName   String
+  mimeType   String
+  sizeBytes  Int
+  storageKey String   @unique
+  isPublic   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  @@index([ownerId])
+}
+
+model ApiToken {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  tokenHash String    @unique
+  kind      String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId, kind])
+}
+
+model BrowserSubscription {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Faq {
+  id           Int      @id @default(autoincrement())
+  question     String
+  answer       String
+  displayOrder Int      @default(0)
+  status       String   @default("PUBLISHED")
+  category     String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model ContactRequest {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String
+  subject   String
+  message   String
+  status    String   @default("OPEN")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Service {
+  id             Int      @id @default(autoincrement())
+  categoryId     Int
+  professionalId Int
+  name           String
+  description    String
+  price          Int?
+  imageUrl       String?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([professionalId])
+}
+
+model PageConfiguration {
+  id              Int       @id @default(autoincrement())
+  pageId          String
+  config          String
+  publishedConfig String?
+  status          String    @default("DRAFT")
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  publishedAt     DateTime?
+
+  @@index([pageId])
+  @@map("page_configurations")
+}
+
+model WebsitePageOverride {
+  id        Int      @id @default(autoincrement())
+  title     String
+  path      String
+  html      String?
+  css       String?
+  status    String   @default("DRAFT")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("website_page_overrides")
+}
+
+model PageTextOverride {
+  pagePath   String
+  elementKey String
+  text       String
+  updatedAt  DateTime
+
+  @@id([pagePath, elementKey])
+  @@map("page_text_overrides")
+}
+
+model LegacyUser {
+  id              String    @id
+  role            String?
+  email           String?
+  phone           String?
+  passwordHash    String?
+  googleId        String?
+  isEmailVerified Boolean?
+  isPhoneVerified Boolean?
+  status          String?
+  createdAt       DateTime?
+  updatedAt       DateTime?
+  lastLogin       DateTime?
+
+  @@map("legacy_users")
+}
+
+model LegacyUserProfile {
+  userId       String  @id
+  fullName     String?
+  companyName  String?
+  profilePhoto String?
+  address      String?
+  bio          String?
+  timezone     String?
+  language     String?
+
+  @@map("legacy_user_profiles")
+}
+
+model LegacyProfessionalDetail {
+  userId             String   @id
+  hourlyRate         Float?
+  fixedRate          Float?
+  experienceYears    Int?
+  skills             String?
+  serviceType        String?
+  serviceRadiusKm    Int?
+  availabilityStatus String?
+  portfolioUrl       String?
+  isVerified         Boolean?
+
+  @@map("legacy_professional_details")
+}
+
+model LegacyLocation {
+  id              String   @id
+  userId          String?
+  lat             Float?
+  lng             Float?
+  city            String?
+  state           String?
+  country         String?
+  addressApprox   String?
+  serviceRadiusKm Int?
+  isBaseLocation  Boolean?
+
+  @@map("legacy_locations")
+}
+
+model LegacyVerification {
+  id             String    @id
+  professionalId String?
+  documentType   String?
+  documentUrl    String?
+  status         String?
+  reviewedBy     String?
+  reviewedAt     DateTime?
+  notes          String?
+
+  @@map("legacy_verifications")
+}
+
+enum UserRole {
+  ADMIN
+  CLIENT
+  PROFESSIONAL
+}
+
+enum JobUrgency {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum JobWorkMode {
+  ON_SITE
+  REMOTE
+  BOTH
+}
+
+enum JobStatus {
+  DRAFT
+  OPEN
+  CLOSED
+}
+
+enum CmsPageStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
