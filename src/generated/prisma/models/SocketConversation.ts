@@ -260,8 +260,8 @@ export type SocketConversationWhereInput = {
   job?: Prisma.StringFilter<"SocketConversation"> | string
   createdAt?: Prisma.DateTimeFilter<"SocketConversation"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"SocketConversation"> | Date | string
-  messages?: Prisma.SocketMessageListRelationFilter
   clears?: Prisma.SocketConversationClearListRelationFilter
+  messages?: Prisma.SocketMessageListRelationFilter
 }
 
 export type SocketConversationOrderByWithRelationInput = {
@@ -275,8 +275,8 @@ export type SocketConversationOrderByWithRelationInput = {
   job?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  messages?: Prisma.SocketMessageOrderByRelationAggregateInput
   clears?: Prisma.SocketConversationClearOrderByRelationAggregateInput
+  messages?: Prisma.SocketMessageOrderByRelationAggregateInput
 }
 
 export type SocketConversationWhereUniqueInput = Prisma.AtLeast<{
@@ -293,8 +293,8 @@ export type SocketConversationWhereUniqueInput = Prisma.AtLeast<{
   job?: Prisma.StringFilter<"SocketConversation"> | string
   createdAt?: Prisma.DateTimeFilter<"SocketConversation"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"SocketConversation"> | Date | string
-  messages?: Prisma.SocketMessageListRelationFilter
   clears?: Prisma.SocketConversationClearListRelationFilter
+  messages?: Prisma.SocketMessageListRelationFilter
 }, "id">
 
 export type SocketConversationOrderByWithAggregationInput = {
@@ -342,8 +342,8 @@ export type SocketConversationCreateInput = {
   job?: string
   createdAt?: Date | string
   updatedAt?: Date | string
-  messages?: Prisma.SocketMessageCreateNestedManyWithoutConversationInput
   clears?: Prisma.SocketConversationClearCreateNestedManyWithoutConversationInput
+  messages?: Prisma.SocketMessageCreateNestedManyWithoutConversationInput
 }
 
 export type SocketConversationUncheckedCreateInput = {
@@ -357,8 +357,8 @@ export type SocketConversationUncheckedCreateInput = {
   job?: string
   createdAt?: Date | string
   updatedAt?: Date | string
-  messages?: Prisma.SocketMessageUncheckedCreateNestedManyWithoutConversationInput
   clears?: Prisma.SocketConversationClearUncheckedCreateNestedManyWithoutConversationInput
+  messages?: Prisma.SocketMessageUncheckedCreateNestedManyWithoutConversationInput
 }
 
 export type SocketConversationUpdateInput = {
@@ -372,8 +372,8 @@ export type SocketConversationUpdateInput = {
   job?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  messages?: Prisma.SocketMessageUpdateManyWithoutConversationNestedInput
   clears?: Prisma.SocketConversationClearUpdateManyWithoutConversationNestedInput
+  messages?: Prisma.SocketMessageUpdateManyWithoutConversationNestedInput
 }
 
 export type SocketConversationUncheckedUpdateInput = {
@@ -387,8 +387,8 @@ export type SocketConversationUncheckedUpdateInput = {
   job?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  messages?: Prisma.SocketMessageUncheckedUpdateManyWithoutConversationNestedInput
   clears?: Prisma.SocketConversationClearUncheckedUpdateManyWithoutConversationNestedInput
+  messages?: Prisma.SocketMessageUncheckedUpdateManyWithoutConversationNestedInput
 }
 
 export type SocketConversationCreateManyInput = {
@@ -662,13 +662,13 @@ export type SocketConversationUncheckedUpdateWithoutClearsInput = {
  */
 
 export type SocketConversationCountOutputType = {
-  messages: number
   clears: number
+  messages: number
 }
 
 export type SocketConversationCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  messages?: boolean | SocketConversationCountOutputTypeCountMessagesArgs
   clears?: boolean | SocketConversationCountOutputTypeCountClearsArgs
+  messages?: boolean | SocketConversationCountOutputTypeCountMessagesArgs
 }
 
 /**
@@ -684,15 +684,15 @@ export type SocketConversationCountOutputTypeDefaultArgs<ExtArgs extends runtime
 /**
  * SocketConversationCountOutputType without action
  */
-export type SocketConversationCountOutputTypeCountMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.SocketMessageWhereInput
+export type SocketConversationCountOutputTypeCountClearsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SocketConversationClearWhereInput
 }
 
 /**
  * SocketConversationCountOutputType without action
  */
-export type SocketConversationCountOutputTypeCountClearsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.SocketConversationClearWhereInput
+export type SocketConversationCountOutputTypeCountMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SocketMessageWhereInput
 }
 
 
@@ -707,8 +707,8 @@ export type SocketConversationSelect<ExtArgs extends runtime.Types.Extensions.In
   job?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  messages?: boolean | Prisma.SocketConversation$messagesArgs<ExtArgs>
   clears?: boolean | Prisma.SocketConversation$clearsArgs<ExtArgs>
+  messages?: boolean | Prisma.SocketConversation$messagesArgs<ExtArgs>
   _count?: boolean | Prisma.SocketConversationCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["socketConversation"]>
 
@@ -753,8 +753,8 @@ export type SocketConversationSelectScalar = {
 
 export type SocketConversationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userAId" | "userBId" | "userAName" | "userBName" | "userAAvatarUrl" | "userBAvatarUrl" | "job" | "createdAt" | "updatedAt", ExtArgs["result"]["socketConversation"]>
 export type SocketConversationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  messages?: boolean | Prisma.SocketConversation$messagesArgs<ExtArgs>
   clears?: boolean | Prisma.SocketConversation$clearsArgs<ExtArgs>
+  messages?: boolean | Prisma.SocketConversation$messagesArgs<ExtArgs>
   _count?: boolean | Prisma.SocketConversationCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type SocketConversationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -763,8 +763,8 @@ export type SocketConversationIncludeUpdateManyAndReturn<ExtArgs extends runtime
 export type $SocketConversationPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "SocketConversation"
   objects: {
-    messages: Prisma.$SocketMessagePayload<ExtArgs>[]
     clears: Prisma.$SocketConversationClearPayload<ExtArgs>[]
+    messages: Prisma.$SocketMessagePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1171,8 +1171,8 @@ readonly fields: SocketConversationFieldRefs;
  */
 export interface Prisma__SocketConversationClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  messages<T extends Prisma.SocketConversation$messagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SocketConversation$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SocketMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   clears<T extends Prisma.SocketConversation$clearsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SocketConversation$clearsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SocketConversationClearPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  messages<T extends Prisma.SocketConversation$messagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SocketConversation$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SocketMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1605,30 +1605,6 @@ export type SocketConversationDeleteManyArgs<ExtArgs extends runtime.Types.Exten
 }
 
 /**
- * SocketConversation.messages
- */
-export type SocketConversation$messagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the SocketMessage
-   */
-  select?: Prisma.SocketMessageSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the SocketMessage
-   */
-  omit?: Prisma.SocketMessageOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.SocketMessageInclude<ExtArgs> | null
-  where?: Prisma.SocketMessageWhereInput
-  orderBy?: Prisma.SocketMessageOrderByWithRelationInput | Prisma.SocketMessageOrderByWithRelationInput[]
-  cursor?: Prisma.SocketMessageWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.SocketMessageScalarFieldEnum | Prisma.SocketMessageScalarFieldEnum[]
-}
-
-/**
  * SocketConversation.clears
  */
 export type SocketConversation$clearsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1650,6 +1626,30 @@ export type SocketConversation$clearsArgs<ExtArgs extends runtime.Types.Extensio
   take?: number
   skip?: number
   distinct?: Prisma.SocketConversationClearScalarFieldEnum | Prisma.SocketConversationClearScalarFieldEnum[]
+}
+
+/**
+ * SocketConversation.messages
+ */
+export type SocketConversation$messagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SocketMessage
+   */
+  select?: Prisma.SocketMessageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SocketMessage
+   */
+  omit?: Prisma.SocketMessageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SocketMessageInclude<ExtArgs> | null
+  where?: Prisma.SocketMessageWhereInput
+  orderBy?: Prisma.SocketMessageOrderByWithRelationInput | Prisma.SocketMessageOrderByWithRelationInput[]
+  cursor?: Prisma.SocketMessageWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SocketMessageScalarFieldEnum | Prisma.SocketMessageScalarFieldEnum[]
 }
 
 /**

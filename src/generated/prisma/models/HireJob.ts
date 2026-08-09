@@ -47,13 +47,13 @@ export type HireJobMinAggregateOutputType = {
   budgetMax: number | null
   currency: string | null
   jobType: string | null
-  categoryId: number | null
   city: string | null
   jobDate: Date | null
   deadline: Date | null
   urgency: string | null
   status: string | null
   createdAt: Date | null
+  categoryId: number | null
 }
 
 export type HireJobMaxAggregateOutputType = {
@@ -65,13 +65,13 @@ export type HireJobMaxAggregateOutputType = {
   budgetMax: number | null
   currency: string | null
   jobType: string | null
-  categoryId: number | null
   city: string | null
   jobDate: Date | null
   deadline: Date | null
   urgency: string | null
   status: string | null
   createdAt: Date | null
+  categoryId: number | null
 }
 
 export type HireJobCountAggregateOutputType = {
@@ -83,13 +83,13 @@ export type HireJobCountAggregateOutputType = {
   budgetMax: number
   currency: number
   jobType: number
-  categoryId: number
   city: number
   jobDate: number
   deadline: number
   urgency: number
   status: number
   createdAt: number
+  categoryId: number
   _all: number
 }
 
@@ -115,13 +115,13 @@ export type HireJobMinAggregateInputType = {
   budgetMax?: true
   currency?: true
   jobType?: true
-  categoryId?: true
   city?: true
   jobDate?: true
   deadline?: true
   urgency?: true
   status?: true
   createdAt?: true
+  categoryId?: true
 }
 
 export type HireJobMaxAggregateInputType = {
@@ -133,13 +133,13 @@ export type HireJobMaxAggregateInputType = {
   budgetMax?: true
   currency?: true
   jobType?: true
-  categoryId?: true
   city?: true
   jobDate?: true
   deadline?: true
   urgency?: true
   status?: true
   createdAt?: true
+  categoryId?: true
 }
 
 export type HireJobCountAggregateInputType = {
@@ -151,13 +151,13 @@ export type HireJobCountAggregateInputType = {
   budgetMax?: true
   currency?: true
   jobType?: true
-  categoryId?: true
   city?: true
   jobDate?: true
   deadline?: true
   urgency?: true
   status?: true
   createdAt?: true
+  categoryId?: true
   _all?: true
 }
 
@@ -256,13 +256,13 @@ export type HireJobGroupByOutputType = {
   budgetMax: number | null
   currency: string
   jobType: string | null
-  categoryId: number | null
   city: string | null
   jobDate: Date | null
   deadline: Date | null
   urgency: string | null
   status: string
   createdAt: Date
+  categoryId: number | null
   _count: HireJobCountAggregateOutputType | null
   _avg: HireJobAvgAggregateOutputType | null
   _sum: HireJobSumAggregateOutputType | null
@@ -297,13 +297,13 @@ export type HireJobWhereInput = {
   budgetMax?: Prisma.FloatNullableFilter<"HireJob"> | number | null
   currency?: Prisma.StringFilter<"HireJob"> | string
   jobType?: Prisma.StringNullableFilter<"HireJob"> | string | null
-  categoryId?: Prisma.IntNullableFilter<"HireJob"> | number | null
   city?: Prisma.StringNullableFilter<"HireJob"> | string | null
   jobDate?: Prisma.DateTimeNullableFilter<"HireJob"> | Date | string | null
   deadline?: Prisma.DateTimeNullableFilter<"HireJob"> | Date | string | null
   urgency?: Prisma.StringNullableFilter<"HireJob"> | string | null
   status?: Prisma.StringFilter<"HireJob"> | string
   createdAt?: Prisma.DateTimeFilter<"HireJob"> | Date | string
+  categoryId?: Prisma.IntNullableFilter<"HireJob"> | number | null
   contracts?: Prisma.HireContractListRelationFilter
   attachments?: Prisma.HireAttachmentListRelationFilter
 }
@@ -317,13 +317,13 @@ export type HireJobOrderByWithRelationInput = {
   budgetMax?: Prisma.SortOrderInput | Prisma.SortOrder
   currency?: Prisma.SortOrder
   jobType?: Prisma.SortOrderInput | Prisma.SortOrder
-  categoryId?: Prisma.SortOrderInput | Prisma.SortOrder
   city?: Prisma.SortOrderInput | Prisma.SortOrder
   jobDate?: Prisma.SortOrderInput | Prisma.SortOrder
   deadline?: Prisma.SortOrderInput | Prisma.SortOrder
   urgency?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  categoryId?: Prisma.SortOrderInput | Prisma.SortOrder
   contracts?: Prisma.HireContractOrderByRelationAggregateInput
   attachments?: Prisma.HireAttachmentOrderByRelationAggregateInput
 }
@@ -340,13 +340,13 @@ export type HireJobWhereUniqueInput = Prisma.AtLeast<{
   budgetMax?: Prisma.FloatNullableFilter<"HireJob"> | number | null
   currency?: Prisma.StringFilter<"HireJob"> | string
   jobType?: Prisma.StringNullableFilter<"HireJob"> | string | null
-  categoryId?: Prisma.IntNullableFilter<"HireJob"> | number | null
   city?: Prisma.StringNullableFilter<"HireJob"> | string | null
   jobDate?: Prisma.DateTimeNullableFilter<"HireJob"> | Date | string | null
   deadline?: Prisma.DateTimeNullableFilter<"HireJob"> | Date | string | null
   urgency?: Prisma.StringNullableFilter<"HireJob"> | string | null
   status?: Prisma.StringFilter<"HireJob"> | string
   createdAt?: Prisma.DateTimeFilter<"HireJob"> | Date | string
+  categoryId?: Prisma.IntNullableFilter<"HireJob"> | number | null
   contracts?: Prisma.HireContractListRelationFilter
   attachments?: Prisma.HireAttachmentListRelationFilter
 }, "id">
@@ -360,13 +360,13 @@ export type HireJobOrderByWithAggregationInput = {
   budgetMax?: Prisma.SortOrderInput | Prisma.SortOrder
   currency?: Prisma.SortOrder
   jobType?: Prisma.SortOrderInput | Prisma.SortOrder
-  categoryId?: Prisma.SortOrderInput | Prisma.SortOrder
   city?: Prisma.SortOrderInput | Prisma.SortOrder
   jobDate?: Prisma.SortOrderInput | Prisma.SortOrder
   deadline?: Prisma.SortOrderInput | Prisma.SortOrder
   urgency?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  categoryId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.HireJobCountOrderByAggregateInput
   _avg?: Prisma.HireJobAvgOrderByAggregateInput
   _max?: Prisma.HireJobMaxOrderByAggregateInput
@@ -386,13 +386,13 @@ export type HireJobScalarWhereWithAggregatesInput = {
   budgetMax?: Prisma.FloatNullableWithAggregatesFilter<"HireJob"> | number | null
   currency?: Prisma.StringWithAggregatesFilter<"HireJob"> | string
   jobType?: Prisma.StringNullableWithAggregatesFilter<"HireJob"> | string | null
-  categoryId?: Prisma.IntNullableWithAggregatesFilter<"HireJob"> | number | null
   city?: Prisma.StringNullableWithAggregatesFilter<"HireJob"> | string | null
   jobDate?: Prisma.DateTimeNullableWithAggregatesFilter<"HireJob"> | Date | string | null
   deadline?: Prisma.DateTimeNullableWithAggregatesFilter<"HireJob"> | Date | string | null
   urgency?: Prisma.StringNullableWithAggregatesFilter<"HireJob"> | string | null
   status?: Prisma.StringWithAggregatesFilter<"HireJob"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"HireJob"> | Date | string
+  categoryId?: Prisma.IntNullableWithAggregatesFilter<"HireJob"> | number | null
 }
 
 export type HireJobCreateInput = {
@@ -404,13 +404,13 @@ export type HireJobCreateInput = {
   budgetMax?: number | null
   currency?: string
   jobType?: string | null
-  categoryId?: number | null
   city?: string | null
   jobDate?: Date | string | null
   deadline?: Date | string | null
   urgency?: string | null
   status?: string
   createdAt?: Date | string
+  categoryId?: number | null
   contracts?: Prisma.HireContractCreateNestedManyWithoutJobInput
   attachments?: Prisma.HireAttachmentCreateNestedManyWithoutJobInput
 }
@@ -424,13 +424,13 @@ export type HireJobUncheckedCreateInput = {
   budgetMax?: number | null
   currency?: string
   jobType?: string | null
-  categoryId?: number | null
   city?: string | null
   jobDate?: Date | string | null
   deadline?: Date | string | null
   urgency?: string | null
   status?: string
   createdAt?: Date | string
+  categoryId?: number | null
   contracts?: Prisma.HireContractUncheckedCreateNestedManyWithoutJobInput
   attachments?: Prisma.HireAttachmentUncheckedCreateNestedManyWithoutJobInput
 }
@@ -444,13 +444,13 @@ export type HireJobUpdateInput = {
   budgetMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   jobType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jobDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   urgency?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   contracts?: Prisma.HireContractUpdateManyWithoutJobNestedInput
   attachments?: Prisma.HireAttachmentUpdateManyWithoutJobNestedInput
 }
@@ -464,13 +464,13 @@ export type HireJobUncheckedUpdateInput = {
   budgetMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   jobType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jobDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   urgency?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   contracts?: Prisma.HireContractUncheckedUpdateManyWithoutJobNestedInput
   attachments?: Prisma.HireAttachmentUncheckedUpdateManyWithoutJobNestedInput
 }
@@ -484,13 +484,13 @@ export type HireJobCreateManyInput = {
   budgetMax?: number | null
   currency?: string
   jobType?: string | null
-  categoryId?: number | null
   city?: string | null
   jobDate?: Date | string | null
   deadline?: Date | string | null
   urgency?: string | null
   status?: string
   createdAt?: Date | string
+  categoryId?: number | null
 }
 
 export type HireJobUpdateManyMutationInput = {
@@ -502,13 +502,13 @@ export type HireJobUpdateManyMutationInput = {
   budgetMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   jobType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jobDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   urgency?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type HireJobUncheckedUpdateManyInput = {
@@ -520,13 +520,13 @@ export type HireJobUncheckedUpdateManyInput = {
   budgetMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   jobType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jobDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   urgency?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type HireJobCountOrderByAggregateInput = {
@@ -538,13 +538,13 @@ export type HireJobCountOrderByAggregateInput = {
   budgetMax?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   jobType?: Prisma.SortOrder
-  categoryId?: Prisma.SortOrder
   city?: Prisma.SortOrder
   jobDate?: Prisma.SortOrder
   deadline?: Prisma.SortOrder
   urgency?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  categoryId?: Prisma.SortOrder
 }
 
 export type HireJobAvgOrderByAggregateInput = {
@@ -562,13 +562,13 @@ export type HireJobMaxOrderByAggregateInput = {
   budgetMax?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   jobType?: Prisma.SortOrder
-  categoryId?: Prisma.SortOrder
   city?: Prisma.SortOrder
   jobDate?: Prisma.SortOrder
   deadline?: Prisma.SortOrder
   urgency?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  categoryId?: Prisma.SortOrder
 }
 
 export type HireJobMinOrderByAggregateInput = {
@@ -580,13 +580,13 @@ export type HireJobMinOrderByAggregateInput = {
   budgetMax?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   jobType?: Prisma.SortOrder
-  categoryId?: Prisma.SortOrder
   city?: Prisma.SortOrder
   jobDate?: Prisma.SortOrder
   deadline?: Prisma.SortOrder
   urgency?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  categoryId?: Prisma.SortOrder
 }
 
 export type HireJobSumOrderByAggregateInput = {
@@ -637,13 +637,13 @@ export type HireJobCreateWithoutContractsInput = {
   budgetMax?: number | null
   currency?: string
   jobType?: string | null
-  categoryId?: number | null
   city?: string | null
   jobDate?: Date | string | null
   deadline?: Date | string | null
   urgency?: string | null
   status?: string
   createdAt?: Date | string
+  categoryId?: number | null
   attachments?: Prisma.HireAttachmentCreateNestedManyWithoutJobInput
 }
 
@@ -656,13 +656,13 @@ export type HireJobUncheckedCreateWithoutContractsInput = {
   budgetMax?: number | null
   currency?: string
   jobType?: string | null
-  categoryId?: number | null
   city?: string | null
   jobDate?: Date | string | null
   deadline?: Date | string | null
   urgency?: string | null
   status?: string
   createdAt?: Date | string
+  categoryId?: number | null
   attachments?: Prisma.HireAttachmentUncheckedCreateNestedManyWithoutJobInput
 }
 
@@ -691,13 +691,13 @@ export type HireJobUpdateWithoutContractsInput = {
   budgetMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   jobType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jobDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   urgency?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   attachments?: Prisma.HireAttachmentUpdateManyWithoutJobNestedInput
 }
 
@@ -710,13 +710,13 @@ export type HireJobUncheckedUpdateWithoutContractsInput = {
   budgetMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   jobType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jobDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   urgency?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   attachments?: Prisma.HireAttachmentUncheckedUpdateManyWithoutJobNestedInput
 }
 
@@ -729,13 +729,13 @@ export type HireJobCreateWithoutAttachmentsInput = {
   budgetMax?: number | null
   currency?: string
   jobType?: string | null
-  categoryId?: number | null
   city?: string | null
   jobDate?: Date | string | null
   deadline?: Date | string | null
   urgency?: string | null
   status?: string
   createdAt?: Date | string
+  categoryId?: number | null
   contracts?: Prisma.HireContractCreateNestedManyWithoutJobInput
 }
 
@@ -748,13 +748,13 @@ export type HireJobUncheckedCreateWithoutAttachmentsInput = {
   budgetMax?: number | null
   currency?: string
   jobType?: string | null
-  categoryId?: number | null
   city?: string | null
   jobDate?: Date | string | null
   deadline?: Date | string | null
   urgency?: string | null
   status?: string
   createdAt?: Date | string
+  categoryId?: number | null
   contracts?: Prisma.HireContractUncheckedCreateNestedManyWithoutJobInput
 }
 
@@ -783,13 +783,13 @@ export type HireJobUpdateWithoutAttachmentsInput = {
   budgetMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   jobType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jobDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   urgency?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   contracts?: Prisma.HireContractUpdateManyWithoutJobNestedInput
 }
 
@@ -802,13 +802,13 @@ export type HireJobUncheckedUpdateWithoutAttachmentsInput = {
   budgetMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   jobType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jobDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   urgency?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   contracts?: Prisma.HireContractUncheckedUpdateManyWithoutJobNestedInput
 }
 
@@ -861,13 +861,13 @@ export type HireJobSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   budgetMax?: boolean
   currency?: boolean
   jobType?: boolean
-  categoryId?: boolean
   city?: boolean
   jobDate?: boolean
   deadline?: boolean
   urgency?: boolean
   status?: boolean
   createdAt?: boolean
+  categoryId?: boolean
   contracts?: boolean | Prisma.HireJob$contractsArgs<ExtArgs>
   attachments?: boolean | Prisma.HireJob$attachmentsArgs<ExtArgs>
   _count?: boolean | Prisma.HireJobCountOutputTypeDefaultArgs<ExtArgs>
@@ -882,13 +882,13 @@ export type HireJobSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   budgetMax?: boolean
   currency?: boolean
   jobType?: boolean
-  categoryId?: boolean
   city?: boolean
   jobDate?: boolean
   deadline?: boolean
   urgency?: boolean
   status?: boolean
   createdAt?: boolean
+  categoryId?: boolean
 }, ExtArgs["result"]["hireJob"]>
 
 export type HireJobSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -900,13 +900,13 @@ export type HireJobSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   budgetMax?: boolean
   currency?: boolean
   jobType?: boolean
-  categoryId?: boolean
   city?: boolean
   jobDate?: boolean
   deadline?: boolean
   urgency?: boolean
   status?: boolean
   createdAt?: boolean
+  categoryId?: boolean
 }, ExtArgs["result"]["hireJob"]>
 
 export type HireJobSelectScalar = {
@@ -918,16 +918,16 @@ export type HireJobSelectScalar = {
   budgetMax?: boolean
   currency?: boolean
   jobType?: boolean
-  categoryId?: boolean
   city?: boolean
   jobDate?: boolean
   deadline?: boolean
   urgency?: boolean
   status?: boolean
   createdAt?: boolean
+  categoryId?: boolean
 }
 
-export type HireJobOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clientId" | "title" | "description" | "budgetMin" | "budgetMax" | "currency" | "jobType" | "categoryId" | "city" | "jobDate" | "deadline" | "urgency" | "status" | "createdAt", ExtArgs["result"]["hireJob"]>
+export type HireJobOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clientId" | "title" | "description" | "budgetMin" | "budgetMax" | "currency" | "jobType" | "city" | "jobDate" | "deadline" | "urgency" | "status" | "createdAt" | "categoryId", ExtArgs["result"]["hireJob"]>
 export type HireJobInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   contracts?: boolean | Prisma.HireJob$contractsArgs<ExtArgs>
   attachments?: boolean | Prisma.HireJob$attachmentsArgs<ExtArgs>
@@ -951,13 +951,13 @@ export type $HireJobPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     budgetMax: number | null
     currency: string
     jobType: string | null
-    categoryId: number | null
     city: string | null
     jobDate: Date | null
     deadline: Date | null
     urgency: string | null
     status: string
     createdAt: Date
+    categoryId: number | null
   }, ExtArgs["result"]["hireJob"]>
   composites: {}
 }
@@ -1391,13 +1391,13 @@ export interface HireJobFieldRefs {
   readonly budgetMax: Prisma.FieldRef<"HireJob", 'Float'>
   readonly currency: Prisma.FieldRef<"HireJob", 'String'>
   readonly jobType: Prisma.FieldRef<"HireJob", 'String'>
-  readonly categoryId: Prisma.FieldRef<"HireJob", 'Int'>
   readonly city: Prisma.FieldRef<"HireJob", 'String'>
   readonly jobDate: Prisma.FieldRef<"HireJob", 'DateTime'>
   readonly deadline: Prisma.FieldRef<"HireJob", 'DateTime'>
   readonly urgency: Prisma.FieldRef<"HireJob", 'String'>
   readonly status: Prisma.FieldRef<"HireJob", 'String'>
   readonly createdAt: Prisma.FieldRef<"HireJob", 'DateTime'>
+  readonly categoryId: Prisma.FieldRef<"HireJob", 'Int'>
 }
     
 

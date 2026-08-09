@@ -2,56 +2,35 @@
 
 import { AppShell } from "@/components/AppShell";
 import { ProCard } from "@/components/ProCard";
-import type { Pro } from "@/lib/mock-data";
+import type { MarketplaceCategory, MarketplaceProfessional } from "@/lib/types/marketplace";
 import { Map, SlidersHorizontal, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 
 export default function Discover() {
-  const [professionals, setProfessionals] = useState<Pro[]>([]);
-  const [categories, setCategories] = useState<{ name: string; count: number }[]>([]);
+  const [professionals, setProfessionals] = useState<MarketplaceProfessional[]>([]);
+  const [categories, setCategories] = useState<MarketplaceCategory[]>([]);
+  const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   useEffect(() => {
-    Promise.all([fetch("/api/marketplace/professionals"), fetch("/api/marketplace/categories")])
-      .then(async ([pros, cats]) => [await pros.json(), await cats.json()])
-      .then(([pros, cats]) => {
-        setProfessionals(
-          pros.map(
-            (p: {
-              id: number;
-              firstName: string;
-              lastName: string;
-              avatarUrl: string | null;
-              professionalCategory: string | null;
-              professionalCity: string | null;
-              hourlyRate: number | null;
-              averageRating: number;
-              reviewCount: number;
-              availabilityStatus: string;
-              isVerified: boolean;
-              professionalSkillsJson: string | null;
-            }) => ({
-              id: String(p.id),
-              name: `${p.firstName} ${p.lastName}`,
-              title: p.professionalCategory ?? "Professional",
-              avatar: p.avatarUrl ?? `https://i.pravatar.cc/200?u=${p.id}`,
-              rating: p.averageRating,
-              reviews: p.reviewCount,
-              hourly: p.hourlyRate ?? 0,
-              location: p.professionalCity ?? "Remote",
-              distance: 0,
-              available: p.availabilityStatus === "available" ? "Now" : "This week",
-              verified: p.isVerified,
-              topRated: p.averageRating >= 4.8,
-              skills: p.professionalSkillsJson ? JSON.parse(p.professionalSkillsJson) : [],
-              bio: "",
-              completed: 0,
-            }),
-          ),
-        );
-        setCategories(cats.map((c: { name: string }) => ({ name: c.name, count: 0 })));
-      })
-      .catch(() => undefined);
+    const controller = new AbortController();
+    async function load() {
+      try {
+        const [prosResponse, categoriesResponse] = await Promise.all([
+          fetch("/api/marketplace/professionals", { signal: controller.signal }),
+          fetch("/api/marketplace/categories", { signal: controller.signal }),
+        ]);
+        if (!prosResponse.ok || !categoriesResponse.ok)
+          throw new Error("Marketplace request failed");
+        setProfessionals((await prosResponse.json()) as MarketplaceProfessional[]);
+        setCategories((await categoriesResponse.json()) as MarketplaceCategory[]);
+        setStatus("ready");
+      } catch (error) {
+        if ((error as Error).name !== "AbortError") setStatus("error");
+      }
+    }
+    void load();
+    return () => controller.abort();
   }, []);
   return (
     <AppShell>
@@ -81,7 +60,9 @@ export default function Discover() {
                 <label key={c.name} className="flex items-center gap-2 text-sm">
                   <input type="checkbox" className="h-4 w-4 rounded border-border accent-primary" />
                   <span>{c.name}</span>
-                  <span className="ml-auto text-xs text-muted-foreground">{c.count}</span>
+                  <span className="ml-auto text-xs text-muted-foreground">
+                    {c.professionalCount}
+                  </span>
                 </label>
               ))}
             </div>
@@ -171,8 +152,7 @@ export default function Discover() {
               <div>
                 <p className="text-sm font-semibold">Pros near you</p>
                 <p className="text-xs text-muted-foreground">
-                  {professionals.filter((p) => p.distance > 0 && p.distance < 5).length} within 5
-                  miles
+                  {professionals.filter((p) => p.location !== null).length} professionals available
                 </p>
               </div>
               <div className="relative h-full w-1/2">
@@ -181,25 +161,52 @@ export default function Discover() {
                     <div key={i} className="rounded bg-primary/20" />
                   ))}
                 </div>
-                {professionals.slice(0, 4).map((p, i) => (
-                  <span
-                    key={p.id}
-                    className="absolute h-3 w-3 animate-pulse rounded-full bg-primary ring-4 ring-primary/20"
-                    style={{ left: `${20 + i * 18}%`, top: `${20 + (i % 2) * 40}%` }}
-                  />
-                ))}
+                <div className="grid h-full grid-cols-2 gap-3 p-6">
+                  {professionals.slice(0, 4).map((professional) => (
+                    <span
+                      key={professional.id}
+                      className="h-3 w-3 animate-pulse rounded-full bg-primary ring-4 ring-primary/20"
+                    />
+                  ))}
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-2">
-            {professionals.map((p) => (
-              <ProCard key={p.id} pro={p} />
-            ))}
-          </div>
+          {status === "loading" && (
+            <div className="grid gap-4 sm:grid-cols-2">
+              <ResultSkeleton />
+              <ResultSkeleton />
+              <ResultSkeleton />
+              <ResultSkeleton />
+            </div>
+          )}
+          {status === "error" && (
+            <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-6 text-sm text-destructive">
+              Professionals could not be loaded. Refresh the page to try again.
+            </div>
+          )}
+          {status === "ready" && professionals.length === 0 && (
+            <div className="rounded-2xl border border-border bg-card p-6 text-sm text-muted-foreground">
+              No professionals match these filters yet.
+            </div>
+          )}
+          {status === "ready" && professionals.length > 0 && (
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-2">
+              {professionals.map((p) => (
+                <ProCard key={p.id} pro={p} />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </AppShell>
+  );
+}
+
+function ResultSkeleton() {
+  return (
+    <div aria-hidden className="h-64 animate-pulse rounded-2xl border border-border bg-muted/40" />
   );
 }
 

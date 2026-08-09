@@ -43,9 +43,24 @@ export default function Login() {
       }
     >
       <form action={submit} className="space-y-4">
-        <Button type="button" variant="outline" className="w-full" onClick={() => { window.location.href = "/api/auth/google"; }}>Continue with Google</Button>
-        {oauthError === "google-not-configured" && <p className="text-sm text-destructive">Google sign-in has not been configured yet.</p>}
-        {oauthError === "google-failed" && <p className="text-sm text-destructive">Google sign-in could not be completed. Please try again.</p>}
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full"
+          onClick={() => {
+            window.location.href = "/api/auth/google";
+          }}
+        >
+          Continue with Google
+        </Button>
+        {oauthError === "google-not-configured" && (
+          <p className="text-sm text-destructive">Google sign-in has not been configured yet.</p>
+        )}
+        {oauthError === "google-failed" && (
+          <p className="text-sm text-destructive">
+            Google sign-in could not be completed. Please try again.
+          </p>
+        )}
         <div className="relative py-2 text-center text-xs text-muted-foreground">
           <span className="relative z-10 bg-background px-3">or</span>
           <div className="absolute inset-x-0 top-1/2 h-px bg-border" />

@@ -4876,9 +4876,9 @@ export const WebsitePageScalarFieldEnum = {
   path: 'path',
   title: 'title',
   content: 'content',
-  css: 'css',
   status: 'status',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  css: 'css'
 } as const
 
 export type WebsitePageScalarFieldEnum = (typeof WebsitePageScalarFieldEnum)[keyof typeof WebsitePageScalarFieldEnum]
@@ -4927,8 +4927,6 @@ export const UserScalarFieldEnum = {
   address: 'address',
   professionalCategory: 'professionalCategory',
   professionalCity: 'professionalCity',
-  professionalLatitude: 'professionalLatitude',
-  professionalLongitude: 'professionalLongitude',
   professionalSkillsJson: 'professionalSkillsJson',
   experienceYears: 'experienceYears',
   hourlyRate: 'hourlyRate',
@@ -4949,14 +4947,16 @@ export const UserScalarFieldEnum = {
   authProvider: 'authProvider',
   isActive: 'isActive',
   lastLoginAt: 'lastLoginAt',
-  emailNotificationsEnabled: 'emailNotificationsEnabled',
-  browserNotificationsEnabled: 'browserNotificationsEnabled',
-  projectActivityNotificationsEnabled: 'projectActivityNotificationsEnabled',
-  emailVerifiedAt: 'emailVerifiedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  professionalLatitude: 'professionalLatitude',
+  professionalLongitude: 'professionalLongitude',
   biometricEnabled: 'biometricEnabled',
   biometricType: 'biometricType',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  browserNotificationsEnabled: 'browserNotificationsEnabled',
+  emailNotificationsEnabled: 'emailNotificationsEnabled',
+  emailVerifiedAt: 'emailVerifiedAt',
+  projectActivityNotificationsEnabled: 'projectActivityNotificationsEnabled'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -5012,8 +5012,6 @@ export const ClientJobScalarFieldEnum = {
   budgetMin: 'budgetMin',
   budgetMax: 'budgetMax',
   urgency: 'urgency',
-  timingType: 'timingType',
-  hourlyRate: 'hourlyRate',
   jobDate: 'jobDate',
   deadline: 'deadline',
   workMode: 'workMode',
@@ -5023,7 +5021,9 @@ export const ClientJobScalarFieldEnum = {
   locationLng: 'locationLng',
   status: 'status',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  hourlyRate: 'hourlyRate',
+  timingType: 'timingType'
 } as const
 
 export type ClientJobScalarFieldEnum = (typeof ClientJobScalarFieldEnum)[keyof typeof ClientJobScalarFieldEnum]
@@ -5180,13 +5180,13 @@ export const HireJobScalarFieldEnum = {
   budgetMax: 'budgetMax',
   currency: 'currency',
   jobType: 'jobType',
-  categoryId: 'categoryId',
   city: 'city',
   jobDate: 'jobDate',
   deadline: 'deadline',
   urgency: 'urgency',
   status: 'status',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  categoryId: 'categoryId'
 } as const
 
 export type HireJobScalarFieldEnum = (typeof HireJobScalarFieldEnum)[keyof typeof HireJobScalarFieldEnum]

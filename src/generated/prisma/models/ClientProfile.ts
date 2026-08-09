@@ -292,9 +292,9 @@ export type ClientProfileWhereInput = {
   profilePhotoUrl?: Prisma.StringNullableFilter<"ClientProfile"> | string | null
   createdAt?: Prisma.DateTimeFilter<"ClientProfile"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ClientProfile"> | Date | string
+  hiringNeeds?: Prisma.ClientHiringNeedListRelationFilter
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   savedLocations?: Prisma.ClientSavedLocationListRelationFilter
-  hiringNeeds?: Prisma.ClientHiringNeedListRelationFilter
 }
 
 export type ClientProfileOrderByWithRelationInput = {
@@ -312,9 +312,9 @@ export type ClientProfileOrderByWithRelationInput = {
   profilePhotoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  hiringNeeds?: Prisma.ClientHiringNeedOrderByRelationAggregateInput
   user?: Prisma.UserOrderByWithRelationInput
   savedLocations?: Prisma.ClientSavedLocationOrderByRelationAggregateInput
-  hiringNeeds?: Prisma.ClientHiringNeedOrderByRelationAggregateInput
 }
 
 export type ClientProfileWhereUniqueInput = Prisma.AtLeast<{
@@ -335,9 +335,9 @@ export type ClientProfileWhereUniqueInput = Prisma.AtLeast<{
   profilePhotoUrl?: Prisma.StringNullableFilter<"ClientProfile"> | string | null
   createdAt?: Prisma.DateTimeFilter<"ClientProfile"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ClientProfile"> | Date | string
+  hiringNeeds?: Prisma.ClientHiringNeedListRelationFilter
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   savedLocations?: Prisma.ClientSavedLocationListRelationFilter
-  hiringNeeds?: Prisma.ClientHiringNeedListRelationFilter
 }, "id">
 
 export type ClientProfileOrderByWithAggregationInput = {
@@ -395,9 +395,9 @@ export type ClientProfileCreateInput = {
   profilePhotoUrl?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  hiringNeeds?: Prisma.ClientHiringNeedCreateNestedManyWithoutClientProfileInput
   user: Prisma.UserCreateNestedOneWithoutClientProfilesInput
   savedLocations?: Prisma.ClientSavedLocationCreateNestedManyWithoutClientProfileInput
-  hiringNeeds?: Prisma.ClientHiringNeedCreateNestedManyWithoutClientProfileInput
 }
 
 export type ClientProfileUncheckedCreateInput = {
@@ -415,8 +415,8 @@ export type ClientProfileUncheckedCreateInput = {
   profilePhotoUrl?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  savedLocations?: Prisma.ClientSavedLocationUncheckedCreateNestedManyWithoutClientProfileInput
   hiringNeeds?: Prisma.ClientHiringNeedUncheckedCreateNestedManyWithoutClientProfileInput
+  savedLocations?: Prisma.ClientSavedLocationUncheckedCreateNestedManyWithoutClientProfileInput
 }
 
 export type ClientProfileUpdateInput = {
@@ -432,9 +432,9 @@ export type ClientProfileUpdateInput = {
   profilePhotoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hiringNeeds?: Prisma.ClientHiringNeedUpdateManyWithoutClientProfileNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutClientProfilesNestedInput
   savedLocations?: Prisma.ClientSavedLocationUpdateManyWithoutClientProfileNestedInput
-  hiringNeeds?: Prisma.ClientHiringNeedUpdateManyWithoutClientProfileNestedInput
 }
 
 export type ClientProfileUncheckedUpdateInput = {
@@ -452,8 +452,8 @@ export type ClientProfileUncheckedUpdateInput = {
   profilePhotoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  savedLocations?: Prisma.ClientSavedLocationUncheckedUpdateManyWithoutClientProfileNestedInput
   hiringNeeds?: Prisma.ClientHiringNeedUncheckedUpdateManyWithoutClientProfileNestedInput
+  savedLocations?: Prisma.ClientSavedLocationUncheckedUpdateManyWithoutClientProfileNestedInput
 }
 
 export type ClientProfileCreateManyInput = {
@@ -664,8 +664,8 @@ export type ClientProfileCreateWithoutUserInput = {
   profilePhotoUrl?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  savedLocations?: Prisma.ClientSavedLocationCreateNestedManyWithoutClientProfileInput
   hiringNeeds?: Prisma.ClientHiringNeedCreateNestedManyWithoutClientProfileInput
+  savedLocations?: Prisma.ClientSavedLocationCreateNestedManyWithoutClientProfileInput
 }
 
 export type ClientProfileUncheckedCreateWithoutUserInput = {
@@ -682,8 +682,8 @@ export type ClientProfileUncheckedCreateWithoutUserInput = {
   profilePhotoUrl?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  savedLocations?: Prisma.ClientSavedLocationUncheckedCreateNestedManyWithoutClientProfileInput
   hiringNeeds?: Prisma.ClientHiringNeedUncheckedCreateNestedManyWithoutClientProfileInput
+  savedLocations?: Prisma.ClientSavedLocationUncheckedCreateNestedManyWithoutClientProfileInput
 }
 
 export type ClientProfileCreateOrConnectWithoutUserInput = {
@@ -745,8 +745,8 @@ export type ClientProfileCreateWithoutSavedLocationsInput = {
   profilePhotoUrl?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  user: Prisma.UserCreateNestedOneWithoutClientProfilesInput
   hiringNeeds?: Prisma.ClientHiringNeedCreateNestedManyWithoutClientProfileInput
+  user: Prisma.UserCreateNestedOneWithoutClientProfilesInput
 }
 
 export type ClientProfileUncheckedCreateWithoutSavedLocationsInput = {
@@ -796,8 +796,8 @@ export type ClientProfileUpdateWithoutSavedLocationsInput = {
   profilePhotoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  user?: Prisma.UserUpdateOneRequiredWithoutClientProfilesNestedInput
   hiringNeeds?: Prisma.ClientHiringNeedUpdateManyWithoutClientProfileNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutClientProfilesNestedInput
 }
 
 export type ClientProfileUncheckedUpdateWithoutSavedLocationsInput = {
@@ -933,8 +933,8 @@ export type ClientProfileUpdateWithoutUserInput = {
   profilePhotoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  savedLocations?: Prisma.ClientSavedLocationUpdateManyWithoutClientProfileNestedInput
   hiringNeeds?: Prisma.ClientHiringNeedUpdateManyWithoutClientProfileNestedInput
+  savedLocations?: Prisma.ClientSavedLocationUpdateManyWithoutClientProfileNestedInput
 }
 
 export type ClientProfileUncheckedUpdateWithoutUserInput = {
@@ -951,8 +951,8 @@ export type ClientProfileUncheckedUpdateWithoutUserInput = {
   profilePhotoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  savedLocations?: Prisma.ClientSavedLocationUncheckedUpdateManyWithoutClientProfileNestedInput
   hiringNeeds?: Prisma.ClientHiringNeedUncheckedUpdateManyWithoutClientProfileNestedInput
+  savedLocations?: Prisma.ClientSavedLocationUncheckedUpdateManyWithoutClientProfileNestedInput
 }
 
 export type ClientProfileUncheckedUpdateManyWithoutUserInput = {
@@ -977,13 +977,13 @@ export type ClientProfileUncheckedUpdateManyWithoutUserInput = {
  */
 
 export type ClientProfileCountOutputType = {
-  savedLocations: number
   hiringNeeds: number
+  savedLocations: number
 }
 
 export type ClientProfileCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  savedLocations?: boolean | ClientProfileCountOutputTypeCountSavedLocationsArgs
   hiringNeeds?: boolean | ClientProfileCountOutputTypeCountHiringNeedsArgs
+  savedLocations?: boolean | ClientProfileCountOutputTypeCountSavedLocationsArgs
 }
 
 /**
@@ -999,15 +999,15 @@ export type ClientProfileCountOutputTypeDefaultArgs<ExtArgs extends runtime.Type
 /**
  * ClientProfileCountOutputType without action
  */
-export type ClientProfileCountOutputTypeCountSavedLocationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ClientSavedLocationWhereInput
+export type ClientProfileCountOutputTypeCountHiringNeedsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ClientHiringNeedWhereInput
 }
 
 /**
  * ClientProfileCountOutputType without action
  */
-export type ClientProfileCountOutputTypeCountHiringNeedsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ClientHiringNeedWhereInput
+export type ClientProfileCountOutputTypeCountSavedLocationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ClientSavedLocationWhereInput
 }
 
 
@@ -1026,9 +1026,9 @@ export type ClientProfileSelect<ExtArgs extends runtime.Types.Extensions.Interna
   profilePhotoUrl?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  hiringNeeds?: boolean | Prisma.ClientProfile$hiringNeedsArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   savedLocations?: boolean | Prisma.ClientProfile$savedLocationsArgs<ExtArgs>
-  hiringNeeds?: boolean | Prisma.ClientProfile$hiringNeedsArgs<ExtArgs>
   _count?: boolean | Prisma.ClientProfileCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["clientProfile"]>
 
@@ -1087,9 +1087,9 @@ export type ClientProfileSelectScalar = {
 
 export type ClientProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "fullName" | "email" | "phone" | "companyName" | "companyWebsite" | "industry" | "teamSize" | "companyDescription" | "address" | "profilePhotoUrl" | "createdAt" | "updatedAt", ExtArgs["result"]["clientProfile"]>
 export type ClientProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  hiringNeeds?: boolean | Prisma.ClientProfile$hiringNeedsArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   savedLocations?: boolean | Prisma.ClientProfile$savedLocationsArgs<ExtArgs>
-  hiringNeeds?: boolean | Prisma.ClientProfile$hiringNeedsArgs<ExtArgs>
   _count?: boolean | Prisma.ClientProfileCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ClientProfileIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1102,9 +1102,9 @@ export type ClientProfileIncludeUpdateManyAndReturn<ExtArgs extends runtime.Type
 export type $ClientProfilePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "ClientProfile"
   objects: {
+    hiringNeeds: Prisma.$ClientHiringNeedPayload<ExtArgs>[]
     user: Prisma.$UserPayload<ExtArgs>
     savedLocations: Prisma.$ClientSavedLocationPayload<ExtArgs>[]
-    hiringNeeds: Prisma.$ClientHiringNeedPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1515,9 +1515,9 @@ readonly fields: ClientProfileFieldRefs;
  */
 export interface Prisma__ClientProfileClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  hiringNeeds<T extends Prisma.ClientProfile$hiringNeedsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ClientProfile$hiringNeedsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClientHiringNeedPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   savedLocations<T extends Prisma.ClientProfile$savedLocationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ClientProfile$savedLocationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClientSavedLocationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  hiringNeeds<T extends Prisma.ClientProfile$hiringNeedsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ClientProfile$hiringNeedsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClientHiringNeedPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1962,30 +1962,6 @@ export type ClientProfileDeleteManyArgs<ExtArgs extends runtime.Types.Extensions
 }
 
 /**
- * ClientProfile.savedLocations
- */
-export type ClientProfile$savedLocationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the ClientSavedLocation
-   */
-  select?: Prisma.ClientSavedLocationSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the ClientSavedLocation
-   */
-  omit?: Prisma.ClientSavedLocationOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.ClientSavedLocationInclude<ExtArgs> | null
-  where?: Prisma.ClientSavedLocationWhereInput
-  orderBy?: Prisma.ClientSavedLocationOrderByWithRelationInput | Prisma.ClientSavedLocationOrderByWithRelationInput[]
-  cursor?: Prisma.ClientSavedLocationWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.ClientSavedLocationScalarFieldEnum | Prisma.ClientSavedLocationScalarFieldEnum[]
-}
-
-/**
  * ClientProfile.hiringNeeds
  */
 export type ClientProfile$hiringNeedsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2007,6 +1983,30 @@ export type ClientProfile$hiringNeedsArgs<ExtArgs extends runtime.Types.Extensio
   take?: number
   skip?: number
   distinct?: Prisma.ClientHiringNeedScalarFieldEnum | Prisma.ClientHiringNeedScalarFieldEnum[]
+}
+
+/**
+ * ClientProfile.savedLocations
+ */
+export type ClientProfile$savedLocationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ClientSavedLocation
+   */
+  select?: Prisma.ClientSavedLocationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ClientSavedLocation
+   */
+  omit?: Prisma.ClientSavedLocationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ClientSavedLocationInclude<ExtArgs> | null
+  where?: Prisma.ClientSavedLocationWhereInput
+  orderBy?: Prisma.ClientSavedLocationOrderByWithRelationInput | Prisma.ClientSavedLocationOrderByWithRelationInput[]
+  cursor?: Prisma.ClientSavedLocationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ClientSavedLocationScalarFieldEnum | Prisma.ClientSavedLocationScalarFieldEnum[]
 }
 
 /**

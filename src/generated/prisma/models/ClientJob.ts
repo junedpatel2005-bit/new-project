@@ -31,9 +31,9 @@ export type ClientJobAvgAggregateOutputType = {
   userId: number | null
   budgetMin: number | null
   budgetMax: number | null
-  hourlyRate: number | null
   locationLat: number | null
   locationLng: number | null
+  hourlyRate: number | null
 }
 
 export type ClientJobSumAggregateOutputType = {
@@ -41,9 +41,9 @@ export type ClientJobSumAggregateOutputType = {
   userId: number | null
   budgetMin: number | null
   budgetMax: number | null
-  hourlyRate: number | null
   locationLat: number | null
   locationLng: number | null
+  hourlyRate: number | null
 }
 
 export type ClientJobMinAggregateOutputType = {
@@ -55,8 +55,6 @@ export type ClientJobMinAggregateOutputType = {
   budgetMin: number | null
   budgetMax: number | null
   urgency: $Enums.JobUrgency | null
-  timingType: string | null
-  hourlyRate: number | null
   jobDate: Date | null
   deadline: Date | null
   workMode: $Enums.JobWorkMode | null
@@ -67,6 +65,8 @@ export type ClientJobMinAggregateOutputType = {
   status: $Enums.JobStatus | null
   createdAt: Date | null
   updatedAt: Date | null
+  hourlyRate: number | null
+  timingType: string | null
 }
 
 export type ClientJobMaxAggregateOutputType = {
@@ -78,8 +78,6 @@ export type ClientJobMaxAggregateOutputType = {
   budgetMin: number | null
   budgetMax: number | null
   urgency: $Enums.JobUrgency | null
-  timingType: string | null
-  hourlyRate: number | null
   jobDate: Date | null
   deadline: Date | null
   workMode: $Enums.JobWorkMode | null
@@ -90,6 +88,8 @@ export type ClientJobMaxAggregateOutputType = {
   status: $Enums.JobStatus | null
   createdAt: Date | null
   updatedAt: Date | null
+  hourlyRate: number | null
+  timingType: string | null
 }
 
 export type ClientJobCountAggregateOutputType = {
@@ -101,8 +101,6 @@ export type ClientJobCountAggregateOutputType = {
   budgetMin: number
   budgetMax: number
   urgency: number
-  timingType: number
-  hourlyRate: number
   jobDate: number
   deadline: number
   workMode: number
@@ -113,6 +111,8 @@ export type ClientJobCountAggregateOutputType = {
   status: number
   createdAt: number
   updatedAt: number
+  hourlyRate: number
+  timingType: number
   _all: number
 }
 
@@ -122,9 +122,9 @@ export type ClientJobAvgAggregateInputType = {
   userId?: true
   budgetMin?: true
   budgetMax?: true
-  hourlyRate?: true
   locationLat?: true
   locationLng?: true
+  hourlyRate?: true
 }
 
 export type ClientJobSumAggregateInputType = {
@@ -132,9 +132,9 @@ export type ClientJobSumAggregateInputType = {
   userId?: true
   budgetMin?: true
   budgetMax?: true
-  hourlyRate?: true
   locationLat?: true
   locationLng?: true
+  hourlyRate?: true
 }
 
 export type ClientJobMinAggregateInputType = {
@@ -146,8 +146,6 @@ export type ClientJobMinAggregateInputType = {
   budgetMin?: true
   budgetMax?: true
   urgency?: true
-  timingType?: true
-  hourlyRate?: true
   jobDate?: true
   deadline?: true
   workMode?: true
@@ -158,6 +156,8 @@ export type ClientJobMinAggregateInputType = {
   status?: true
   createdAt?: true
   updatedAt?: true
+  hourlyRate?: true
+  timingType?: true
 }
 
 export type ClientJobMaxAggregateInputType = {
@@ -169,8 +169,6 @@ export type ClientJobMaxAggregateInputType = {
   budgetMin?: true
   budgetMax?: true
   urgency?: true
-  timingType?: true
-  hourlyRate?: true
   jobDate?: true
   deadline?: true
   workMode?: true
@@ -181,6 +179,8 @@ export type ClientJobMaxAggregateInputType = {
   status?: true
   createdAt?: true
   updatedAt?: true
+  hourlyRate?: true
+  timingType?: true
 }
 
 export type ClientJobCountAggregateInputType = {
@@ -192,8 +192,6 @@ export type ClientJobCountAggregateInputType = {
   budgetMin?: true
   budgetMax?: true
   urgency?: true
-  timingType?: true
-  hourlyRate?: true
   jobDate?: true
   deadline?: true
   workMode?: true
@@ -204,6 +202,8 @@ export type ClientJobCountAggregateInputType = {
   status?: true
   createdAt?: true
   updatedAt?: true
+  hourlyRate?: true
+  timingType?: true
   _all?: true
 }
 
@@ -302,8 +302,6 @@ export type ClientJobGroupByOutputType = {
   budgetMin: number | null
   budgetMax: number | null
   urgency: $Enums.JobUrgency
-  timingType: string
-  hourlyRate: number | null
   jobDate: Date | null
   deadline: Date
   workMode: $Enums.JobWorkMode
@@ -314,6 +312,8 @@ export type ClientJobGroupByOutputType = {
   status: $Enums.JobStatus
   createdAt: Date
   updatedAt: Date
+  hourlyRate: number | null
+  timingType: string
   _count: ClientJobCountAggregateOutputType | null
   _avg: ClientJobAvgAggregateOutputType | null
   _sum: ClientJobSumAggregateOutputType | null
@@ -348,8 +348,6 @@ export type ClientJobWhereInput = {
   budgetMin?: Prisma.IntNullableFilter<"ClientJob"> | number | null
   budgetMax?: Prisma.IntNullableFilter<"ClientJob"> | number | null
   urgency?: Prisma.EnumJobUrgencyFilter<"ClientJob"> | $Enums.JobUrgency
-  timingType?: Prisma.StringFilter<"ClientJob"> | string
-  hourlyRate?: Prisma.IntNullableFilter<"ClientJob"> | number | null
   jobDate?: Prisma.DateTimeNullableFilter<"ClientJob"> | Date | string | null
   deadline?: Prisma.DateTimeFilter<"ClientJob"> | Date | string
   workMode?: Prisma.EnumJobWorkModeFilter<"ClientJob"> | $Enums.JobWorkMode
@@ -360,6 +358,8 @@ export type ClientJobWhereInput = {
   status?: Prisma.EnumJobStatusFilter<"ClientJob"> | $Enums.JobStatus
   createdAt?: Prisma.DateTimeFilter<"ClientJob"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ClientJob"> | Date | string
+  hourlyRate?: Prisma.IntNullableFilter<"ClientJob"> | number | null
+  timingType?: Prisma.StringFilter<"ClientJob"> | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   attachments?: Prisma.ClientJobAttachmentListRelationFilter
   favoriteJobs?: Prisma.FavoriteJobListRelationFilter
@@ -374,8 +374,6 @@ export type ClientJobOrderByWithRelationInput = {
   budgetMin?: Prisma.SortOrderInput | Prisma.SortOrder
   budgetMax?: Prisma.SortOrderInput | Prisma.SortOrder
   urgency?: Prisma.SortOrder
-  timingType?: Prisma.SortOrder
-  hourlyRate?: Prisma.SortOrderInput | Prisma.SortOrder
   jobDate?: Prisma.SortOrderInput | Prisma.SortOrder
   deadline?: Prisma.SortOrder
   workMode?: Prisma.SortOrder
@@ -386,6 +384,8 @@ export type ClientJobOrderByWithRelationInput = {
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  hourlyRate?: Prisma.SortOrderInput | Prisma.SortOrder
+  timingType?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   attachments?: Prisma.ClientJobAttachmentOrderByRelationAggregateInput
   favoriteJobs?: Prisma.FavoriteJobOrderByRelationAggregateInput
@@ -403,8 +403,6 @@ export type ClientJobWhereUniqueInput = Prisma.AtLeast<{
   budgetMin?: Prisma.IntNullableFilter<"ClientJob"> | number | null
   budgetMax?: Prisma.IntNullableFilter<"ClientJob"> | number | null
   urgency?: Prisma.EnumJobUrgencyFilter<"ClientJob"> | $Enums.JobUrgency
-  timingType?: Prisma.StringFilter<"ClientJob"> | string
-  hourlyRate?: Prisma.IntNullableFilter<"ClientJob"> | number | null
   jobDate?: Prisma.DateTimeNullableFilter<"ClientJob"> | Date | string | null
   deadline?: Prisma.DateTimeFilter<"ClientJob"> | Date | string
   workMode?: Prisma.EnumJobWorkModeFilter<"ClientJob"> | $Enums.JobWorkMode
@@ -415,6 +413,8 @@ export type ClientJobWhereUniqueInput = Prisma.AtLeast<{
   status?: Prisma.EnumJobStatusFilter<"ClientJob"> | $Enums.JobStatus
   createdAt?: Prisma.DateTimeFilter<"ClientJob"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ClientJob"> | Date | string
+  hourlyRate?: Prisma.IntNullableFilter<"ClientJob"> | number | null
+  timingType?: Prisma.StringFilter<"ClientJob"> | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   attachments?: Prisma.ClientJobAttachmentListRelationFilter
   favoriteJobs?: Prisma.FavoriteJobListRelationFilter
@@ -429,8 +429,6 @@ export type ClientJobOrderByWithAggregationInput = {
   budgetMin?: Prisma.SortOrderInput | Prisma.SortOrder
   budgetMax?: Prisma.SortOrderInput | Prisma.SortOrder
   urgency?: Prisma.SortOrder
-  timingType?: Prisma.SortOrder
-  hourlyRate?: Prisma.SortOrderInput | Prisma.SortOrder
   jobDate?: Prisma.SortOrderInput | Prisma.SortOrder
   deadline?: Prisma.SortOrder
   workMode?: Prisma.SortOrder
@@ -441,6 +439,8 @@ export type ClientJobOrderByWithAggregationInput = {
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  hourlyRate?: Prisma.SortOrderInput | Prisma.SortOrder
+  timingType?: Prisma.SortOrder
   _count?: Prisma.ClientJobCountOrderByAggregateInput
   _avg?: Prisma.ClientJobAvgOrderByAggregateInput
   _max?: Prisma.ClientJobMaxOrderByAggregateInput
@@ -460,8 +460,6 @@ export type ClientJobScalarWhereWithAggregatesInput = {
   budgetMin?: Prisma.IntNullableWithAggregatesFilter<"ClientJob"> | number | null
   budgetMax?: Prisma.IntNullableWithAggregatesFilter<"ClientJob"> | number | null
   urgency?: Prisma.EnumJobUrgencyWithAggregatesFilter<"ClientJob"> | $Enums.JobUrgency
-  timingType?: Prisma.StringWithAggregatesFilter<"ClientJob"> | string
-  hourlyRate?: Prisma.IntNullableWithAggregatesFilter<"ClientJob"> | number | null
   jobDate?: Prisma.DateTimeNullableWithAggregatesFilter<"ClientJob"> | Date | string | null
   deadline?: Prisma.DateTimeWithAggregatesFilter<"ClientJob"> | Date | string
   workMode?: Prisma.EnumJobWorkModeWithAggregatesFilter<"ClientJob"> | $Enums.JobWorkMode
@@ -472,6 +470,8 @@ export type ClientJobScalarWhereWithAggregatesInput = {
   status?: Prisma.EnumJobStatusWithAggregatesFilter<"ClientJob"> | $Enums.JobStatus
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ClientJob"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"ClientJob"> | Date | string
+  hourlyRate?: Prisma.IntNullableWithAggregatesFilter<"ClientJob"> | number | null
+  timingType?: Prisma.StringWithAggregatesFilter<"ClientJob"> | string
 }
 
 export type ClientJobCreateInput = {
@@ -481,8 +481,6 @@ export type ClientJobCreateInput = {
   budgetMin?: number | null
   budgetMax?: number | null
   urgency?: $Enums.JobUrgency
-  timingType?: string
-  hourlyRate?: number | null
   jobDate?: Date | string | null
   deadline: Date | string
   workMode?: $Enums.JobWorkMode
@@ -493,6 +491,8 @@ export type ClientJobCreateInput = {
   status?: $Enums.JobStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  hourlyRate?: number | null
+  timingType?: string
   user: Prisma.UserCreateNestedOneWithoutClientJobsInput
   attachments?: Prisma.ClientJobAttachmentCreateNestedManyWithoutJobInput
   favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutJobInput
@@ -507,8 +507,6 @@ export type ClientJobUncheckedCreateInput = {
   budgetMin?: number | null
   budgetMax?: number | null
   urgency?: $Enums.JobUrgency
-  timingType?: string
-  hourlyRate?: number | null
   jobDate?: Date | string | null
   deadline: Date | string
   workMode?: $Enums.JobWorkMode
@@ -519,6 +517,8 @@ export type ClientJobUncheckedCreateInput = {
   status?: $Enums.JobStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  hourlyRate?: number | null
+  timingType?: string
   attachments?: Prisma.ClientJobAttachmentUncheckedCreateNestedManyWithoutJobInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedCreateNestedManyWithoutJobInput
 }
@@ -530,8 +530,6 @@ export type ClientJobUpdateInput = {
   budgetMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   budgetMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   urgency?: Prisma.EnumJobUrgencyFieldUpdateOperationsInput | $Enums.JobUrgency
-  timingType?: Prisma.StringFieldUpdateOperationsInput | string
-  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   jobDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
@@ -542,6 +540,8 @@ export type ClientJobUpdateInput = {
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  timingType?: Prisma.StringFieldUpdateOperationsInput | string
   user?: Prisma.UserUpdateOneRequiredWithoutClientJobsNestedInput
   attachments?: Prisma.ClientJobAttachmentUpdateManyWithoutJobNestedInput
   favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutJobNestedInput
@@ -556,8 +556,6 @@ export type ClientJobUncheckedUpdateInput = {
   budgetMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   budgetMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   urgency?: Prisma.EnumJobUrgencyFieldUpdateOperationsInput | $Enums.JobUrgency
-  timingType?: Prisma.StringFieldUpdateOperationsInput | string
-  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   jobDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
@@ -568,6 +566,8 @@ export type ClientJobUncheckedUpdateInput = {
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  timingType?: Prisma.StringFieldUpdateOperationsInput | string
   attachments?: Prisma.ClientJobAttachmentUncheckedUpdateManyWithoutJobNestedInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedUpdateManyWithoutJobNestedInput
 }
@@ -581,8 +581,6 @@ export type ClientJobCreateManyInput = {
   budgetMin?: number | null
   budgetMax?: number | null
   urgency?: $Enums.JobUrgency
-  timingType?: string
-  hourlyRate?: number | null
   jobDate?: Date | string | null
   deadline: Date | string
   workMode?: $Enums.JobWorkMode
@@ -593,6 +591,8 @@ export type ClientJobCreateManyInput = {
   status?: $Enums.JobStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  hourlyRate?: number | null
+  timingType?: string
 }
 
 export type ClientJobUpdateManyMutationInput = {
@@ -602,8 +602,6 @@ export type ClientJobUpdateManyMutationInput = {
   budgetMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   budgetMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   urgency?: Prisma.EnumJobUrgencyFieldUpdateOperationsInput | $Enums.JobUrgency
-  timingType?: Prisma.StringFieldUpdateOperationsInput | string
-  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   jobDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
@@ -614,6 +612,8 @@ export type ClientJobUpdateManyMutationInput = {
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  timingType?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type ClientJobUncheckedUpdateManyInput = {
@@ -625,8 +625,6 @@ export type ClientJobUncheckedUpdateManyInput = {
   budgetMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   budgetMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   urgency?: Prisma.EnumJobUrgencyFieldUpdateOperationsInput | $Enums.JobUrgency
-  timingType?: Prisma.StringFieldUpdateOperationsInput | string
-  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   jobDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
@@ -637,6 +635,8 @@ export type ClientJobUncheckedUpdateManyInput = {
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  timingType?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type ClientJobListRelationFilter = {
@@ -658,8 +658,6 @@ export type ClientJobCountOrderByAggregateInput = {
   budgetMin?: Prisma.SortOrder
   budgetMax?: Prisma.SortOrder
   urgency?: Prisma.SortOrder
-  timingType?: Prisma.SortOrder
-  hourlyRate?: Prisma.SortOrder
   jobDate?: Prisma.SortOrder
   deadline?: Prisma.SortOrder
   workMode?: Prisma.SortOrder
@@ -670,6 +668,8 @@ export type ClientJobCountOrderByAggregateInput = {
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  hourlyRate?: Prisma.SortOrder
+  timingType?: Prisma.SortOrder
 }
 
 export type ClientJobAvgOrderByAggregateInput = {
@@ -677,9 +677,9 @@ export type ClientJobAvgOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   budgetMin?: Prisma.SortOrder
   budgetMax?: Prisma.SortOrder
-  hourlyRate?: Prisma.SortOrder
   locationLat?: Prisma.SortOrder
   locationLng?: Prisma.SortOrder
+  hourlyRate?: Prisma.SortOrder
 }
 
 export type ClientJobMaxOrderByAggregateInput = {
@@ -691,8 +691,6 @@ export type ClientJobMaxOrderByAggregateInput = {
   budgetMin?: Prisma.SortOrder
   budgetMax?: Prisma.SortOrder
   urgency?: Prisma.SortOrder
-  timingType?: Prisma.SortOrder
-  hourlyRate?: Prisma.SortOrder
   jobDate?: Prisma.SortOrder
   deadline?: Prisma.SortOrder
   workMode?: Prisma.SortOrder
@@ -703,6 +701,8 @@ export type ClientJobMaxOrderByAggregateInput = {
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  hourlyRate?: Prisma.SortOrder
+  timingType?: Prisma.SortOrder
 }
 
 export type ClientJobMinOrderByAggregateInput = {
@@ -714,8 +714,6 @@ export type ClientJobMinOrderByAggregateInput = {
   budgetMin?: Prisma.SortOrder
   budgetMax?: Prisma.SortOrder
   urgency?: Prisma.SortOrder
-  timingType?: Prisma.SortOrder
-  hourlyRate?: Prisma.SortOrder
   jobDate?: Prisma.SortOrder
   deadline?: Prisma.SortOrder
   workMode?: Prisma.SortOrder
@@ -726,6 +724,8 @@ export type ClientJobMinOrderByAggregateInput = {
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  hourlyRate?: Prisma.SortOrder
+  timingType?: Prisma.SortOrder
 }
 
 export type ClientJobSumOrderByAggregateInput = {
@@ -733,9 +733,9 @@ export type ClientJobSumOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   budgetMin?: Prisma.SortOrder
   budgetMax?: Prisma.SortOrder
-  hourlyRate?: Prisma.SortOrder
   locationLat?: Prisma.SortOrder
   locationLng?: Prisma.SortOrder
+  hourlyRate?: Prisma.SortOrder
 }
 
 export type ClientJobScalarRelationFilter = {
@@ -832,8 +832,6 @@ export type ClientJobCreateWithoutUserInput = {
   budgetMin?: number | null
   budgetMax?: number | null
   urgency?: $Enums.JobUrgency
-  timingType?: string
-  hourlyRate?: number | null
   jobDate?: Date | string | null
   deadline: Date | string
   workMode?: $Enums.JobWorkMode
@@ -844,6 +842,8 @@ export type ClientJobCreateWithoutUserInput = {
   status?: $Enums.JobStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  hourlyRate?: number | null
+  timingType?: string
   attachments?: Prisma.ClientJobAttachmentCreateNestedManyWithoutJobInput
   favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutJobInput
 }
@@ -856,8 +856,6 @@ export type ClientJobUncheckedCreateWithoutUserInput = {
   budgetMin?: number | null
   budgetMax?: number | null
   urgency?: $Enums.JobUrgency
-  timingType?: string
-  hourlyRate?: number | null
   jobDate?: Date | string | null
   deadline: Date | string
   workMode?: $Enums.JobWorkMode
@@ -868,6 +866,8 @@ export type ClientJobUncheckedCreateWithoutUserInput = {
   status?: $Enums.JobStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  hourlyRate?: number | null
+  timingType?: string
   attachments?: Prisma.ClientJobAttachmentUncheckedCreateNestedManyWithoutJobInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedCreateNestedManyWithoutJobInput
 }
@@ -910,8 +910,6 @@ export type ClientJobScalarWhereInput = {
   budgetMin?: Prisma.IntNullableFilter<"ClientJob"> | number | null
   budgetMax?: Prisma.IntNullableFilter<"ClientJob"> | number | null
   urgency?: Prisma.EnumJobUrgencyFilter<"ClientJob"> | $Enums.JobUrgency
-  timingType?: Prisma.StringFilter<"ClientJob"> | string
-  hourlyRate?: Prisma.IntNullableFilter<"ClientJob"> | number | null
   jobDate?: Prisma.DateTimeNullableFilter<"ClientJob"> | Date | string | null
   deadline?: Prisma.DateTimeFilter<"ClientJob"> | Date | string
   workMode?: Prisma.EnumJobWorkModeFilter<"ClientJob"> | $Enums.JobWorkMode
@@ -922,6 +920,8 @@ export type ClientJobScalarWhereInput = {
   status?: Prisma.EnumJobStatusFilter<"ClientJob"> | $Enums.JobStatus
   createdAt?: Prisma.DateTimeFilter<"ClientJob"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ClientJob"> | Date | string
+  hourlyRate?: Prisma.IntNullableFilter<"ClientJob"> | number | null
+  timingType?: Prisma.StringFilter<"ClientJob"> | string
 }
 
 export type ClientJobCreateWithoutFavoriteJobsInput = {
@@ -931,8 +931,6 @@ export type ClientJobCreateWithoutFavoriteJobsInput = {
   budgetMin?: number | null
   budgetMax?: number | null
   urgency?: $Enums.JobUrgency
-  timingType?: string
-  hourlyRate?: number | null
   jobDate?: Date | string | null
   deadline: Date | string
   workMode?: $Enums.JobWorkMode
@@ -943,6 +941,8 @@ export type ClientJobCreateWithoutFavoriteJobsInput = {
   status?: $Enums.JobStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  hourlyRate?: number | null
+  timingType?: string
   user: Prisma.UserCreateNestedOneWithoutClientJobsInput
   attachments?: Prisma.ClientJobAttachmentCreateNestedManyWithoutJobInput
 }
@@ -956,8 +956,6 @@ export type ClientJobUncheckedCreateWithoutFavoriteJobsInput = {
   budgetMin?: number | null
   budgetMax?: number | null
   urgency?: $Enums.JobUrgency
-  timingType?: string
-  hourlyRate?: number | null
   jobDate?: Date | string | null
   deadline: Date | string
   workMode?: $Enums.JobWorkMode
@@ -968,6 +966,8 @@ export type ClientJobUncheckedCreateWithoutFavoriteJobsInput = {
   status?: $Enums.JobStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  hourlyRate?: number | null
+  timingType?: string
   attachments?: Prisma.ClientJobAttachmentUncheckedCreateNestedManyWithoutJobInput
 }
 
@@ -994,8 +994,6 @@ export type ClientJobUpdateWithoutFavoriteJobsInput = {
   budgetMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   budgetMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   urgency?: Prisma.EnumJobUrgencyFieldUpdateOperationsInput | $Enums.JobUrgency
-  timingType?: Prisma.StringFieldUpdateOperationsInput | string
-  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   jobDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
@@ -1006,6 +1004,8 @@ export type ClientJobUpdateWithoutFavoriteJobsInput = {
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  timingType?: Prisma.StringFieldUpdateOperationsInput | string
   user?: Prisma.UserUpdateOneRequiredWithoutClientJobsNestedInput
   attachments?: Prisma.ClientJobAttachmentUpdateManyWithoutJobNestedInput
 }
@@ -1019,8 +1019,6 @@ export type ClientJobUncheckedUpdateWithoutFavoriteJobsInput = {
   budgetMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   budgetMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   urgency?: Prisma.EnumJobUrgencyFieldUpdateOperationsInput | $Enums.JobUrgency
-  timingType?: Prisma.StringFieldUpdateOperationsInput | string
-  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   jobDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
@@ -1031,6 +1029,8 @@ export type ClientJobUncheckedUpdateWithoutFavoriteJobsInput = {
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  timingType?: Prisma.StringFieldUpdateOperationsInput | string
   attachments?: Prisma.ClientJobAttachmentUncheckedUpdateManyWithoutJobNestedInput
 }
 
@@ -1041,8 +1041,6 @@ export type ClientJobCreateWithoutAttachmentsInput = {
   budgetMin?: number | null
   budgetMax?: number | null
   urgency?: $Enums.JobUrgency
-  timingType?: string
-  hourlyRate?: number | null
   jobDate?: Date | string | null
   deadline: Date | string
   workMode?: $Enums.JobWorkMode
@@ -1053,6 +1051,8 @@ export type ClientJobCreateWithoutAttachmentsInput = {
   status?: $Enums.JobStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  hourlyRate?: number | null
+  timingType?: string
   user: Prisma.UserCreateNestedOneWithoutClientJobsInput
   favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutJobInput
 }
@@ -1066,8 +1066,6 @@ export type ClientJobUncheckedCreateWithoutAttachmentsInput = {
   budgetMin?: number | null
   budgetMax?: number | null
   urgency?: $Enums.JobUrgency
-  timingType?: string
-  hourlyRate?: number | null
   jobDate?: Date | string | null
   deadline: Date | string
   workMode?: $Enums.JobWorkMode
@@ -1078,6 +1076,8 @@ export type ClientJobUncheckedCreateWithoutAttachmentsInput = {
   status?: $Enums.JobStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  hourlyRate?: number | null
+  timingType?: string
   favoriteJobs?: Prisma.FavoriteJobUncheckedCreateNestedManyWithoutJobInput
 }
 
@@ -1104,8 +1104,6 @@ export type ClientJobUpdateWithoutAttachmentsInput = {
   budgetMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   budgetMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   urgency?: Prisma.EnumJobUrgencyFieldUpdateOperationsInput | $Enums.JobUrgency
-  timingType?: Prisma.StringFieldUpdateOperationsInput | string
-  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   jobDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
@@ -1116,6 +1114,8 @@ export type ClientJobUpdateWithoutAttachmentsInput = {
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  timingType?: Prisma.StringFieldUpdateOperationsInput | string
   user?: Prisma.UserUpdateOneRequiredWithoutClientJobsNestedInput
   favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutJobNestedInput
 }
@@ -1129,8 +1129,6 @@ export type ClientJobUncheckedUpdateWithoutAttachmentsInput = {
   budgetMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   budgetMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   urgency?: Prisma.EnumJobUrgencyFieldUpdateOperationsInput | $Enums.JobUrgency
-  timingType?: Prisma.StringFieldUpdateOperationsInput | string
-  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   jobDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
@@ -1141,6 +1139,8 @@ export type ClientJobUncheckedUpdateWithoutAttachmentsInput = {
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  timingType?: Prisma.StringFieldUpdateOperationsInput | string
   favoriteJobs?: Prisma.FavoriteJobUncheckedUpdateManyWithoutJobNestedInput
 }
 
@@ -1152,8 +1152,6 @@ export type ClientJobCreateManyUserInput = {
   budgetMin?: number | null
   budgetMax?: number | null
   urgency?: $Enums.JobUrgency
-  timingType?: string
-  hourlyRate?: number | null
   jobDate?: Date | string | null
   deadline: Date | string
   workMode?: $Enums.JobWorkMode
@@ -1164,6 +1162,8 @@ export type ClientJobCreateManyUserInput = {
   status?: $Enums.JobStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  hourlyRate?: number | null
+  timingType?: string
 }
 
 export type ClientJobUpdateWithoutUserInput = {
@@ -1173,8 +1173,6 @@ export type ClientJobUpdateWithoutUserInput = {
   budgetMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   budgetMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   urgency?: Prisma.EnumJobUrgencyFieldUpdateOperationsInput | $Enums.JobUrgency
-  timingType?: Prisma.StringFieldUpdateOperationsInput | string
-  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   jobDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
@@ -1185,6 +1183,8 @@ export type ClientJobUpdateWithoutUserInput = {
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  timingType?: Prisma.StringFieldUpdateOperationsInput | string
   attachments?: Prisma.ClientJobAttachmentUpdateManyWithoutJobNestedInput
   favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutJobNestedInput
 }
@@ -1197,8 +1197,6 @@ export type ClientJobUncheckedUpdateWithoutUserInput = {
   budgetMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   budgetMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   urgency?: Prisma.EnumJobUrgencyFieldUpdateOperationsInput | $Enums.JobUrgency
-  timingType?: Prisma.StringFieldUpdateOperationsInput | string
-  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   jobDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
@@ -1209,6 +1207,8 @@ export type ClientJobUncheckedUpdateWithoutUserInput = {
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  timingType?: Prisma.StringFieldUpdateOperationsInput | string
   attachments?: Prisma.ClientJobAttachmentUncheckedUpdateManyWithoutJobNestedInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedUpdateManyWithoutJobNestedInput
 }
@@ -1221,8 +1221,6 @@ export type ClientJobUncheckedUpdateManyWithoutUserInput = {
   budgetMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   budgetMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   urgency?: Prisma.EnumJobUrgencyFieldUpdateOperationsInput | $Enums.JobUrgency
-  timingType?: Prisma.StringFieldUpdateOperationsInput | string
-  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   jobDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
@@ -1233,6 +1231,8 @@ export type ClientJobUncheckedUpdateManyWithoutUserInput = {
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  timingType?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 
@@ -1284,8 +1284,6 @@ export type ClientJobSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   budgetMin?: boolean
   budgetMax?: boolean
   urgency?: boolean
-  timingType?: boolean
-  hourlyRate?: boolean
   jobDate?: boolean
   deadline?: boolean
   workMode?: boolean
@@ -1296,6 +1294,8 @@ export type ClientJobSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  hourlyRate?: boolean
+  timingType?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   attachments?: boolean | Prisma.ClientJob$attachmentsArgs<ExtArgs>
   favoriteJobs?: boolean | Prisma.ClientJob$favoriteJobsArgs<ExtArgs>
@@ -1311,8 +1311,6 @@ export type ClientJobSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   budgetMin?: boolean
   budgetMax?: boolean
   urgency?: boolean
-  timingType?: boolean
-  hourlyRate?: boolean
   jobDate?: boolean
   deadline?: boolean
   workMode?: boolean
@@ -1323,6 +1321,8 @@ export type ClientJobSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  hourlyRate?: boolean
+  timingType?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["clientJob"]>
 
@@ -1335,8 +1335,6 @@ export type ClientJobSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   budgetMin?: boolean
   budgetMax?: boolean
   urgency?: boolean
-  timingType?: boolean
-  hourlyRate?: boolean
   jobDate?: boolean
   deadline?: boolean
   workMode?: boolean
@@ -1347,6 +1345,8 @@ export type ClientJobSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  hourlyRate?: boolean
+  timingType?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["clientJob"]>
 
@@ -1359,8 +1359,6 @@ export type ClientJobSelectScalar = {
   budgetMin?: boolean
   budgetMax?: boolean
   urgency?: boolean
-  timingType?: boolean
-  hourlyRate?: boolean
   jobDate?: boolean
   deadline?: boolean
   workMode?: boolean
@@ -1371,9 +1369,11 @@ export type ClientJobSelectScalar = {
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  hourlyRate?: boolean
+  timingType?: boolean
 }
 
-export type ClientJobOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "category" | "title" | "description" | "budgetMin" | "budgetMax" | "urgency" | "timingType" | "hourlyRate" | "jobDate" | "deadline" | "workMode" | "locationLabel" | "locationAddress" | "locationLat" | "locationLng" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["clientJob"]>
+export type ClientJobOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "category" | "title" | "description" | "budgetMin" | "budgetMax" | "urgency" | "jobDate" | "deadline" | "workMode" | "locationLabel" | "locationAddress" | "locationLat" | "locationLng" | "status" | "createdAt" | "updatedAt" | "hourlyRate" | "timingType", ExtArgs["result"]["clientJob"]>
 export type ClientJobInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   attachments?: boolean | Prisma.ClientJob$attachmentsArgs<ExtArgs>
@@ -1403,8 +1403,6 @@ export type $ClientJobPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     budgetMin: number | null
     budgetMax: number | null
     urgency: $Enums.JobUrgency
-    timingType: string
-    hourlyRate: number | null
     jobDate: Date | null
     deadline: Date
     workMode: $Enums.JobWorkMode
@@ -1415,6 +1413,8 @@ export type $ClientJobPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     status: $Enums.JobStatus
     createdAt: Date
     updatedAt: Date
+    hourlyRate: number | null
+    timingType: string
   }, ExtArgs["result"]["clientJob"]>
   composites: {}
 }
@@ -1849,8 +1849,6 @@ export interface ClientJobFieldRefs {
   readonly budgetMin: Prisma.FieldRef<"ClientJob", 'Int'>
   readonly budgetMax: Prisma.FieldRef<"ClientJob", 'Int'>
   readonly urgency: Prisma.FieldRef<"ClientJob", 'JobUrgency'>
-  readonly timingType: Prisma.FieldRef<"ClientJob", 'String'>
-  readonly hourlyRate: Prisma.FieldRef<"ClientJob", 'Int'>
   readonly jobDate: Prisma.FieldRef<"ClientJob", 'DateTime'>
   readonly deadline: Prisma.FieldRef<"ClientJob", 'DateTime'>
   readonly workMode: Prisma.FieldRef<"ClientJob", 'JobWorkMode'>
@@ -1861,6 +1859,8 @@ export interface ClientJobFieldRefs {
   readonly status: Prisma.FieldRef<"ClientJob", 'JobStatus'>
   readonly createdAt: Prisma.FieldRef<"ClientJob", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"ClientJob", 'DateTime'>
+  readonly hourlyRate: Prisma.FieldRef<"ClientJob", 'Int'>
+  readonly timingType: Prisma.FieldRef<"ClientJob", 'String'>
 }
     
 

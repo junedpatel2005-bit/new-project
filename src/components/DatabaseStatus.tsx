@@ -21,7 +21,12 @@ export function DatabaseStatus() {
         checkedAt?: string;
         latencyMs?: number;
       };
-      if (response.ok && data.connected && data.checkedAt !== undefined && data.latencyMs !== undefined) {
+      if (
+        response.ok &&
+        data.connected &&
+        data.checkedAt !== undefined &&
+        data.latencyMs !== undefined
+      ) {
         setStatus({ state: "connected", checkedAt: data.checkedAt, latencyMs: data.latencyMs });
       } else {
         setStatus({ state: "disconnected", checkedAt: data.checkedAt });
@@ -48,10 +53,20 @@ export function DatabaseStatus() {
       <div className="flex items-center gap-3">
         <span
           className={`grid h-10 w-10 place-items-center rounded-xl ${
-            isChecking ? "bg-muted text-muted-foreground" : isConnected ? "bg-success/15 text-success" : "bg-destructive/10 text-destructive"
+            isChecking
+              ? "bg-muted text-muted-foreground"
+              : isConnected
+                ? "bg-success/15 text-success"
+                : "bg-destructive/10 text-destructive"
           }`}
         >
-          {isChecking ? <Database className="h-5 w-5" /> : isConnected ? <CheckCircle2 className="h-5 w-5" /> : <XCircle className="h-5 w-5" />}
+          {isChecking ? (
+            <Database className="h-5 w-5" />
+          ) : isConnected ? (
+            <CheckCircle2 className="h-5 w-5" />
+          ) : (
+            <XCircle className="h-5 w-5" />
+          )}
         </span>
         <div>
           <h2 className="font-semibold">Database status</h2>

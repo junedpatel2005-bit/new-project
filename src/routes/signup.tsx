@@ -66,7 +66,14 @@ export default function Signup() {
           ? "Create an account to post jobs and hire trusted professionals."
           : "Create a professional account to showcase your services and find work."}
       </p>
-      <Button type="button" variant="outline" className="mb-4 w-full" onClick={() => { window.location.href = `/api/auth/google?role=${role === "pro" ? "PROFESSIONAL" : "CLIENT"}`; }}>
+      <Button
+        type="button"
+        variant="outline"
+        className="mb-4 w-full"
+        onClick={() => {
+          window.location.href = `/api/auth/google?role=${role === "pro" ? "PROFESSIONAL" : "CLIENT"}`;
+        }}
+      >
         Continue with Google
       </Button>
       <form action={submit} className="space-y-4">

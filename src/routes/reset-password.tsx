@@ -31,12 +31,30 @@ export default function ResetPassword() {
     else router.push("/login");
   }
 
-  return <AuthLayout title="Choose a new password" subtitle="Use at least 8 characters, including upper- and lowercase letters and a number." footer={<Link href="/login" className="text-primary hover:underline">Back to log in</Link>}>
-    <form action={submit} className="space-y-4">
-      <div className="space-y-1.5"><Label htmlFor="password">New password</Label><Input id="password" name="password" type="password" required /></div>
-      <div className="space-y-1.5"><Label htmlFor="confirmation">Confirm password</Label><Input id="confirmation" name="confirmation" type="password" required /></div>
-      {error && <p className="text-sm text-destructive">{error}</p>}
-      <Button type="submit" className="w-full" disabled={pending}>{pending ? "Resetting…" : "Reset password"}</Button>
-    </form>
-  </AuthLayout>;
+  return (
+    <AuthLayout
+      title="Choose a new password"
+      subtitle="Use at least 8 characters, including upper- and lowercase letters and a number."
+      footer={
+        <Link href="/login" className="text-primary hover:underline">
+          Back to log in
+        </Link>
+      }
+    >
+      <form action={submit} className="space-y-4">
+        <div className="space-y-1.5">
+          <Label htmlFor="password">New password</Label>
+          <Input id="password" name="password" type="password" required />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="confirmation">Confirm password</Label>
+          <Input id="confirmation" name="confirmation" type="password" required />
+        </div>
+        {error && <p className="text-sm text-destructive">{error}</p>}
+        <Button type="submit" className="w-full" disabled={pending}>
+          {pending ? "Resetting…" : "Reset password"}
+        </Button>
+      </form>
+    </AuthLayout>
+  );
 }

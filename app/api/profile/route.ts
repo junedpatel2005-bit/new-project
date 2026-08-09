@@ -15,8 +15,15 @@ async function getSession(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const session = await getSession(request);
   if (!session) return NextResponse.json({ error: "Please sign in again." }, { status: 401 });
-  const account = await db.user.findUnique({ where: { id: session.userId }, select: { emailVerifiedAt: true } });
-  if (!account?.emailVerifiedAt) return NextResponse.json({ error: "Please verify your email before completing your profile." }, { status: 403 });
+  const account = await db.user.findUnique({
+    where: { id: session.userId },
+    select: { emailVerifiedAt: true },
+  });
+  if (!account?.emailVerifiedAt)
+    return NextResponse.json(
+      { error: "Please verify your email before completing your profile." },
+      { status: 403 },
+    );
 
   const body = await request.json().catch(() => null);
   if (!body || typeof body !== "object") {
@@ -24,7 +31,10 @@ export async function POST(request: NextRequest) {
   }
 
   if (session.role === "CLIENT") {
-    const { fullName, phone, companyName, address, companyWebsite, industry } = body as Record<string, string>;
+    const { fullName, phone, companyName, address, companyWebsite, industry } = body as Record<
+      string,
+      string
+    >;
     if (!fullName || !phone || !companyName || !address) {
       return NextResponse.json({ error: "Please complete all required fields." }, { status: 400 });
     }
@@ -43,15 +53,18 @@ export async function POST(request: NextRequest) {
     } else {
       await db.clientProfile.create({
         data: {
-        userId: session.userId,
-        email: user.email,
-        ...profileData,
-      },
+          userId: session.userId,
+          email: user.email,
+          ...profileData,
+        },
       });
     }
     await db.user.update({ where: { id: session.userId }, data: { phone, companyName, address } });
   } else if (session.role === "PROFESSIONAL") {
-    const { category, city, experienceYears, hourlyRate, serviceArea } = body as Record<string, string>;
+    const { category, city, experienceYears, hourlyRate, serviceArea } = body as Record<
+      string,
+      string
+    >;
     if (!category || !city) {
       return NextResponse.json({ error: "Please add your category and city." }, { status: 400 });
     }
@@ -66,7 +79,10 @@ export async function POST(request: NextRequest) {
       },
     });
   } else {
-    return NextResponse.json({ error: "This profile type cannot be updated here." }, { status: 403 });
+    return NextResponse.json(
+      { error: "This profile type cannot be updated here." },
+      { status: 403 },
+    );
   }
 
   return NextResponse.json({ success: true });

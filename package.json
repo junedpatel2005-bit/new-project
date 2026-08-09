@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "db:seed": "tsx prisma/seed.ts",
     "format": "prettier --write ."
   },
   "dependencies": {
@@ -69,6 +70,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.32.0",
+    "@faker-js/faker": "^10.5.0",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^22.16.5",
     "@types/nodemailer": "^8.0.1",
@@ -83,6 +85,7 @@
     "globals": "^17.9.0",
     "prettier": "^3.7.3",
     "prisma": "^7.9.1",
+    "tsx": "^4.23.11",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.56.1"
   }

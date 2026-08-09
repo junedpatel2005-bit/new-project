@@ -29,9 +29,9 @@ export type WebsitePageMinAggregateOutputType = {
   path: string | null
   title: string | null
   content: string | null
-  css: string | null
   status: $Enums.CmsPageStatus | null
   updatedAt: Date | null
+  css: string | null
 }
 
 export type WebsitePageMaxAggregateOutputType = {
@@ -39,9 +39,9 @@ export type WebsitePageMaxAggregateOutputType = {
   path: string | null
   title: string | null
   content: string | null
-  css: string | null
   status: $Enums.CmsPageStatus | null
   updatedAt: Date | null
+  css: string | null
 }
 
 export type WebsitePageCountAggregateOutputType = {
@@ -49,9 +49,9 @@ export type WebsitePageCountAggregateOutputType = {
   path: number
   title: number
   content: number
-  css: number
   status: number
   updatedAt: number
+  css: number
   _all: number
 }
 
@@ -61,9 +61,9 @@ export type WebsitePageMinAggregateInputType = {
   path?: true
   title?: true
   content?: true
-  css?: true
   status?: true
   updatedAt?: true
+  css?: true
 }
 
 export type WebsitePageMaxAggregateInputType = {
@@ -71,9 +71,9 @@ export type WebsitePageMaxAggregateInputType = {
   path?: true
   title?: true
   content?: true
-  css?: true
   status?: true
   updatedAt?: true
+  css?: true
 }
 
 export type WebsitePageCountAggregateInputType = {
@@ -81,9 +81,9 @@ export type WebsitePageCountAggregateInputType = {
   path?: true
   title?: true
   content?: true
-  css?: true
   status?: true
   updatedAt?: true
+  css?: true
   _all?: true
 }
 
@@ -164,9 +164,9 @@ export type WebsitePageGroupByOutputType = {
   path: string
   title: string
   content: string
-  css: string
   status: $Enums.CmsPageStatus
   updatedAt: Date
+  css: string
   _count: WebsitePageCountAggregateOutputType | null
   _min: WebsitePageMinAggregateOutputType | null
   _max: WebsitePageMaxAggregateOutputType | null
@@ -195,9 +195,9 @@ export type WebsitePageWhereInput = {
   path?: Prisma.StringFilter<"WebsitePage"> | string
   title?: Prisma.StringFilter<"WebsitePage"> | string
   content?: Prisma.StringFilter<"WebsitePage"> | string
-  css?: Prisma.StringFilter<"WebsitePage"> | string
   status?: Prisma.EnumCmsPageStatusFilter<"WebsitePage"> | $Enums.CmsPageStatus
   updatedAt?: Prisma.DateTimeFilter<"WebsitePage"> | Date | string
+  css?: Prisma.StringFilter<"WebsitePage"> | string
 }
 
 export type WebsitePageOrderByWithRelationInput = {
@@ -205,9 +205,9 @@ export type WebsitePageOrderByWithRelationInput = {
   path?: Prisma.SortOrder
   title?: Prisma.SortOrder
   content?: Prisma.SortOrder
-  css?: Prisma.SortOrder
   status?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  css?: Prisma.SortOrder
 }
 
 export type WebsitePageWhereUniqueInput = Prisma.AtLeast<{
@@ -218,9 +218,9 @@ export type WebsitePageWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.WebsitePageWhereInput | Prisma.WebsitePageWhereInput[]
   title?: Prisma.StringFilter<"WebsitePage"> | string
   content?: Prisma.StringFilter<"WebsitePage"> | string
-  css?: Prisma.StringFilter<"WebsitePage"> | string
   status?: Prisma.EnumCmsPageStatusFilter<"WebsitePage"> | $Enums.CmsPageStatus
   updatedAt?: Prisma.DateTimeFilter<"WebsitePage"> | Date | string
+  css?: Prisma.StringFilter<"WebsitePage"> | string
 }, "pageKey" | "path">
 
 export type WebsitePageOrderByWithAggregationInput = {
@@ -228,9 +228,9 @@ export type WebsitePageOrderByWithAggregationInput = {
   path?: Prisma.SortOrder
   title?: Prisma.SortOrder
   content?: Prisma.SortOrder
-  css?: Prisma.SortOrder
   status?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  css?: Prisma.SortOrder
   _count?: Prisma.WebsitePageCountOrderByAggregateInput
   _max?: Prisma.WebsitePageMaxOrderByAggregateInput
   _min?: Prisma.WebsitePageMinOrderByAggregateInput
@@ -244,9 +244,9 @@ export type WebsitePageScalarWhereWithAggregatesInput = {
   path?: Prisma.StringWithAggregatesFilter<"WebsitePage"> | string
   title?: Prisma.StringWithAggregatesFilter<"WebsitePage"> | string
   content?: Prisma.StringWithAggregatesFilter<"WebsitePage"> | string
-  css?: Prisma.StringWithAggregatesFilter<"WebsitePage"> | string
   status?: Prisma.EnumCmsPageStatusWithAggregatesFilter<"WebsitePage"> | $Enums.CmsPageStatus
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"WebsitePage"> | Date | string
+  css?: Prisma.StringWithAggregatesFilter<"WebsitePage"> | string
 }
 
 export type WebsitePageCreateInput = {
@@ -254,9 +254,9 @@ export type WebsitePageCreateInput = {
   path: string
   title: string
   content?: string
-  css?: string
   status?: $Enums.CmsPageStatus
   updatedAt: Date | string
+  css?: string
 }
 
 export type WebsitePageUncheckedCreateInput = {
@@ -264,9 +264,9 @@ export type WebsitePageUncheckedCreateInput = {
   path: string
   title: string
   content?: string
-  css?: string
   status?: $Enums.CmsPageStatus
   updatedAt: Date | string
+  css?: string
 }
 
 export type WebsitePageUpdateInput = {
@@ -274,9 +274,9 @@ export type WebsitePageUpdateInput = {
   path?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
-  css?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumCmsPageStatusFieldUpdateOperationsInput | $Enums.CmsPageStatus
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  css?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type WebsitePageUncheckedUpdateInput = {
@@ -284,9 +284,9 @@ export type WebsitePageUncheckedUpdateInput = {
   path?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
-  css?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumCmsPageStatusFieldUpdateOperationsInput | $Enums.CmsPageStatus
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  css?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type WebsitePageCreateManyInput = {
@@ -294,9 +294,9 @@ export type WebsitePageCreateManyInput = {
   path: string
   title: string
   content?: string
-  css?: string
   status?: $Enums.CmsPageStatus
   updatedAt: Date | string
+  css?: string
 }
 
 export type WebsitePageUpdateManyMutationInput = {
@@ -304,9 +304,9 @@ export type WebsitePageUpdateManyMutationInput = {
   path?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
-  css?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumCmsPageStatusFieldUpdateOperationsInput | $Enums.CmsPageStatus
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  css?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type WebsitePageUncheckedUpdateManyInput = {
@@ -314,9 +314,9 @@ export type WebsitePageUncheckedUpdateManyInput = {
   path?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
-  css?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumCmsPageStatusFieldUpdateOperationsInput | $Enums.CmsPageStatus
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  css?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type WebsitePageCountOrderByAggregateInput = {
@@ -324,9 +324,9 @@ export type WebsitePageCountOrderByAggregateInput = {
   path?: Prisma.SortOrder
   title?: Prisma.SortOrder
   content?: Prisma.SortOrder
-  css?: Prisma.SortOrder
   status?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  css?: Prisma.SortOrder
 }
 
 export type WebsitePageMaxOrderByAggregateInput = {
@@ -334,9 +334,9 @@ export type WebsitePageMaxOrderByAggregateInput = {
   path?: Prisma.SortOrder
   title?: Prisma.SortOrder
   content?: Prisma.SortOrder
-  css?: Prisma.SortOrder
   status?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  css?: Prisma.SortOrder
 }
 
 export type WebsitePageMinOrderByAggregateInput = {
@@ -344,9 +344,9 @@ export type WebsitePageMinOrderByAggregateInput = {
   path?: Prisma.SortOrder
   title?: Prisma.SortOrder
   content?: Prisma.SortOrder
-  css?: Prisma.SortOrder
   status?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  css?: Prisma.SortOrder
 }
 
 
@@ -356,9 +356,9 @@ export type WebsitePageSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   path?: boolean
   title?: boolean
   content?: boolean
-  css?: boolean
   status?: boolean
   updatedAt?: boolean
+  css?: boolean
 }, ExtArgs["result"]["websitePage"]>
 
 export type WebsitePageSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -366,9 +366,9 @@ export type WebsitePageSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   path?: boolean
   title?: boolean
   content?: boolean
-  css?: boolean
   status?: boolean
   updatedAt?: boolean
+  css?: boolean
 }, ExtArgs["result"]["websitePage"]>
 
 export type WebsitePageSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -376,9 +376,9 @@ export type WebsitePageSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   path?: boolean
   title?: boolean
   content?: boolean
-  css?: boolean
   status?: boolean
   updatedAt?: boolean
+  css?: boolean
 }, ExtArgs["result"]["websitePage"]>
 
 export type WebsitePageSelectScalar = {
@@ -386,12 +386,12 @@ export type WebsitePageSelectScalar = {
   path?: boolean
   title?: boolean
   content?: boolean
-  css?: boolean
   status?: boolean
   updatedAt?: boolean
+  css?: boolean
 }
 
-export type WebsitePageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"pageKey" | "path" | "title" | "content" | "css" | "status" | "updatedAt", ExtArgs["result"]["websitePage"]>
+export type WebsitePageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"pageKey" | "path" | "title" | "content" | "status" | "updatedAt" | "css", ExtArgs["result"]["websitePage"]>
 
 export type $WebsitePagePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "WebsitePage"
@@ -401,9 +401,9 @@ export type $WebsitePagePayload<ExtArgs extends runtime.Types.Extensions.Interna
     path: string
     title: string
     content: string
-    css: string
     status: $Enums.CmsPageStatus
     updatedAt: Date
+    css: string
   }, ExtArgs["result"]["websitePage"]>
   composites: {}
 }
@@ -831,9 +831,9 @@ export interface WebsitePageFieldRefs {
   readonly path: Prisma.FieldRef<"WebsitePage", 'String'>
   readonly title: Prisma.FieldRef<"WebsitePage", 'String'>
   readonly content: Prisma.FieldRef<"WebsitePage", 'String'>
-  readonly css: Prisma.FieldRef<"WebsitePage", 'String'>
   readonly status: Prisma.FieldRef<"WebsitePage", 'CmsPageStatus'>
   readonly updatedAt: Prisma.FieldRef<"WebsitePage", 'DateTime'>
+  readonly css: Prisma.FieldRef<"WebsitePage", 'String'>
 }
     
 

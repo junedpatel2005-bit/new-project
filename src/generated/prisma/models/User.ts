@@ -28,26 +28,26 @@ export type AggregateUser = {
 
 export type UserAvgAggregateOutputType = {
   id: number | null
-  professionalLatitude: number | null
-  professionalLongitude: number | null
   experienceYears: number | null
   hourlyRate: number | null
   fixedRate: number | null
   serviceRadiusKm: number | null
   averageRating: number | null
   reviewCount: number | null
+  professionalLatitude: number | null
+  professionalLongitude: number | null
 }
 
 export type UserSumAggregateOutputType = {
   id: number | null
-  professionalLatitude: number | null
-  professionalLongitude: number | null
   experienceYears: number | null
   hourlyRate: number | null
   fixedRate: number | null
   serviceRadiusKm: number | null
   averageRating: number | null
   reviewCount: number | null
+  professionalLatitude: number | null
+  professionalLongitude: number | null
 }
 
 export type UserMinAggregateOutputType = {
@@ -68,8 +68,6 @@ export type UserMinAggregateOutputType = {
   address: string | null
   professionalCategory: string | null
   professionalCity: string | null
-  professionalLatitude: number | null
-  professionalLongitude: number | null
   professionalSkillsJson: string | null
   experienceYears: number | null
   hourlyRate: number | null
@@ -90,14 +88,16 @@ export type UserMinAggregateOutputType = {
   authProvider: string | null
   isActive: boolean | null
   lastLoginAt: Date | null
-  emailNotificationsEnabled: boolean | null
-  browserNotificationsEnabled: boolean | null
-  projectActivityNotificationsEnabled: boolean | null
-  emailVerifiedAt: Date | null
-  biometricEnabled: boolean | null
-  biometricType: string | null
   createdAt: Date | null
   updatedAt: Date | null
+  professionalLatitude: number | null
+  professionalLongitude: number | null
+  biometricEnabled: boolean | null
+  biometricType: string | null
+  browserNotificationsEnabled: boolean | null
+  emailNotificationsEnabled: boolean | null
+  emailVerifiedAt: Date | null
+  projectActivityNotificationsEnabled: boolean | null
 }
 
 export type UserMaxAggregateOutputType = {
@@ -118,8 +118,6 @@ export type UserMaxAggregateOutputType = {
   address: string | null
   professionalCategory: string | null
   professionalCity: string | null
-  professionalLatitude: number | null
-  professionalLongitude: number | null
   professionalSkillsJson: string | null
   experienceYears: number | null
   hourlyRate: number | null
@@ -140,14 +138,16 @@ export type UserMaxAggregateOutputType = {
   authProvider: string | null
   isActive: boolean | null
   lastLoginAt: Date | null
-  emailNotificationsEnabled: boolean | null
-  browserNotificationsEnabled: boolean | null
-  projectActivityNotificationsEnabled: boolean | null
-  emailVerifiedAt: Date | null
-  biometricEnabled: boolean | null
-  biometricType: string | null
   createdAt: Date | null
   updatedAt: Date | null
+  professionalLatitude: number | null
+  professionalLongitude: number | null
+  biometricEnabled: boolean | null
+  biometricType: string | null
+  browserNotificationsEnabled: boolean | null
+  emailNotificationsEnabled: boolean | null
+  emailVerifiedAt: Date | null
+  projectActivityNotificationsEnabled: boolean | null
 }
 
 export type UserCountAggregateOutputType = {
@@ -168,8 +168,6 @@ export type UserCountAggregateOutputType = {
   address: number
   professionalCategory: number
   professionalCity: number
-  professionalLatitude: number
-  professionalLongitude: number
   professionalSkillsJson: number
   experienceYears: number
   hourlyRate: number
@@ -190,40 +188,42 @@ export type UserCountAggregateOutputType = {
   authProvider: number
   isActive: number
   lastLoginAt: number
-  emailNotificationsEnabled: number
-  browserNotificationsEnabled: number
-  projectActivityNotificationsEnabled: number
-  emailVerifiedAt: number
-  biometricEnabled: number
-  biometricType: number
   createdAt: number
   updatedAt: number
+  professionalLatitude: number
+  professionalLongitude: number
+  biometricEnabled: number
+  biometricType: number
+  browserNotificationsEnabled: number
+  emailNotificationsEnabled: number
+  emailVerifiedAt: number
+  projectActivityNotificationsEnabled: number
   _all: number
 }
 
 
 export type UserAvgAggregateInputType = {
   id?: true
-  professionalLatitude?: true
-  professionalLongitude?: true
   experienceYears?: true
   hourlyRate?: true
   fixedRate?: true
   serviceRadiusKm?: true
   averageRating?: true
   reviewCount?: true
+  professionalLatitude?: true
+  professionalLongitude?: true
 }
 
 export type UserSumAggregateInputType = {
   id?: true
-  professionalLatitude?: true
-  professionalLongitude?: true
   experienceYears?: true
   hourlyRate?: true
   fixedRate?: true
   serviceRadiusKm?: true
   averageRating?: true
   reviewCount?: true
+  professionalLatitude?: true
+  professionalLongitude?: true
 }
 
 export type UserMinAggregateInputType = {
@@ -244,8 +244,6 @@ export type UserMinAggregateInputType = {
   address?: true
   professionalCategory?: true
   professionalCity?: true
-  professionalLatitude?: true
-  professionalLongitude?: true
   professionalSkillsJson?: true
   experienceYears?: true
   hourlyRate?: true
@@ -266,14 +264,16 @@ export type UserMinAggregateInputType = {
   authProvider?: true
   isActive?: true
   lastLoginAt?: true
-  emailNotificationsEnabled?: true
-  browserNotificationsEnabled?: true
-  projectActivityNotificationsEnabled?: true
-  emailVerifiedAt?: true
-  biometricEnabled?: true
-  biometricType?: true
   createdAt?: true
   updatedAt?: true
+  professionalLatitude?: true
+  professionalLongitude?: true
+  biometricEnabled?: true
+  biometricType?: true
+  browserNotificationsEnabled?: true
+  emailNotificationsEnabled?: true
+  emailVerifiedAt?: true
+  projectActivityNotificationsEnabled?: true
 }
 
 export type UserMaxAggregateInputType = {
@@ -294,8 +294,6 @@ export type UserMaxAggregateInputType = {
   address?: true
   professionalCategory?: true
   professionalCity?: true
-  professionalLatitude?: true
-  professionalLongitude?: true
   professionalSkillsJson?: true
   experienceYears?: true
   hourlyRate?: true
@@ -316,14 +314,16 @@ export type UserMaxAggregateInputType = {
   authProvider?: true
   isActive?: true
   lastLoginAt?: true
-  emailNotificationsEnabled?: true
-  browserNotificationsEnabled?: true
-  projectActivityNotificationsEnabled?: true
-  emailVerifiedAt?: true
-  biometricEnabled?: true
-  biometricType?: true
   createdAt?: true
   updatedAt?: true
+  professionalLatitude?: true
+  professionalLongitude?: true
+  biometricEnabled?: true
+  biometricType?: true
+  browserNotificationsEnabled?: true
+  emailNotificationsEnabled?: true
+  emailVerifiedAt?: true
+  projectActivityNotificationsEnabled?: true
 }
 
 export type UserCountAggregateInputType = {
@@ -344,8 +344,6 @@ export type UserCountAggregateInputType = {
   address?: true
   professionalCategory?: true
   professionalCity?: true
-  professionalLatitude?: true
-  professionalLongitude?: true
   professionalSkillsJson?: true
   experienceYears?: true
   hourlyRate?: true
@@ -366,14 +364,16 @@ export type UserCountAggregateInputType = {
   authProvider?: true
   isActive?: true
   lastLoginAt?: true
-  emailNotificationsEnabled?: true
-  browserNotificationsEnabled?: true
-  projectActivityNotificationsEnabled?: true
-  emailVerifiedAt?: true
-  biometricEnabled?: true
-  biometricType?: true
   createdAt?: true
   updatedAt?: true
+  professionalLatitude?: true
+  professionalLongitude?: true
+  biometricEnabled?: true
+  biometricType?: true
+  browserNotificationsEnabled?: true
+  emailNotificationsEnabled?: true
+  emailVerifiedAt?: true
+  projectActivityNotificationsEnabled?: true
   _all?: true
 }
 
@@ -481,8 +481,6 @@ export type UserGroupByOutputType = {
   address: string | null
   professionalCategory: string | null
   professionalCity: string | null
-  professionalLatitude: number | null
-  professionalLongitude: number | null
   professionalSkillsJson: string | null
   experienceYears: number | null
   hourlyRate: number | null
@@ -503,14 +501,16 @@ export type UserGroupByOutputType = {
   authProvider: string
   isActive: boolean
   lastLoginAt: Date | null
-  emailNotificationsEnabled: boolean
-  browserNotificationsEnabled: boolean
-  projectActivityNotificationsEnabled: boolean
-  emailVerifiedAt: Date | null
-  biometricEnabled: boolean
-  biometricType: string | null
   createdAt: Date
   updatedAt: Date
+  professionalLatitude: number | null
+  professionalLongitude: number | null
+  biometricEnabled: boolean
+  biometricType: string | null
+  browserNotificationsEnabled: boolean
+  emailNotificationsEnabled: boolean
+  emailVerifiedAt: Date | null
+  projectActivityNotificationsEnabled: boolean
   _count: UserCountAggregateOutputType | null
   _avg: UserAvgAggregateOutputType | null
   _sum: UserSumAggregateOutputType | null
@@ -554,8 +554,6 @@ export type UserWhereInput = {
   address?: Prisma.StringNullableFilter<"User"> | string | null
   professionalCategory?: Prisma.StringNullableFilter<"User"> | string | null
   professionalCity?: Prisma.StringNullableFilter<"User"> | string | null
-  professionalLatitude?: Prisma.FloatNullableFilter<"User"> | number | null
-  professionalLongitude?: Prisma.FloatNullableFilter<"User"> | number | null
   professionalSkillsJson?: Prisma.StringNullableFilter<"User"> | string | null
   experienceYears?: Prisma.IntNullableFilter<"User"> | number | null
   hourlyRate?: Prisma.IntNullableFilter<"User"> | number | null
@@ -576,16 +574,18 @@ export type UserWhereInput = {
   authProvider?: Prisma.StringFilter<"User"> | string
   isActive?: Prisma.BoolFilter<"User"> | boolean
   lastLoginAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
-  emailNotificationsEnabled?: Prisma.BoolFilter<"User"> | boolean
-  browserNotificationsEnabled?: Prisma.BoolFilter<"User"> | boolean
-  projectActivityNotificationsEnabled?: Prisma.BoolFilter<"User"> | boolean
-  emailVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
-  biometricEnabled?: Prisma.BoolFilter<"User"> | boolean
-  biometricType?: Prisma.StringNullableFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
-  clientProfiles?: Prisma.ClientProfileListRelationFilter
+  professionalLatitude?: Prisma.FloatNullableFilter<"User"> | number | null
+  professionalLongitude?: Prisma.FloatNullableFilter<"User"> | number | null
+  biometricEnabled?: Prisma.BoolFilter<"User"> | boolean
+  biometricType?: Prisma.StringNullableFilter<"User"> | string | null
+  browserNotificationsEnabled?: Prisma.BoolFilter<"User"> | boolean
+  emailNotificationsEnabled?: Prisma.BoolFilter<"User"> | boolean
+  emailVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  projectActivityNotificationsEnabled?: Prisma.BoolFilter<"User"> | boolean
   clientJobs?: Prisma.ClientJobListRelationFilter
+  clientProfiles?: Prisma.ClientProfileListRelationFilter
   favoriteJobs?: Prisma.FavoriteJobListRelationFilter
 }
 
@@ -607,8 +607,6 @@ export type UserOrderByWithRelationInput = {
   address?: Prisma.SortOrderInput | Prisma.SortOrder
   professionalCategory?: Prisma.SortOrderInput | Prisma.SortOrder
   professionalCity?: Prisma.SortOrderInput | Prisma.SortOrder
-  professionalLatitude?: Prisma.SortOrderInput | Prisma.SortOrder
-  professionalLongitude?: Prisma.SortOrderInput | Prisma.SortOrder
   professionalSkillsJson?: Prisma.SortOrderInput | Prisma.SortOrder
   experienceYears?: Prisma.SortOrderInput | Prisma.SortOrder
   hourlyRate?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -629,16 +627,18 @@ export type UserOrderByWithRelationInput = {
   authProvider?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  emailNotificationsEnabled?: Prisma.SortOrder
-  browserNotificationsEnabled?: Prisma.SortOrder
-  projectActivityNotificationsEnabled?: Prisma.SortOrder
-  emailVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  biometricEnabled?: Prisma.SortOrder
-  biometricType?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  clientProfiles?: Prisma.ClientProfileOrderByRelationAggregateInput
+  professionalLatitude?: Prisma.SortOrderInput | Prisma.SortOrder
+  professionalLongitude?: Prisma.SortOrderInput | Prisma.SortOrder
+  biometricEnabled?: Prisma.SortOrder
+  biometricType?: Prisma.SortOrderInput | Prisma.SortOrder
+  browserNotificationsEnabled?: Prisma.SortOrder
+  emailNotificationsEnabled?: Prisma.SortOrder
+  emailVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  projectActivityNotificationsEnabled?: Prisma.SortOrder
   clientJobs?: Prisma.ClientJobOrderByRelationAggregateInput
+  clientProfiles?: Prisma.ClientProfileOrderByRelationAggregateInput
   favoriteJobs?: Prisma.FavoriteJobOrderByRelationAggregateInput
 }
 
@@ -663,8 +663,6 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   address?: Prisma.StringNullableFilter<"User"> | string | null
   professionalCategory?: Prisma.StringNullableFilter<"User"> | string | null
   professionalCity?: Prisma.StringNullableFilter<"User"> | string | null
-  professionalLatitude?: Prisma.FloatNullableFilter<"User"> | number | null
-  professionalLongitude?: Prisma.FloatNullableFilter<"User"> | number | null
   professionalSkillsJson?: Prisma.StringNullableFilter<"User"> | string | null
   experienceYears?: Prisma.IntNullableFilter<"User"> | number | null
   hourlyRate?: Prisma.IntNullableFilter<"User"> | number | null
@@ -685,16 +683,18 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   authProvider?: Prisma.StringFilter<"User"> | string
   isActive?: Prisma.BoolFilter<"User"> | boolean
   lastLoginAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
-  emailNotificationsEnabled?: Prisma.BoolFilter<"User"> | boolean
-  browserNotificationsEnabled?: Prisma.BoolFilter<"User"> | boolean
-  projectActivityNotificationsEnabled?: Prisma.BoolFilter<"User"> | boolean
-  emailVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
-  biometricEnabled?: Prisma.BoolFilter<"User"> | boolean
-  biometricType?: Prisma.StringNullableFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
-  clientProfiles?: Prisma.ClientProfileListRelationFilter
+  professionalLatitude?: Prisma.FloatNullableFilter<"User"> | number | null
+  professionalLongitude?: Prisma.FloatNullableFilter<"User"> | number | null
+  biometricEnabled?: Prisma.BoolFilter<"User"> | boolean
+  biometricType?: Prisma.StringNullableFilter<"User"> | string | null
+  browserNotificationsEnabled?: Prisma.BoolFilter<"User"> | boolean
+  emailNotificationsEnabled?: Prisma.BoolFilter<"User"> | boolean
+  emailVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  projectActivityNotificationsEnabled?: Prisma.BoolFilter<"User"> | boolean
   clientJobs?: Prisma.ClientJobListRelationFilter
+  clientProfiles?: Prisma.ClientProfileListRelationFilter
   favoriteJobs?: Prisma.FavoriteJobListRelationFilter
 }, "id" | "email" | "phone" | "googleId">
 
@@ -716,8 +716,6 @@ export type UserOrderByWithAggregationInput = {
   address?: Prisma.SortOrderInput | Prisma.SortOrder
   professionalCategory?: Prisma.SortOrderInput | Prisma.SortOrder
   professionalCity?: Prisma.SortOrderInput | Prisma.SortOrder
-  professionalLatitude?: Prisma.SortOrderInput | Prisma.SortOrder
-  professionalLongitude?: Prisma.SortOrderInput | Prisma.SortOrder
   professionalSkillsJson?: Prisma.SortOrderInput | Prisma.SortOrder
   experienceYears?: Prisma.SortOrderInput | Prisma.SortOrder
   hourlyRate?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -738,14 +736,16 @@ export type UserOrderByWithAggregationInput = {
   authProvider?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  emailNotificationsEnabled?: Prisma.SortOrder
-  browserNotificationsEnabled?: Prisma.SortOrder
-  projectActivityNotificationsEnabled?: Prisma.SortOrder
-  emailVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  biometricEnabled?: Prisma.SortOrder
-  biometricType?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  professionalLatitude?: Prisma.SortOrderInput | Prisma.SortOrder
+  professionalLongitude?: Prisma.SortOrderInput | Prisma.SortOrder
+  biometricEnabled?: Prisma.SortOrder
+  biometricType?: Prisma.SortOrderInput | Prisma.SortOrder
+  browserNotificationsEnabled?: Prisma.SortOrder
+  emailNotificationsEnabled?: Prisma.SortOrder
+  emailVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  projectActivityNotificationsEnabled?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _avg?: Prisma.UserAvgOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
@@ -774,8 +774,6 @@ export type UserScalarWhereWithAggregatesInput = {
   address?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   professionalCategory?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   professionalCity?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
-  professionalLatitude?: Prisma.FloatNullableWithAggregatesFilter<"User"> | number | null
-  professionalLongitude?: Prisma.FloatNullableWithAggregatesFilter<"User"> | number | null
   professionalSkillsJson?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   experienceYears?: Prisma.IntNullableWithAggregatesFilter<"User"> | number | null
   hourlyRate?: Prisma.IntNullableWithAggregatesFilter<"User"> | number | null
@@ -796,14 +794,16 @@ export type UserScalarWhereWithAggregatesInput = {
   authProvider?: Prisma.StringWithAggregatesFilter<"User"> | string
   isActive?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   lastLoginAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
-  emailNotificationsEnabled?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
-  browserNotificationsEnabled?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
-  projectActivityNotificationsEnabled?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
-  emailVerifiedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
-  biometricEnabled?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
-  biometricType?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
+  professionalLatitude?: Prisma.FloatNullableWithAggregatesFilter<"User"> | number | null
+  professionalLongitude?: Prisma.FloatNullableWithAggregatesFilter<"User"> | number | null
+  biometricEnabled?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
+  biometricType?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  browserNotificationsEnabled?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
+  emailNotificationsEnabled?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
+  emailVerifiedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  projectActivityNotificationsEnabled?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
 }
 
 export type UserCreateInput = {
@@ -823,8 +823,6 @@ export type UserCreateInput = {
   address?: string | null
   professionalCategory?: string | null
   professionalCity?: string | null
-  professionalLatitude?: number | null
-  professionalLongitude?: number | null
   professionalSkillsJson?: string | null
   experienceYears?: number | null
   hourlyRate?: number | null
@@ -845,16 +843,18 @@ export type UserCreateInput = {
   authProvider?: string
   isActive?: boolean
   lastLoginAt?: Date | string | null
-  emailNotificationsEnabled?: boolean
-  browserNotificationsEnabled?: boolean
-  projectActivityNotificationsEnabled?: boolean
-  emailVerifiedAt?: Date | string | null
-  biometricEnabled?: boolean
-  biometricType?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  clientProfiles?: Prisma.ClientProfileCreateNestedManyWithoutUserInput
+  professionalLatitude?: number | null
+  professionalLongitude?: number | null
+  biometricEnabled?: boolean
+  biometricType?: string | null
+  browserNotificationsEnabled?: boolean
+  emailNotificationsEnabled?: boolean
+  emailVerifiedAt?: Date | string | null
+  projectActivityNotificationsEnabled?: boolean
   clientJobs?: Prisma.ClientJobCreateNestedManyWithoutUserInput
+  clientProfiles?: Prisma.ClientProfileCreateNestedManyWithoutUserInput
   favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutUserInput
 }
 
@@ -876,8 +876,6 @@ export type UserUncheckedCreateInput = {
   address?: string | null
   professionalCategory?: string | null
   professionalCity?: string | null
-  professionalLatitude?: number | null
-  professionalLongitude?: number | null
   professionalSkillsJson?: string | null
   experienceYears?: number | null
   hourlyRate?: number | null
@@ -898,16 +896,18 @@ export type UserUncheckedCreateInput = {
   authProvider?: string
   isActive?: boolean
   lastLoginAt?: Date | string | null
-  emailNotificationsEnabled?: boolean
-  browserNotificationsEnabled?: boolean
-  projectActivityNotificationsEnabled?: boolean
-  emailVerifiedAt?: Date | string | null
-  biometricEnabled?: boolean
-  biometricType?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  clientProfiles?: Prisma.ClientProfileUncheckedCreateNestedManyWithoutUserInput
+  professionalLatitude?: number | null
+  professionalLongitude?: number | null
+  biometricEnabled?: boolean
+  biometricType?: string | null
+  browserNotificationsEnabled?: boolean
+  emailNotificationsEnabled?: boolean
+  emailVerifiedAt?: Date | string | null
+  projectActivityNotificationsEnabled?: boolean
   clientJobs?: Prisma.ClientJobUncheckedCreateNestedManyWithoutUserInput
+  clientProfiles?: Prisma.ClientProfileUncheckedCreateNestedManyWithoutUserInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -928,8 +928,6 @@ export type UserUpdateInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  professionalLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  professionalLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   professionalSkillsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -950,16 +948,18 @@ export type UserUpdateInput = {
   authProvider?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  clientProfiles?: Prisma.ClientProfileUpdateManyWithoutUserNestedInput
+  professionalLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  professionalLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clientJobs?: Prisma.ClientJobUpdateManyWithoutUserNestedInput
+  clientProfiles?: Prisma.ClientProfileUpdateManyWithoutUserNestedInput
   favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutUserNestedInput
 }
 
@@ -981,8 +981,6 @@ export type UserUncheckedUpdateInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  professionalLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  professionalLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   professionalSkillsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1003,16 +1001,18 @@ export type UserUncheckedUpdateInput = {
   authProvider?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  clientProfiles?: Prisma.ClientProfileUncheckedUpdateManyWithoutUserNestedInput
+  professionalLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  professionalLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clientJobs?: Prisma.ClientJobUncheckedUpdateManyWithoutUserNestedInput
+  clientProfiles?: Prisma.ClientProfileUncheckedUpdateManyWithoutUserNestedInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -1034,8 +1034,6 @@ export type UserCreateManyInput = {
   address?: string | null
   professionalCategory?: string | null
   professionalCity?: string | null
-  professionalLatitude?: number | null
-  professionalLongitude?: number | null
   professionalSkillsJson?: string | null
   experienceYears?: number | null
   hourlyRate?: number | null
@@ -1056,14 +1054,16 @@ export type UserCreateManyInput = {
   authProvider?: string
   isActive?: boolean
   lastLoginAt?: Date | string | null
-  emailNotificationsEnabled?: boolean
-  browserNotificationsEnabled?: boolean
-  projectActivityNotificationsEnabled?: boolean
-  emailVerifiedAt?: Date | string | null
-  biometricEnabled?: boolean
-  biometricType?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  professionalLatitude?: number | null
+  professionalLongitude?: number | null
+  biometricEnabled?: boolean
+  biometricType?: string | null
+  browserNotificationsEnabled?: boolean
+  emailNotificationsEnabled?: boolean
+  emailVerifiedAt?: Date | string | null
+  projectActivityNotificationsEnabled?: boolean
 }
 
 export type UserUpdateManyMutationInput = {
@@ -1083,8 +1083,6 @@ export type UserUpdateManyMutationInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  professionalLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  professionalLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   professionalSkillsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1105,14 +1103,16 @@ export type UserUpdateManyMutationInput = {
   authProvider?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  professionalLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  professionalLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type UserUncheckedUpdateManyInput = {
@@ -1133,8 +1133,6 @@ export type UserUncheckedUpdateManyInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  professionalLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  professionalLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   professionalSkillsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1155,14 +1153,16 @@ export type UserUncheckedUpdateManyInput = {
   authProvider?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  professionalLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  professionalLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type UserCountOrderByAggregateInput = {
@@ -1183,8 +1183,6 @@ export type UserCountOrderByAggregateInput = {
   address?: Prisma.SortOrder
   professionalCategory?: Prisma.SortOrder
   professionalCity?: Prisma.SortOrder
-  professionalLatitude?: Prisma.SortOrder
-  professionalLongitude?: Prisma.SortOrder
   professionalSkillsJson?: Prisma.SortOrder
   experienceYears?: Prisma.SortOrder
   hourlyRate?: Prisma.SortOrder
@@ -1205,26 +1203,28 @@ export type UserCountOrderByAggregateInput = {
   authProvider?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrder
-  emailNotificationsEnabled?: Prisma.SortOrder
-  browserNotificationsEnabled?: Prisma.SortOrder
-  projectActivityNotificationsEnabled?: Prisma.SortOrder
-  emailVerifiedAt?: Prisma.SortOrder
-  biometricEnabled?: Prisma.SortOrder
-  biometricType?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  professionalLatitude?: Prisma.SortOrder
+  professionalLongitude?: Prisma.SortOrder
+  biometricEnabled?: Prisma.SortOrder
+  biometricType?: Prisma.SortOrder
+  browserNotificationsEnabled?: Prisma.SortOrder
+  emailNotificationsEnabled?: Prisma.SortOrder
+  emailVerifiedAt?: Prisma.SortOrder
+  projectActivityNotificationsEnabled?: Prisma.SortOrder
 }
 
 export type UserAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  professionalLatitude?: Prisma.SortOrder
-  professionalLongitude?: Prisma.SortOrder
   experienceYears?: Prisma.SortOrder
   hourlyRate?: Prisma.SortOrder
   fixedRate?: Prisma.SortOrder
   serviceRadiusKm?: Prisma.SortOrder
   averageRating?: Prisma.SortOrder
   reviewCount?: Prisma.SortOrder
+  professionalLatitude?: Prisma.SortOrder
+  professionalLongitude?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -1245,8 +1245,6 @@ export type UserMaxOrderByAggregateInput = {
   address?: Prisma.SortOrder
   professionalCategory?: Prisma.SortOrder
   professionalCity?: Prisma.SortOrder
-  professionalLatitude?: Prisma.SortOrder
-  professionalLongitude?: Prisma.SortOrder
   professionalSkillsJson?: Prisma.SortOrder
   experienceYears?: Prisma.SortOrder
   hourlyRate?: Prisma.SortOrder
@@ -1267,14 +1265,16 @@ export type UserMaxOrderByAggregateInput = {
   authProvider?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrder
-  emailNotificationsEnabled?: Prisma.SortOrder
-  browserNotificationsEnabled?: Prisma.SortOrder
-  projectActivityNotificationsEnabled?: Prisma.SortOrder
-  emailVerifiedAt?: Prisma.SortOrder
-  biometricEnabled?: Prisma.SortOrder
-  biometricType?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  professionalLatitude?: Prisma.SortOrder
+  professionalLongitude?: Prisma.SortOrder
+  biometricEnabled?: Prisma.SortOrder
+  biometricType?: Prisma.SortOrder
+  browserNotificationsEnabled?: Prisma.SortOrder
+  emailNotificationsEnabled?: Prisma.SortOrder
+  emailVerifiedAt?: Prisma.SortOrder
+  projectActivityNotificationsEnabled?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
@@ -1295,8 +1295,6 @@ export type UserMinOrderByAggregateInput = {
   address?: Prisma.SortOrder
   professionalCategory?: Prisma.SortOrder
   professionalCity?: Prisma.SortOrder
-  professionalLatitude?: Prisma.SortOrder
-  professionalLongitude?: Prisma.SortOrder
   professionalSkillsJson?: Prisma.SortOrder
   experienceYears?: Prisma.SortOrder
   hourlyRate?: Prisma.SortOrder
@@ -1317,26 +1315,28 @@ export type UserMinOrderByAggregateInput = {
   authProvider?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrder
-  emailNotificationsEnabled?: Prisma.SortOrder
-  browserNotificationsEnabled?: Prisma.SortOrder
-  projectActivityNotificationsEnabled?: Prisma.SortOrder
-  emailVerifiedAt?: Prisma.SortOrder
-  biometricEnabled?: Prisma.SortOrder
-  biometricType?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  professionalLatitude?: Prisma.SortOrder
+  professionalLongitude?: Prisma.SortOrder
+  biometricEnabled?: Prisma.SortOrder
+  biometricType?: Prisma.SortOrder
+  browserNotificationsEnabled?: Prisma.SortOrder
+  emailNotificationsEnabled?: Prisma.SortOrder
+  emailVerifiedAt?: Prisma.SortOrder
+  projectActivityNotificationsEnabled?: Prisma.SortOrder
 }
 
 export type UserSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  professionalLatitude?: Prisma.SortOrder
-  professionalLongitude?: Prisma.SortOrder
   experienceYears?: Prisma.SortOrder
   hourlyRate?: Prisma.SortOrder
   fixedRate?: Prisma.SortOrder
   serviceRadiusKm?: Prisma.SortOrder
   averageRating?: Prisma.SortOrder
   reviewCount?: Prisma.SortOrder
+  professionalLatitude?: Prisma.SortOrder
+  professionalLongitude?: Prisma.SortOrder
 }
 
 export type UserScalarRelationFilter = {
@@ -1350,14 +1350,6 @@ export type EnumUserRoleFieldUpdateOperationsInput = {
 
 export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
-}
-
-export type NullableFloatFieldUpdateOperationsInput = {
-  set?: number | null
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
 }
 
 export type FloatFieldUpdateOperationsInput = {
@@ -1374,6 +1366,14 @@ export type BoolFieldUpdateOperationsInput = {
 
 export type NullableDateTimeFieldUpdateOperationsInput = {
   set?: Date | string | null
+}
+
+export type NullableFloatFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
 }
 
 export type UserCreateNestedOneWithoutClientProfilesInput = {
@@ -1435,8 +1435,6 @@ export type UserCreateWithoutClientProfilesInput = {
   address?: string | null
   professionalCategory?: string | null
   professionalCity?: string | null
-  professionalLatitude?: number | null
-  professionalLongitude?: number | null
   professionalSkillsJson?: string | null
   experienceYears?: number | null
   hourlyRate?: number | null
@@ -1457,14 +1455,16 @@ export type UserCreateWithoutClientProfilesInput = {
   authProvider?: string
   isActive?: boolean
   lastLoginAt?: Date | string | null
-  emailNotificationsEnabled?: boolean
-  browserNotificationsEnabled?: boolean
-  projectActivityNotificationsEnabled?: boolean
-  emailVerifiedAt?: Date | string | null
-  biometricEnabled?: boolean
-  biometricType?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  professionalLatitude?: number | null
+  professionalLongitude?: number | null
+  biometricEnabled?: boolean
+  biometricType?: string | null
+  browserNotificationsEnabled?: boolean
+  emailNotificationsEnabled?: boolean
+  emailVerifiedAt?: Date | string | null
+  projectActivityNotificationsEnabled?: boolean
   clientJobs?: Prisma.ClientJobCreateNestedManyWithoutUserInput
   favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutUserInput
 }
@@ -1487,8 +1487,6 @@ export type UserUncheckedCreateWithoutClientProfilesInput = {
   address?: string | null
   professionalCategory?: string | null
   professionalCity?: string | null
-  professionalLatitude?: number | null
-  professionalLongitude?: number | null
   professionalSkillsJson?: string | null
   experienceYears?: number | null
   hourlyRate?: number | null
@@ -1509,14 +1507,16 @@ export type UserUncheckedCreateWithoutClientProfilesInput = {
   authProvider?: string
   isActive?: boolean
   lastLoginAt?: Date | string | null
-  emailNotificationsEnabled?: boolean
-  browserNotificationsEnabled?: boolean
-  projectActivityNotificationsEnabled?: boolean
-  emailVerifiedAt?: Date | string | null
-  biometricEnabled?: boolean
-  biometricType?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  professionalLatitude?: number | null
+  professionalLongitude?: number | null
+  biometricEnabled?: boolean
+  biometricType?: string | null
+  browserNotificationsEnabled?: boolean
+  emailNotificationsEnabled?: boolean
+  emailVerifiedAt?: Date | string | null
+  projectActivityNotificationsEnabled?: boolean
   clientJobs?: Prisma.ClientJobUncheckedCreateNestedManyWithoutUserInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedCreateNestedManyWithoutUserInput
 }
@@ -1554,8 +1554,6 @@ export type UserUpdateWithoutClientProfilesInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  professionalLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  professionalLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   professionalSkillsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1576,14 +1574,16 @@ export type UserUpdateWithoutClientProfilesInput = {
   authProvider?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  professionalLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  professionalLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clientJobs?: Prisma.ClientJobUpdateManyWithoutUserNestedInput
   favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutUserNestedInput
 }
@@ -1606,8 +1606,6 @@ export type UserUncheckedUpdateWithoutClientProfilesInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  professionalLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  professionalLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   professionalSkillsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1628,14 +1626,16 @@ export type UserUncheckedUpdateWithoutClientProfilesInput = {
   authProvider?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  professionalLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  professionalLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clientJobs?: Prisma.ClientJobUncheckedUpdateManyWithoutUserNestedInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -1657,8 +1657,6 @@ export type UserCreateWithoutClientJobsInput = {
   address?: string | null
   professionalCategory?: string | null
   professionalCity?: string | null
-  professionalLatitude?: number | null
-  professionalLongitude?: number | null
   professionalSkillsJson?: string | null
   experienceYears?: number | null
   hourlyRate?: number | null
@@ -1679,14 +1677,16 @@ export type UserCreateWithoutClientJobsInput = {
   authProvider?: string
   isActive?: boolean
   lastLoginAt?: Date | string | null
-  emailNotificationsEnabled?: boolean
-  browserNotificationsEnabled?: boolean
-  projectActivityNotificationsEnabled?: boolean
-  emailVerifiedAt?: Date | string | null
-  biometricEnabled?: boolean
-  biometricType?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  professionalLatitude?: number | null
+  professionalLongitude?: number | null
+  biometricEnabled?: boolean
+  biometricType?: string | null
+  browserNotificationsEnabled?: boolean
+  emailNotificationsEnabled?: boolean
+  emailVerifiedAt?: Date | string | null
+  projectActivityNotificationsEnabled?: boolean
   clientProfiles?: Prisma.ClientProfileCreateNestedManyWithoutUserInput
   favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutUserInput
 }
@@ -1709,8 +1709,6 @@ export type UserUncheckedCreateWithoutClientJobsInput = {
   address?: string | null
   professionalCategory?: string | null
   professionalCity?: string | null
-  professionalLatitude?: number | null
-  professionalLongitude?: number | null
   professionalSkillsJson?: string | null
   experienceYears?: number | null
   hourlyRate?: number | null
@@ -1731,14 +1729,16 @@ export type UserUncheckedCreateWithoutClientJobsInput = {
   authProvider?: string
   isActive?: boolean
   lastLoginAt?: Date | string | null
-  emailNotificationsEnabled?: boolean
-  browserNotificationsEnabled?: boolean
-  projectActivityNotificationsEnabled?: boolean
-  emailVerifiedAt?: Date | string | null
-  biometricEnabled?: boolean
-  biometricType?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  professionalLatitude?: number | null
+  professionalLongitude?: number | null
+  biometricEnabled?: boolean
+  biometricType?: string | null
+  browserNotificationsEnabled?: boolean
+  emailNotificationsEnabled?: boolean
+  emailVerifiedAt?: Date | string | null
+  projectActivityNotificationsEnabled?: boolean
   clientProfiles?: Prisma.ClientProfileUncheckedCreateNestedManyWithoutUserInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedCreateNestedManyWithoutUserInput
 }
@@ -1776,8 +1776,6 @@ export type UserUpdateWithoutClientJobsInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  professionalLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  professionalLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   professionalSkillsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1798,14 +1796,16 @@ export type UserUpdateWithoutClientJobsInput = {
   authProvider?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  professionalLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  professionalLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clientProfiles?: Prisma.ClientProfileUpdateManyWithoutUserNestedInput
   favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutUserNestedInput
 }
@@ -1828,8 +1828,6 @@ export type UserUncheckedUpdateWithoutClientJobsInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  professionalLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  professionalLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   professionalSkillsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1850,14 +1848,16 @@ export type UserUncheckedUpdateWithoutClientJobsInput = {
   authProvider?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  professionalLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  professionalLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clientProfiles?: Prisma.ClientProfileUncheckedUpdateManyWithoutUserNestedInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -1879,8 +1879,6 @@ export type UserCreateWithoutFavoriteJobsInput = {
   address?: string | null
   professionalCategory?: string | null
   professionalCity?: string | null
-  professionalLatitude?: number | null
-  professionalLongitude?: number | null
   professionalSkillsJson?: string | null
   experienceYears?: number | null
   hourlyRate?: number | null
@@ -1901,16 +1899,18 @@ export type UserCreateWithoutFavoriteJobsInput = {
   authProvider?: string
   isActive?: boolean
   lastLoginAt?: Date | string | null
-  emailNotificationsEnabled?: boolean
-  browserNotificationsEnabled?: boolean
-  projectActivityNotificationsEnabled?: boolean
-  emailVerifiedAt?: Date | string | null
-  biometricEnabled?: boolean
-  biometricType?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  clientProfiles?: Prisma.ClientProfileCreateNestedManyWithoutUserInput
+  professionalLatitude?: number | null
+  professionalLongitude?: number | null
+  biometricEnabled?: boolean
+  biometricType?: string | null
+  browserNotificationsEnabled?: boolean
+  emailNotificationsEnabled?: boolean
+  emailVerifiedAt?: Date | string | null
+  projectActivityNotificationsEnabled?: boolean
   clientJobs?: Prisma.ClientJobCreateNestedManyWithoutUserInput
+  clientProfiles?: Prisma.ClientProfileCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutFavoriteJobsInput = {
@@ -1931,8 +1931,6 @@ export type UserUncheckedCreateWithoutFavoriteJobsInput = {
   address?: string | null
   professionalCategory?: string | null
   professionalCity?: string | null
-  professionalLatitude?: number | null
-  professionalLongitude?: number | null
   professionalSkillsJson?: string | null
   experienceYears?: number | null
   hourlyRate?: number | null
@@ -1953,16 +1951,18 @@ export type UserUncheckedCreateWithoutFavoriteJobsInput = {
   authProvider?: string
   isActive?: boolean
   lastLoginAt?: Date | string | null
-  emailNotificationsEnabled?: boolean
-  browserNotificationsEnabled?: boolean
-  projectActivityNotificationsEnabled?: boolean
-  emailVerifiedAt?: Date | string | null
-  biometricEnabled?: boolean
-  biometricType?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  clientProfiles?: Prisma.ClientProfileUncheckedCreateNestedManyWithoutUserInput
+  professionalLatitude?: number | null
+  professionalLongitude?: number | null
+  biometricEnabled?: boolean
+  biometricType?: string | null
+  browserNotificationsEnabled?: boolean
+  emailNotificationsEnabled?: boolean
+  emailVerifiedAt?: Date | string | null
+  projectActivityNotificationsEnabled?: boolean
   clientJobs?: Prisma.ClientJobUncheckedCreateNestedManyWithoutUserInput
+  clientProfiles?: Prisma.ClientProfileUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutFavoriteJobsInput = {
@@ -1998,8 +1998,6 @@ export type UserUpdateWithoutFavoriteJobsInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  professionalLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  professionalLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   professionalSkillsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -2020,16 +2018,18 @@ export type UserUpdateWithoutFavoriteJobsInput = {
   authProvider?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  clientProfiles?: Prisma.ClientProfileUpdateManyWithoutUserNestedInput
+  professionalLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  professionalLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clientJobs?: Prisma.ClientJobUpdateManyWithoutUserNestedInput
+  clientProfiles?: Prisma.ClientProfileUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutFavoriteJobsInput = {
@@ -2050,8 +2050,6 @@ export type UserUncheckedUpdateWithoutFavoriteJobsInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  professionalLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  professionalLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   professionalSkillsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -2072,16 +2070,18 @@ export type UserUncheckedUpdateWithoutFavoriteJobsInput = {
   authProvider?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  clientProfiles?: Prisma.ClientProfileUncheckedUpdateManyWithoutUserNestedInput
+  professionalLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  professionalLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clientJobs?: Prisma.ClientJobUncheckedUpdateManyWithoutUserNestedInput
+  clientProfiles?: Prisma.ClientProfileUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -2090,14 +2090,14 @@ export type UserUncheckedUpdateWithoutFavoriteJobsInput = {
  */
 
 export type UserCountOutputType = {
-  clientProfiles: number
   clientJobs: number
+  clientProfiles: number
   favoriteJobs: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  clientProfiles?: boolean | UserCountOutputTypeCountClientProfilesArgs
   clientJobs?: boolean | UserCountOutputTypeCountClientJobsArgs
+  clientProfiles?: boolean | UserCountOutputTypeCountClientProfilesArgs
   favoriteJobs?: boolean | UserCountOutputTypeCountFavoriteJobsArgs
 }
 
@@ -2114,15 +2114,15 @@ export type UserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensi
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountClientProfilesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ClientProfileWhereInput
+export type UserCountOutputTypeCountClientJobsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ClientJobWhereInput
 }
 
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountClientJobsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ClientJobWhereInput
+export type UserCountOutputTypeCountClientProfilesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ClientProfileWhereInput
 }
 
 /**
@@ -2151,8 +2151,6 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   address?: boolean
   professionalCategory?: boolean
   professionalCity?: boolean
-  professionalLatitude?: boolean
-  professionalLongitude?: boolean
   professionalSkillsJson?: boolean
   experienceYears?: boolean
   hourlyRate?: boolean
@@ -2173,16 +2171,18 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   authProvider?: boolean
   isActive?: boolean
   lastLoginAt?: boolean
-  emailNotificationsEnabled?: boolean
-  browserNotificationsEnabled?: boolean
-  projectActivityNotificationsEnabled?: boolean
-  emailVerifiedAt?: boolean
-  biometricEnabled?: boolean
-  biometricType?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  clientProfiles?: boolean | Prisma.User$clientProfilesArgs<ExtArgs>
+  professionalLatitude?: boolean
+  professionalLongitude?: boolean
+  biometricEnabled?: boolean
+  biometricType?: boolean
+  browserNotificationsEnabled?: boolean
+  emailNotificationsEnabled?: boolean
+  emailVerifiedAt?: boolean
+  projectActivityNotificationsEnabled?: boolean
   clientJobs?: boolean | Prisma.User$clientJobsArgs<ExtArgs>
+  clientProfiles?: boolean | Prisma.User$clientProfilesArgs<ExtArgs>
   favoriteJobs?: boolean | Prisma.User$favoriteJobsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
@@ -2205,8 +2205,6 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   address?: boolean
   professionalCategory?: boolean
   professionalCity?: boolean
-  professionalLatitude?: boolean
-  professionalLongitude?: boolean
   professionalSkillsJson?: boolean
   experienceYears?: boolean
   hourlyRate?: boolean
@@ -2227,14 +2225,16 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   authProvider?: boolean
   isActive?: boolean
   lastLoginAt?: boolean
-  emailNotificationsEnabled?: boolean
-  browserNotificationsEnabled?: boolean
-  projectActivityNotificationsEnabled?: boolean
-  emailVerifiedAt?: boolean
-  biometricEnabled?: boolean
-  biometricType?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  professionalLatitude?: boolean
+  professionalLongitude?: boolean
+  biometricEnabled?: boolean
+  biometricType?: boolean
+  browserNotificationsEnabled?: boolean
+  emailNotificationsEnabled?: boolean
+  emailVerifiedAt?: boolean
+  projectActivityNotificationsEnabled?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -2255,8 +2255,6 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   address?: boolean
   professionalCategory?: boolean
   professionalCity?: boolean
-  professionalLatitude?: boolean
-  professionalLongitude?: boolean
   professionalSkillsJson?: boolean
   experienceYears?: boolean
   hourlyRate?: boolean
@@ -2277,14 +2275,16 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   authProvider?: boolean
   isActive?: boolean
   lastLoginAt?: boolean
-  emailNotificationsEnabled?: boolean
-  browserNotificationsEnabled?: boolean
-  projectActivityNotificationsEnabled?: boolean
-  emailVerifiedAt?: boolean
-  biometricEnabled?: boolean
-  biometricType?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  professionalLatitude?: boolean
+  professionalLongitude?: boolean
+  biometricEnabled?: boolean
+  biometricType?: boolean
+  browserNotificationsEnabled?: boolean
+  emailNotificationsEnabled?: boolean
+  emailVerifiedAt?: boolean
+  projectActivityNotificationsEnabled?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
@@ -2305,8 +2305,6 @@ export type UserSelectScalar = {
   address?: boolean
   professionalCategory?: boolean
   professionalCity?: boolean
-  professionalLatitude?: boolean
-  professionalLongitude?: boolean
   professionalSkillsJson?: boolean
   experienceYears?: boolean
   hourlyRate?: boolean
@@ -2327,20 +2325,22 @@ export type UserSelectScalar = {
   authProvider?: boolean
   isActive?: boolean
   lastLoginAt?: boolean
-  emailNotificationsEnabled?: boolean
-  browserNotificationsEnabled?: boolean
-  projectActivityNotificationsEnabled?: boolean
-  emailVerifiedAt?: boolean
-  biometricEnabled?: boolean
-  biometricType?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  professionalLatitude?: boolean
+  professionalLongitude?: boolean
+  biometricEnabled?: boolean
+  biometricType?: boolean
+  browserNotificationsEnabled?: boolean
+  emailNotificationsEnabled?: boolean
+  emailVerifiedAt?: boolean
+  projectActivityNotificationsEnabled?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "role" | "firstName" | "lastName" | "email" | "phone" | "passwordHash" | "googleId" | "avatarUrl" | "companyName" | "companyWebsite" | "industry" | "teamSize" | "companyDescription" | "address" | "professionalCategory" | "professionalCity" | "professionalLatitude" | "professionalLongitude" | "professionalSkillsJson" | "experienceYears" | "hourlyRate" | "fixedRate" | "portfolioUrl" | "workPhotosJson" | "certificationsJson" | "tradeLicenseUrl" | "serviceArea" | "workMode" | "serviceRadiusKm" | "averageRating" | "reviewCount" | "isVerified" | "availabilityStatus" | "savedLocationsJson" | "hiringNeedsJson" | "authProvider" | "isActive" | "lastLoginAt" | "emailNotificationsEnabled" | "browserNotificationsEnabled" | "projectActivityNotificationsEnabled" | "emailVerifiedAt" | "biometricEnabled" | "biometricType" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "role" | "firstName" | "lastName" | "email" | "phone" | "passwordHash" | "googleId" | "avatarUrl" | "companyName" | "companyWebsite" | "industry" | "teamSize" | "companyDescription" | "address" | "professionalCategory" | "professionalCity" | "professionalSkillsJson" | "experienceYears" | "hourlyRate" | "fixedRate" | "portfolioUrl" | "workPhotosJson" | "certificationsJson" | "tradeLicenseUrl" | "serviceArea" | "workMode" | "serviceRadiusKm" | "averageRating" | "reviewCount" | "isVerified" | "availabilityStatus" | "savedLocationsJson" | "hiringNeedsJson" | "authProvider" | "isActive" | "lastLoginAt" | "createdAt" | "updatedAt" | "professionalLatitude" | "professionalLongitude" | "biometricEnabled" | "biometricType" | "browserNotificationsEnabled" | "emailNotificationsEnabled" | "emailVerifiedAt" | "projectActivityNotificationsEnabled", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  clientProfiles?: boolean | Prisma.User$clientProfilesArgs<ExtArgs>
   clientJobs?: boolean | Prisma.User$clientJobsArgs<ExtArgs>
+  clientProfiles?: boolean | Prisma.User$clientProfilesArgs<ExtArgs>
   favoriteJobs?: boolean | Prisma.User$favoriteJobsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -2350,8 +2350,8 @@ export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "User"
   objects: {
-    clientProfiles: Prisma.$ClientProfilePayload<ExtArgs>[]
     clientJobs: Prisma.$ClientJobPayload<ExtArgs>[]
+    clientProfiles: Prisma.$ClientProfilePayload<ExtArgs>[]
     favoriteJobs: Prisma.$FavoriteJobPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -2372,8 +2372,6 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     address: string | null
     professionalCategory: string | null
     professionalCity: string | null
-    professionalLatitude: number | null
-    professionalLongitude: number | null
     professionalSkillsJson: string | null
     experienceYears: number | null
     hourlyRate: number | null
@@ -2394,14 +2392,16 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     authProvider: string
     isActive: boolean
     lastLoginAt: Date | null
-    emailNotificationsEnabled: boolean
-    browserNotificationsEnabled: boolean
-    projectActivityNotificationsEnabled: boolean
-    emailVerifiedAt: Date | null
-    biometricEnabled: boolean
-    biometricType: string | null
     createdAt: Date
     updatedAt: Date
+    professionalLatitude: number | null
+    professionalLongitude: number | null
+    biometricEnabled: boolean
+    biometricType: string | null
+    browserNotificationsEnabled: boolean
+    emailNotificationsEnabled: boolean
+    emailVerifiedAt: Date | null
+    projectActivityNotificationsEnabled: boolean
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -2796,8 +2796,8 @@ readonly fields: UserFieldRefs;
  */
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  clientProfiles<T extends Prisma.User$clientProfilesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$clientProfilesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClientProfilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   clientJobs<T extends Prisma.User$clientJobsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$clientJobsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClientJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  clientProfiles<T extends Prisma.User$clientProfilesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$clientProfilesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClientProfilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   favoriteJobs<T extends Prisma.User$favoriteJobsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$favoriteJobsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FavoriteJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -2845,8 +2845,6 @@ export interface UserFieldRefs {
   readonly address: Prisma.FieldRef<"User", 'String'>
   readonly professionalCategory: Prisma.FieldRef<"User", 'String'>
   readonly professionalCity: Prisma.FieldRef<"User", 'String'>
-  readonly professionalLatitude: Prisma.FieldRef<"User", 'Float'>
-  readonly professionalLongitude: Prisma.FieldRef<"User", 'Float'>
   readonly professionalSkillsJson: Prisma.FieldRef<"User", 'String'>
   readonly experienceYears: Prisma.FieldRef<"User", 'Int'>
   readonly hourlyRate: Prisma.FieldRef<"User", 'Int'>
@@ -2867,14 +2865,16 @@ export interface UserFieldRefs {
   readonly authProvider: Prisma.FieldRef<"User", 'String'>
   readonly isActive: Prisma.FieldRef<"User", 'Boolean'>
   readonly lastLoginAt: Prisma.FieldRef<"User", 'DateTime'>
-  readonly emailNotificationsEnabled: Prisma.FieldRef<"User", 'Boolean'>
-  readonly browserNotificationsEnabled: Prisma.FieldRef<"User", 'Boolean'>
-  readonly projectActivityNotificationsEnabled: Prisma.FieldRef<"User", 'Boolean'>
-  readonly emailVerifiedAt: Prisma.FieldRef<"User", 'DateTime'>
-  readonly biometricEnabled: Prisma.FieldRef<"User", 'Boolean'>
-  readonly biometricType: Prisma.FieldRef<"User", 'String'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly professionalLatitude: Prisma.FieldRef<"User", 'Float'>
+  readonly professionalLongitude: Prisma.FieldRef<"User", 'Float'>
+  readonly biometricEnabled: Prisma.FieldRef<"User", 'Boolean'>
+  readonly biometricType: Prisma.FieldRef<"User", 'String'>
+  readonly browserNotificationsEnabled: Prisma.FieldRef<"User", 'Boolean'>
+  readonly emailNotificationsEnabled: Prisma.FieldRef<"User", 'Boolean'>
+  readonly emailVerifiedAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly projectActivityNotificationsEnabled: Prisma.FieldRef<"User", 'Boolean'>
 }
     
 
@@ -3268,30 +3268,6 @@ export type UserDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
 }
 
 /**
- * User.clientProfiles
- */
-export type User$clientProfilesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the ClientProfile
-   */
-  select?: Prisma.ClientProfileSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the ClientProfile
-   */
-  omit?: Prisma.ClientProfileOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.ClientProfileInclude<ExtArgs> | null
-  where?: Prisma.ClientProfileWhereInput
-  orderBy?: Prisma.ClientProfileOrderByWithRelationInput | Prisma.ClientProfileOrderByWithRelationInput[]
-  cursor?: Prisma.ClientProfileWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.ClientProfileScalarFieldEnum | Prisma.ClientProfileScalarFieldEnum[]
-}
-
-/**
  * User.clientJobs
  */
 export type User$clientJobsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -3313,6 +3289,30 @@ export type User$clientJobsArgs<ExtArgs extends runtime.Types.Extensions.Interna
   take?: number
   skip?: number
   distinct?: Prisma.ClientJobScalarFieldEnum | Prisma.ClientJobScalarFieldEnum[]
+}
+
+/**
+ * User.clientProfiles
+ */
+export type User$clientProfilesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ClientProfile
+   */
+  select?: Prisma.ClientProfileSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ClientProfile
+   */
+  omit?: Prisma.ClientProfileOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ClientProfileInclude<ExtArgs> | null
+  where?: Prisma.ClientProfileWhereInput
+  orderBy?: Prisma.ClientProfileOrderByWithRelationInput | Prisma.ClientProfileOrderByWithRelationInput[]
+  cursor?: Prisma.ClientProfileWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ClientProfileScalarFieldEnum | Prisma.ClientProfileScalarFieldEnum[]
 }
 
 /**

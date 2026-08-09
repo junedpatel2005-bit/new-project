@@ -216,8 +216,8 @@ export type FavoriteJobWhereInput = {
   userId?: Prisma.IntFilter<"FavoriteJob"> | number
   jobId?: Prisma.IntFilter<"FavoriteJob"> | number
   createdAt?: Prisma.DateTimeFilter<"FavoriteJob"> | Date | string
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   job?: Prisma.XOR<Prisma.ClientJobScalarRelationFilter, Prisma.ClientJobWhereInput>
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
 export type FavoriteJobOrderByWithRelationInput = {
@@ -225,8 +225,8 @@ export type FavoriteJobOrderByWithRelationInput = {
   userId?: Prisma.SortOrder
   jobId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
-  user?: Prisma.UserOrderByWithRelationInput
   job?: Prisma.ClientJobOrderByWithRelationInput
+  user?: Prisma.UserOrderByWithRelationInput
 }
 
 export type FavoriteJobWhereUniqueInput = Prisma.AtLeast<{
@@ -238,8 +238,8 @@ export type FavoriteJobWhereUniqueInput = Prisma.AtLeast<{
   userId?: Prisma.IntFilter<"FavoriteJob"> | number
   jobId?: Prisma.IntFilter<"FavoriteJob"> | number
   createdAt?: Prisma.DateTimeFilter<"FavoriteJob"> | Date | string
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   job?: Prisma.XOR<Prisma.ClientJobScalarRelationFilter, Prisma.ClientJobWhereInput>
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id" | "userId_jobId">
 
 export type FavoriteJobOrderByWithAggregationInput = {
@@ -266,8 +266,8 @@ export type FavoriteJobScalarWhereWithAggregatesInput = {
 
 export type FavoriteJobCreateInput = {
   createdAt?: Date | string
-  user: Prisma.UserCreateNestedOneWithoutFavoriteJobsInput
   job: Prisma.ClientJobCreateNestedOneWithoutFavoriteJobsInput
+  user: Prisma.UserCreateNestedOneWithoutFavoriteJobsInput
 }
 
 export type FavoriteJobUncheckedCreateInput = {
@@ -279,8 +279,8 @@ export type FavoriteJobUncheckedCreateInput = {
 
 export type FavoriteJobUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  user?: Prisma.UserUpdateOneRequiredWithoutFavoriteJobsNestedInput
   job?: Prisma.ClientJobUpdateOneRequiredWithoutFavoriteJobsNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutFavoriteJobsNestedInput
 }
 
 export type FavoriteJobUncheckedUpdateInput = {
@@ -577,8 +577,8 @@ export type FavoriteJobSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   userId?: boolean
   jobId?: boolean
   createdAt?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   job?: boolean | Prisma.ClientJobDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["favoriteJob"]>
 
 export type FavoriteJobSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -586,8 +586,8 @@ export type FavoriteJobSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   userId?: boolean
   jobId?: boolean
   createdAt?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   job?: boolean | Prisma.ClientJobDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["favoriteJob"]>
 
 export type FavoriteJobSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -595,8 +595,8 @@ export type FavoriteJobSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   userId?: boolean
   jobId?: boolean
   createdAt?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   job?: boolean | Prisma.ClientJobDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["favoriteJob"]>
 
 export type FavoriteJobSelectScalar = {
@@ -608,23 +608,23 @@ export type FavoriteJobSelectScalar = {
 
 export type FavoriteJobOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "jobId" | "createdAt", ExtArgs["result"]["favoriteJob"]>
 export type FavoriteJobInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   job?: boolean | Prisma.ClientJobDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type FavoriteJobIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   job?: boolean | Prisma.ClientJobDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type FavoriteJobIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   job?: boolean | Prisma.ClientJobDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
 export type $FavoriteJobPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "FavoriteJob"
   objects: {
-    user: Prisma.$UserPayload<ExtArgs>
     job: Prisma.$ClientJobPayload<ExtArgs>
+    user: Prisma.$UserPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1025,8 +1025,8 @@ readonly fields: FavoriteJobFieldRefs;
  */
 export interface Prisma__FavoriteJobClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   job<T extends Prisma.ClientJobDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ClientJobDefaultArgs<ExtArgs>>): Prisma.Prisma__ClientJobClient<runtime.Types.Result.GetResult<Prisma.$ClientJobPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.

@@ -40,7 +40,8 @@ export async function GET(
 
     const code = request.nextUrl.searchParams.get("code");
     if (!code) {
-      const role = request.nextUrl.searchParams.get("role") === "PROFESSIONAL" ? "PROFESSIONAL" : "CLIENT";
+      const role =
+        request.nextUrl.searchParams.get("role") === "PROFESSIONAL" ? "PROFESSIONAL" : "CLIENT";
       const state = randomBytes(24).toString("hex");
       const url = new URL("https://accounts.google.com/o/oauth2/v2/auth");
       url.searchParams.set("client_id", clientId);
@@ -60,32 +61,78 @@ export async function GET(
     }
 
     try {
-      const saved = JSON.parse(request.cookies.get("servio_google_oauth")?.value ?? "{}") as { state?: string; role?: "CLIENT" | "PROFESSIONAL" };
-      if (!saved.state || saved.state !== request.nextUrl.searchParams.get("state")) throw new Error("Invalid OAuth state");
+      const saved = JSON.parse(request.cookies.get("servio_google_oauth")?.value ?? "{}") as {
+        state?: string;
+        role?: "CLIENT" | "PROFESSIONAL";
+      };
+      if (!saved.state || saved.state !== request.nextUrl.searchParams.get("state"))
+        throw new Error("Invalid OAuth state");
       const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
         method: "POST",
         headers: { "content-type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({ code, client_id: clientId, client_secret: clientSecret, redirect_uri: callbackUrl, grant_type: "authorization_code" }),
+        body: new URLSearchParams({
+          code,
+          client_id: clientId,
+          client_secret: clientSecret,
+          redirect_uri: callbackUrl,
+          grant_type: "authorization_code",
+        }),
       });
       const token = (await tokenResponse.json()) as { access_token?: string };
-      if (!tokenResponse.ok || !token.access_token) throw new Error("Could not exchange Google authorization code");
-      const profileResponse = await fetch("https://openidconnect.googleapis.com/v1/userinfo", { headers: { Authorization: `Bearer ${token.access_token}` } });
-      const profile = (await profileResponse.json()) as { sub?: string; email?: string; given_name?: string; family_name?: string; name?: string };
-      if (!profileResponse.ok || !profile.sub || !profile.email) throw new Error("Could not read Google profile");
-      let user = await db.user.findFirst({ where: { OR: [{ googleId: profile.sub }, { email: profile.email }] } });
+      if (!tokenResponse.ok || !token.access_token)
+        throw new Error("Could not exchange Google authorization code");
+      const profileResponse = await fetch("https://openidconnect.googleapis.com/v1/userinfo", {
+        headers: { Authorization: `Bearer ${token.access_token}` },
+      });
+      const profile = (await profileResponse.json()) as {
+        sub?: string;
+        email?: string;
+        given_name?: string;
+        family_name?: string;
+        name?: string;
+      };
+      if (!profileResponse.ok || !profile.sub || !profile.email)
+        throw new Error("Could not read Google profile");
+      let user = await db.user.findFirst({
+        where: { OR: [{ googleId: profile.sub }, { email: profile.email }] },
+      });
       if (!user) {
         const names = (profile.name ?? "New User").trim().split(/\s+/, 2);
-        user = await db.user.create({ data: { googleId: profile.sub, authProvider: "GOOGLE", email: profile.email, firstName: profile.given_name ?? names[0] ?? "New", lastName: profile.family_name ?? names[1] ?? "", role: saved.role ?? "CLIENT", emailVerifiedAt: new Date() } });
+        user = await db.user.create({
+          data: {
+            googleId: profile.sub,
+            authProvider: "GOOGLE",
+            email: profile.email,
+            firstName: profile.given_name ?? names[0] ?? "New",
+            lastName: profile.family_name ?? names[1] ?? "",
+            role: saved.role ?? "CLIENT",
+            emailVerifiedAt: new Date(),
+          },
+        });
       } else if (!user.googleId) {
-        user = await db.user.update({ where: { id: user.id }, data: { googleId: profile.sub, authProvider: "GOOGLE", emailVerifiedAt: new Date() } });
+        user = await db.user.update({
+          where: { id: user.id },
+          data: { googleId: profile.sub, authProvider: "GOOGLE", emailVerifiedAt: new Date() },
+        });
       }
-      const redirect = user.role === "CLIENT" ? "/client-profile" : user.role === "PROFESSIONAL" ? "/professional-profile" : "/admin";
+      const redirect =
+        user.role === "CLIENT"
+          ? "/client-profile"
+          : user.role === "PROFESSIONAL"
+            ? "/professional-profile"
+            : "/admin";
       const response = NextResponse.redirect(new URL(redirect, request.url));
-      response.cookies.set(sessionCookie, await createSession({ userId: user.id, role: user.role }), sessionOptions);
+      response.cookies.set(
+        sessionCookie,
+        await createSession({ userId: user.id, role: user.role }),
+        sessionOptions,
+      );
       response.cookies.set("servio_google_oauth", "", { httpOnly: true, path: "/", maxAge: 0 });
       return response;
     } catch {
-      const response = NextResponse.redirect(new URL("/login?oauthError=google-failed", request.url));
+      const response = NextResponse.redirect(
+        new URL("/login?oauthError=google-failed", request.url),
+      );
       response.cookies.set("servio_google_oauth", "", { httpOnly: true, path: "/", maxAge: 0 });
       return response;
     }
@@ -183,9 +230,9 @@ export async function POST(
           ? "/admin"
           : !user.emailVerifiedAt
             ? "/verify"
-          : user.role === "PROFESSIONAL"
-            ? "/professional-profile"
-            : "/dashboard",
+            : user.role === "PROFESSIONAL"
+              ? "/professional-profile"
+              : "/dashboard",
     });
     response.cookies.set(
       sessionCookie,
@@ -207,7 +254,14 @@ export async function POST(
       const user = await db.user.findUniqueOrThrow({ where: { id: session.userId } });
       if (user.emailVerifiedAt) return NextResponse.json({ success: true });
       const code = verificationCode();
-      await db.apiToken.create({ data: { userId: user.id, tokenHash: tokenHash(code), kind: "EMAIL_VERIFICATION", expiresAt: new Date(Date.now() + 15 * 60 * 1000) } });
+      await db.apiToken.create({
+        data: {
+          userId: user.id,
+          tokenHash: tokenHash(code),
+          kind: "EMAIL_VERIFICATION",
+          expiresAt: new Date(Date.now() + 15 * 60 * 1000),
+        },
+      });
       await sendVerificationCodeEmail(user.email, code);
       return NextResponse.json({ success: true });
     } catch {
@@ -244,13 +298,24 @@ export async function POST(
     if (!parsed.success || !token) return safe("Enter the 6-digit verification code.");
     try {
       const session = await verifySession(token);
-      const verification = await db.apiToken.findFirst({ where: { userId: session.userId, tokenHash: tokenHash(parsed.data.code), kind: "EMAIL_VERIFICATION", usedAt: null, expiresAt: { gt: new Date() } } });
+      const verification = await db.apiToken.findFirst({
+        where: {
+          userId: session.userId,
+          tokenHash: tokenHash(parsed.data.code),
+          kind: "EMAIL_VERIFICATION",
+          usedAt: null,
+          expiresAt: { gt: new Date() },
+        },
+      });
       if (!verification) return safe("That verification code is invalid or has expired.");
       await db.$transaction([
         db.apiToken.update({ where: { id: verification.id }, data: { usedAt: new Date() } }),
         db.user.update({ where: { id: session.userId }, data: { emailVerifiedAt: new Date() } }),
       ]);
-      return NextResponse.json({ success: true, redirect: session.role === "CLIENT" ? "/client-profile" : "/professional-profile" });
+      return NextResponse.json({
+        success: true,
+        redirect: session.role === "CLIENT" ? "/client-profile" : "/professional-profile",
+      });
     } catch {
       return safe("Unable to verify your email.", 500);
     }
