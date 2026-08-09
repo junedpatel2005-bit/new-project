@@ -8,6 +8,7 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+.next
 dist
 dist-ssr
 .output
@@ -16,6 +17,9 @@ dist-ssr
 .nitro
 *.local
 .env
+prisma/*.db
+prisma/*.db-shm
+prisma/*.db-wal
 
 # Wrangler / Cloudflare
 .wrangler/
