@@ -40,6 +40,7 @@ export async function GET(request: NextRequest) {
   const profile = await db.clientProfile.findFirst({
     where: { userId: user.id },
     select: {
+      id: true,
       fullName: true,
       companyName: true,
       address: true,

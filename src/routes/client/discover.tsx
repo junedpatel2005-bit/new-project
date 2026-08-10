@@ -268,10 +268,10 @@ export default function Discover() {
           )}
           {status === "ready" && professionals.length > 0 && (
             <>
-              {showMap && results?.professionals.length > 0 && (
+              {showMap && (results?.professionals?.length ?? 0) > 0 && (
                 <div ref={mapSectionRef} className="mb-6">
                   <ProfessionalDiscoveryMap
-                    professionals={results.professionals}
+                    professionals={results?.professionals ?? []}
                     selectedPoint={selectedPoint ?? undefined}
                   />
                 </div>
