@@ -2,27 +2,43 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { AuthLayout } from "@/components/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Loader2 } from "lucide-react";
 
 export default function Login() {
   const router = useRouter();
   const [oauthError, setOauthError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({ email: "", password: "" });
   useEffect(() => {
     setOauthError(new URLSearchParams(window.location.search).get("oauthError"));
   }, []);
   async function submit(formData: FormData) {
+    const email = String(formData.get("email") ?? "").trim();
+    const password = String(formData.get("password") ?? "");
+
+    const nextFieldErrors = { email: "", password: "" };
+    if (!email) nextFieldErrors.email = "Email is required.";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) nextFieldErrors.email = "Enter a valid email.";
+    if (!password) nextFieldErrors.password = "Password is required.";
+
+    setFieldErrors(nextFieldErrors);
+    if (nextFieldErrors.email || nextFieldErrors.password) {
+      setError("Please fix the highlighted fields before signing in.");
+      return;
+    }
+
     setPending(true);
     setError(null);
     const response = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ email: formData.get("email"), password: formData.get("password") }),
+      body: JSON.stringify({ email, password }),
     });
     const result = (await response.json()) as { error?: string; redirect?: string };
     setPending(false);
@@ -67,7 +83,16 @@ export default function Login() {
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="email">Email</Label>
-          <Input id="email" name="email" type="email" required placeholder="you@example.com" />
+          <Input
+            id="email"
+            name="email"
+            type="email"
+            required
+            placeholder="you@example.com"
+            aria-invalid={Boolean(fieldErrors.email)}
+            className={fieldErrors.email ? "border-destructive" : ""}
+          />
+          {fieldErrors.email && <p className="text-xs text-destructive">{fieldErrors.email}</p>}
         </div>
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
@@ -76,11 +101,26 @@ export default function Login() {
               Forgot?
             </Link>
           </div>
-          <Input id="password" name="password" type="password" required placeholder="••••••••" />
+          <Input
+            id="password"
+            name="password"
+            type="password"
+            required
+            placeholder="••••••••"
+            aria-invalid={Boolean(fieldErrors.password)}
+            className={fieldErrors.password ? "border-destructive" : ""}
+          />
+          {fieldErrors.password && <p className="text-xs text-destructive">{fieldErrors.password}</p>}
         </div>
         {error && <p className="text-sm text-destructive">{error}</p>}
         <Button type="submit" className="w-full" disabled={pending}>
-          {pending ? "Signing in…" : "Log in"}
+          {pending ? (
+            <span className="inline-flex items-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin" /> Signing in…
+            </span>
+          ) : (
+            "Log in"
+          )}
         </Button>
       </form>
     </AuthLayout>
