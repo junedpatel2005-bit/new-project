@@ -3,7 +3,13 @@ import { Star, MapPin, BadgeCheck, Heart } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-export function ProCard({ pro }: { pro: MarketplaceProfessional }) {
+export function ProCard({
+  pro,
+  onShowLocation,
+}: {
+  pro: MarketplaceProfessional;
+  onShowLocation?: () => void;
+}) {
   const initial = pro.name.slice(0, 1).toUpperCase();
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-soft transition-all hover:-translate-y-1 hover:border-primary/30 hover:shadow-elevated">
@@ -64,7 +70,7 @@ export function ProCard({ pro }: { pro: MarketplaceProfessional }) {
           </span>
         ))}
       </div>
-      <div className="mt-5 flex items-end justify-between border-t border-border pt-4">
+      <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
         <div>
           <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Starting at</p>
           <p>
@@ -74,9 +80,17 @@ export function ProCard({ pro }: { pro: MarketplaceProfessional }) {
             {pro.hourlyRate !== null && <span className="text-sm text-muted-foreground">/hr</span>}
           </p>
         </div>
-        <Button asChild size="sm" className="bg-cta text-cta-foreground hover:bg-cta/90">
-          <Link href={`/pro/${pro.id}`}>Hire</Link>
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          {onShowLocation && (
+            <Button type="button" variant="outline" size="sm" className="gap-2" onClick={onShowLocation}>
+              <MapPin className="h-4 w-4" />
+              Show on map
+            </Button>
+          )}
+          <Button asChild size="sm" className="bg-cta text-cta-foreground hover:bg-cta/90">
+            <Link href={`/pro/${pro.id}`}>Hire</Link>
+          </Button>
+        </div>
       </div>
     </div>
   );

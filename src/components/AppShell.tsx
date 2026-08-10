@@ -20,6 +20,7 @@ import {
   User,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ClientAccountMenu } from "@/components/ClientAccountMenu";
 
 const items = [
   { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
@@ -120,19 +121,7 @@ export function AppShell({ children, title }: { children: React.ReactNode; title
             <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-cta" />
           </Link>
           <div className="flex items-center gap-2">
-            <img
-              src={user?.avatarUrl ?? "https://i.pravatar.cc/100?u=me"}
-              alt={user ? `${user.firstName} ${user.lastName}` : "User"}
-              className="h-8 w-8 rounded-full"
-            />
-            <div className="hidden text-sm leading-tight sm:block">
-              <p className="font-medium">{user ? `${user.firstName} ${user.lastName}` : "Guest"}</p>
-              <p className="text-xs text-muted-foreground">
-                {user?.role
-                  ? user.role.charAt(0) + user.role.slice(1).toLowerCase()
-                  : "Not signed in"}
-              </p>
-            </div>
+            <ClientAccountMenu />
           </div>
         </header>
         <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">

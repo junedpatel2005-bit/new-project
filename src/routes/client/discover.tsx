@@ -1,13 +1,23 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { AppShell } from "@/components/AppShell";
+const ProfessionalDiscoveryMap = dynamic(
+  () => import("@/components/ProfessionalDiscoveryMap"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[520px] w-full overflow-hidden rounded-2xl border bg-muted" />
+    ),
+  },
+);
 import { ProCard } from "@/components/ProCard";
 import type { MarketplaceCategory, MarketplaceProfessional } from "@/lib/types/marketplace";
 import type { ProfessionalDiscoveryResponse } from "@/lib/types/professional-discovery";
 import { Map, SlidersHorizontal, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 const PAGE_SIZE = 20;
 
@@ -37,7 +47,10 @@ export default function Discover() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("");
   const [verifiedOnly, setVerifiedOnly] = useState(true);
+  const [showMap, setShowMap] = useState(false);
+  const [selectedPoint, setSelectedPoint] = useState<{ lat: number; lng: number } | null>(null);
   const [page, setPage] = useState(1);
+  const mapSectionRef = useRef<HTMLDivElement | null>(null);
 
   const professionals = useMemo(
     () => (results ? results.professionals.map(toMarketplaceProfessional) : []),
@@ -189,8 +202,23 @@ export default function Discover() {
               <option>Lowest price</option>
               <option>Closest</option>
             </select>
-            <Button variant="outline" size="sm" className="gap-2 lg:hidden">
-              <SlidersHorizontal className="h-4 w-4" /> Filters
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={() => {
+                setShowMap((current) => {
+                  const next = !current;
+                  if (!current && mapSectionRef.current) {
+                    window.requestAnimationFrame(() => {
+                      mapSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                    });
+                  }
+                  return next;
+                });
+              }}
+            >
+              <Map className="h-4 w-4" /> {showMap ? "Hide map" : "View on map"}
             </Button>
           </div>
 
@@ -240,9 +268,29 @@ export default function Discover() {
           )}
           {status === "ready" && professionals.length > 0 && (
             <>
+              {showMap && results?.professionals.length > 0 && (
+                <div ref={mapSectionRef} className="mb-6">
+                  <ProfessionalDiscoveryMap
+                    professionals={results.professionals}
+                    selectedPoint={selectedPoint ?? undefined}
+                  />
+                </div>
+              )}
               <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-2">
                 {professionals.map((p) => (
-                  <ProCard key={p.id} pro={p} />
+                  <ProCard
+                    key={p.id}
+                    pro={p}
+                    onShowLocation={() => {
+                      const proResult = results?.professionals.find((item) => item.id === p.id);
+                      if (!proResult?.displayPoint) return;
+                      setSelectedPoint(proResult.displayPoint);
+                      setShowMap(true);
+                      window.requestAnimationFrame(() => {
+                        mapSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                      });
+                    }}
+                  />
                 ))}
               </div>
               <div className="mt-8 flex items-center justify-between gap-3 text-sm text-muted-foreground">

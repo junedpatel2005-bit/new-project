@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { ClientAccountMenu } from "@/components/ClientAccountMenu";
 import { Logo } from "./Logo";
 import { Menu, X } from "lucide-react";
 
@@ -45,9 +46,19 @@ export function SiteHeader() {
         </div>
         <div className="hidden items-center gap-2 lg:flex">
           {user ? (
-            <Button asChild variant="outline" size="sm">
-              <Link href={dashboardHref}>Dashboard</Link>
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                asChild
+                variant="outline"
+                size="sm"
+                className="hidden sm:inline-flex"
+              >
+                <Link href={dashboardHref}>Dashboard</Link>
+              </Button>
+              <div className="hidden sm:block">
+                <ClientAccountMenu />
+              </div>
+            </div>
           ) : (
             <>
               <Button asChild variant="ghost" size="sm">
