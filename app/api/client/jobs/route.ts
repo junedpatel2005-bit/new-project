@@ -1,0 +1,119 @@
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { db } from "@/lib/db";
+import { sessionCookie, verifySession } from "@/lib/auth";
+
+const jobInput = z.object({
+  title: z.string().trim().max(160).optional().or(z.literal("")),
+  category: z.string().trim().max(100).optional().or(z.literal("")),
+  description: z.string().trim().max(5000).optional().or(z.literal("")),
+  budgetMin: z.coerce.number().int().min(0).max(10000000).nullable().optional(),
+  budgetMax: z.coerce.number().int().min(0).max(10000000).nullable().optional(),
+  hourlyRate: z.coerce.number().int().min(0).max(1000000).nullable().optional(),
+  timingType: z.enum(["FIXED", "HOURLY"]).optional(),
+  urgency: z.enum(["LOW", "MEDIUM", "HIGH"]).optional(),
+  jobDate: z.string().date().nullable().optional(),
+  deadline: z.string().date().nullable().optional(),
+  workMode: z.enum(["ON_SITE", "REMOTE", "BOTH"]).optional(),
+  locationLabel: z.string().trim().max(100).nullable().optional(),
+  locationAddress: z.string().trim().max(300).nullable().optional(),
+  locationLat: z.coerce.number().min(-90).max(90).nullable().optional(),
+  locationLng: z.coerce.number().min(-180).max(180).nullable().optional(),
+  mode: z.enum(["draft", "publish"]),
+});
+
+async function getClient(request: NextRequest) {
+  const token = request.cookies.get(sessionCookie)?.value;
+  if (!token) return null;
+  try {
+    const session = await verifySession(token);
+    if (session.role !== "CLIENT") return null;
+    const user = await db.user.findUnique({
+      where: { id: session.userId },
+      select: { id: true, isActive: true },
+    });
+    return user?.isActive ? user : null;
+  } catch {
+    return null;
+  }
+}
+
+function normalized(data: z.infer<typeof jobInput>) {
+  return {
+    title: data.title || null,
+    category: data.category || null,
+    description: data.description || null,
+    budgetMin: data.budgetMin ?? null,
+    budgetMax: data.budgetMax ?? null,
+    hourlyRate: data.hourlyRate ?? null,
+    timingType: data.timingType ?? "FIXED",
+    urgency: data.urgency ?? "MEDIUM",
+    workMode: data.workMode ?? "BOTH",
+    jobDate: data.jobDate ? new Date(`${data.jobDate}T00:00:00.000Z`) : null,
+    deadline: data.deadline ? new Date(`${data.deadline}T00:00:00.000Z`) : null,
+    locationLabel: data.locationLabel || null,
+    locationAddress: data.locationAddress || null,
+    locationLat: data.locationLat ?? null,
+    locationLng: data.locationLng ?? null,
+  };
+}
+
+async function publishErrors(data: z.infer<typeof jobInput>) {
+  const fields: Record<string, string> = {};
+  if (!data.title?.trim()) fields.title = "Enter a job title.";
+  if (!data.category?.trim()) fields.category = "Choose a category.";
+  if (!data.description?.trim()) fields.description = "Describe the work needed.";
+  if (!data.deadline) fields.deadline = "Choose a deadline.";
+  if (!data.locationAddress?.trim() && data.workMode !== "REMOTE")
+    fields.locationAddress = "Choose a job location.";
+  if (data.timingType === "HOURLY" && !data.hourlyRate) fields.hourlyRate = "Enter an hourly rate.";
+  if (data.timingType !== "HOURLY" && (data.budgetMin == null || data.budgetMax == null))
+    fields.budgetMin = "Enter a budget range.";
+  if (data.budgetMin != null && data.budgetMax != null && data.budgetMin > data.budgetMax)
+    fields.budgetMax = "Maximum budget must be at least the minimum.";
+  if (data.jobDate && data.deadline && data.deadline < data.jobDate)
+    fields.deadline = "Deadline cannot be before the preferred job date.";
+  if (data.category?.trim()) {
+    const exists = await db.serviceCategory.findFirst({
+      where: { name: data.category.trim() },
+      select: { id: true },
+    });
+    if (!exists) fields.category = "Choose a valid category.";
+  }
+  return fields;
+}
+
+export async function GET(request: NextRequest) {
+  const user = await getClient(request);
+  if (!user) return NextResponse.json({ error: "Client sign-in is required." }, { status: 401 });
+  const jobs = await db.clientJob.findMany({
+    where: { userId: user.id },
+    orderBy: { updatedAt: "desc" },
+  });
+  return NextResponse.json({ jobs });
+}
+
+export async function POST(request: NextRequest) {
+  const user = await getClient(request);
+  if (!user) return NextResponse.json({ error: "Client sign-in is required." }, { status: 401 });
+  const parsed = jobInput.safeParse(await request.json().catch(() => null));
+  if (!parsed.success)
+    return NextResponse.json(
+      { error: "Please review the job details.", fields: parsed.error.flatten().fieldErrors },
+      { status: 400 },
+    );
+  const fields = parsed.data.mode === "publish" ? await publishErrors(parsed.data) : {};
+  if (Object.keys(fields).length)
+    return NextResponse.json(
+      { error: "Please correct the highlighted fields.", fields },
+      { status: 400 },
+    );
+  const job = await db.clientJob.create({
+    data: {
+      userId: user.id,
+      ...normalized(parsed.data),
+      status: parsed.data.mode === "publish" ? "OPEN" : "DRAFT",
+    },
+  });
+  return NextResponse.json({ job }, { status: 201 });
+}

@@ -114,24 +114,28 @@ export async function listOpenJobs(): Promise<MarketplaceJob[]> {
     orderBy: { createdAt: "desc" },
     take: 50,
   });
-  return jobs.map((job) => ({
-    id: job.id,
-    title: job.title,
-    description: job.description,
-    category: job.category,
-    budgetMin: job.budgetMin,
-    budgetMax: job.budgetMax,
-    urgency: job.urgency,
-    workMode: job.workMode,
-    location: job.locationLabel,
-    createdAt: job.createdAt.toISOString(),
-    proposalCount: job._count.favoriteJobs,
-    client: {
-      name: `${job.user.firstName} ${job.user.lastName}`.trim(),
-      avatar: job.user.avatarUrl,
-      rating: job.user.averageRating,
-    },
-  }));
+  return jobs
+    .filter((job): job is typeof job & { title: string; description: string; category: string } =>
+      Boolean(job.title && job.description && job.category),
+    )
+    .map((job) => ({
+      id: job.id,
+      title: job.title,
+      description: job.description,
+      category: job.category,
+      budgetMin: job.budgetMin,
+      budgetMax: job.budgetMax,
+      urgency: job.urgency,
+      workMode: job.workMode,
+      location: job.locationLabel,
+      createdAt: job.createdAt.toISOString(),
+      proposalCount: job._count.favoriteJobs,
+      client: {
+        name: `${job.user.firstName} ${job.user.lastName}`.trim(),
+        avatar: job.user.avatarUrl,
+        rating: job.user.averageRating,
+      },
+    }));
 }
 
 export async function getProfessional(id: number): Promise<MarketplaceProfessional | null> {
@@ -174,7 +178,7 @@ export async function getOpenJob(id: number): Promise<MarketplaceJob | null> {
       _count: { select: { favoriteJobs: true } },
     },
   });
-  if (!job) return null;
+  if (!job || !job.title || !job.description || !job.category) return null;
   return {
     id: job.id,
     title: job.title,

@@ -4,18 +4,31 @@ import bcrypt from "bcryptjs";
 import { createHash, randomBytes, randomInt } from "crypto";
 import { db } from "@/lib/db";
 import { createSession, sessionCookie, sessionOptions, verifySession } from "@/lib/auth";
+import {
+  createPhoneVerificationProof,
+  hasValidPhoneVerificationProof,
+  phoneProofCookie,
+  phoneProofCookieOptions,
+} from "@/lib/dev-phone-otp";
+import { requestPhoneOtp, verifyPhoneOtp } from "@/lib/phone-otp-provider";
 import { rateLimit } from "@/lib/rate-limit";
 import { sendAuthEmail, sendVerificationCodeEmail } from "@/lib/email";
 
-const registerSchema = z.object({
-  firstName: z.string().min(1).max(80),
-  lastName: z.string().min(1).max(80),
-  email: z.string().email(),
-  phone: z.string().min(7).max(25).optional(),
-  password: z.string().min(8).regex(/[A-Z]/).regex(/[a-z]/).regex(/\d/),
-  role: z.enum(["CLIENT", "PROFESSIONAL"]),
-  terms: z.literal(true),
-});
+const registerSchema = z
+  .object({
+    firstName: z.string().min(1).max(80),
+    lastName: z.string().min(1).max(80),
+    email: z.string().email(),
+    phone: z.string().min(7).max(25).optional(),
+    password: z.string().min(8).regex(/[A-Z]/).regex(/[a-z]/).regex(/\d/),
+    role: z.enum(["CLIENT", "PROFESSIONAL"]),
+    terms: z.literal(true),
+  })
+  .superRefine((value, context) => {
+    if (value.role === "CLIENT" && !value.phone?.trim()) {
+      context.addIssue({ code: "custom", path: ["phone"], message: "A phone number is required." });
+    }
+  });
 const credentials = z.object({ email: z.string().email(), password: z.string().min(1) });
 const tokenHash = (value: string) => createHash("sha256").update(value).digest("hex");
 const clientKey = (request: NextRequest) =>
@@ -170,10 +183,60 @@ export async function POST(
   if (!rateLimit(`${action}:${clientKey(request)}`))
     return safe("Too many attempts. Please try again shortly.", 429);
   const body = await request.json().catch(() => null);
+  if (action === "send-phone-otp") {
+    const parsed = z.object({ phone: z.string().min(7).max(25) }).safeParse(body);
+    if (!parsed.success) return safe("Enter a valid phone number.");
+    if (
+      !rateLimit(`send-phone-otp:${clientKey(request)}:${parsed.data.phone.trim()}`, 3, 10 * 60_000)
+    )
+      return safe("Too many code requests. Please try again later.", 429);
+    const result = await requestPhoneOtp(parsed.data.phone);
+    if (!result.ok) return safe(result.error, result.status);
+    // The development code is configured only on the server. A real SMS sender
+    // can replace this isolated action without changing signup or registration.
+    return NextResponse.json({ success: true });
+  }
+  if (action === "verify-phone") {
+    const parsed = z
+      .object({ phone: z.string().min(7).max(25), code: z.string().min(1).max(20) })
+      .safeParse(body);
+    if (!parsed.success) return safe("Enter a valid phone number and verification code.");
+    if (
+      !rateLimit(`verify-phone:${clientKey(request)}:${parsed.data.phone.trim()}`, 5, 10 * 60_000)
+    )
+      return safe("Too many verification attempts. Please try again later.", 429);
+    const result = await verifyPhoneOtp(parsed.data.phone, parsed.data.code);
+    if (!result.ok) return safe(result.error, result.status);
+
+    const response = NextResponse.json({ success: true });
+    response.cookies.set(
+      phoneProofCookie,
+      await createPhoneVerificationProof(parsed.data.phone),
+      phoneProofCookieOptions,
+    );
+    return response;
+  }
   if (action === "register") {
     const parsed = registerSchema.safeParse(body);
-    if (!parsed.success) return safe("Please review the required fields.");
+    if (!parsed.success) {
+      const fields = Object.fromEntries(
+        parsed.error.issues.map((issue) => [String(issue.path[0] ?? "form"), issue.message]),
+      );
+      return NextResponse.json(
+        { error: "Please correct the highlighted fields.", fields },
+        { status: 400 },
+      );
+    }
     const data = parsed.data;
+    if (
+      data.role === "CLIENT" &&
+      !(await hasValidPhoneVerificationProof(
+        request.cookies.get(phoneProofCookie)?.value,
+        data.phone!,
+      ))
+    ) {
+      return safe("Verify this phone number before creating a client account.", 403);
+    }
     const exists = await db.user.findFirst({
       where: { OR: [{ email: data.email }, { phone: data.phone ?? undefined }] },
       select: { id: true },
@@ -187,6 +250,7 @@ export async function POST(
         phone: data.phone || null,
         passwordHash: await bcrypt.hash(data.password, 12),
         role: data.role,
+        phoneVerifiedAt: data.role === "CLIENT" ? new Date() : null,
       },
     });
     const code = verificationCode();
@@ -211,6 +275,9 @@ export async function POST(
       await createSession({ userId: user.id, role: user.role }),
       sessionOptions,
     );
+    if (data.role === "CLIENT") {
+      response.cookies.set(phoneProofCookie, "", { ...phoneProofCookieOptions, maxAge: 0 });
+    }
     return response;
   }
   if (action === "login") {

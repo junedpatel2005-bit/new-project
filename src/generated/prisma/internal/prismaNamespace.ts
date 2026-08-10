@@ -4956,6 +4956,7 @@ export const UserScalarFieldEnum = {
   browserNotificationsEnabled: 'browserNotificationsEnabled',
   emailNotificationsEnabled: 'emailNotificationsEnabled',
   emailVerifiedAt: 'emailVerifiedAt',
+  phoneVerifiedAt: 'phoneVerifiedAt',
   projectActivityNotificationsEnabled: 'projectActivityNotificationsEnabled'
 } as const
 

@@ -97,6 +97,7 @@ export type UserMinAggregateOutputType = {
   browserNotificationsEnabled: boolean | null
   emailNotificationsEnabled: boolean | null
   emailVerifiedAt: Date | null
+  phoneVerifiedAt: Date | null
   projectActivityNotificationsEnabled: boolean | null
 }
 
@@ -147,6 +148,7 @@ export type UserMaxAggregateOutputType = {
   browserNotificationsEnabled: boolean | null
   emailNotificationsEnabled: boolean | null
   emailVerifiedAt: Date | null
+  phoneVerifiedAt: Date | null
   projectActivityNotificationsEnabled: boolean | null
 }
 
@@ -197,6 +199,7 @@ export type UserCountAggregateOutputType = {
   browserNotificationsEnabled: number
   emailNotificationsEnabled: number
   emailVerifiedAt: number
+  phoneVerifiedAt: number
   projectActivityNotificationsEnabled: number
   _all: number
 }
@@ -273,6 +276,7 @@ export type UserMinAggregateInputType = {
   browserNotificationsEnabled?: true
   emailNotificationsEnabled?: true
   emailVerifiedAt?: true
+  phoneVerifiedAt?: true
   projectActivityNotificationsEnabled?: true
 }
 
@@ -323,6 +327,7 @@ export type UserMaxAggregateInputType = {
   browserNotificationsEnabled?: true
   emailNotificationsEnabled?: true
   emailVerifiedAt?: true
+  phoneVerifiedAt?: true
   projectActivityNotificationsEnabled?: true
 }
 
@@ -373,6 +378,7 @@ export type UserCountAggregateInputType = {
   browserNotificationsEnabled?: true
   emailNotificationsEnabled?: true
   emailVerifiedAt?: true
+  phoneVerifiedAt?: true
   projectActivityNotificationsEnabled?: true
   _all?: true
 }
@@ -510,6 +516,7 @@ export type UserGroupByOutputType = {
   browserNotificationsEnabled: boolean
   emailNotificationsEnabled: boolean
   emailVerifiedAt: Date | null
+  phoneVerifiedAt: Date | null
   projectActivityNotificationsEnabled: boolean
   _count: UserCountAggregateOutputType | null
   _avg: UserAvgAggregateOutputType | null
@@ -583,6 +590,7 @@ export type UserWhereInput = {
   browserNotificationsEnabled?: Prisma.BoolFilter<"User"> | boolean
   emailNotificationsEnabled?: Prisma.BoolFilter<"User"> | boolean
   emailVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  phoneVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFilter<"User"> | boolean
   clientJobs?: Prisma.ClientJobListRelationFilter
   clientProfiles?: Prisma.ClientProfileListRelationFilter
@@ -636,6 +644,7 @@ export type UserOrderByWithRelationInput = {
   browserNotificationsEnabled?: Prisma.SortOrder
   emailNotificationsEnabled?: Prisma.SortOrder
   emailVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  phoneVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   projectActivityNotificationsEnabled?: Prisma.SortOrder
   clientJobs?: Prisma.ClientJobOrderByRelationAggregateInput
   clientProfiles?: Prisma.ClientProfileOrderByRelationAggregateInput
@@ -692,6 +701,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   browserNotificationsEnabled?: Prisma.BoolFilter<"User"> | boolean
   emailNotificationsEnabled?: Prisma.BoolFilter<"User"> | boolean
   emailVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  phoneVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFilter<"User"> | boolean
   clientJobs?: Prisma.ClientJobListRelationFilter
   clientProfiles?: Prisma.ClientProfileListRelationFilter
@@ -745,6 +755,7 @@ export type UserOrderByWithAggregationInput = {
   browserNotificationsEnabled?: Prisma.SortOrder
   emailNotificationsEnabled?: Prisma.SortOrder
   emailVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  phoneVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   projectActivityNotificationsEnabled?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _avg?: Prisma.UserAvgOrderByAggregateInput
@@ -803,6 +814,7 @@ export type UserScalarWhereWithAggregatesInput = {
   browserNotificationsEnabled?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   emailNotificationsEnabled?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   emailVerifiedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  phoneVerifiedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
 }
 
@@ -852,6 +864,7 @@ export type UserCreateInput = {
   browserNotificationsEnabled?: boolean
   emailNotificationsEnabled?: boolean
   emailVerifiedAt?: Date | string | null
+  phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
   clientJobs?: Prisma.ClientJobCreateNestedManyWithoutUserInput
   clientProfiles?: Prisma.ClientProfileCreateNestedManyWithoutUserInput
@@ -905,6 +918,7 @@ export type UserUncheckedCreateInput = {
   browserNotificationsEnabled?: boolean
   emailNotificationsEnabled?: boolean
   emailVerifiedAt?: Date | string | null
+  phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
   clientJobs?: Prisma.ClientJobUncheckedCreateNestedManyWithoutUserInput
   clientProfiles?: Prisma.ClientProfileUncheckedCreateNestedManyWithoutUserInput
@@ -957,6 +971,7 @@ export type UserUpdateInput = {
   browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clientJobs?: Prisma.ClientJobUpdateManyWithoutUserNestedInput
   clientProfiles?: Prisma.ClientProfileUpdateManyWithoutUserNestedInput
@@ -1010,6 +1025,7 @@ export type UserUncheckedUpdateInput = {
   browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clientJobs?: Prisma.ClientJobUncheckedUpdateManyWithoutUserNestedInput
   clientProfiles?: Prisma.ClientProfileUncheckedUpdateManyWithoutUserNestedInput
@@ -1063,6 +1079,7 @@ export type UserCreateManyInput = {
   browserNotificationsEnabled?: boolean
   emailNotificationsEnabled?: boolean
   emailVerifiedAt?: Date | string | null
+  phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
 }
 
@@ -1112,6 +1129,7 @@ export type UserUpdateManyMutationInput = {
   browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
@@ -1162,6 +1180,7 @@ export type UserUncheckedUpdateManyInput = {
   browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
@@ -1212,6 +1231,7 @@ export type UserCountOrderByAggregateInput = {
   browserNotificationsEnabled?: Prisma.SortOrder
   emailNotificationsEnabled?: Prisma.SortOrder
   emailVerifiedAt?: Prisma.SortOrder
+  phoneVerifiedAt?: Prisma.SortOrder
   projectActivityNotificationsEnabled?: Prisma.SortOrder
 }
 
@@ -1274,6 +1294,7 @@ export type UserMaxOrderByAggregateInput = {
   browserNotificationsEnabled?: Prisma.SortOrder
   emailNotificationsEnabled?: Prisma.SortOrder
   emailVerifiedAt?: Prisma.SortOrder
+  phoneVerifiedAt?: Prisma.SortOrder
   projectActivityNotificationsEnabled?: Prisma.SortOrder
 }
 
@@ -1324,6 +1345,7 @@ export type UserMinOrderByAggregateInput = {
   browserNotificationsEnabled?: Prisma.SortOrder
   emailNotificationsEnabled?: Prisma.SortOrder
   emailVerifiedAt?: Prisma.SortOrder
+  phoneVerifiedAt?: Prisma.SortOrder
   projectActivityNotificationsEnabled?: Prisma.SortOrder
 }
 
@@ -1464,6 +1486,7 @@ export type UserCreateWithoutClientProfilesInput = {
   browserNotificationsEnabled?: boolean
   emailNotificationsEnabled?: boolean
   emailVerifiedAt?: Date | string | null
+  phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
   clientJobs?: Prisma.ClientJobCreateNestedManyWithoutUserInput
   favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutUserInput
@@ -1516,6 +1539,7 @@ export type UserUncheckedCreateWithoutClientProfilesInput = {
   browserNotificationsEnabled?: boolean
   emailNotificationsEnabled?: boolean
   emailVerifiedAt?: Date | string | null
+  phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
   clientJobs?: Prisma.ClientJobUncheckedCreateNestedManyWithoutUserInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedCreateNestedManyWithoutUserInput
@@ -1583,6 +1607,7 @@ export type UserUpdateWithoutClientProfilesInput = {
   browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clientJobs?: Prisma.ClientJobUpdateManyWithoutUserNestedInput
   favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutUserNestedInput
@@ -1635,6 +1660,7 @@ export type UserUncheckedUpdateWithoutClientProfilesInput = {
   browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clientJobs?: Prisma.ClientJobUncheckedUpdateManyWithoutUserNestedInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedUpdateManyWithoutUserNestedInput
@@ -1686,6 +1712,7 @@ export type UserCreateWithoutClientJobsInput = {
   browserNotificationsEnabled?: boolean
   emailNotificationsEnabled?: boolean
   emailVerifiedAt?: Date | string | null
+  phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
   clientProfiles?: Prisma.ClientProfileCreateNestedManyWithoutUserInput
   favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutUserInput
@@ -1738,6 +1765,7 @@ export type UserUncheckedCreateWithoutClientJobsInput = {
   browserNotificationsEnabled?: boolean
   emailNotificationsEnabled?: boolean
   emailVerifiedAt?: Date | string | null
+  phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
   clientProfiles?: Prisma.ClientProfileUncheckedCreateNestedManyWithoutUserInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedCreateNestedManyWithoutUserInput
@@ -1805,6 +1833,7 @@ export type UserUpdateWithoutClientJobsInput = {
   browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clientProfiles?: Prisma.ClientProfileUpdateManyWithoutUserNestedInput
   favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutUserNestedInput
@@ -1857,6 +1886,7 @@ export type UserUncheckedUpdateWithoutClientJobsInput = {
   browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clientProfiles?: Prisma.ClientProfileUncheckedUpdateManyWithoutUserNestedInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedUpdateManyWithoutUserNestedInput
@@ -1908,6 +1938,7 @@ export type UserCreateWithoutFavoriteJobsInput = {
   browserNotificationsEnabled?: boolean
   emailNotificationsEnabled?: boolean
   emailVerifiedAt?: Date | string | null
+  phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
   clientJobs?: Prisma.ClientJobCreateNestedManyWithoutUserInput
   clientProfiles?: Prisma.ClientProfileCreateNestedManyWithoutUserInput
@@ -1960,6 +1991,7 @@ export type UserUncheckedCreateWithoutFavoriteJobsInput = {
   browserNotificationsEnabled?: boolean
   emailNotificationsEnabled?: boolean
   emailVerifiedAt?: Date | string | null
+  phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
   clientJobs?: Prisma.ClientJobUncheckedCreateNestedManyWithoutUserInput
   clientProfiles?: Prisma.ClientProfileUncheckedCreateNestedManyWithoutUserInput
@@ -2027,6 +2059,7 @@ export type UserUpdateWithoutFavoriteJobsInput = {
   browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clientJobs?: Prisma.ClientJobUpdateManyWithoutUserNestedInput
   clientProfiles?: Prisma.ClientProfileUpdateManyWithoutUserNestedInput
@@ -2079,6 +2112,7 @@ export type UserUncheckedUpdateWithoutFavoriteJobsInput = {
   browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clientJobs?: Prisma.ClientJobUncheckedUpdateManyWithoutUserNestedInput
   clientProfiles?: Prisma.ClientProfileUncheckedUpdateManyWithoutUserNestedInput
@@ -2180,6 +2214,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   browserNotificationsEnabled?: boolean
   emailNotificationsEnabled?: boolean
   emailVerifiedAt?: boolean
+  phoneVerifiedAt?: boolean
   projectActivityNotificationsEnabled?: boolean
   clientJobs?: boolean | Prisma.User$clientJobsArgs<ExtArgs>
   clientProfiles?: boolean | Prisma.User$clientProfilesArgs<ExtArgs>
@@ -2234,6 +2269,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   browserNotificationsEnabled?: boolean
   emailNotificationsEnabled?: boolean
   emailVerifiedAt?: boolean
+  phoneVerifiedAt?: boolean
   projectActivityNotificationsEnabled?: boolean
 }, ExtArgs["result"]["user"]>
 
@@ -2284,6 +2320,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   browserNotificationsEnabled?: boolean
   emailNotificationsEnabled?: boolean
   emailVerifiedAt?: boolean
+  phoneVerifiedAt?: boolean
   projectActivityNotificationsEnabled?: boolean
 }, ExtArgs["result"]["user"]>
 
@@ -2334,10 +2371,11 @@ export type UserSelectScalar = {
   browserNotificationsEnabled?: boolean
   emailNotificationsEnabled?: boolean
   emailVerifiedAt?: boolean
+  phoneVerifiedAt?: boolean
   projectActivityNotificationsEnabled?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "role" | "firstName" | "lastName" | "email" | "phone" | "passwordHash" | "googleId" | "avatarUrl" | "companyName" | "companyWebsite" | "industry" | "teamSize" | "companyDescription" | "address" | "professionalCategory" | "professionalCity" | "professionalSkillsJson" | "experienceYears" | "hourlyRate" | "fixedRate" | "portfolioUrl" | "workPhotosJson" | "certificationsJson" | "tradeLicenseUrl" | "serviceArea" | "workMode" | "serviceRadiusKm" | "averageRating" | "reviewCount" | "isVerified" | "availabilityStatus" | "savedLocationsJson" | "hiringNeedsJson" | "authProvider" | "isActive" | "lastLoginAt" | "createdAt" | "updatedAt" | "professionalLatitude" | "professionalLongitude" | "biometricEnabled" | "biometricType" | "browserNotificationsEnabled" | "emailNotificationsEnabled" | "emailVerifiedAt" | "projectActivityNotificationsEnabled", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "role" | "firstName" | "lastName" | "email" | "phone" | "passwordHash" | "googleId" | "avatarUrl" | "companyName" | "companyWebsite" | "industry" | "teamSize" | "companyDescription" | "address" | "professionalCategory" | "professionalCity" | "professionalSkillsJson" | "experienceYears" | "hourlyRate" | "fixedRate" | "portfolioUrl" | "workPhotosJson" | "certificationsJson" | "tradeLicenseUrl" | "serviceArea" | "workMode" | "serviceRadiusKm" | "averageRating" | "reviewCount" | "isVerified" | "availabilityStatus" | "savedLocationsJson" | "hiringNeedsJson" | "authProvider" | "isActive" | "lastLoginAt" | "createdAt" | "updatedAt" | "professionalLatitude" | "professionalLongitude" | "biometricEnabled" | "biometricType" | "browserNotificationsEnabled" | "emailNotificationsEnabled" | "emailVerifiedAt" | "phoneVerifiedAt" | "projectActivityNotificationsEnabled", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   clientJobs?: boolean | Prisma.User$clientJobsArgs<ExtArgs>
   clientProfiles?: boolean | Prisma.User$clientProfilesArgs<ExtArgs>
@@ -2401,6 +2439,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     browserNotificationsEnabled: boolean
     emailNotificationsEnabled: boolean
     emailVerifiedAt: Date | null
+    phoneVerifiedAt: Date | null
     projectActivityNotificationsEnabled: boolean
   }, ExtArgs["result"]["user"]>
   composites: {}
@@ -2874,6 +2913,7 @@ export interface UserFieldRefs {
   readonly browserNotificationsEnabled: Prisma.FieldRef<"User", 'Boolean'>
   readonly emailNotificationsEnabled: Prisma.FieldRef<"User", 'Boolean'>
   readonly emailVerifiedAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly phoneVerifiedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly projectActivityNotificationsEnabled: Prisma.FieldRef<"User", 'Boolean'>
 }
     

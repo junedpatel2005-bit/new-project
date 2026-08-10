@@ -1,39 +1,177 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { ClipboardEvent, KeyboardEvent, useRef, useState } from "react";
 import { AuthLayout } from "@/components/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+
+const emptyOtp = ["", "", "", ""];
 
 export default function Signup() {
   const router = useRouter();
+  const otpRefs = useRef<Array<HTMLInputElement | null>>([]);
   const [role, setRole] = useState<"client" | "pro">("client");
+  const [phone, setPhone] = useState("");
+  const [otp, setOtp] = useState(emptyOtp);
+  const [otpOpen, setOtpOpen] = useState(false);
+  const [phoneVerified, setPhoneVerified] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [draft, setDraft] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    professionalPhone: "",
+    password: "",
+    confirmPassword: "",
+    terms: false,
+  });
+  const [phoneError, setPhoneError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
-  async function submit(formData: FormData) {
-    setPending(true);
+  const [sendingCode, setSendingCode] = useState(false);
+  const [verifyingPhone, setVerifyingPhone] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  function resetPhoneVerification() {
+    setOtp(emptyOtp);
+    setOtpOpen(false);
+    setPhoneVerified(false);
+    setPhoneError(null);
+  }
+
+  function chooseRole(nextRole: "client" | "pro") {
+    setRole(nextRole);
     setError(null);
+    resetPhoneVerification();
+  }
+
+  async function requestCode() {
+    setPhoneError(null);
+    if (phone.trim().length < 7) {
+      setPhoneError("Enter a valid phone number first.");
+      return;
+    }
+    setSendingCode(true);
+    const response = await fetch("/api/auth/send-phone-otp", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ phone }),
+    });
+    const result = (await response.json()) as { error?: string };
+    setSendingCode(false);
+    if (!response.ok) {
+      setPhoneError(result.error ?? "Unable to start phone verification.");
+      return;
+    }
+    setOtpOpen(true);
+    requestAnimationFrame(() => otpRefs.current[0]?.focus());
+  }
+
+  function updateOtp(index: number, value: string) {
+    const digit = value.replace(/\D/g, "").slice(-1);
+    setOtp((current) => current.map((item, itemIndex) => (itemIndex === index ? digit : item)));
+    if (digit && index < otpRefs.current.length - 1) otpRefs.current[index + 1]?.focus();
+  }
+
+  function handleOtpKeyDown(index: number, event: KeyboardEvent<HTMLInputElement>) {
+    if (event.key === "Backspace" && !otp[index] && index > 0) {
+      otpRefs.current[index - 1]?.focus();
+    }
+  }
+
+  function handleOtpPaste(event: ClipboardEvent<HTMLInputElement>) {
+    const digits = event.clipboardData.getData("text").replace(/\D/g, "").slice(0, 4);
+    if (!digits) return;
+    event.preventDefault();
+    setOtp(Array.from({ length: 4 }, (_, index) => digits[index] ?? ""));
+    otpRefs.current[Math.min(digits.length, 4) - 1]?.focus();
+  }
+
+  async function verifyPhone() {
+    const code = otp.join("");
+    if (code.length !== 4) {
+      setPhoneError("Enter the 4-digit verification code.");
+      return;
+    }
+    setPhoneError(null);
+    setVerifyingPhone(true);
+    const response = await fetch("/api/auth/verify-phone", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ phone, code }),
+    });
+    const result = (await response.json()) as { error?: string };
+    setVerifyingPhone(false);
+    if (!response.ok) {
+      setPhoneError(result.error ?? "Unable to verify this phone number.");
+      return;
+    }
+    setPhoneVerified(true);
+    setOtpOpen(false);
+  }
+
+  async function submit() {
+    setError(null);
+    const nextErrors: Record<string, string> = {};
+    const firstName = draft.firstName.trim();
+    const lastName = draft.lastName.trim();
+    const email = draft.email.trim();
+    const password = draft.password;
+    if (!firstName) nextErrors.firstName = "First name is required.";
+    if (!lastName) nextErrors.lastName = "Last name is required.";
+    if (!email) nextErrors.email = "Email is required.";
+    else if (!/^\S+@\S+\.\S+$/.test(email)) nextErrors.email = "Enter a valid email address.";
+    if (!password) nextErrors.password = "Password is required.";
+    else if (password.length < 8) nextErrors.password = "Password must be at least 8 characters.";
+    else if (!/[A-Z]/.test(password))
+      nextErrors.password = "Password must include an uppercase letter.";
+    else if (!/[a-z]/.test(password))
+      nextErrors.password = "Password must include a lowercase letter.";
+    else if (!/\d/.test(password)) nextErrors.password = "Password must include a number.";
+    if (!draft.confirmPassword) nextErrors.confirmPassword = "Please confirm your password.";
+    else if (password !== draft.confirmPassword) {
+      nextErrors.confirmPassword = "Passwords do not match.";
+    }
+    if (role === "client" && !phone.trim()) nextErrors.phone = "Phone number is required.";
+    if (!draft.terms) nextErrors.terms = "Please accept the Terms and Privacy Policy.";
+    setFieldErrors(nextErrors);
+    if (Object.keys(nextErrors).length) {
+      return;
+    }
+    if (role === "client" && !phoneVerified) {
+      setError("Verify your phone number before creating a client account.");
+      return;
+    }
+    setPending(true);
     const response = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
-        firstName: formData.get("firstName"),
-        lastName: formData.get("lastName"),
-        email: formData.get("email"),
-        phone: formData.get("phone") || undefined,
-        password: formData.get("password"),
+        firstName,
+        lastName,
+        email,
+        phone: role === "client" ? phone : draft.professionalPhone || undefined,
+        password,
         role: role === "pro" ? "PROFESSIONAL" : "CLIENT",
-        terms: formData.get("terms") === "on",
+        terms: draft.terms,
       }),
     });
-    const result = (await response.json()) as { error?: string; redirect?: string };
+    const result = (await response.json()) as {
+      error?: string;
+      redirect?: string;
+      fields?: Record<string, string>;
+    };
     setPending(false);
-    if (!response.ok) setError(result.error ?? "Unable to create your account.");
-    else router.push(result.redirect ?? "/client-profile");
+    if (!response.ok) {
+      setFieldErrors(result.fields ?? {});
+      setError(result.error ?? "Unable to create your account.");
+    } else router.push(result.redirect ?? "/client-profile");
   }
+
   return (
     <AuthLayout
       title="Create your account"
@@ -48,16 +186,14 @@ export default function Signup() {
       }
     >
       <div className="mb-5 grid grid-cols-2 gap-2 rounded-xl bg-muted p-1">
-        {(["client", "pro"] as const).map((r) => (
+        {(["client", "pro"] as const).map((choice) => (
           <button
-            key={r}
+            key={choice}
             type="button"
-            onClick={() => setRole(r)}
-            className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-              role === r ? "bg-card text-foreground shadow-soft" : "text-muted-foreground"
-            }`}
+            onClick={() => chooseRole(choice)}
+            className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${role === choice ? "bg-card text-foreground shadow-soft" : "text-muted-foreground"}`}
           >
-            I'm a {r === "client" ? "client" : "professional"}
+            I&apos;m a {choice === "client" ? "client" : "professional"}
           </button>
         ))}
       </div>
@@ -76,55 +212,254 @@ export default function Signup() {
       >
         Continue with Google
       </Button>
-      <form action={submit} className="space-y-4">
+
+      <form action={submit} noValidate className="space-y-4">
         <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-1.5">
-            <Label htmlFor="first">First name</Label>
-            <Input id="first" name="firstName" required placeholder="Jane" />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="last">Last name</Label>
-            <Input id="last" name="lastName" required placeholder="Doe" />
-          </div>
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="email">Work email</Label>
-          <Input id="email" name="email" type="email" required placeholder="you@company.com" />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="phone">Phone</Label>
-          <Input id="phone" name="phone" type="tel" placeholder="+1 555 123 4567" />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="password">Password</Label>
-          <Input
-            id="password"
-            name="password"
-            type="password"
+          <Field
+            id="first"
+            name="firstName"
+            label="First name"
+            placeholder="First name"
             required
-            placeholder="At least 8 characters"
+            error={fieldErrors.firstName}
+            value={draft.firstName}
+            onValueChange={(value) => setDraft({ ...draft, firstName: value })}
+          />
+          <Field
+            id="last"
+            name="lastName"
+            label="Last name"
+            placeholder="Last name"
+            required
+            error={fieldErrors.lastName}
+            value={draft.lastName}
+            onValueChange={(value) => setDraft({ ...draft, lastName: value })}
           />
         </div>
+        <Field
+          id="email"
+          name="email"
+          label="Work email"
+          placeholder="you@company.com"
+          type="email"
+          required
+          error={fieldErrors.email}
+          value={draft.email}
+          onValueChange={(value) => setDraft({ ...draft, email: value })}
+        />
+        {role === "client" ? (
+          <div className="space-y-2">
+            <Label htmlFor="phone">Phone number</Label>
+            <div className="flex gap-2">
+              <Input
+                id="phone"
+                value={phone}
+                onChange={(event) => {
+                  setPhone(event.target.value);
+                  resetPhoneVerification();
+                }}
+                type="tel"
+                required
+                disabled={phoneVerified}
+                placeholder="+1 555 123 4567"
+                className={
+                  fieldErrors.phone
+                    ? "border-destructive placeholder:text-destructive focus-visible:ring-destructive"
+                    : ""
+                }
+                aria-invalid={Boolean(fieldErrors.phone)}
+                aria-describedby={fieldErrors.phone ? "phone-error" : undefined}
+              />
+              {!phoneVerified && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={requestCode}
+                  disabled={sendingCode}
+                >
+                  {sendingCode ? "Sending…" : otpOpen ? "Resend" : "Verify"}
+                </Button>
+              )}
+            </div>
+            {phoneVerified ? (
+              <div className="flex animate-in items-center justify-between rounded-md bg-muted px-3 py-2 text-sm text-primary fade-in zoom-in-95 duration-300">
+                <span className="animate-in fade-in slide-in-from-left-1 duration-300">
+                  ✓ Phone number verified
+                </span>
+                <Button type="button" variant="ghost" size="sm" onClick={resetPhoneVerification}>
+                  Change phone number
+                </Button>
+              </div>
+            ) : (
+              otpOpen && (
+                <div className="animate-in space-y-3 rounded-lg border border-border p-3 fade-in slide-in-from-top-2 duration-300">
+                  <Label>Verification code</Label>
+                  <div className="flex gap-2">
+                    {otp.map((digit, index) => (
+                      <Input
+                        key={index}
+                        ref={(element) => {
+                          otpRefs.current[index] = element;
+                        }}
+                        value={digit}
+                        onChange={(event) => updateOtp(index, event.target.value)}
+                        onKeyDown={(event) => handleOtpKeyDown(index, event)}
+                        onPaste={handleOtpPaste}
+                        inputMode="numeric"
+                        autoComplete="one-time-code"
+                        maxLength={1}
+                        aria-label={`Verification digit ${index + 1}`}
+                        className="h-11 w-11 animate-in text-center text-lg fade-in zoom-in-95 duration-300"
+                      />
+                    ))}
+                  </div>
+                  <Button
+                    type="button"
+                    onClick={verifyPhone}
+                    disabled={verifyingPhone || otp.join("").length !== 4}
+                  >
+                    {verifyingPhone ? "Verifying…" : "Verify OTP"}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="link"
+                    size="sm"
+                    onClick={requestCode}
+                    disabled={sendingCode}
+                  >
+                    {sendingCode ? "Sending…" : "Resend code"}
+                  </Button>
+                </div>
+              )
+            )}
+            {phoneError && <p className="text-sm text-destructive">{phoneError}</p>}
+            {fieldErrors.phone && (
+              <p id="phone-error" className="text-sm text-destructive">
+                {fieldErrors.phone}
+              </p>
+            )}
+          </div>
+        ) : (
+          <Field
+            id="phone"
+            name="phone"
+            label="Phone (optional)"
+            placeholder="+1 555 123 4567"
+            type="tel"
+            value={draft.professionalPhone}
+            onValueChange={(value) => setDraft({ ...draft, professionalPhone: value })}
+          />
+        )}
+        <Field
+          id="password"
+          name="password"
+          label="Password"
+          placeholder="At least 8 characters"
+          type={showPassword ? "text" : "password"}
+          required
+          error={fieldErrors.password}
+          value={draft.password}
+          onValueChange={(value) => setDraft({ ...draft, password: value })}
+          trailingAction={{
+            label: showPassword ? "Hide password" : "Show password",
+            onClick: () => setShowPassword((current) => !current),
+          }}
+        />
+        <Field
+          id="confirm-password"
+          name="confirmPassword"
+          label="Confirm password"
+          placeholder="Repeat your password"
+          type={showConfirmPassword ? "text" : "password"}
+          required
+          error={fieldErrors.confirmPassword}
+          value={draft.confirmPassword}
+          onValueChange={(value) => setDraft({ ...draft, confirmPassword: value })}
+          trailingAction={{
+            label: showConfirmPassword ? "Hide password" : "Show password",
+            onClick: () => setShowConfirmPassword((current) => !current),
+          }}
+        />
         <label className="flex items-start gap-2 text-xs text-muted-foreground">
-          <input name="terms" type="checkbox" required className="mt-0.5 h-4 w-4 accent-primary" />I
-          agree to the Terms and Privacy Policy.
+          <input
+            name="terms"
+            type="checkbox"
+            required
+            checked={draft.terms}
+            onChange={(event) => setDraft({ ...draft, terms: event.target.checked })}
+            className="mt-0.5 h-4 w-4 accent-primary"
+          />
+          I agree to the Terms and Privacy Policy.
         </label>
+        {fieldErrors.terms && <p className="text-sm text-destructive">{fieldErrors.terms}</p>}
         {error && <p className="text-sm text-destructive">{error}</p>}
-        <Button type="submit" className="w-full" disabled={pending}>
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={pending || (role === "client" && !phoneVerified)}
+        >
           {pending ? "Creating account…" : "Create account"}
         </Button>
-        <p className="text-center text-xs text-muted-foreground">
-          By signing up you agree to our{" "}
-          <a className="underline" href="#">
-            Terms
-          </a>{" "}
-          and{" "}
-          <a className="underline" href="#">
-            Privacy
-          </a>
-          .
-        </p>
       </form>
     </AuthLayout>
+  );
+}
+
+function Field({
+  id,
+  name,
+  label,
+  placeholder,
+  type = "text",
+  required = false,
+  error,
+  value,
+  onValueChange,
+  trailingAction,
+}: {
+  id: string;
+  name: string;
+  label: string;
+  placeholder: string;
+  type?: string;
+  required?: boolean;
+  error?: string;
+  value?: string;
+  onValueChange?: (value: string) => void;
+  trailingAction?: { label: string; onClick: () => void };
+}) {
+  return (
+    <div className="space-y-1.5">
+      <Label htmlFor={id}>{label}</Label>
+      <div className="relative">
+        <Input
+          id={id}
+          name={name}
+          type={type}
+          required={required}
+          placeholder={placeholder}
+          value={value}
+          onChange={(event) => onValueChange?.(event.target.value)}
+          aria-invalid={Boolean(error)}
+          aria-describedby={error ? `${name}-error` : undefined}
+          className={`${trailingAction ? "pr-16" : ""} ${error ? "border-destructive placeholder:text-destructive focus-visible:ring-destructive" : ""}`}
+        />
+        {trailingAction && (
+          <button
+            type="button"
+            onClick={trailingAction.onClick}
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-medium text-primary transition-all duration-200 hover:scale-105 hover:underline active:scale-95"
+            aria-label={trailingAction.label}
+          >
+            {trailingAction.label.startsWith("Show") ? "Show" : "Hide"}
+          </button>
+        )}
+      </div>
+      {error && (
+        <p id={`${name}-error`} className="text-sm text-destructive">
+          {error}
+        </p>
+      )}
+    </div>
   );
 }

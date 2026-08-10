@@ -25,7 +25,7 @@ const items = [
   { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { to: "/discover", icon: Users, label: "Find pros" },
   { to: "/post-job", icon: PlusCircle, label: "Post a job" },
-  { to: "/project/p-001", icon: FolderKanban, label: "Projects" },
+  { to: "/my-jobs", icon: FolderKanban, label: "My jobs" },
   { to: "/messages", icon: MessageSquare, label: "Messages" },
   { to: "/earnings", icon: Wallet, label: "Earnings" },
   { to: "/verification", icon: BadgeCheck, label: "Verification" },
@@ -36,7 +36,7 @@ const items = [
 const mobileItems = [
   { to: "/dashboard", icon: Home, label: "Home" },
   { to: "/discover", icon: Search, label: "Search" },
-  { to: "/project/p-001", icon: Briefcase, label: "Jobs" },
+  { to: "/my-jobs", icon: Briefcase, label: "Jobs" },
   { to: "/messages", icon: MessageSquare, label: "Messages" },
   { to: "/dashboard", icon: User, label: "Profile" },
 ];

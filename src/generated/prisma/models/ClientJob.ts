@@ -296,14 +296,14 @@ export type ClientJobGroupByArgs<ExtArgs extends runtime.Types.Extensions.Intern
 export type ClientJobGroupByOutputType = {
   id: number
   userId: number
-  category: string
-  title: string
-  description: string
+  category: string | null
+  title: string | null
+  description: string | null
   budgetMin: number | null
   budgetMax: number | null
   urgency: $Enums.JobUrgency
   jobDate: Date | null
-  deadline: Date
+  deadline: Date | null
   workMode: $Enums.JobWorkMode
   locationLabel: string | null
   locationAddress: string | null
@@ -342,14 +342,14 @@ export type ClientJobWhereInput = {
   NOT?: Prisma.ClientJobWhereInput | Prisma.ClientJobWhereInput[]
   id?: Prisma.IntFilter<"ClientJob"> | number
   userId?: Prisma.IntFilter<"ClientJob"> | number
-  category?: Prisma.StringFilter<"ClientJob"> | string
-  title?: Prisma.StringFilter<"ClientJob"> | string
-  description?: Prisma.StringFilter<"ClientJob"> | string
+  category?: Prisma.StringNullableFilter<"ClientJob"> | string | null
+  title?: Prisma.StringNullableFilter<"ClientJob"> | string | null
+  description?: Prisma.StringNullableFilter<"ClientJob"> | string | null
   budgetMin?: Prisma.IntNullableFilter<"ClientJob"> | number | null
   budgetMax?: Prisma.IntNullableFilter<"ClientJob"> | number | null
   urgency?: Prisma.EnumJobUrgencyFilter<"ClientJob"> | $Enums.JobUrgency
   jobDate?: Prisma.DateTimeNullableFilter<"ClientJob"> | Date | string | null
-  deadline?: Prisma.DateTimeFilter<"ClientJob"> | Date | string
+  deadline?: Prisma.DateTimeNullableFilter<"ClientJob"> | Date | string | null
   workMode?: Prisma.EnumJobWorkModeFilter<"ClientJob"> | $Enums.JobWorkMode
   locationLabel?: Prisma.StringNullableFilter<"ClientJob"> | string | null
   locationAddress?: Prisma.StringNullableFilter<"ClientJob"> | string | null
@@ -368,14 +368,14 @@ export type ClientJobWhereInput = {
 export type ClientJobOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  category?: Prisma.SortOrder
-  title?: Prisma.SortOrder
-  description?: Prisma.SortOrder
+  category?: Prisma.SortOrderInput | Prisma.SortOrder
+  title?: Prisma.SortOrderInput | Prisma.SortOrder
+  description?: Prisma.SortOrderInput | Prisma.SortOrder
   budgetMin?: Prisma.SortOrderInput | Prisma.SortOrder
   budgetMax?: Prisma.SortOrderInput | Prisma.SortOrder
   urgency?: Prisma.SortOrder
   jobDate?: Prisma.SortOrderInput | Prisma.SortOrder
-  deadline?: Prisma.SortOrder
+  deadline?: Prisma.SortOrderInput | Prisma.SortOrder
   workMode?: Prisma.SortOrder
   locationLabel?: Prisma.SortOrderInput | Prisma.SortOrder
   locationAddress?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -397,14 +397,14 @@ export type ClientJobWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.ClientJobWhereInput[]
   NOT?: Prisma.ClientJobWhereInput | Prisma.ClientJobWhereInput[]
   userId?: Prisma.IntFilter<"ClientJob"> | number
-  category?: Prisma.StringFilter<"ClientJob"> | string
-  title?: Prisma.StringFilter<"ClientJob"> | string
-  description?: Prisma.StringFilter<"ClientJob"> | string
+  category?: Prisma.StringNullableFilter<"ClientJob"> | string | null
+  title?: Prisma.StringNullableFilter<"ClientJob"> | string | null
+  description?: Prisma.StringNullableFilter<"ClientJob"> | string | null
   budgetMin?: Prisma.IntNullableFilter<"ClientJob"> | number | null
   budgetMax?: Prisma.IntNullableFilter<"ClientJob"> | number | null
   urgency?: Prisma.EnumJobUrgencyFilter<"ClientJob"> | $Enums.JobUrgency
   jobDate?: Prisma.DateTimeNullableFilter<"ClientJob"> | Date | string | null
-  deadline?: Prisma.DateTimeFilter<"ClientJob"> | Date | string
+  deadline?: Prisma.DateTimeNullableFilter<"ClientJob"> | Date | string | null
   workMode?: Prisma.EnumJobWorkModeFilter<"ClientJob"> | $Enums.JobWorkMode
   locationLabel?: Prisma.StringNullableFilter<"ClientJob"> | string | null
   locationAddress?: Prisma.StringNullableFilter<"ClientJob"> | string | null
@@ -423,14 +423,14 @@ export type ClientJobWhereUniqueInput = Prisma.AtLeast<{
 export type ClientJobOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  category?: Prisma.SortOrder
-  title?: Prisma.SortOrder
-  description?: Prisma.SortOrder
+  category?: Prisma.SortOrderInput | Prisma.SortOrder
+  title?: Prisma.SortOrderInput | Prisma.SortOrder
+  description?: Prisma.SortOrderInput | Prisma.SortOrder
   budgetMin?: Prisma.SortOrderInput | Prisma.SortOrder
   budgetMax?: Prisma.SortOrderInput | Prisma.SortOrder
   urgency?: Prisma.SortOrder
   jobDate?: Prisma.SortOrderInput | Prisma.SortOrder
-  deadline?: Prisma.SortOrder
+  deadline?: Prisma.SortOrderInput | Prisma.SortOrder
   workMode?: Prisma.SortOrder
   locationLabel?: Prisma.SortOrderInput | Prisma.SortOrder
   locationAddress?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -454,14 +454,14 @@ export type ClientJobScalarWhereWithAggregatesInput = {
   NOT?: Prisma.ClientJobScalarWhereWithAggregatesInput | Prisma.ClientJobScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"ClientJob"> | number
   userId?: Prisma.IntWithAggregatesFilter<"ClientJob"> | number
-  category?: Prisma.StringWithAggregatesFilter<"ClientJob"> | string
-  title?: Prisma.StringWithAggregatesFilter<"ClientJob"> | string
-  description?: Prisma.StringWithAggregatesFilter<"ClientJob"> | string
+  category?: Prisma.StringNullableWithAggregatesFilter<"ClientJob"> | string | null
+  title?: Prisma.StringNullableWithAggregatesFilter<"ClientJob"> | string | null
+  description?: Prisma.StringNullableWithAggregatesFilter<"ClientJob"> | string | null
   budgetMin?: Prisma.IntNullableWithAggregatesFilter<"ClientJob"> | number | null
   budgetMax?: Prisma.IntNullableWithAggregatesFilter<"ClientJob"> | number | null
   urgency?: Prisma.EnumJobUrgencyWithAggregatesFilter<"ClientJob"> | $Enums.JobUrgency
   jobDate?: Prisma.DateTimeNullableWithAggregatesFilter<"ClientJob"> | Date | string | null
-  deadline?: Prisma.DateTimeWithAggregatesFilter<"ClientJob"> | Date | string
+  deadline?: Prisma.DateTimeNullableWithAggregatesFilter<"ClientJob"> | Date | string | null
   workMode?: Prisma.EnumJobWorkModeWithAggregatesFilter<"ClientJob"> | $Enums.JobWorkMode
   locationLabel?: Prisma.StringNullableWithAggregatesFilter<"ClientJob"> | string | null
   locationAddress?: Prisma.StringNullableWithAggregatesFilter<"ClientJob"> | string | null
@@ -475,14 +475,14 @@ export type ClientJobScalarWhereWithAggregatesInput = {
 }
 
 export type ClientJobCreateInput = {
-  category: string
-  title: string
-  description: string
+  category?: string | null
+  title?: string | null
+  description?: string | null
   budgetMin?: number | null
   budgetMax?: number | null
   urgency?: $Enums.JobUrgency
   jobDate?: Date | string | null
-  deadline: Date | string
+  deadline?: Date | string | null
   workMode?: $Enums.JobWorkMode
   locationLabel?: string | null
   locationAddress?: string | null
@@ -501,14 +501,14 @@ export type ClientJobCreateInput = {
 export type ClientJobUncheckedCreateInput = {
   id?: number
   userId: number
-  category: string
-  title: string
-  description: string
+  category?: string | null
+  title?: string | null
+  description?: string | null
   budgetMin?: number | null
   budgetMax?: number | null
   urgency?: $Enums.JobUrgency
   jobDate?: Date | string | null
-  deadline: Date | string
+  deadline?: Date | string | null
   workMode?: $Enums.JobWorkMode
   locationLabel?: string | null
   locationAddress?: string | null
@@ -524,14 +524,14 @@ export type ClientJobUncheckedCreateInput = {
 }
 
 export type ClientJobUpdateInput = {
-  category?: Prisma.StringFieldUpdateOperationsInput | string
-  title?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   budgetMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   budgetMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   urgency?: Prisma.EnumJobUrgencyFieldUpdateOperationsInput | $Enums.JobUrgency
   jobDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
   locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -550,14 +550,14 @@ export type ClientJobUpdateInput = {
 export type ClientJobUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   userId?: Prisma.IntFieldUpdateOperationsInput | number
-  category?: Prisma.StringFieldUpdateOperationsInput | string
-  title?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   budgetMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   budgetMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   urgency?: Prisma.EnumJobUrgencyFieldUpdateOperationsInput | $Enums.JobUrgency
   jobDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
   locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -575,14 +575,14 @@ export type ClientJobUncheckedUpdateInput = {
 export type ClientJobCreateManyInput = {
   id?: number
   userId: number
-  category: string
-  title: string
-  description: string
+  category?: string | null
+  title?: string | null
+  description?: string | null
   budgetMin?: number | null
   budgetMax?: number | null
   urgency?: $Enums.JobUrgency
   jobDate?: Date | string | null
-  deadline: Date | string
+  deadline?: Date | string | null
   workMode?: $Enums.JobWorkMode
   locationLabel?: string | null
   locationAddress?: string | null
@@ -596,14 +596,14 @@ export type ClientJobCreateManyInput = {
 }
 
 export type ClientJobUpdateManyMutationInput = {
-  category?: Prisma.StringFieldUpdateOperationsInput | string
-  title?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   budgetMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   budgetMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   urgency?: Prisma.EnumJobUrgencyFieldUpdateOperationsInput | $Enums.JobUrgency
   jobDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
   locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -619,14 +619,14 @@ export type ClientJobUpdateManyMutationInput = {
 export type ClientJobUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   userId?: Prisma.IntFieldUpdateOperationsInput | number
-  category?: Prisma.StringFieldUpdateOperationsInput | string
-  title?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   budgetMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   budgetMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   urgency?: Prisma.EnumJobUrgencyFieldUpdateOperationsInput | $Enums.JobUrgency
   jobDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
   locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -826,14 +826,14 @@ export type ClientJobUpdateOneRequiredWithoutAttachmentsNestedInput = {
 }
 
 export type ClientJobCreateWithoutUserInput = {
-  category: string
-  title: string
-  description: string
+  category?: string | null
+  title?: string | null
+  description?: string | null
   budgetMin?: number | null
   budgetMax?: number | null
   urgency?: $Enums.JobUrgency
   jobDate?: Date | string | null
-  deadline: Date | string
+  deadline?: Date | string | null
   workMode?: $Enums.JobWorkMode
   locationLabel?: string | null
   locationAddress?: string | null
@@ -850,14 +850,14 @@ export type ClientJobCreateWithoutUserInput = {
 
 export type ClientJobUncheckedCreateWithoutUserInput = {
   id?: number
-  category: string
-  title: string
-  description: string
+  category?: string | null
+  title?: string | null
+  description?: string | null
   budgetMin?: number | null
   budgetMax?: number | null
   urgency?: $Enums.JobUrgency
   jobDate?: Date | string | null
-  deadline: Date | string
+  deadline?: Date | string | null
   workMode?: $Enums.JobWorkMode
   locationLabel?: string | null
   locationAddress?: string | null
@@ -904,14 +904,14 @@ export type ClientJobScalarWhereInput = {
   NOT?: Prisma.ClientJobScalarWhereInput | Prisma.ClientJobScalarWhereInput[]
   id?: Prisma.IntFilter<"ClientJob"> | number
   userId?: Prisma.IntFilter<"ClientJob"> | number
-  category?: Prisma.StringFilter<"ClientJob"> | string
-  title?: Prisma.StringFilter<"ClientJob"> | string
-  description?: Prisma.StringFilter<"ClientJob"> | string
+  category?: Prisma.StringNullableFilter<"ClientJob"> | string | null
+  title?: Prisma.StringNullableFilter<"ClientJob"> | string | null
+  description?: Prisma.StringNullableFilter<"ClientJob"> | string | null
   budgetMin?: Prisma.IntNullableFilter<"ClientJob"> | number | null
   budgetMax?: Prisma.IntNullableFilter<"ClientJob"> | number | null
   urgency?: Prisma.EnumJobUrgencyFilter<"ClientJob"> | $Enums.JobUrgency
   jobDate?: Prisma.DateTimeNullableFilter<"ClientJob"> | Date | string | null
-  deadline?: Prisma.DateTimeFilter<"ClientJob"> | Date | string
+  deadline?: Prisma.DateTimeNullableFilter<"ClientJob"> | Date | string | null
   workMode?: Prisma.EnumJobWorkModeFilter<"ClientJob"> | $Enums.JobWorkMode
   locationLabel?: Prisma.StringNullableFilter<"ClientJob"> | string | null
   locationAddress?: Prisma.StringNullableFilter<"ClientJob"> | string | null
@@ -925,14 +925,14 @@ export type ClientJobScalarWhereInput = {
 }
 
 export type ClientJobCreateWithoutFavoriteJobsInput = {
-  category: string
-  title: string
-  description: string
+  category?: string | null
+  title?: string | null
+  description?: string | null
   budgetMin?: number | null
   budgetMax?: number | null
   urgency?: $Enums.JobUrgency
   jobDate?: Date | string | null
-  deadline: Date | string
+  deadline?: Date | string | null
   workMode?: $Enums.JobWorkMode
   locationLabel?: string | null
   locationAddress?: string | null
@@ -950,14 +950,14 @@ export type ClientJobCreateWithoutFavoriteJobsInput = {
 export type ClientJobUncheckedCreateWithoutFavoriteJobsInput = {
   id?: number
   userId: number
-  category: string
-  title: string
-  description: string
+  category?: string | null
+  title?: string | null
+  description?: string | null
   budgetMin?: number | null
   budgetMax?: number | null
   urgency?: $Enums.JobUrgency
   jobDate?: Date | string | null
-  deadline: Date | string
+  deadline?: Date | string | null
   workMode?: $Enums.JobWorkMode
   locationLabel?: string | null
   locationAddress?: string | null
@@ -988,14 +988,14 @@ export type ClientJobUpdateToOneWithWhereWithoutFavoriteJobsInput = {
 }
 
 export type ClientJobUpdateWithoutFavoriteJobsInput = {
-  category?: Prisma.StringFieldUpdateOperationsInput | string
-  title?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   budgetMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   budgetMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   urgency?: Prisma.EnumJobUrgencyFieldUpdateOperationsInput | $Enums.JobUrgency
   jobDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
   locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1013,14 +1013,14 @@ export type ClientJobUpdateWithoutFavoriteJobsInput = {
 export type ClientJobUncheckedUpdateWithoutFavoriteJobsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   userId?: Prisma.IntFieldUpdateOperationsInput | number
-  category?: Prisma.StringFieldUpdateOperationsInput | string
-  title?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   budgetMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   budgetMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   urgency?: Prisma.EnumJobUrgencyFieldUpdateOperationsInput | $Enums.JobUrgency
   jobDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
   locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1035,14 +1035,14 @@ export type ClientJobUncheckedUpdateWithoutFavoriteJobsInput = {
 }
 
 export type ClientJobCreateWithoutAttachmentsInput = {
-  category: string
-  title: string
-  description: string
+  category?: string | null
+  title?: string | null
+  description?: string | null
   budgetMin?: number | null
   budgetMax?: number | null
   urgency?: $Enums.JobUrgency
   jobDate?: Date | string | null
-  deadline: Date | string
+  deadline?: Date | string | null
   workMode?: $Enums.JobWorkMode
   locationLabel?: string | null
   locationAddress?: string | null
@@ -1060,14 +1060,14 @@ export type ClientJobCreateWithoutAttachmentsInput = {
 export type ClientJobUncheckedCreateWithoutAttachmentsInput = {
   id?: number
   userId: number
-  category: string
-  title: string
-  description: string
+  category?: string | null
+  title?: string | null
+  description?: string | null
   budgetMin?: number | null
   budgetMax?: number | null
   urgency?: $Enums.JobUrgency
   jobDate?: Date | string | null
-  deadline: Date | string
+  deadline?: Date | string | null
   workMode?: $Enums.JobWorkMode
   locationLabel?: string | null
   locationAddress?: string | null
@@ -1098,14 +1098,14 @@ export type ClientJobUpdateToOneWithWhereWithoutAttachmentsInput = {
 }
 
 export type ClientJobUpdateWithoutAttachmentsInput = {
-  category?: Prisma.StringFieldUpdateOperationsInput | string
-  title?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   budgetMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   budgetMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   urgency?: Prisma.EnumJobUrgencyFieldUpdateOperationsInput | $Enums.JobUrgency
   jobDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
   locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1123,14 +1123,14 @@ export type ClientJobUpdateWithoutAttachmentsInput = {
 export type ClientJobUncheckedUpdateWithoutAttachmentsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   userId?: Prisma.IntFieldUpdateOperationsInput | number
-  category?: Prisma.StringFieldUpdateOperationsInput | string
-  title?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   budgetMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   budgetMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   urgency?: Prisma.EnumJobUrgencyFieldUpdateOperationsInput | $Enums.JobUrgency
   jobDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
   locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1146,14 +1146,14 @@ export type ClientJobUncheckedUpdateWithoutAttachmentsInput = {
 
 export type ClientJobCreateManyUserInput = {
   id?: number
-  category: string
-  title: string
-  description: string
+  category?: string | null
+  title?: string | null
+  description?: string | null
   budgetMin?: number | null
   budgetMax?: number | null
   urgency?: $Enums.JobUrgency
   jobDate?: Date | string | null
-  deadline: Date | string
+  deadline?: Date | string | null
   workMode?: $Enums.JobWorkMode
   locationLabel?: string | null
   locationAddress?: string | null
@@ -1167,14 +1167,14 @@ export type ClientJobCreateManyUserInput = {
 }
 
 export type ClientJobUpdateWithoutUserInput = {
-  category?: Prisma.StringFieldUpdateOperationsInput | string
-  title?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   budgetMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   budgetMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   urgency?: Prisma.EnumJobUrgencyFieldUpdateOperationsInput | $Enums.JobUrgency
   jobDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
   locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1191,14 +1191,14 @@ export type ClientJobUpdateWithoutUserInput = {
 
 export type ClientJobUncheckedUpdateWithoutUserInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  category?: Prisma.StringFieldUpdateOperationsInput | string
-  title?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   budgetMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   budgetMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   urgency?: Prisma.EnumJobUrgencyFieldUpdateOperationsInput | $Enums.JobUrgency
   jobDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
   locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1215,14 +1215,14 @@ export type ClientJobUncheckedUpdateWithoutUserInput = {
 
 export type ClientJobUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  category?: Prisma.StringFieldUpdateOperationsInput | string
-  title?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   budgetMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   budgetMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   urgency?: Prisma.EnumJobUrgencyFieldUpdateOperationsInput | $Enums.JobUrgency
   jobDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
   locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1397,14 +1397,14 @@ export type $ClientJobPayload<ExtArgs extends runtime.Types.Extensions.InternalA
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     userId: number
-    category: string
-    title: string
-    description: string
+    category: string | null
+    title: string | null
+    description: string | null
     budgetMin: number | null
     budgetMax: number | null
     urgency: $Enums.JobUrgency
     jobDate: Date | null
-    deadline: Date
+    deadline: Date | null
     workMode: $Enums.JobWorkMode
     locationLabel: string | null
     locationAddress: string | null

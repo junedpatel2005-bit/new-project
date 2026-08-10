@@ -1,5 +1,5 @@
-import { ProfileSetup } from "@/components/ProfileSetup";
+import { ClientProfilePage as ClientProfile } from "@/components/ClientProfilePage";
 
 export default function ClientProfilePage() {
-  return <ProfileSetup role="client" />;
+  return <ClientProfile />;
 }

@@ -1,6 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { db } from "@/lib/db";
 import { sessionCookie, verifySession } from "@/lib/auth";
+
+const profileSchema = z.object({
+  firstName: z.string().trim().min(1, "First name is required.").max(80),
+  lastName: z.string().trim().min(1, "Last name is required.").max(80),
+  companyName: z.string().trim().max(160).optional().or(z.literal("")),
+  address: z.string().trim().min(1, "Address is required.").max(300),
+  profilePhotoUrl: z
+    .string()
+    .url("Enter a valid photo URL.")
+    .max(2048)
+    .optional()
+    .or(z.literal("")),
+});
 
 async function getSession(request: NextRequest) {
   const token = request.cookies.get(sessionCookie)?.value;
@@ -12,78 +26,107 @@ async function getSession(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
+async function getClient(request: NextRequest) {
   const session = await getSession(request);
-  if (!session) return NextResponse.json({ error: "Please sign in again." }, { status: 401 });
-  const account = await db.user.findUnique({
-    where: { id: session.userId },
-    select: { emailVerifiedAt: true },
+  if (!session)
+    return { error: NextResponse.json({ error: "Please sign in again." }, { status: 401 }) };
+  if (session.role !== "CLIENT")
+    return {
+      error: NextResponse.json(
+        { error: "This profile is only available to clients." },
+        { status: 403 },
+      ),
+    };
+  const user = await db.user.findUnique({ where: { id: session.userId } });
+  if (!user?.isActive)
+    return { error: NextResponse.json({ error: "Account is unavailable." }, { status: 401 }) };
+  return { user };
+}
+
+export async function GET(request: NextRequest) {
+  const result = await getClient(request);
+  if ("error" in result) return result.error;
+  const { user } = result;
+  const profile = await db.clientProfile.findFirst({
+    where: { userId: user.id },
+    include: { savedLocations: { orderBy: { createdAt: "desc" } } },
   });
-  if (!account?.emailVerifiedAt)
+  return NextResponse.json({
+    account: {
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      phone: user.phone,
+      phoneVerifiedAt: user.phoneVerifiedAt,
+      avatarUrl: user.avatarUrl,
+    },
+    profile,
+  });
+}
+
+export async function POST(request: NextRequest) {
+  const result = await getClient(request);
+  if ("error" in result) return result.error;
+  const { user } = result;
+  if (!user.emailVerifiedAt)
     return NextResponse.json(
       { error: "Please verify your email before completing your profile." },
       { status: 403 },
     );
-
-  const body = await request.json().catch(() => null);
-  if (!body || typeof body !== "object") {
-    return NextResponse.json({ error: "Invalid profile details." }, { status: 400 });
-  }
-
-  if (session.role === "CLIENT") {
-    const { fullName, phone, companyName, address, companyWebsite, industry } = body as Record<
-      string,
-      string
-    >;
-    if (!fullName || !phone || !companyName || !address) {
-      return NextResponse.json({ error: "Please complete all required fields." }, { status: 400 });
-    }
-    const user = await db.user.findUniqueOrThrow({ where: { id: session.userId } });
-    const existingProfile = await db.clientProfile.findFirst({ where: { userId: session.userId } });
-    const profileData = {
-      fullName,
-      phone,
-      companyName,
-      address,
-      companyWebsite: companyWebsite || null,
-      industry: industry || null,
-    };
-    if (existingProfile) {
-      await db.clientProfile.update({ where: { id: existingProfile.id }, data: profileData });
-    } else {
-      await db.clientProfile.create({
-        data: {
-          userId: session.userId,
-          email: user.email,
-          ...profileData,
-        },
-      });
-    }
-    await db.user.update({ where: { id: session.userId }, data: { phone, companyName, address } });
-  } else if (session.role === "PROFESSIONAL") {
-    const { category, city, experienceYears, hourlyRate, serviceArea } = body as Record<
-      string,
-      string
-    >;
-    if (!category || !city) {
-      return NextResponse.json({ error: "Please add your category and city." }, { status: 400 });
-    }
-    await db.user.update({
-      where: { id: session.userId },
+  const parsed = profileSchema.safeParse(await request.json().catch(() => null));
+  if (!parsed.success)
+    return NextResponse.json(
+      { error: parsed.error.issues[0]?.message ?? "Please review your profile details." },
+      { status: 400 },
+    );
+  const data = parsed.data;
+  const companyName = data.companyName || null;
+  const profilePhotoUrl = data.profilePhotoUrl || null;
+  const fullName = `${data.firstName} ${data.lastName}`;
+  const profileData = {
+    fullName,
+    phone: user.phone ?? "",
+    companyName,
+    address: data.address,
+    profilePhotoUrl,
+  };
+  if (!user.phone)
+    return NextResponse.json(
+      { error: "Add and verify a phone number during signup before completing your profile." },
+      { status: 400 },
+    );
+  const existing = await db.clientProfile.findFirst({ where: { userId: user.id } });
+  const primaryLocation = await db.$transaction(async (tx) => {
+    const profile = existing
+      ? await tx.clientProfile.update({ where: { id: existing.id }, data: profileData })
+      : await tx.clientProfile.create({
+          data: { userId: user.id, email: user.email, ...profileData },
+        });
+    await tx.user.update({
+      where: { id: user.id },
       data: {
-        professionalCategory: category,
-        professionalCity: city,
-        experienceYears: experienceYears ? Number(experienceYears) : null,
-        hourlyRate: hourlyRate ? Number(hourlyRate) : null,
-        serviceArea: serviceArea || null,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        companyName,
+        address: data.address,
+        avatarUrl: profilePhotoUrl,
       },
     });
-  } else {
-    return NextResponse.json(
-      { error: "This profile type cannot be updated here." },
-      { status: 403 },
-    );
-  }
-
-  return NextResponse.json({ success: true });
+    const sameAddress = await tx.clientSavedLocation.findFirst({
+      where: { clientProfileId: profile.id, address: data.address },
+    });
+    if (sameAddress) return sameAddress;
+    const existingPrimary = await tx.clientSavedLocation.findFirst({
+      where: { clientProfileId: profile.id, label: "Primary Address" },
+    });
+    return existingPrimary
+      ? tx.clientSavedLocation.update({
+          where: { id: existingPrimary.id },
+          data: { address: data.address },
+        })
+      : tx.clientSavedLocation.create({
+          data: { clientProfileId: profile.id, label: "Primary Address", address: data.address },
+        });
+  });
+  return NextResponse.json({ success: true, primaryLocation });
 }

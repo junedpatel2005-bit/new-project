@@ -243,7 +243,7 @@ export type ClientProfileGroupByOutputType = {
   fullName: string
   email: string
   phone: string
-  companyName: string
+  companyName: string | null
   companyWebsite: string | null
   industry: string | null
   teamSize: string | null
@@ -283,7 +283,7 @@ export type ClientProfileWhereInput = {
   fullName?: Prisma.StringFilter<"ClientProfile"> | string
   email?: Prisma.StringFilter<"ClientProfile"> | string
   phone?: Prisma.StringFilter<"ClientProfile"> | string
-  companyName?: Prisma.StringFilter<"ClientProfile"> | string
+  companyName?: Prisma.StringNullableFilter<"ClientProfile"> | string | null
   companyWebsite?: Prisma.StringNullableFilter<"ClientProfile"> | string | null
   industry?: Prisma.StringNullableFilter<"ClientProfile"> | string | null
   teamSize?: Prisma.StringNullableFilter<"ClientProfile"> | string | null
@@ -303,7 +303,7 @@ export type ClientProfileOrderByWithRelationInput = {
   fullName?: Prisma.SortOrder
   email?: Prisma.SortOrder
   phone?: Prisma.SortOrder
-  companyName?: Prisma.SortOrder
+  companyName?: Prisma.SortOrderInput | Prisma.SortOrder
   companyWebsite?: Prisma.SortOrderInput | Prisma.SortOrder
   industry?: Prisma.SortOrderInput | Prisma.SortOrder
   teamSize?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -326,7 +326,7 @@ export type ClientProfileWhereUniqueInput = Prisma.AtLeast<{
   fullName?: Prisma.StringFilter<"ClientProfile"> | string
   email?: Prisma.StringFilter<"ClientProfile"> | string
   phone?: Prisma.StringFilter<"ClientProfile"> | string
-  companyName?: Prisma.StringFilter<"ClientProfile"> | string
+  companyName?: Prisma.StringNullableFilter<"ClientProfile"> | string | null
   companyWebsite?: Prisma.StringNullableFilter<"ClientProfile"> | string | null
   industry?: Prisma.StringNullableFilter<"ClientProfile"> | string | null
   teamSize?: Prisma.StringNullableFilter<"ClientProfile"> | string | null
@@ -346,7 +346,7 @@ export type ClientProfileOrderByWithAggregationInput = {
   fullName?: Prisma.SortOrder
   email?: Prisma.SortOrder
   phone?: Prisma.SortOrder
-  companyName?: Prisma.SortOrder
+  companyName?: Prisma.SortOrderInput | Prisma.SortOrder
   companyWebsite?: Prisma.SortOrderInput | Prisma.SortOrder
   industry?: Prisma.SortOrderInput | Prisma.SortOrder
   teamSize?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -371,7 +371,7 @@ export type ClientProfileScalarWhereWithAggregatesInput = {
   fullName?: Prisma.StringWithAggregatesFilter<"ClientProfile"> | string
   email?: Prisma.StringWithAggregatesFilter<"ClientProfile"> | string
   phone?: Prisma.StringWithAggregatesFilter<"ClientProfile"> | string
-  companyName?: Prisma.StringWithAggregatesFilter<"ClientProfile"> | string
+  companyName?: Prisma.StringNullableWithAggregatesFilter<"ClientProfile"> | string | null
   companyWebsite?: Prisma.StringNullableWithAggregatesFilter<"ClientProfile"> | string | null
   industry?: Prisma.StringNullableWithAggregatesFilter<"ClientProfile"> | string | null
   teamSize?: Prisma.StringNullableWithAggregatesFilter<"ClientProfile"> | string | null
@@ -386,7 +386,7 @@ export type ClientProfileCreateInput = {
   fullName: string
   email: string
   phone: string
-  companyName: string
+  companyName?: string | null
   companyWebsite?: string | null
   industry?: string | null
   teamSize?: string | null
@@ -406,7 +406,7 @@ export type ClientProfileUncheckedCreateInput = {
   fullName: string
   email: string
   phone: string
-  companyName: string
+  companyName?: string | null
   companyWebsite?: string | null
   industry?: string | null
   teamSize?: string | null
@@ -423,7 +423,7 @@ export type ClientProfileUpdateInput = {
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
-  companyName?: Prisma.StringFieldUpdateOperationsInput | string
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   companyWebsite?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teamSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -443,7 +443,7 @@ export type ClientProfileUncheckedUpdateInput = {
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
-  companyName?: Prisma.StringFieldUpdateOperationsInput | string
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   companyWebsite?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teamSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -462,7 +462,7 @@ export type ClientProfileCreateManyInput = {
   fullName: string
   email: string
   phone: string
-  companyName: string
+  companyName?: string | null
   companyWebsite?: string | null
   industry?: string | null
   teamSize?: string | null
@@ -477,7 +477,7 @@ export type ClientProfileUpdateManyMutationInput = {
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
-  companyName?: Prisma.StringFieldUpdateOperationsInput | string
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   companyWebsite?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teamSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -494,7 +494,7 @@ export type ClientProfileUncheckedUpdateManyInput = {
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
-  companyName?: Prisma.StringFieldUpdateOperationsInput | string
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   companyWebsite?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teamSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -655,7 +655,7 @@ export type ClientProfileCreateWithoutUserInput = {
   fullName: string
   email: string
   phone: string
-  companyName: string
+  companyName?: string | null
   companyWebsite?: string | null
   industry?: string | null
   teamSize?: string | null
@@ -673,7 +673,7 @@ export type ClientProfileUncheckedCreateWithoutUserInput = {
   fullName: string
   email: string
   phone: string
-  companyName: string
+  companyName?: string | null
   companyWebsite?: string | null
   industry?: string | null
   teamSize?: string | null
@@ -721,7 +721,7 @@ export type ClientProfileScalarWhereInput = {
   fullName?: Prisma.StringFilter<"ClientProfile"> | string
   email?: Prisma.StringFilter<"ClientProfile"> | string
   phone?: Prisma.StringFilter<"ClientProfile"> | string
-  companyName?: Prisma.StringFilter<"ClientProfile"> | string
+  companyName?: Prisma.StringNullableFilter<"ClientProfile"> | string | null
   companyWebsite?: Prisma.StringNullableFilter<"ClientProfile"> | string | null
   industry?: Prisma.StringNullableFilter<"ClientProfile"> | string | null
   teamSize?: Prisma.StringNullableFilter<"ClientProfile"> | string | null
@@ -736,7 +736,7 @@ export type ClientProfileCreateWithoutSavedLocationsInput = {
   fullName: string
   email: string
   phone: string
-  companyName: string
+  companyName?: string | null
   companyWebsite?: string | null
   industry?: string | null
   teamSize?: string | null
@@ -755,7 +755,7 @@ export type ClientProfileUncheckedCreateWithoutSavedLocationsInput = {
   fullName: string
   email: string
   phone: string
-  companyName: string
+  companyName?: string | null
   companyWebsite?: string | null
   industry?: string | null
   teamSize?: string | null
@@ -787,7 +787,7 @@ export type ClientProfileUpdateWithoutSavedLocationsInput = {
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
-  companyName?: Prisma.StringFieldUpdateOperationsInput | string
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   companyWebsite?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teamSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -806,7 +806,7 @@ export type ClientProfileUncheckedUpdateWithoutSavedLocationsInput = {
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
-  companyName?: Prisma.StringFieldUpdateOperationsInput | string
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   companyWebsite?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teamSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -822,7 +822,7 @@ export type ClientProfileCreateWithoutHiringNeedsInput = {
   fullName: string
   email: string
   phone: string
-  companyName: string
+  companyName?: string | null
   companyWebsite?: string | null
   industry?: string | null
   teamSize?: string | null
@@ -841,7 +841,7 @@ export type ClientProfileUncheckedCreateWithoutHiringNeedsInput = {
   fullName: string
   email: string
   phone: string
-  companyName: string
+  companyName?: string | null
   companyWebsite?: string | null
   industry?: string | null
   teamSize?: string | null
@@ -873,7 +873,7 @@ export type ClientProfileUpdateWithoutHiringNeedsInput = {
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
-  companyName?: Prisma.StringFieldUpdateOperationsInput | string
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   companyWebsite?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teamSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -892,7 +892,7 @@ export type ClientProfileUncheckedUpdateWithoutHiringNeedsInput = {
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
-  companyName?: Prisma.StringFieldUpdateOperationsInput | string
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   companyWebsite?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teamSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -909,7 +909,7 @@ export type ClientProfileCreateManyUserInput = {
   fullName: string
   email: string
   phone: string
-  companyName: string
+  companyName?: string | null
   companyWebsite?: string | null
   industry?: string | null
   teamSize?: string | null
@@ -924,7 +924,7 @@ export type ClientProfileUpdateWithoutUserInput = {
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
-  companyName?: Prisma.StringFieldUpdateOperationsInput | string
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   companyWebsite?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teamSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -942,7 +942,7 @@ export type ClientProfileUncheckedUpdateWithoutUserInput = {
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
-  companyName?: Prisma.StringFieldUpdateOperationsInput | string
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   companyWebsite?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teamSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -960,7 +960,7 @@ export type ClientProfileUncheckedUpdateManyWithoutUserInput = {
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
-  companyName?: Prisma.StringFieldUpdateOperationsInput | string
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   companyWebsite?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teamSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1112,7 +1112,7 @@ export type $ClientProfilePayload<ExtArgs extends runtime.Types.Extensions.Inter
     fullName: string
     email: string
     phone: string
-    companyName: string
+    companyName: string | null
     companyWebsite: string | null
     industry: string | null
     teamSize: string | null
