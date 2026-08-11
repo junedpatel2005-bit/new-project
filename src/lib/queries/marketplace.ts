@@ -107,9 +107,15 @@ export async function listOpenJobs(): Promise<MarketplaceJob[]> {
       urgency: true,
       workMode: true,
       locationLabel: true,
+      locationAddress: true,
+      jobDate: true,
+      deadline: true,
+      timingType: true,
+      hourlyRate: true,
       createdAt: true,
       user: { select: { firstName: true, lastName: true, avatarUrl: true, averageRating: true } },
       _count: { select: { favoriteJobs: true } },
+      attachments: { select: { id: true, fileName: true, fileType: true, fileSize: true, previewUrl: true } },
     },
     orderBy: { createdAt: "desc" },
     take: 50,
@@ -128,6 +134,11 @@ export async function listOpenJobs(): Promise<MarketplaceJob[]> {
       urgency: job.urgency,
       workMode: job.workMode,
       location: job.locationLabel,
+      locationAddress: job.locationAddress,
+      jobDate: job.jobDate?.toISOString() ?? null,
+      deadline: job.deadline?.toISOString() ?? null,
+      timingType: job.timingType as "FIXED" | "HOURLY",
+      hourlyRate: job.hourlyRate,
       createdAt: job.createdAt.toISOString(),
       proposalCount: job._count.favoriteJobs,
       client: {
@@ -135,6 +146,7 @@ export async function listOpenJobs(): Promise<MarketplaceJob[]> {
         avatar: job.user.avatarUrl,
         rating: job.user.averageRating,
       },
+      attachments: job.attachments,
     }));
 }
 
@@ -173,9 +185,15 @@ export async function getOpenJob(id: number): Promise<MarketplaceJob | null> {
       urgency: true,
       workMode: true,
       locationLabel: true,
+      locationAddress: true,
+      jobDate: true,
+      deadline: true,
+      timingType: true,
+      hourlyRate: true,
       createdAt: true,
       user: { select: { firstName: true, lastName: true, avatarUrl: true, averageRating: true } },
       _count: { select: { favoriteJobs: true } },
+      attachments: { select: { id: true, fileName: true, fileType: true, fileSize: true, previewUrl: true } },
     },
   });
   if (!job || !job.title || !job.description || !job.category) return null;
@@ -189,6 +207,11 @@ export async function getOpenJob(id: number): Promise<MarketplaceJob | null> {
     urgency: job.urgency,
     workMode: job.workMode,
     location: job.locationLabel,
+    locationAddress: job.locationAddress,
+    jobDate: job.jobDate?.toISOString() ?? null,
+    deadline: job.deadline?.toISOString() ?? null,
+    timingType: job.timingType as "FIXED" | "HOURLY",
+    hourlyRate: job.hourlyRate,
     createdAt: job.createdAt.toISOString(),
     proposalCount: job._count.favoriteJobs,
     client: {
@@ -196,5 +219,6 @@ export async function getOpenJob(id: number): Promise<MarketplaceJob | null> {
       avatar: job.user.avatarUrl,
       rating: job.user.averageRating,
     },
+    attachments: job.attachments,
   };
 }

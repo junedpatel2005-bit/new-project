@@ -84,7 +84,12 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   const userId = await client(request);
   const id = idOf((await params).id);
   if (!userId || !id) return NextResponse.json({ error: "Not found." }, { status: 404 });
-  const job = await db.clientJob.findFirst({ where: { id, userId } });
+  const job = await db.clientJob.findFirst({
+    where: { id, userId },
+    include: {
+      attachments: { select: { id: true, fileName: true, fileType: true, fileSize: true, previewUrl: true } },
+    },
+  });
   return job
     ? NextResponse.json({ job })
     : NextResponse.json({ error: "Not found." }, { status: 404 });
