@@ -127,9 +127,6 @@ export default function Discover() {
               : "Browse vetted professionals across all categories."}
           </p>
         </div>
-        <Button variant="outline" className="gap-2">
-          <Map className="h-4 w-4" /> View on map
-        </Button>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[260px_1fr]">

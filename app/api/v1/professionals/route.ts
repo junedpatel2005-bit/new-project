@@ -6,7 +6,7 @@ const querySchema = z.object({
   query: z.string().trim().max(200).optional(),
   category: z.string().trim().max(100).optional(),
   city: z.string().trim().max(100).optional(),
-  minRating: z.coerce.number().int().min(0).max(5).optional(),
+  minRating: z.coerce.number().min(0).max(5).optional(),
   verified: z.coerce.boolean().optional(),
   availability: z.string().trim().max(60).optional(),
   distanceKm: z.coerce.number().positive().max(500).optional(),
