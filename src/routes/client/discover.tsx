@@ -46,11 +46,18 @@ export default function Discover() {
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("");
+  const [city, setCity] = useState("");
+  const [minRating, setMinRating] = useState<number | "">("");
+  const [availability, setAvailability] = useState("");
+  const [distanceKm, setDistanceKm] = useState<number | "">("");
+  const [originLat, setOriginLat] = useState<number | null>(null);
+  const [originLng, setOriginLng] = useState<number | null>(null);
   const [verifiedOnly, setVerifiedOnly] = useState(true);
   const [showMap, setShowMap] = useState(false);
   const [selectedPoint, setSelectedPoint] = useState<{ lat: number; lng: number } | null>(null);
   const [page, setPage] = useState(1);
   const mapSectionRef = useRef<HTMLDivElement | null>(null);
+  const userLocationRef = useRef<{ lat: number; lng: number } | null>(null);
 
   const professionals = useMemo(
     () => (results ? results.professionals.map(toMarketplaceProfessional) : []),
@@ -83,6 +90,14 @@ export default function Discover() {
     const params = new URLSearchParams();
     if (query.trim()) params.set("query", query.trim());
     if (category) params.set("category", category);
+    if (city) params.set("city", city);
+    if (minRating !== "") params.set("minRating", String(minRating));
+    if (availability) params.set("availability", availability);
+    if (distanceKm !== "" && originLat !== null && originLng !== null) {
+      params.set("distanceKm", String(distanceKm));
+      params.set("originLat", String(originLat));
+      params.set("originLng", String(originLng));
+    }
     if (verifiedOnly) params.set("verified", "true");
     params.set("page", String(page));
     params.set("limit", String(PAGE_SIZE));
@@ -105,7 +120,7 @@ export default function Discover() {
 
     void loadProfessionals();
     return () => controller.abort();
-  }, [query, category, verifiedOnly, page]);
+  }, [query, category, city, minRating, availability, distanceKm, originLat, originLng, verifiedOnly, page]);
 
   const totalProfessionals = results?.total ?? 0;
 
@@ -135,6 +150,12 @@ export default function Discover() {
               onClick={() => {
                 setQuery("");
                 setCategory("");
+                setCity("");
+                setMinRating("");
+                setAvailability("");
+                setDistanceKm("");
+                setOriginLat(null);
+                setOriginLng(null);
                 setVerifiedOnly(true);
                 setPage(1);
               }}
@@ -179,6 +200,164 @@ export default function Discover() {
                 className="h-4 w-4 rounded border-border accent-primary"
               />
             </label>
+          </FilterSection>
+
+          <FilterSection title="City">
+            <Input
+              className="text-sm"
+              value={city}
+              onChange={(event) => {
+                setCity(event.target.value);
+                setPage(1);
+              }}
+              placeholder="e.g., Toronto, Vancouver"
+            />
+          </FilterSection>
+
+          <FilterSection title="Distance">
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={distanceKm !== "" && originLat !== null && originLng !== null}
+                  onChange={(event) => {
+                    if (event.target.checked) {
+                      if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(
+                          (position) => {
+                            setOriginLat(position.coords.latitude);
+                            setOriginLng(position.coords.longitude);
+                            userLocationRef.current = {
+                              lat: position.coords.latitude,
+                              lng: position.coords.longitude,
+                            };
+                          },
+                          () => {
+                            alert("Unable to retrieve your location. Please enable location access or enter a city.");
+                          }
+                        );
+                      }
+                    } else {
+                      setDistanceKm("");
+                      setOriginLat(null);
+                      setOriginLng(null);
+                      userLocationRef.current = null;
+                    }
+                  }}
+                  className="h-4 w-4 rounded border-border accent-primary"
+                />
+                <span>Use my location</span>
+              </label>
+              {(distanceKm !== "" && originLat !== null && originLng !== null) && (
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 text-sm">
+                    <span className="w-20">Within</span>
+                    <select
+                      className="flex-1 h-9 rounded-lg border border-input bg-background px-3 text-sm"
+                      value={distanceKm}
+                      onChange={(event) => {
+                        setDistanceKm(Number(event.target.value));
+                        setPage(1);
+                      }}
+                    >
+                      <option value={5}>5 km</option>
+                      <option value={10}>10 km</option>
+                      <option value={25}>25 km</option>
+                      <option value={50}>50 km</option>
+                      <option value={100}>100 km</option>
+                    </select>
+                  </label>
+                  <button
+                    type="button"
+                    className="text-xs text-primary hover:underline"
+                    onClick={() => {
+                      setDistanceKm("");
+                      setOriginLat(null);
+                      setOriginLng(null);
+                      userLocationRef.current = null;
+                      setPage(1);
+                    }}
+                  >
+                    Clear location
+                  </button>
+                </div>
+              )}
+            </div>
+          </FilterSection>
+
+          <FilterSection title="Minimum Rating">
+            <div className="space-y-2">
+              {[
+                { value: 4.5, label: "4.5+ stars" },
+                { value: 4, label: "4+ stars" },
+                { value: 3.5, label: "3.5+ stars" },
+                { value: 3, label: "3+ stars" },
+              ].map((option) => (
+                <label key={option.value} className="flex items-center gap-2 text-sm">
+                  <input
+                    type="radio"
+                    name="minRating"
+                    checked={minRating === option.value}
+                    onChange={() => {
+                      setMinRating(minRating === option.value ? "" : option.value);
+                      setPage(1);
+                    }}
+                    className="h-4 w-4 rounded border-border accent-primary"
+                  />
+                  <span>{option.label}</span>
+                </label>
+              ))}
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="radio"
+                  name="minRating"
+                  checked={minRating === ""}
+                  onChange={() => {
+                    setMinRating("");
+                    setPage(1);
+                  }}
+                  className="h-4 w-4 rounded border-border accent-primary"
+                />
+                <span>Any rating</span>
+              </label>
+            </div>
+          </FilterSection>
+
+          <FilterSection title="Availability">
+            <div className="space-y-2">
+              {[
+                { value: "AVAILABLE", label: "Available now" },
+                { value: "BUSY", label: "Busy" },
+                { value: "UNAVAILABLE", label: "Unavailable" },
+              ].map((option) => (
+                <label key={option.value} className="flex items-center gap-2 text-sm">
+                  <input
+                    type="radio"
+                    name="availability"
+                    checked={availability === option.value}
+                    onChange={() => {
+                      setAvailability(availability === option.value ? "" : option.value);
+                      setPage(1);
+                    }}
+                    className="h-4 w-4 rounded border-border accent-primary"
+                  />
+                  <span>{option.label}</span>
+                </label>
+              ))}
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="radio"
+                  name="availability"
+                  checked={availability === ""}
+                  onChange={() => {
+                    setAvailability("");
+                    setPage(1);
+                  }}
+                  className="h-4 w-4 rounded border-border accent-primary"
+                />
+                <span>Any availability</span>
+              </label>
+            </div>
           </FilterSection>
         </aside>
 

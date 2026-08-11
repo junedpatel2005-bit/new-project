@@ -40,6 +40,10 @@ async function upsertCategories() {
 }
 
 async function createProfessionals(passwordHash: string) {
+  // Surat, Gujarat coordinates
+  const suratLat = 21.1702;
+  const suratLng = 72.8311;
+
   const professionals = Array.from({ length: 12 }, (_, index) => ({
     email: `professional.${index + 1}@${SEED_DOMAIN}`,
     firstName: faker.person.firstName(),
@@ -51,12 +55,31 @@ async function createProfessionals(passwordHash: string) {
       ["React", "TypeScript", "Plumbing", "Figma", "SEO", "Photography", "Tutoring", "AWS"],
       { min: 3, max: 5 },
     ),
+    // Generate realistic lat/lng coordinates (using major city areas)
+    latitude: faker.location.latitude({ min: -90, max: 90 }),
+    longitude: faker.location.longitude({ min: -180, max: 180 }),
   }));
+
+  // Add a specific professional in Surat
+  professionals.push({
+    email: "surat.pro@servio.example",
+    firstName: "Rajesh",
+    lastName: "Patel",
+    category: "Development",
+    city: "Surat",
+    hourlyRate: 120,
+    skills: ["React", "TypeScript", "AWS", "Figma", "SEO"],
+    latitude: suratLat,
+    longitude: suratLng,
+  });
   return Promise.all(
     professionals.map((professional, index) =>
       db.user.upsert({
         where: { email: professional.email },
-        update: {},
+        update: {
+          professionalLatitude: professional.latitude,
+          professionalLongitude: professional.longitude,
+        },
         create: {
           email: professional.email,
           firstName: professional.firstName,
@@ -74,6 +97,8 @@ async function createProfessionals(passwordHash: string) {
           availabilityStatus: index % 2 === 0 ? "available" : "this_week",
           averageRating: faker.number.float({ min: 4.1, max: 5, fractionDigits: 1 }),
           reviewCount: faker.number.int({ min: 3, max: 65 }),
+          professionalLatitude: professional.latitude,
+          professionalLongitude: professional.longitude,
         },
       }),
     ),
