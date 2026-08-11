@@ -1,16 +1,8 @@
 "use client";
 
-import dynamic from "next/dynamic";
+import { Suspense, lazy } from "react";
 import { AppShell } from "@/components/AppShell";
-const ProfessionalDiscoveryMap = dynamic(
-  () => import("@/components/ProfessionalDiscoveryMap"),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="h-[520px] w-full overflow-hidden rounded-2xl border bg-muted" />
-    ),
-  },
-);
+const ProfessionalDiscoveryMap = lazy(() => import("@/components/ProfessionalDiscoveryMap"));
 import { ProCard } from "@/components/ProCard";
 import type { MarketplaceCategory, MarketplaceProfessional } from "@/lib/types/marketplace";
 import type { ProfessionalDiscoveryResponse } from "@/lib/types/professional-discovery";
@@ -449,10 +441,16 @@ export default function Discover() {
             <>
               {showMap && (results?.professionals?.length ?? 0) > 0 && (
                 <div ref={mapSectionRef} className="mb-6">
-                  <ProfessionalDiscoveryMap
-                    professionals={results?.professionals ?? []}
-                    selectedPoint={selectedPoint ?? undefined}
-                  />
+                  <Suspense
+                    fallback={
+                      <div className="h-[520px] w-full overflow-hidden rounded-2xl border bg-muted animate-pulse" />
+                    }
+                  >
+                    <ProfessionalDiscoveryMap
+                      professionals={results?.professionals ?? []}
+                      selectedPoint={selectedPoint ?? undefined}
+                    />
+                  </Suspense>
                 </div>
               )}
               <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-2">

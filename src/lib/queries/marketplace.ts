@@ -4,6 +4,8 @@ import type {
   MarketplaceCategory,
   MarketplaceJob,
   MarketplaceProfessional,
+  DetailedProfessional,
+  ProfessionalService,
 } from "@/lib/types/marketplace";
 
 function parseSkills(value: string | null): string[] {
@@ -13,6 +15,16 @@ function parseSkills(value: string | null): string[] {
     return Array.isArray(parsed) && parsed.every((skill) => typeof skill === "string")
       ? parsed
       : [];
+  } catch {
+    return [];
+  }
+}
+
+function parseJsonArray(value: string | null): string[] {
+  if (!value) return [];
+  try {
+    const parsed: unknown = JSON.parse(value);
+    return Array.isArray(parsed) && parsed.every((item) => typeof item === "string") ? parsed : [];
   } catch {
     return [];
   }
@@ -46,6 +58,115 @@ function toProfessional(professional: {
     verified: professional.isVerified,
     skills: parseSkills(professional.professionalSkillsJson),
     bio: professional.companyDescription,
+  };
+}
+
+function toDetailedProfessional(professional: {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string | null;
+  avatarUrl: string | null;
+  companyName: string | null;
+  companyWebsite: string | null;
+  industry: string | null;
+  teamSize: string | null;
+  companyDescription: string | null;
+  address: string | null;
+  professionalCategory: string | null;
+  professionalCity: string | null;
+  professionalSkillsJson: string | null;
+  experienceYears: number | null;
+  hourlyRate: number | null;
+  fixedRate: number | null;
+  portfolioUrl: string | null;
+  workPhotosJson: string | null;
+  certificationsJson: string | null;
+  tradeLicenseUrl: string | null;
+  serviceArea: string | null;
+  workMode: string;
+  serviceRadiusKm: number | null;
+  averageRating: number;
+  reviewCount: number;
+  isVerified: boolean;
+  availabilityStatus: string;
+  professionalLatitude: number | null;
+  professionalLongitude: number | null;
+  isActive: boolean;
+  lastLoginAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+  verification: {
+    status: string | null;
+    governmentIdUrl: string | null;
+    licenseUrl: string | null;
+    insuranceUrl: string | null;
+    selfieUrl: string | null;
+  } | null;
+  services: {
+    id: number;
+    name: string;
+    description: string;
+    price: number | null;
+    imageUrl: string | null;
+    isActive: boolean;
+  }[];
+}): DetailedProfessional {
+  const base = toProfessional({
+    id: professional.id,
+    firstName: professional.firstName,
+    lastName: professional.lastName,
+    avatarUrl: professional.avatarUrl,
+    professionalCategory: professional.professionalCategory,
+    professionalCity: professional.professionalCity,
+    hourlyRate: professional.hourlyRate,
+    averageRating: professional.averageRating,
+    reviewCount: professional.reviewCount,
+    availabilityStatus: professional.availabilityStatus,
+    isVerified: professional.isVerified,
+    professionalSkillsJson: professional.professionalSkillsJson,
+    companyDescription: professional.companyDescription,
+  });
+
+  return {
+    ...base,
+    firstName: professional.firstName,
+    lastName: professional.lastName,
+    email: professional.email,
+    phone: professional.phone,
+    companyName: professional.companyName,
+    companyWebsite: professional.companyWebsite,
+    industry: professional.industry,
+    teamSize: professional.teamSize,
+    experienceYears: professional.experienceYears,
+    fixedRate: professional.fixedRate,
+    portfolioUrl: professional.portfolioUrl,
+    workPhotos: parseJsonArray(professional.workPhotosJson),
+    certifications: parseJsonArray(professional.certificationsJson),
+    tradeLicenseUrl: professional.tradeLicenseUrl,
+    serviceArea: professional.serviceArea,
+    workMode: professional.workMode,
+    serviceRadiusKm: professional.serviceRadiusKm,
+    professionalLatitude: professional.professionalLatitude,
+    professionalLongitude: professional.professionalLongitude,
+    isActive: professional.isActive,
+    lastLoginAt: professional.lastLoginAt?.toISOString() ?? null,
+    createdAt: professional.createdAt.toISOString(),
+    updatedAt: professional.updatedAt.toISOString(),
+    verificationStatus: professional.verification?.status ?? null,
+    governmentIdUrl: professional.verification?.governmentIdUrl ?? null,
+    licenseUrl: professional.verification?.licenseUrl ?? null,
+    insuranceUrl: professional.verification?.insuranceUrl ?? null,
+    selfieUrl: professional.verification?.selfieUrl ?? null,
+    services: professional.services.map((s) => ({
+      id: s.id,
+      name: s.name,
+      description: s.description,
+      price: s.price,
+      imageUrl: s.imageUrl,
+      isActive: s.isActive,
+    })),
   };
 }
 
@@ -170,6 +291,71 @@ export async function getProfessional(id: number): Promise<MarketplaceProfession
     },
   });
   return professional ? toProfessional(professional) : null;
+}
+
+export async function getDetailedProfessional(id: number): Promise<DetailedProfessional | null> {
+  const professional = await db.user.findFirst({
+    where: { id, role: "PROFESSIONAL", isActive: true },
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      email: true,
+      phone: true,
+      avatarUrl: true,
+      companyName: true,
+      companyWebsite: true,
+      industry: true,
+      teamSize: true,
+      companyDescription: true,
+      address: true,
+      professionalCategory: true,
+      professionalCity: true,
+      professionalSkillsJson: true,
+      experienceYears: true,
+      hourlyRate: true,
+      fixedRate: true,
+      portfolioUrl: true,
+      workPhotosJson: true,
+      certificationsJson: true,
+      tradeLicenseUrl: true,
+      serviceArea: true,
+      workMode: true,
+      serviceRadiusKm: true,
+      averageRating: true,
+      reviewCount: true,
+      isVerified: true,
+      availabilityStatus: true,
+      professionalLatitude: true,
+      professionalLongitude: true,
+      isActive: true,
+      lastLoginAt: true,
+      createdAt: true,
+      updatedAt: true,
+      verification: {
+        select: {
+          status: true,
+          governmentIdUrl: true,
+          licenseUrl: true,
+          insuranceUrl: true,
+          selfieUrl: true,
+        },
+      },
+      services: {
+        where: { isActive: true },
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          price: true,
+          imageUrl: true,
+          isActive: true,
+        },
+        orderBy: { createdAt: "desc" },
+      },
+    },
+  });
+  return professional ? toDetailedProfessional(professional) : null;
 }
 
 export async function getOpenJob(id: number): Promise<MarketplaceJob | null> {

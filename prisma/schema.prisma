@@ -150,6 +150,8 @@ model User {
   clientJobs                          ClientJob[]
   clientProfiles                      ClientProfile[]
   favoriteJobs                        FavoriteJob[]
+  verification                        ProfessionalVerification?
+  services                            Service[]
 }
 
 model ClientProfile {
@@ -696,6 +698,7 @@ model ProfessionalVerification {
   selfieUrl          String?
   status             String   @default("PENDING")
   updatedAt          DateTime @updatedAt
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model StoredFile {
@@ -768,6 +771,7 @@ model Service {
   isActive       Boolean  @default(true)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+  professional   User     @relation(fields: [professionalId], references: [id], onDelete: Cascade)
 
   @@index([professionalId])
 }

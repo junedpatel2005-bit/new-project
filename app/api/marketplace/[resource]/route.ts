@@ -3,6 +3,7 @@ import { z } from "zod";
 import {
   getOpenJob,
   getProfessional,
+  getDetailedProfessional,
   listCategories,
   listOpenJobs,
   listProfessionals,
@@ -24,6 +25,18 @@ export async function GET(request: Request, { params }: { params: Promise<{ reso
           { status: 400 },
         );
       const professional = await getProfessional(id.data);
+      return professional
+        ? NextResponse.json(professional)
+        : NextResponse.json({ error: "Professional not found." }, { status: 404 });
+    }
+    if (resource === "professional-detail") {
+      const id = idSchema.safeParse(new URL(request.url).searchParams.get("id"));
+      if (!id.success)
+        return NextResponse.json(
+          { error: "A valid professional id is required." },
+          { status: 400 },
+        );
+      const professional = await getDetailedProfessional(id.data);
       return professional
         ? NextResponse.json(professional)
         : NextResponse.json({ error: "Professional not found." }, { status: 404 });

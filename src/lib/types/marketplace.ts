@@ -13,6 +13,50 @@ export type MarketplaceProfessional = {
   bio: string | null;
 };
 
+export type DetailedProfessional = MarketplaceProfessional & {
+  // Additional fields from User model
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string | null;
+  companyName: string | null;
+  companyWebsite: string | null;
+  industry: string | null;
+  teamSize: string | null;
+  experienceYears: number | null;
+  fixedRate: number | null;
+  portfolioUrl: string | null;
+  workPhotos: string[];
+  certifications: string[];
+  tradeLicenseUrl: string | null;
+  serviceArea: string | null;
+  workMode: string;
+  serviceRadiusKm: number | null;
+  professionalLatitude: number | null;
+  professionalLongitude: number | null;
+  isActive: boolean;
+  lastLoginAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  // Verification
+  verificationStatus: string | null;
+  governmentIdUrl: string | null;
+  licenseUrl: string | null;
+  insuranceUrl: string | null;
+  selfieUrl: string | null;
+  // Services
+  services: ProfessionalService[];
+};
+
+export type ProfessionalService = {
+  id: number;
+  name: string;
+  description: string;
+  price: number | null;
+  imageUrl: string | null;
+  isActive: boolean;
+};
+
 export type MarketplaceCategory = {
   id: number;
   name: string;
