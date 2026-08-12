@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AuthLayout } from "@/components/AuthLayout";
@@ -8,12 +9,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
+const LeafletMap = dynamic(() => import("@/components/LeafletAddressMap"), {
+  ssr: false,
+  loading: () => <div className="h-64 animate-pulse rounded-lg bg-muted" />,
+});
+
 type Profile = {
   professionalCategory: string | null;
-  professionalCity: string | null;
   experienceYears: number | null;
   hourlyRate: number | null;
-  serviceArea: string | null;
+  professionalLatitude: number | null;
+  professionalLongitude: number | null;
   workMode: string;
   companyDescription: string | null;
   professionalSkillsJson: string | null;
@@ -25,6 +31,7 @@ export function ProfessionalProfileSetup() {
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [skills, setSkills] = useState("");
+  const [location, setLocation] = useState<[number, number]>([20.5937, 78.9629]);
 
   useEffect(() => {
     void fetch("/api/professional/profile")
@@ -32,6 +39,12 @@ export function ProfessionalProfileSetup() {
       .then((data: { profile?: Profile | null } | null) => {
         if (!data?.profile) return;
         setProfile(data.profile);
+        if (
+          data.profile.professionalLatitude !== null &&
+          data.profile.professionalLongitude !== null
+        ) {
+          setLocation([data.profile.professionalLatitude, data.profile.professionalLongitude]);
+        }
         try {
           setSkills(
             (JSON.parse(data.profile.professionalSkillsJson ?? "[]") as string[]).join(", "),
@@ -52,10 +65,10 @@ export function ProfessionalProfileSetup() {
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
         category: form.get("category"),
-        city: form.get("city"),
         experienceYears: form.get("experienceYears") ? Number(form.get("experienceYears")) : null,
         hourlyRate: form.get("hourlyRate") ? Number(form.get("hourlyRate")) : null,
-        serviceArea: form.get("serviceArea"),
+        latitude: location[0],
+        longitude: location[1],
         workMode: form.get("workMode"),
         bio: form.get("bio"),
         skills: skills
@@ -79,22 +92,13 @@ export function ProfessionalProfileSetup() {
       subtitle="Add the essentials clients need before they can hire you."
     >
       <form onSubmit={submit} className="space-y-4">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field
-            name="category"
-            label="Service category"
-            required
-            defaultValue={profile?.professionalCategory}
-            placeholder="Designer, electrician…"
-          />
-          <Field
-            name="city"
-            label="Your city"
-            required
-            defaultValue={profile?.professionalCity}
-            placeholder="Surat"
-          />
-        </div>
+        <Field
+          name="category"
+          label="Service category"
+          required
+          defaultValue={profile?.professionalCategory}
+          placeholder="Designer, electrician..."
+        />
         <div className="grid gap-4 sm:grid-cols-2">
           <Field
             name="experienceYears"
@@ -109,12 +113,29 @@ export function ProfessionalProfileSetup() {
             defaultValue={profile?.hourlyRate?.toString()}
           />
         </div>
-        <Field
-          name="serviceArea"
-          label="Service area"
-          defaultValue={profile?.serviceArea}
-          placeholder="Surat and nearby areas"
-        />
+        <div className="space-y-3">
+          <div className="space-y-1.5">
+            <Label>Service location</Label>
+            <p className="text-sm text-muted-foreground">
+              Click the map or drag the pin to choose where you provide services.
+            </p>
+          </div>
+          <LeafletMap
+            point={location}
+            onPointChange={(latitude, longitude) => setLocation([latitude, longitude])}
+          />
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() =>
+              navigator.geolocation?.getCurrentPosition((position) =>
+                setLocation([position.coords.latitude, position.coords.longitude]),
+              )
+            }
+          >
+            Use my current location
+          </Button>
+        </div>
         <div className="space-y-1.5">
           <Label htmlFor="workMode">Work mode</Label>
           <select
@@ -150,7 +171,7 @@ export function ProfessionalProfileSetup() {
         </div>
         {error && <p className="text-sm text-destructive">{error}</p>}
         <Button type="submit" className="w-full" disabled={pending}>
-          {pending ? "Saving…" : "Save profile and open dashboard"}
+          {pending ? "Saving..." : "Save profile and open dashboard"}
         </Button>
       </form>
     </AuthLayout>

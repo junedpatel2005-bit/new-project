@@ -217,8 +217,15 @@ export async function listProfessionals(): Promise<MarketplaceProfessional[]> {
 }
 
 export async function listOpenJobs(): Promise<MarketplaceJob[]> {
+  const runningJobs = await db.projectTracking.findMany({
+    where: { status: { notIn: ["COMPLETED", "CANCELLED"] } },
+    select: { jobId: true },
+  });
   const jobs = await db.clientJob.findMany({
-    where: { status: "OPEN" },
+    where: {
+      status: "OPEN",
+      id: { notIn: runningJobs.map((project) => project.jobId) },
+    },
     select: {
       id: true,
       title: true,
@@ -239,9 +246,7 @@ export async function listOpenJobs(): Promise<MarketplaceJob[]> {
       createdAt: true,
       user: { select: { firstName: true, lastName: true, avatarUrl: true, averageRating: true } },
       _count: { select: { favoriteJobs: true } },
-      attachments: {
-        select: { id: true, fileName: true, fileType: true, fileSize: true, previewUrl: true },
-      },
+      attachments: { select: { id: true, fileName: true, fileType: true, fileSize: true, previewUrl: true } },
     },
     orderBy: { createdAt: "desc" },
     take: 50,
@@ -302,7 +307,7 @@ export async function getProfessional(id: number): Promise<MarketplaceProfession
 }
 
 export async function getDetailedProfessional(id: number): Promise<DetailedProfessional | null> {
-  const professional = await db.user.findFirst({
+  const  professional = await db.user.findFirst({
     where: { id, role: "PROFESSIONAL", isActive: true },
     select: {
       id: true,
@@ -367,6 +372,12 @@ export async function getDetailedProfessional(id: number): Promise<DetailedProfe
 }
 
 export async function getOpenJob(id: number): Promise<MarketplaceJob | null> {
+  const runningProject = await db.projectTracking.findFirst({
+    where: { jobId: id, status: { notIn: ["COMPLETED", "CANCELLED"] } },
+    select: { id: true },
+  });
+  if (runningProject) return null;
+
   const job = await db.clientJob.findFirst({
     where: { id, status: "OPEN" },
     select: {
@@ -389,9 +400,7 @@ export async function getOpenJob(id: number): Promise<MarketplaceJob | null> {
       createdAt: true,
       user: { select: { firstName: true, lastName: true, avatarUrl: true, averageRating: true } },
       _count: { select: { favoriteJobs: true } },
-      attachments: {
-        select: { id: true, fileName: true, fileType: true, fileSize: true, previewUrl: true },
-      },
+      attachments: { select: { id: true, fileName: true, fileType: true, fileSize: true, previewUrl: true } },
     },
   });
   if (!job || !job.title || !job.description || !job.category) return null;

@@ -346,7 +346,9 @@ export async function POST(
           : !user.emailVerifiedAt
             ? "/verify"
             : user.role === "PROFESSIONAL"
-              ? user.professionalCategory && user.professionalCity
+              ? user.professionalCategory &&
+                user.professionalLatitude !== null &&
+                user.professionalLongitude !== null
                 ? "/professional/dashboard"
                 : "/professional/setup"
               : "/dashboard",

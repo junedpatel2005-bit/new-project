@@ -324,6 +324,10 @@ export async function POST(request: NextRequest) {
           where: { id: project.id },
           data: { status: "COMPLETED", progress: 100, completedAt: new Date(), currentStage: null },
         });
+        await db.clientJob.updateMany({
+          where: { id: project.jobId, userId: project.clientId },
+          data: { status: "CLOSED" },
+        });
       } else {
         if (next)
           await db.projectMilestone.update({
@@ -392,6 +396,10 @@ export async function POST(request: NextRequest) {
       await db.projectTracking.update({
         where: { id: project.id },
         data: { status: "COMPLETED", progress: 100, completedAt: new Date() },
+      });
+      await db.clientJob.updateMany({
+        where: { id: project.jobId, userId: project.clientId },
+        data: { status: "CLOSED" },
       });
       await event(
         "PROJECT_COMPLETED",

@@ -35,6 +35,12 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     );
 
   const project = await db.$transaction(async (tx) => {
+    const closedJob = await tx.clientJob.updateMany({
+      where: { id: hireRequest.jobId, userId: hireRequest.clientId, status: "OPEN" },
+      data: { status: "CLOSED" },
+    });
+    if (closedJob.count !== 1) throw new Error("This job is no longer available to hire for.");
+
     await tx.projectRequest.update({ where: { id: requestId }, data: { status: "ACCEPTED" } });
     const tracking = await tx.projectTracking.create({
       data: {
