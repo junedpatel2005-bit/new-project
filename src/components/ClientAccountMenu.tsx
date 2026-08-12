@@ -111,7 +111,7 @@ export function ClientAccountMenu() {
               <Link href="/client-profile">My Profile</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link href="/my-jobs">My Jobs</Link>
+              <Link href="/my-jobs">Projects</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link href="/client-profile">Saved Locations</Link>
@@ -126,7 +126,7 @@ export function ClientAccountMenu() {
               <Link href="/dashboard">Dashboard</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link href="/my-jobs">My Jobs</Link>
+              <Link href="/my-jobs">Projects</Link>
             </DropdownMenuItem>
           </>
         )}

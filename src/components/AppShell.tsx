@@ -18,15 +18,16 @@ import {
   Home,
   Briefcase,
   User,
+  Star,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ClientAccountMenu } from "@/components/ClientAccountMenu";
 
-const items = [
+const clientItems = [
   { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { to: "/discover", icon: Users, label: "Find pros" },
   { to: "/post-job", icon: PlusCircle, label: "Post a job" },
-  { to: "/my-jobs", icon: FolderKanban, label: "My jobs" },
+  { to: "/my-jobs", icon: FolderKanban, label: "Projects" },
   { to: "/messages", icon: MessageSquare, label: "Messages" },
   { to: "/earnings", icon: Wallet, label: "Earnings" },
   { to: "/verification", icon: BadgeCheck, label: "Verification" },
@@ -34,12 +35,30 @@ const items = [
   { to: "/admin", icon: ShieldCheck, label: "Admin" },
 ];
 
-const mobileItems = [
+const professionalItems = [
+  { to: "/professional/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+  { to: "/professional/my-jobs", icon: FolderKanban, label: "My Jobs" },
+  { to: "/professional/reviews", icon: Star, label: "Reviews" },
+  { to: "/earnings", icon: Wallet, label: "Earnings" },
+  { to: "/notifications", icon: BellRing, label: "Notifications" },
+  { to: "/professional-profile", icon: User, label: "Profile" },
+];
+
+const clientMobileItems = [
   { to: "/dashboard", icon: Home, label: "Home" },
   { to: "/discover", icon: Search, label: "Search" },
   { to: "/my-jobs", icon: Briefcase, label: "Jobs" },
   { to: "/messages", icon: MessageSquare, label: "Messages" },
   { to: "/dashboard", icon: User, label: "Profile" },
+];
+
+const professionalMobileItems = [
+  { to: "/professional/dashboard", icon: Home, label: "Home" },
+  { to: "/professional/my-jobs", icon: Briefcase, label: "Jobs" },
+  { to: "/professional/reviews", icon: Star, label: "Reviews" },
+  { to: "/earnings", icon: Wallet, label: "Earnings" },
+  { to: "/notifications", icon: BellRing, label: "Notifications" },
+  { to: "/professional-profile", icon: User, label: "Profile" },
 ];
 
 export function AppShell({ children, title }: { children: React.ReactNode; title?: string }) {
@@ -50,6 +69,9 @@ export function AppShell({ children, title }: { children: React.ReactNode; title
     role: string;
     avatarUrl: string | null;
   } | null>(null);
+  const [items, setItems] = useState(clientItems);
+  const [mobileItemsState, setMobileItemsState] = useState(clientMobileItems);
+
   useEffect(() => {
     fetch("/api/auth/me")
       .then((response) => (response.ok ? response.json() : null))
@@ -58,9 +80,23 @@ export function AppShell({ children, title }: { children: React.ReactNode; title
           data: {
             user?: { firstName: string; lastName: string; role: string; avatarUrl: string | null };
           } | null,
-        ) => setUser(data?.user ?? null),
+        ) => {
+          const nextUser = data?.user ?? null;
+          setUser(nextUser);
+          if (nextUser?.role === "PROFESSIONAL") {
+            setItems(professionalItems);
+            setMobileItemsState(professionalMobileItems);
+          } else {
+            setItems(clientItems);
+            setMobileItemsState(clientMobileItems);
+          }
+        },
       )
-      .catch(() => setUser(null));
+      .catch(() => {
+        setUser(null);
+        setItems(clientItems);
+        setMobileItemsState(clientMobileItems);
+      });
   }, []);
   return (
     <div className="min-h-screen bg-background pb-16 lg:pb-0">
@@ -70,9 +106,7 @@ export function AppShell({ children, title }: { children: React.ReactNode; title
         </div>
         <nav className="px-3 py-2">
           {items.map((it) => {
-            const active =
-              path === it.to ||
-              (it.to !== "/dashboard" && path.startsWith(it.to.split("/").slice(0, 2).join("/")));
+            const active = path === it.to || path.startsWith(`${it.to}/`);
             return (
               <Link
                 key={it.to}
@@ -108,11 +142,13 @@ export function AppShell({ children, title }: { children: React.ReactNode; title
               />
             </div>
           </div>
-          <Link href="/post-job" className="hidden sm:inline-flex">
-            <Button size="sm" className="bg-cta text-cta-foreground hover:bg-cta/90">
-              Post a Job
-            </Button>
-          </Link>
+          {user?.role !== "PROFESSIONAL" ? (
+            <Link href="/post-job" className="hidden sm:inline-flex">
+              <Button size="sm" className="bg-cta text-cta-foreground hover:bg-cta/90">
+                Post a Job
+              </Button>
+            </Link>
+          ) : null}
           <Link
             href="/notifications"
             className="relative grid h-9 w-9 place-items-center rounded-lg hover:bg-muted"
@@ -134,11 +170,9 @@ export function AppShell({ children, title }: { children: React.ReactNode; title
 
       {/* Mobile bottom nav */}
       <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface/95 backdrop-blur-md lg:hidden">
-        <div className="grid grid-cols-5">
-          {mobileItems.map((it) => {
-            const active =
-              path === it.to ||
-              (it.to !== "/dashboard" && path.startsWith(it.to.split("/").slice(0, 2).join("/")));
+        <div className="grid grid-cols-6">
+          {mobileItemsState.map((it) => {
+            const active = path === it.to || path.startsWith(`${it.to}/`);
             return (
               <Link
                 key={it.label}

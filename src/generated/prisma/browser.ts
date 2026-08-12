@@ -118,6 +118,11 @@ export type ProjectRequest = Prisma.ProjectRequestModel
  */
 export type ProjectTracking = Prisma.ProjectTrackingModel
 /**
+ * Model ProjectTimelineEvent
+ * 
+ */
+export type ProjectTimelineEvent = Prisma.ProjectTimelineEventModel
+/**
  * Model ProjectMilestone
  * 
  */

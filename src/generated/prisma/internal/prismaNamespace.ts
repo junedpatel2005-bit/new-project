@@ -417,6 +417,7 @@ export const ModelName = {
   ProjectReview: 'ProjectReview',
   ProjectRequest: 'ProjectRequest',
   ProjectTracking: 'ProjectTracking',
+  ProjectTimelineEvent: 'ProjectTimelineEvent',
   ProjectMilestone: 'ProjectMilestone',
   ProjectWorkUpload: 'ProjectWorkUpload',
   HireJob: 'HireJob',
@@ -470,7 +471,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "cmsPage" | "cmsPageVersion" | "cmsMedia" | "sQLiteMigrationTableArchive" | "sQLiteMigrationAudit" | "websitePage" | "legalPage" | "serviceCategory" | "user" | "clientProfile" | "clientSavedLocation" | "clientHiringNeed" | "clientJob" | "favoriteJob" | "clientJobAttachment" | "projectTransaction" | "projectNegotiation" | "projectReview" | "projectRequest" | "projectTracking" | "projectMilestone" | "projectWorkUpload" | "hireJob" | "hireContract" | "hireAttachment" | "hireMilestone" | "directHireNegotiation" | "socketConversation" | "socketMessage" | "socketConversationClear" | "callSession" | "messageConversation" | "message" | "userNotification" | "userNotificationState" | "payment" | "wallet" | "walletTransaction" | "projectWithdrawal" | "projectDispute" | "projectCompletionRequest" | "projectRevisionRequest" | "projectReviewRequest" | "professionalVerification" | "storedFile" | "apiToken" | "browserSubscription" | "faq" | "contactRequest" | "service" | "pageConfiguration" | "websitePageOverride" | "pageTextOverride" | "legacyUser" | "legacyUserProfile" | "legacyProfessionalDetail" | "legacyLocation" | "legacyVerification"
+    modelProps: "cmsPage" | "cmsPageVersion" | "cmsMedia" | "sQLiteMigrationTableArchive" | "sQLiteMigrationAudit" | "websitePage" | "legalPage" | "serviceCategory" | "user" | "clientProfile" | "clientSavedLocation" | "clientHiringNeed" | "clientJob" | "favoriteJob" | "clientJobAttachment" | "projectTransaction" | "projectNegotiation" | "projectReview" | "projectRequest" | "projectTracking" | "projectTimelineEvent" | "projectMilestone" | "projectWorkUpload" | "hireJob" | "hireContract" | "hireAttachment" | "hireMilestone" | "directHireNegotiation" | "socketConversation" | "socketMessage" | "socketConversationClear" | "callSession" | "messageConversation" | "message" | "userNotification" | "userNotificationState" | "payment" | "wallet" | "walletTransaction" | "projectWithdrawal" | "projectDispute" | "projectCompletionRequest" | "projectRevisionRequest" | "projectReviewRequest" | "professionalVerification" | "storedFile" | "apiToken" | "browserSubscription" | "faq" | "contactRequest" | "service" | "pageConfiguration" | "websitePageOverride" | "pageTextOverride" | "legacyUser" | "legacyUserProfile" | "legacyProfessionalDetail" | "legacyLocation" | "legacyVerification"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1951,6 +1952,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.ProjectTrackingCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.ProjectTrackingCountAggregateOutputType> | number
+        }
+      }
+    }
+    ProjectTimelineEvent: {
+      payload: Prisma.$ProjectTimelineEventPayload<ExtArgs>
+      fields: Prisma.ProjectTimelineEventFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ProjectTimelineEventFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectTimelineEventPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ProjectTimelineEventFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectTimelineEventPayload>
+        }
+        findFirst: {
+          args: Prisma.ProjectTimelineEventFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectTimelineEventPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ProjectTimelineEventFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectTimelineEventPayload>
+        }
+        findMany: {
+          args: Prisma.ProjectTimelineEventFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectTimelineEventPayload>[]
+        }
+        create: {
+          args: Prisma.ProjectTimelineEventCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectTimelineEventPayload>
+        }
+        createMany: {
+          args: Prisma.ProjectTimelineEventCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ProjectTimelineEventCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectTimelineEventPayload>[]
+        }
+        delete: {
+          args: Prisma.ProjectTimelineEventDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectTimelineEventPayload>
+        }
+        update: {
+          args: Prisma.ProjectTimelineEventUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectTimelineEventPayload>
+        }
+        deleteMany: {
+          args: Prisma.ProjectTimelineEventDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ProjectTimelineEventUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ProjectTimelineEventUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectTimelineEventPayload>[]
+        }
+        upsert: {
+          args: Prisma.ProjectTimelineEventUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectTimelineEventPayload>
+        }
+        aggregate: {
+          args: Prisma.ProjectTimelineEventAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProjectTimelineEvent>
+        }
+        groupBy: {
+          args: Prisma.ProjectTimelineEventGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProjectTimelineEventGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ProjectTimelineEventCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProjectTimelineEventCountAggregateOutputType> | number
         }
       }
     }
@@ -5117,6 +5192,7 @@ export const ProjectRequestScalarFieldEnum = {
   duration: 'duration',
   coverLetter: 'coverLetter',
   status: 'status',
+  origin: 'origin',
   attachmentsJson: 'attachmentsJson',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -5132,12 +5208,34 @@ export const ProjectTrackingScalarFieldEnum = {
   clientId: 'clientId',
   professionalId: 'professionalId',
   status: 'status',
+  progress: 'progress',
+  currentStage: 'currentStage',
   acceptedAt: 'acceptedAt',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type ProjectTrackingScalarFieldEnum = (typeof ProjectTrackingScalarFieldEnum)[keyof typeof ProjectTrackingScalarFieldEnum]
+
+
+export const ProjectTimelineEventScalarFieldEnum = {
+  id: 'id',
+  trackingId: 'trackingId',
+  milestoneId: 'milestoneId',
+  actorId: 'actorId',
+  actorRole: 'actorRole',
+  type: 'type',
+  title: 'title',
+  description: 'description',
+  progress: 'progress',
+  stage: 'stage',
+  attachmentJson: 'attachmentJson',
+  createdAt: 'createdAt'
+} as const
+
+export type ProjectTimelineEventScalarFieldEnum = (typeof ProjectTimelineEventScalarFieldEnum)[keyof typeof ProjectTimelineEventScalarFieldEnum]
 
 
 export const ProjectMilestoneScalarFieldEnum = {
@@ -5150,6 +5248,8 @@ export const ProjectMilestoneScalarFieldEnum = {
   amount: 'amount',
   dueDate: 'dueDate',
   status: 'status',
+  submittedAt: 'submittedAt',
+  approvedAt: 'approvedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -5160,6 +5260,8 @@ export type ProjectMilestoneScalarFieldEnum = (typeof ProjectMilestoneScalarFiel
 export const ProjectWorkUploadScalarFieldEnum = {
   id: 'id',
   trackingId: 'trackingId',
+  milestoneId: 'milestoneId',
+  status: 'status',
   roundNumber: 'roundNumber',
   title: 'title',
   note: 'note',
@@ -6054,6 +6156,7 @@ export type GlobalOmitConfig = {
   projectReview?: Prisma.ProjectReviewOmit
   projectRequest?: Prisma.ProjectRequestOmit
   projectTracking?: Prisma.ProjectTrackingOmit
+  projectTimelineEvent?: Prisma.ProjectTimelineEventOmit
   projectMilestone?: Prisma.ProjectMilestoneOmit
   projectWorkUpload?: Prisma.ProjectWorkUploadOmit
   hireJob?: Prisma.HireJobOmit

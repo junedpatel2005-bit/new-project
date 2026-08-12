@@ -8,6 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test:project-flow": "tsx scripts/test-professional-proposal-flow.ts",
     "db:seed": "tsx prisma/seed.ts",
     "format": "prettier --write ."
   },

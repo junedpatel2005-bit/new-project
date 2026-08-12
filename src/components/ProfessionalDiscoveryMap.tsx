@@ -21,11 +21,7 @@ function FitBounds({ bounds }: { bounds: [number, number][] }) {
   return null;
 }
 
-function SelectedPointFocus({
-  point,
-}: {
-  point?: { lat: number; lng: number };
-}) {
+function SelectedPointFocus({ point }: { point?: { lat: number; lng: number } }) {
   const map = useMap();
   useEffect(() => {
     if (!point) return;

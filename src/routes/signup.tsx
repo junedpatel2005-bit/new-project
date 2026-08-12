@@ -1,17 +1,27 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { ClipboardEvent, KeyboardEvent, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import {
+  ClipboardEvent,
+  FormEvent,
+  KeyboardEvent,
+  Suspense,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { AuthLayout } from "@/components/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Loader2 } from "lucide-react";
 
 const emptyOtp = ["", "", "", ""];
 
-export default function Signup() {
+function SignupContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const otpRefs = useRef<Array<HTMLInputElement | null>>([]);
   const [role, setRole] = useState<"client" | "pro">("client");
   const [phone, setPhone] = useState("");
@@ -24,7 +34,6 @@ export default function Signup() {
     firstName: "",
     lastName: "",
     email: "",
-    professionalPhone: "",
     password: "",
     confirmPassword: "",
     terms: false,
@@ -35,6 +44,15 @@ export default function Signup() {
   const [verifyingPhone, setVerifyingPhone] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  useEffect(() => {
+    const rawRole = searchParams.get("role")?.toLowerCase();
+    if (rawRole === "pro" || rawRole === "professional") {
+      setRole("pro");
+    } else if (rawRole === "client") {
+      setRole("client");
+    }
+  }, [searchParams]);
 
   function resetPhoneVerification() {
     setOtp(emptyOtp);
@@ -114,6 +132,32 @@ export default function Signup() {
     setOtpOpen(false);
   }
 
+  async function checkAvailability(field: "email" | "phone", value: string) {
+    const trimmed = value.trim();
+    if (!trimmed) return;
+    const response = await fetch("/api/auth/check-availability", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ [field]: trimmed }),
+    });
+    if (!response.ok) return;
+    const result =
+      response.status === 204
+        ? { fields: {} }
+        : ((await response.json()) as { fields?: Record<string, string> });
+    setFieldErrors((current) => {
+      const next = { ...current };
+      if (result.fields?.[field]) next[field] = result.fields[field];
+      else delete next[field];
+      return next;
+    });
+  }
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    void submit();
+  }
+
   async function submit() {
     setError(null);
     const nextErrors: Record<string, string> = {};
@@ -136,14 +180,14 @@ export default function Signup() {
     else if (password !== draft.confirmPassword) {
       nextErrors.confirmPassword = "Passwords do not match.";
     }
-    if (role === "client" && !phone.trim()) nextErrors.phone = "Phone number is required.";
+    if (!phone.trim()) nextErrors.phone = "Phone number is required.";
     if (!draft.terms) nextErrors.terms = "Please accept the Terms and Privacy Policy.";
     setFieldErrors(nextErrors);
     if (Object.keys(nextErrors).length) {
       return;
     }
-    if (role === "client" && !phoneVerified) {
-      setError("Verify your phone number before creating a client account.");
+    if (!phoneVerified) {
+      setError("Verify your phone number before creating your account.");
       return;
     }
     setPending(true);
@@ -154,7 +198,7 @@ export default function Signup() {
         firstName,
         lastName,
         email,
-        phone: role === "client" ? phone : draft.professionalPhone || undefined,
+        phone,
         password,
         role: role === "pro" ? "PROFESSIONAL" : "CLIENT",
         terms: draft.terms,
@@ -213,7 +257,7 @@ export default function Signup() {
         Continue with Google
       </Button>
 
-      <form action={submit} noValidate className="space-y-4">
+      <form onSubmit={handleSubmit} noValidate className="space-y-4">
         <div className="grid grid-cols-2 gap-3">
           <Field
             id="first"
@@ -245,111 +289,109 @@ export default function Signup() {
           required
           error={fieldErrors.email}
           value={draft.email}
-          onValueChange={(value) => setDraft({ ...draft, email: value })}
+          onValueChange={(value) => {
+            setDraft({ ...draft, email: value });
+            setFieldErrors((current) => {
+              const next = { ...current };
+              delete next.email;
+              return next;
+            });
+          }}
+          onBlur={() => checkAvailability("email", draft.email)}
         />
-        {role === "client" ? (
-          <div className="space-y-2">
-            <Label htmlFor="phone">Phone number</Label>
-            <div className="flex gap-2">
-              <Input
-                id="phone"
-                value={phone}
-                onChange={(event) => {
-                  setPhone(event.target.value);
-                  resetPhoneVerification();
-                }}
-                type="tel"
-                required
-                disabled={phoneVerified}
-                placeholder="+1 555 123 4567"
-                className={
-                  fieldErrors.phone
-                    ? "border-destructive placeholder:text-destructive focus-visible:ring-destructive"
-                    : ""
-                }
-                aria-invalid={Boolean(fieldErrors.phone)}
-                aria-describedby={fieldErrors.phone ? "phone-error" : undefined}
-              />
-              {!phoneVerified && (
+        <div className="space-y-2">
+          <Label htmlFor="phone">Phone number</Label>
+          <div className="flex gap-2">
+            <Input
+              id="phone"
+              value={phone}
+              onChange={(event) => {
+                setPhone(event.target.value);
+                resetPhoneVerification();
+                setFieldErrors((current) => {
+                  const next = { ...current };
+                  delete next.phone;
+                  return next;
+                });
+              }}
+              onBlur={() => {
+                if (phone.trim().length >= 7) checkAvailability("phone", phone);
+              }}
+              type="tel"
+              required
+              disabled={phoneVerified}
+              placeholder="+1 555 123 4567"
+              className={
+                fieldErrors.phone
+                  ? "border-destructive placeholder:text-destructive focus-visible:ring-destructive"
+                  : ""
+              }
+              aria-invalid={Boolean(fieldErrors.phone)}
+              aria-describedby={fieldErrors.phone ? "phone-error" : undefined}
+            />
+            {!phoneVerified && (
+              <Button type="button" variant="outline" onClick={requestCode} disabled={sendingCode}>
+                {sendingCode ? "Sending…" : otpOpen ? "Resend" : "Verify"}
+              </Button>
+            )}
+          </div>
+          {phoneVerified ? (
+            <div className="flex animate-in items-center justify-between rounded-md bg-muted px-3 py-2 text-sm text-primary fade-in zoom-in-95 duration-300">
+              <span className="animate-in fade-in slide-in-from-left-1 duration-300">
+                ✓ Phone number verified
+              </span>
+              <Button type="button" variant="ghost" size="sm" onClick={resetPhoneVerification}>
+                Change phone number
+              </Button>
+            </div>
+          ) : (
+            otpOpen && (
+              <div className="animate-in space-y-3 rounded-lg border border-border p-3 fade-in slide-in-from-top-2 duration-300">
+                <Label>Verification code</Label>
+                <div className="flex gap-2">
+                  {otp.map((digit, index) => (
+                    <Input
+                      key={index}
+                      ref={(element) => {
+                        otpRefs.current[index] = element;
+                      }}
+                      value={digit}
+                      onChange={(event) => updateOtp(index, event.target.value)}
+                      onKeyDown={(event) => handleOtpKeyDown(index, event)}
+                      onPaste={handleOtpPaste}
+                      inputMode="numeric"
+                      autoComplete="one-time-code"
+                      maxLength={1}
+                      aria-label={`Verification digit ${index + 1}`}
+                      className="h-11 w-11 animate-in text-center text-lg fade-in zoom-in-95 duration-300"
+                    />
+                  ))}
+                </div>
                 <Button
                   type="button"
-                  variant="outline"
+                  onClick={verifyPhone}
+                  disabled={verifyingPhone || otp.join("").length !== 4}
+                >
+                  {verifyingPhone ? "Verifying…" : "Verify OTP"}
+                </Button>
+                <Button
+                  type="button"
+                  variant="link"
+                  size="sm"
                   onClick={requestCode}
                   disabled={sendingCode}
                 >
-                  {sendingCode ? "Sending…" : otpOpen ? "Resend" : "Verify"}
-                </Button>
-              )}
-            </div>
-            {phoneVerified ? (
-              <div className="flex animate-in items-center justify-between rounded-md bg-muted px-3 py-2 text-sm text-primary fade-in zoom-in-95 duration-300">
-                <span className="animate-in fade-in slide-in-from-left-1 duration-300">
-                  ✓ Phone number verified
-                </span>
-                <Button type="button" variant="ghost" size="sm" onClick={resetPhoneVerification}>
-                  Change phone number
+                  {sendingCode ? "Sending…" : "Resend code"}
                 </Button>
               </div>
-            ) : (
-              otpOpen && (
-                <div className="animate-in space-y-3 rounded-lg border border-border p-3 fade-in slide-in-from-top-2 duration-300">
-                  <Label>Verification code</Label>
-                  <div className="flex gap-2">
-                    {otp.map((digit, index) => (
-                      <Input
-                        key={index}
-                        ref={(element) => {
-                          otpRefs.current[index] = element;
-                        }}
-                        value={digit}
-                        onChange={(event) => updateOtp(index, event.target.value)}
-                        onKeyDown={(event) => handleOtpKeyDown(index, event)}
-                        onPaste={handleOtpPaste}
-                        inputMode="numeric"
-                        autoComplete="one-time-code"
-                        maxLength={1}
-                        aria-label={`Verification digit ${index + 1}`}
-                        className="h-11 w-11 animate-in text-center text-lg fade-in zoom-in-95 duration-300"
-                      />
-                    ))}
-                  </div>
-                  <Button
-                    type="button"
-                    onClick={verifyPhone}
-                    disabled={verifyingPhone || otp.join("").length !== 4}
-                  >
-                    {verifyingPhone ? "Verifying…" : "Verify OTP"}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="link"
-                    size="sm"
-                    onClick={requestCode}
-                    disabled={sendingCode}
-                  >
-                    {sendingCode ? "Sending…" : "Resend code"}
-                  </Button>
-                </div>
-              )
-            )}
-            {phoneError && <p className="text-sm text-destructive">{phoneError}</p>}
-            {fieldErrors.phone && (
-              <p id="phone-error" className="text-sm text-destructive">
-                {fieldErrors.phone}
-              </p>
-            )}
-          </div>
-        ) : (
-          <Field
-            id="phone"
-            name="phone"
-            label="Phone (optional)"
-            placeholder="+1 555 123 4567"
-            type="tel"
-            value={draft.professionalPhone}
-            onValueChange={(value) => setDraft({ ...draft, professionalPhone: value })}
-          />
-        )}
+            )
+          )}
+          {(phoneError || fieldErrors.phone) && (
+            <p id="phone-error" className="text-sm text-destructive">
+              {phoneError || fieldErrors.phone}
+            </p>
+          )}
+        </div>
         <Field
           id="password"
           name="password"
@@ -393,15 +435,26 @@ export default function Signup() {
         </label>
         {fieldErrors.terms && <p className="text-sm text-destructive">{fieldErrors.terms}</p>}
         {error && <p className="text-sm text-destructive">{error}</p>}
-        <Button
-          type="submit"
-          className="w-full"
-          disabled={pending || (role === "client" && !phoneVerified)}
-        >
-          {pending ? "Creating account…" : "Create account"}
+        <Button type="submit" className="w-full" disabled={pending || !phoneVerified}>
+          {pending ? (
+            <span className="flex items-center justify-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Creating account…
+            </span>
+          ) : (
+            "Create account"
+          )}
         </Button>
       </form>
     </AuthLayout>
+  );
+}
+
+export default function Signup() {
+  return (
+    <Suspense fallback={null}>
+      <SignupContent />
+    </Suspense>
   );
 }
 
@@ -415,6 +468,7 @@ function Field({
   error,
   value,
   onValueChange,
+  onBlur,
   trailingAction,
 }: {
   id: string;
@@ -426,6 +480,7 @@ function Field({
   error?: string;
   value?: string;
   onValueChange?: (value: string) => void;
+  onBlur?: () => void;
   trailingAction?: { label: string; onClick: () => void };
 }) {
   return (
@@ -440,6 +495,7 @@ function Field({
           placeholder={placeholder}
           value={value}
           onChange={(event) => onValueChange?.(event.target.value)}
+          onBlur={onBlur}
           aria-invalid={Boolean(error)}
           aria-describedby={error ? `${name}-error` : undefined}
           className={`${trailingAction ? "pr-16" : ""} ${error ? "border-destructive placeholder:text-destructive focus-visible:ring-destructive" : ""}`}

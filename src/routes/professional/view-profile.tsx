@@ -244,9 +244,7 @@ export default function ViewProfessionalProfile() {
                 <div>
                   <h1 className="flex items-center gap-2 text-2xl font-semibold">
                     {professional.name}
-                    {professional.verified && (
-                      <Verified className="h-5 w-5 text-primary" />
-                    )}
+                    {professional.verified && <Verified className="h-5 w-5 text-primary" />}
                   </h1>
                   <p className="text-muted-foreground">{professional.title}</p>
                 </div>
@@ -459,8 +457,12 @@ export default function ViewProfessionalProfile() {
                 <dl className="grid gap-4 sm:grid-cols-2">
                   {professional.experienceYears !== null && (
                     <div>
-                      <dt className="text-sm font-medium text-muted-foreground">Years of Experience</dt>
-                      <dd className="mt-1 text-2xl font-semibold">{professional.experienceYears}+ years</dd>
+                      <dt className="text-sm font-medium text-muted-foreground">
+                        Years of Experience
+                      </dt>
+                      <dd className="mt-1 text-2xl font-semibold">
+                        {professional.experienceYears}+ years
+                      </dd>
                     </div>
                   )}
                   {professional.certifications.length > 0 && (
@@ -523,7 +525,9 @@ export default function ViewProfessionalProfile() {
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex-1">
                             <h4 className="font-semibold">{service.name}</h4>
-                            <p className="mt-1 text-sm text-muted-foreground">{service.description}</p>
+                            <p className="mt-1 text-sm text-muted-foreground">
+                              {service.description}
+                            </p>
                           </div>
                           <div className="flex items-center gap-4">
                             {service.price !== null && (
@@ -568,16 +572,20 @@ export default function ViewProfessionalProfile() {
                   {professional.hourlyRate !== null && (
                     <div>
                       <dt className="text-sm font-medium text-muted-foreground">Hourly Rate</dt>
-                      <dd className="mt-1 text-2xl font-semibold">{formatCurrency(professional.hourlyRate)}/hr</dd>
+                      <dd className="mt-1 text-2xl font-semibold">
+                        {formatCurrency(professional.hourlyRate)}/hr
+                      </dd>
                     </div>
                   )}
                   {professional.fixedRate !== null && (
                     <div>
                       <dt className="text-sm font-medium text-muted-foreground">Fixed Rate</dt>
-                      <dd className="mt-1 text-2xl font-semibold">{formatCurrency(professional.fixedRate)}</dd>
+                      <dd className="mt-1 text-2xl font-semibold">
+                        {formatCurrency(professional.fixedRate)}
+                      </dd>
                     </div>
                   )}
-                  {(professional.hourlyRate === null && professional.fixedRate === null) && (
+                  {professional.hourlyRate === null && professional.fixedRate === null && (
                     <div className="sm:col-span-2">
                       <p className="text-muted-foreground">Contact for pricing</p>
                     </div>
@@ -689,7 +697,9 @@ export default function ViewProfessionalProfile() {
                   )}
                   {professional.selfieUrl && (
                     <div>
-                      <dt className="text-sm font-medium text-muted-foreground">Selfie Verification</dt>
+                      <dt className="text-sm font-medium text-muted-foreground">
+                        Selfie Verification
+                      </dt>
                       <dd className="mt-1">
                         <a
                           href={professional.selfieUrl}
@@ -744,14 +754,16 @@ export default function ViewProfessionalProfile() {
                       <dd className="mt-1">{professional.serviceRadiusKm} km</dd>
                     </div>
                   )}
-                  {(professional.professionalLatitude !== null && professional.professionalLongitude !== null) && (
-                    <div>
-                      <dt className="text-sm font-medium text-muted-foreground">Coordinates</dt>
-                      <dd className="mt-1 text-sm font-mono">
-                        {professional.professionalLatitude.toFixed(6)}, {professional.professionalLongitude.toFixed(6)}
-                      </dd>
-                    </div>
-                  )}
+                  {professional.professionalLatitude !== null &&
+                    professional.professionalLongitude !== null && (
+                      <div>
+                        <dt className="text-sm font-medium text-muted-foreground">Coordinates</dt>
+                        <dd className="mt-1 text-sm font-mono">
+                          {professional.professionalLatitude.toFixed(6)},{" "}
+                          {professional.professionalLongitude.toFixed(6)}
+                        </dd>
+                      </div>
+                    )}
                 </dl>
               </CardContent>
             </Card>

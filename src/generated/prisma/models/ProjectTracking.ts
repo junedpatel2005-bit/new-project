@@ -32,6 +32,7 @@ export type ProjectTrackingAvgAggregateOutputType = {
   jobId: number | null
   clientId: number | null
   professionalId: number | null
+  progress: number | null
 }
 
 export type ProjectTrackingSumAggregateOutputType = {
@@ -40,6 +41,7 @@ export type ProjectTrackingSumAggregateOutputType = {
   jobId: number | null
   clientId: number | null
   professionalId: number | null
+  progress: number | null
 }
 
 export type ProjectTrackingMinAggregateOutputType = {
@@ -49,7 +51,11 @@ export type ProjectTrackingMinAggregateOutputType = {
   clientId: number | null
   professionalId: number | null
   status: string | null
+  progress: number | null
+  currentStage: string | null
   acceptedAt: Date | null
+  startedAt: Date | null
+  completedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -61,7 +67,11 @@ export type ProjectTrackingMaxAggregateOutputType = {
   clientId: number | null
   professionalId: number | null
   status: string | null
+  progress: number | null
+  currentStage: string | null
   acceptedAt: Date | null
+  startedAt: Date | null
+  completedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -73,7 +83,11 @@ export type ProjectTrackingCountAggregateOutputType = {
   clientId: number
   professionalId: number
   status: number
+  progress: number
+  currentStage: number
   acceptedAt: number
+  startedAt: number
+  completedAt: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -86,6 +100,7 @@ export type ProjectTrackingAvgAggregateInputType = {
   jobId?: true
   clientId?: true
   professionalId?: true
+  progress?: true
 }
 
 export type ProjectTrackingSumAggregateInputType = {
@@ -94,6 +109,7 @@ export type ProjectTrackingSumAggregateInputType = {
   jobId?: true
   clientId?: true
   professionalId?: true
+  progress?: true
 }
 
 export type ProjectTrackingMinAggregateInputType = {
@@ -103,7 +119,11 @@ export type ProjectTrackingMinAggregateInputType = {
   clientId?: true
   professionalId?: true
   status?: true
+  progress?: true
+  currentStage?: true
   acceptedAt?: true
+  startedAt?: true
+  completedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -115,7 +135,11 @@ export type ProjectTrackingMaxAggregateInputType = {
   clientId?: true
   professionalId?: true
   status?: true
+  progress?: true
+  currentStage?: true
   acceptedAt?: true
+  startedAt?: true
+  completedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -127,7 +151,11 @@ export type ProjectTrackingCountAggregateInputType = {
   clientId?: true
   professionalId?: true
   status?: true
+  progress?: true
+  currentStage?: true
   acceptedAt?: true
+  startedAt?: true
+  completedAt?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -226,7 +254,11 @@ export type ProjectTrackingGroupByOutputType = {
   clientId: number
   professionalId: number
   status: string
+  progress: number
+  currentStage: string | null
   acceptedAt: Date
+  startedAt: Date | null
+  completedAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: ProjectTrackingCountAggregateOutputType | null
@@ -261,7 +293,11 @@ export type ProjectTrackingWhereInput = {
   clientId?: Prisma.IntFilter<"ProjectTracking"> | number
   professionalId?: Prisma.IntFilter<"ProjectTracking"> | number
   status?: Prisma.StringFilter<"ProjectTracking"> | string
+  progress?: Prisma.IntFilter<"ProjectTracking"> | number
+  currentStage?: Prisma.StringNullableFilter<"ProjectTracking"> | string | null
   acceptedAt?: Prisma.DateTimeFilter<"ProjectTracking"> | Date | string
+  startedAt?: Prisma.DateTimeNullableFilter<"ProjectTracking"> | Date | string | null
+  completedAt?: Prisma.DateTimeNullableFilter<"ProjectTracking"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"ProjectTracking"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ProjectTracking"> | Date | string
 }
@@ -273,7 +309,11 @@ export type ProjectTrackingOrderByWithRelationInput = {
   clientId?: Prisma.SortOrder
   professionalId?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  progress?: Prisma.SortOrder
+  currentStage?: Prisma.SortOrderInput | Prisma.SortOrder
   acceptedAt?: Prisma.SortOrder
+  startedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -288,7 +328,11 @@ export type ProjectTrackingWhereUniqueInput = Prisma.AtLeast<{
   clientId?: Prisma.IntFilter<"ProjectTracking"> | number
   professionalId?: Prisma.IntFilter<"ProjectTracking"> | number
   status?: Prisma.StringFilter<"ProjectTracking"> | string
+  progress?: Prisma.IntFilter<"ProjectTracking"> | number
+  currentStage?: Prisma.StringNullableFilter<"ProjectTracking"> | string | null
   acceptedAt?: Prisma.DateTimeFilter<"ProjectTracking"> | Date | string
+  startedAt?: Prisma.DateTimeNullableFilter<"ProjectTracking"> | Date | string | null
+  completedAt?: Prisma.DateTimeNullableFilter<"ProjectTracking"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"ProjectTracking"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ProjectTracking"> | Date | string
 }, "id" | "requestId">
@@ -300,7 +344,11 @@ export type ProjectTrackingOrderByWithAggregationInput = {
   clientId?: Prisma.SortOrder
   professionalId?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  progress?: Prisma.SortOrder
+  currentStage?: Prisma.SortOrderInput | Prisma.SortOrder
   acceptedAt?: Prisma.SortOrder
+  startedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ProjectTrackingCountOrderByAggregateInput
@@ -320,7 +368,11 @@ export type ProjectTrackingScalarWhereWithAggregatesInput = {
   clientId?: Prisma.IntWithAggregatesFilter<"ProjectTracking"> | number
   professionalId?: Prisma.IntWithAggregatesFilter<"ProjectTracking"> | number
   status?: Prisma.StringWithAggregatesFilter<"ProjectTracking"> | string
+  progress?: Prisma.IntWithAggregatesFilter<"ProjectTracking"> | number
+  currentStage?: Prisma.StringNullableWithAggregatesFilter<"ProjectTracking"> | string | null
   acceptedAt?: Prisma.DateTimeWithAggregatesFilter<"ProjectTracking"> | Date | string
+  startedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ProjectTracking"> | Date | string | null
+  completedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ProjectTracking"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ProjectTracking"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"ProjectTracking"> | Date | string
 }
@@ -331,7 +383,11 @@ export type ProjectTrackingCreateInput = {
   clientId: number
   professionalId: number
   status?: string
+  progress?: number
+  currentStage?: string | null
   acceptedAt?: Date | string
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -343,7 +399,11 @@ export type ProjectTrackingUncheckedCreateInput = {
   clientId: number
   professionalId: number
   status?: string
+  progress?: number
+  currentStage?: string | null
   acceptedAt?: Date | string
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -354,7 +414,11 @@ export type ProjectTrackingUpdateInput = {
   clientId?: Prisma.IntFieldUpdateOperationsInput | number
   professionalId?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
+  currentStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -366,7 +430,11 @@ export type ProjectTrackingUncheckedUpdateInput = {
   clientId?: Prisma.IntFieldUpdateOperationsInput | number
   professionalId?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
+  currentStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -378,7 +446,11 @@ export type ProjectTrackingCreateManyInput = {
   clientId: number
   professionalId: number
   status?: string
+  progress?: number
+  currentStage?: string | null
   acceptedAt?: Date | string
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -389,7 +461,11 @@ export type ProjectTrackingUpdateManyMutationInput = {
   clientId?: Prisma.IntFieldUpdateOperationsInput | number
   professionalId?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
+  currentStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -401,7 +477,11 @@ export type ProjectTrackingUncheckedUpdateManyInput = {
   clientId?: Prisma.IntFieldUpdateOperationsInput | number
   professionalId?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
+  currentStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -413,7 +493,11 @@ export type ProjectTrackingCountOrderByAggregateInput = {
   clientId?: Prisma.SortOrder
   professionalId?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  progress?: Prisma.SortOrder
+  currentStage?: Prisma.SortOrder
   acceptedAt?: Prisma.SortOrder
+  startedAt?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -424,6 +508,7 @@ export type ProjectTrackingAvgOrderByAggregateInput = {
   jobId?: Prisma.SortOrder
   clientId?: Prisma.SortOrder
   professionalId?: Prisma.SortOrder
+  progress?: Prisma.SortOrder
 }
 
 export type ProjectTrackingMaxOrderByAggregateInput = {
@@ -433,7 +518,11 @@ export type ProjectTrackingMaxOrderByAggregateInput = {
   clientId?: Prisma.SortOrder
   professionalId?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  progress?: Prisma.SortOrder
+  currentStage?: Prisma.SortOrder
   acceptedAt?: Prisma.SortOrder
+  startedAt?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -445,7 +534,11 @@ export type ProjectTrackingMinOrderByAggregateInput = {
   clientId?: Prisma.SortOrder
   professionalId?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  progress?: Prisma.SortOrder
+  currentStage?: Prisma.SortOrder
   acceptedAt?: Prisma.SortOrder
+  startedAt?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -456,6 +549,7 @@ export type ProjectTrackingSumOrderByAggregateInput = {
   jobId?: Prisma.SortOrder
   clientId?: Prisma.SortOrder
   professionalId?: Prisma.SortOrder
+  progress?: Prisma.SortOrder
 }
 
 
@@ -467,7 +561,11 @@ export type ProjectTrackingSelect<ExtArgs extends runtime.Types.Extensions.Inter
   clientId?: boolean
   professionalId?: boolean
   status?: boolean
+  progress?: boolean
+  currentStage?: boolean
   acceptedAt?: boolean
+  startedAt?: boolean
+  completedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["projectTracking"]>
@@ -479,7 +577,11 @@ export type ProjectTrackingSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   clientId?: boolean
   professionalId?: boolean
   status?: boolean
+  progress?: boolean
+  currentStage?: boolean
   acceptedAt?: boolean
+  startedAt?: boolean
+  completedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["projectTracking"]>
@@ -491,7 +593,11 @@ export type ProjectTrackingSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   clientId?: boolean
   professionalId?: boolean
   status?: boolean
+  progress?: boolean
+  currentStage?: boolean
   acceptedAt?: boolean
+  startedAt?: boolean
+  completedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["projectTracking"]>
@@ -503,12 +609,16 @@ export type ProjectTrackingSelectScalar = {
   clientId?: boolean
   professionalId?: boolean
   status?: boolean
+  progress?: boolean
+  currentStage?: boolean
   acceptedAt?: boolean
+  startedAt?: boolean
+  completedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ProjectTrackingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "requestId" | "jobId" | "clientId" | "professionalId" | "status" | "acceptedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["projectTracking"]>
+export type ProjectTrackingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "requestId" | "jobId" | "clientId" | "professionalId" | "status" | "progress" | "currentStage" | "acceptedAt" | "startedAt" | "completedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["projectTracking"]>
 
 export type $ProjectTrackingPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "ProjectTracking"
@@ -520,7 +630,11 @@ export type $ProjectTrackingPayload<ExtArgs extends runtime.Types.Extensions.Int
     clientId: number
     professionalId: number
     status: string
+    progress: number
+    currentStage: string | null
     acceptedAt: Date
+    startedAt: Date | null
+    completedAt: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["projectTracking"]>
@@ -952,7 +1066,11 @@ export interface ProjectTrackingFieldRefs {
   readonly clientId: Prisma.FieldRef<"ProjectTracking", 'Int'>
   readonly professionalId: Prisma.FieldRef<"ProjectTracking", 'Int'>
   readonly status: Prisma.FieldRef<"ProjectTracking", 'String'>
+  readonly progress: Prisma.FieldRef<"ProjectTracking", 'Int'>
+  readonly currentStage: Prisma.FieldRef<"ProjectTracking", 'String'>
   readonly acceptedAt: Prisma.FieldRef<"ProjectTracking", 'DateTime'>
+  readonly startedAt: Prisma.FieldRef<"ProjectTracking", 'DateTime'>
+  readonly completedAt: Prisma.FieldRef<"ProjectTracking", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"ProjectTracking", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"ProjectTracking", 'DateTime'>
 }

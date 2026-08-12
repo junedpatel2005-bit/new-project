@@ -47,12 +47,7 @@ export function SiteHeader() {
         <div className="hidden items-center gap-2 lg:flex">
           {user ? (
             <div className="flex items-center gap-2">
-              <Button
-                asChild
-                variant="outline"
-                size="sm"
-                className="hidden sm:inline-flex"
-              >
+              <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex">
                 <Link href={dashboardHref}>Dashboard</Link>
               </Button>
               <div className="hidden sm:block">

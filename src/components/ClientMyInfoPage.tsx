@@ -6,8 +6,23 @@ import { useRouter } from "next/navigation";
 import { AppShell } from "@/components/AppShell";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle2, Circle, ShieldCheck, MapPin, Lock, ClipboardList, LogOut } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  CheckCircle2,
+  Circle,
+  ShieldCheck,
+  MapPin,
+  Lock,
+  ClipboardList,
+  LogOut,
+} from "lucide-react";
 import type { ClientAccountSummaryResponse } from "@/lib/types/client-account";
 
 function formatName(firstName: string, lastName: string) {
@@ -40,7 +55,8 @@ export function ClientMyInfoPage({ data }: { data: ClientAccountSummaryResponse 
   const [loggingOut, setLoggingOut] = useState(false);
 
   const completion = getCompletion(data);
-  const initials = `${data.account.firstName[0] ?? ""}${data.account.lastName[0] ?? ""}`.toUpperCase();
+  const initials =
+    `${data.account.firstName[0] ?? ""}${data.account.lastName[0] ?? ""}`.toUpperCase();
   const profileName = formatName(data.account.firstName, data.account.lastName);
   const companyName = data.profile?.companyName || "Not added";
   const address = data.profile?.address || null;
@@ -76,7 +92,9 @@ export function ClientMyInfoPage({ data }: { data: ClientAccountSummaryResponse 
                 <div className="rounded-2xl border border-border bg-muted p-4">
                   <div className="flex items-center justify-between gap-4">
                     <div>
-                      <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Profile completion</p>
+                      <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">
+                        Profile completion
+                      </p>
                       <p className="text-lg font-semibold">{completion.percentage}% complete</p>
                     </div>
                     <span className="rounded-full bg-success/10 px-3 py-1 text-xs font-semibold text-success">
@@ -92,7 +110,10 @@ export function ClientMyInfoPage({ data }: { data: ClientAccountSummaryResponse 
                 </div>
                 <div className="grid gap-2 sm:grid-cols-2">
                   {completion.steps.map((step) => (
-                    <div key={step.label} className="flex items-center gap-2 rounded-2xl border border-border bg-card p-3 text-sm">
+                    <div
+                      key={step.label}
+                      className="flex items-center gap-2 rounded-2xl border border-border bg-card p-3 text-sm"
+                    >
                       {step.done ? (
                         <CheckCircle2 className="h-4 w-4 text-success" />
                       ) : (
@@ -221,7 +242,7 @@ export function ClientMyInfoPage({ data }: { data: ClientAccountSummaryResponse 
               </CardContent>
               <CardFooter>
                 <Button asChild size="sm">
-                  <Link href="/my-jobs">View My Jobs</Link>
+                  <Link href="/my-jobs">View Projects</Link>
                 </Button>
               </CardFooter>
             </Card>
@@ -264,7 +285,15 @@ export function ClientMyInfoPage({ data }: { data: ClientAccountSummaryResponse 
   );
 }
 
-function KeyValue({ label, value, fallback }: { label: string; value: string | null; fallback?: string }) {
+function KeyValue({
+  label,
+  value,
+  fallback,
+}: {
+  label: string;
+  value: string | null;
+  fallback?: string;
+}) {
   return (
     <div className="rounded-2xl border border-border bg-card p-4">
       <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">{label}</p>
@@ -289,7 +318,9 @@ function ContactRow({
       <div>
         <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">{label}</p>
         <p className="mt-1 text-sm text-foreground">{value}</p>
-        <p className={`mt-2 text-sm ${state === "verified" ? "text-success" : "text-muted-foreground"}`}>
+        <p
+          className={`mt-2 text-sm ${state === "verified" ? "text-success" : "text-muted-foreground"}`}
+        >
           {state === "verified" ? "✓ Verified" : "Not verified"}
         </p>
       </div>

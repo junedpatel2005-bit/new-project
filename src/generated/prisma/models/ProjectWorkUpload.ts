@@ -29,18 +29,22 @@ export type AggregateProjectWorkUpload = {
 export type ProjectWorkUploadAvgAggregateOutputType = {
   id: number | null
   trackingId: number | null
+  milestoneId: number | null
   roundNumber: number | null
 }
 
 export type ProjectWorkUploadSumAggregateOutputType = {
   id: number | null
   trackingId: number | null
+  milestoneId: number | null
   roundNumber: number | null
 }
 
 export type ProjectWorkUploadMinAggregateOutputType = {
   id: number | null
   trackingId: number | null
+  milestoneId: number | null
+  status: string | null
   roundNumber: number | null
   title: string | null
   note: string | null
@@ -53,6 +57,8 @@ export type ProjectWorkUploadMinAggregateOutputType = {
 export type ProjectWorkUploadMaxAggregateOutputType = {
   id: number | null
   trackingId: number | null
+  milestoneId: number | null
+  status: string | null
   roundNumber: number | null
   title: string | null
   note: string | null
@@ -65,6 +71,8 @@ export type ProjectWorkUploadMaxAggregateOutputType = {
 export type ProjectWorkUploadCountAggregateOutputType = {
   id: number
   trackingId: number
+  milestoneId: number
+  status: number
   roundNumber: number
   title: number
   note: number
@@ -79,18 +87,22 @@ export type ProjectWorkUploadCountAggregateOutputType = {
 export type ProjectWorkUploadAvgAggregateInputType = {
   id?: true
   trackingId?: true
+  milestoneId?: true
   roundNumber?: true
 }
 
 export type ProjectWorkUploadSumAggregateInputType = {
   id?: true
   trackingId?: true
+  milestoneId?: true
   roundNumber?: true
 }
 
 export type ProjectWorkUploadMinAggregateInputType = {
   id?: true
   trackingId?: true
+  milestoneId?: true
+  status?: true
   roundNumber?: true
   title?: true
   note?: true
@@ -103,6 +115,8 @@ export type ProjectWorkUploadMinAggregateInputType = {
 export type ProjectWorkUploadMaxAggregateInputType = {
   id?: true
   trackingId?: true
+  milestoneId?: true
+  status?: true
   roundNumber?: true
   title?: true
   note?: true
@@ -115,6 +129,8 @@ export type ProjectWorkUploadMaxAggregateInputType = {
 export type ProjectWorkUploadCountAggregateInputType = {
   id?: true
   trackingId?: true
+  milestoneId?: true
+  status?: true
   roundNumber?: true
   title?: true
   note?: true
@@ -214,6 +230,8 @@ export type ProjectWorkUploadGroupByArgs<ExtArgs extends runtime.Types.Extension
 export type ProjectWorkUploadGroupByOutputType = {
   id: number
   trackingId: number
+  milestoneId: number | null
+  status: string
   roundNumber: number
   title: string
   note: string | null
@@ -249,6 +267,8 @@ export type ProjectWorkUploadWhereInput = {
   NOT?: Prisma.ProjectWorkUploadWhereInput | Prisma.ProjectWorkUploadWhereInput[]
   id?: Prisma.IntFilter<"ProjectWorkUpload"> | number
   trackingId?: Prisma.IntFilter<"ProjectWorkUpload"> | number
+  milestoneId?: Prisma.IntNullableFilter<"ProjectWorkUpload"> | number | null
+  status?: Prisma.StringFilter<"ProjectWorkUpload"> | string
   roundNumber?: Prisma.IntFilter<"ProjectWorkUpload"> | number
   title?: Prisma.StringFilter<"ProjectWorkUpload"> | string
   note?: Prisma.StringNullableFilter<"ProjectWorkUpload"> | string | null
@@ -261,6 +281,8 @@ export type ProjectWorkUploadWhereInput = {
 export type ProjectWorkUploadOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   trackingId?: Prisma.SortOrder
+  milestoneId?: Prisma.SortOrderInput | Prisma.SortOrder
+  status?: Prisma.SortOrder
   roundNumber?: Prisma.SortOrder
   title?: Prisma.SortOrder
   note?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -276,6 +298,8 @@ export type ProjectWorkUploadWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.ProjectWorkUploadWhereInput[]
   NOT?: Prisma.ProjectWorkUploadWhereInput | Prisma.ProjectWorkUploadWhereInput[]
   trackingId?: Prisma.IntFilter<"ProjectWorkUpload"> | number
+  milestoneId?: Prisma.IntNullableFilter<"ProjectWorkUpload"> | number | null
+  status?: Prisma.StringFilter<"ProjectWorkUpload"> | string
   roundNumber?: Prisma.IntFilter<"ProjectWorkUpload"> | number
   title?: Prisma.StringFilter<"ProjectWorkUpload"> | string
   note?: Prisma.StringNullableFilter<"ProjectWorkUpload"> | string | null
@@ -288,6 +312,8 @@ export type ProjectWorkUploadWhereUniqueInput = Prisma.AtLeast<{
 export type ProjectWorkUploadOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   trackingId?: Prisma.SortOrder
+  milestoneId?: Prisma.SortOrderInput | Prisma.SortOrder
+  status?: Prisma.SortOrder
   roundNumber?: Prisma.SortOrder
   title?: Prisma.SortOrder
   note?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -308,6 +334,8 @@ export type ProjectWorkUploadScalarWhereWithAggregatesInput = {
   NOT?: Prisma.ProjectWorkUploadScalarWhereWithAggregatesInput | Prisma.ProjectWorkUploadScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"ProjectWorkUpload"> | number
   trackingId?: Prisma.IntWithAggregatesFilter<"ProjectWorkUpload"> | number
+  milestoneId?: Prisma.IntNullableWithAggregatesFilter<"ProjectWorkUpload"> | number | null
+  status?: Prisma.StringWithAggregatesFilter<"ProjectWorkUpload"> | string
   roundNumber?: Prisma.IntWithAggregatesFilter<"ProjectWorkUpload"> | number
   title?: Prisma.StringWithAggregatesFilter<"ProjectWorkUpload"> | string
   note?: Prisma.StringNullableWithAggregatesFilter<"ProjectWorkUpload"> | string | null
@@ -319,6 +347,8 @@ export type ProjectWorkUploadScalarWhereWithAggregatesInput = {
 
 export type ProjectWorkUploadCreateInput = {
   trackingId: number
+  milestoneId?: number | null
+  status?: string
   roundNumber?: number
   title: string
   note?: string | null
@@ -331,6 +361,8 @@ export type ProjectWorkUploadCreateInput = {
 export type ProjectWorkUploadUncheckedCreateInput = {
   id?: number
   trackingId: number
+  milestoneId?: number | null
+  status?: string
   roundNumber?: number
   title: string
   note?: string | null
@@ -342,6 +374,8 @@ export type ProjectWorkUploadUncheckedCreateInput = {
 
 export type ProjectWorkUploadUpdateInput = {
   trackingId?: Prisma.IntFieldUpdateOperationsInput | number
+  milestoneId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   roundNumber?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -354,6 +388,8 @@ export type ProjectWorkUploadUpdateInput = {
 export type ProjectWorkUploadUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   trackingId?: Prisma.IntFieldUpdateOperationsInput | number
+  milestoneId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   roundNumber?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -366,6 +402,8 @@ export type ProjectWorkUploadUncheckedUpdateInput = {
 export type ProjectWorkUploadCreateManyInput = {
   id?: number
   trackingId: number
+  milestoneId?: number | null
+  status?: string
   roundNumber?: number
   title: string
   note?: string | null
@@ -377,6 +415,8 @@ export type ProjectWorkUploadCreateManyInput = {
 
 export type ProjectWorkUploadUpdateManyMutationInput = {
   trackingId?: Prisma.IntFieldUpdateOperationsInput | number
+  milestoneId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   roundNumber?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -389,6 +429,8 @@ export type ProjectWorkUploadUpdateManyMutationInput = {
 export type ProjectWorkUploadUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   trackingId?: Prisma.IntFieldUpdateOperationsInput | number
+  milestoneId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   roundNumber?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -401,6 +443,8 @@ export type ProjectWorkUploadUncheckedUpdateManyInput = {
 export type ProjectWorkUploadCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   trackingId?: Prisma.SortOrder
+  milestoneId?: Prisma.SortOrder
+  status?: Prisma.SortOrder
   roundNumber?: Prisma.SortOrder
   title?: Prisma.SortOrder
   note?: Prisma.SortOrder
@@ -413,12 +457,15 @@ export type ProjectWorkUploadCountOrderByAggregateInput = {
 export type ProjectWorkUploadAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
   trackingId?: Prisma.SortOrder
+  milestoneId?: Prisma.SortOrder
   roundNumber?: Prisma.SortOrder
 }
 
 export type ProjectWorkUploadMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   trackingId?: Prisma.SortOrder
+  milestoneId?: Prisma.SortOrder
+  status?: Prisma.SortOrder
   roundNumber?: Prisma.SortOrder
   title?: Prisma.SortOrder
   note?: Prisma.SortOrder
@@ -431,6 +478,8 @@ export type ProjectWorkUploadMaxOrderByAggregateInput = {
 export type ProjectWorkUploadMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   trackingId?: Prisma.SortOrder
+  milestoneId?: Prisma.SortOrder
+  status?: Prisma.SortOrder
   roundNumber?: Prisma.SortOrder
   title?: Prisma.SortOrder
   note?: Prisma.SortOrder
@@ -443,6 +492,7 @@ export type ProjectWorkUploadMinOrderByAggregateInput = {
 export type ProjectWorkUploadSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   trackingId?: Prisma.SortOrder
+  milestoneId?: Prisma.SortOrder
   roundNumber?: Prisma.SortOrder
 }
 
@@ -451,6 +501,8 @@ export type ProjectWorkUploadSumOrderByAggregateInput = {
 export type ProjectWorkUploadSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   trackingId?: boolean
+  milestoneId?: boolean
+  status?: boolean
   roundNumber?: boolean
   title?: boolean
   note?: boolean
@@ -463,6 +515,8 @@ export type ProjectWorkUploadSelect<ExtArgs extends runtime.Types.Extensions.Int
 export type ProjectWorkUploadSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   trackingId?: boolean
+  milestoneId?: boolean
+  status?: boolean
   roundNumber?: boolean
   title?: boolean
   note?: boolean
@@ -475,6 +529,8 @@ export type ProjectWorkUploadSelectCreateManyAndReturn<ExtArgs extends runtime.T
 export type ProjectWorkUploadSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   trackingId?: boolean
+  milestoneId?: boolean
+  status?: boolean
   roundNumber?: boolean
   title?: boolean
   note?: boolean
@@ -487,6 +543,8 @@ export type ProjectWorkUploadSelectUpdateManyAndReturn<ExtArgs extends runtime.T
 export type ProjectWorkUploadSelectScalar = {
   id?: boolean
   trackingId?: boolean
+  milestoneId?: boolean
+  status?: boolean
   roundNumber?: boolean
   title?: boolean
   note?: boolean
@@ -496,7 +554,7 @@ export type ProjectWorkUploadSelectScalar = {
   createdAt?: boolean
 }
 
-export type ProjectWorkUploadOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "trackingId" | "roundNumber" | "title" | "note" | "fileName" | "fileUrl" | "filesJson" | "createdAt", ExtArgs["result"]["projectWorkUpload"]>
+export type ProjectWorkUploadOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "trackingId" | "milestoneId" | "status" | "roundNumber" | "title" | "note" | "fileName" | "fileUrl" | "filesJson" | "createdAt", ExtArgs["result"]["projectWorkUpload"]>
 
 export type $ProjectWorkUploadPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "ProjectWorkUpload"
@@ -504,6 +562,8 @@ export type $ProjectWorkUploadPayload<ExtArgs extends runtime.Types.Extensions.I
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     trackingId: number
+    milestoneId: number | null
+    status: string
     roundNumber: number
     title: string
     note: string | null
@@ -936,6 +996,8 @@ export interface Prisma__ProjectWorkUploadClient<T, Null = never, ExtArgs extend
 export interface ProjectWorkUploadFieldRefs {
   readonly id: Prisma.FieldRef<"ProjectWorkUpload", 'Int'>
   readonly trackingId: Prisma.FieldRef<"ProjectWorkUpload", 'Int'>
+  readonly milestoneId: Prisma.FieldRef<"ProjectWorkUpload", 'Int'>
+  readonly status: Prisma.FieldRef<"ProjectWorkUpload", 'String'>
   readonly roundNumber: Prisma.FieldRef<"ProjectWorkUpload", 'Int'>
   readonly title: Prisma.FieldRef<"ProjectWorkUpload", 'String'>
   readonly note: Prisma.FieldRef<"ProjectWorkUpload", 'String'>

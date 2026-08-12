@@ -6,15 +6,33 @@ import { Button } from "@/components/ui/button";
 export function ProCard({
   pro,
   onShowLocation,
+  onCardClick,
+  profileHref,
 }: {
   pro: MarketplaceProfessional;
   onShowLocation?: () => void;
+  onCardClick?: () => void;
+  profileHref?: string;
 }) {
   const initial = pro.name.slice(0, 1).toUpperCase();
   return (
-    <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-soft transition-all hover:-translate-y-1 hover:border-primary/30 hover:shadow-elevated">
+    <div
+      className={`group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-soft transition-all hover:-translate-y-1 hover:border-primary/30 hover:shadow-elevated ${onCardClick ? "cursor-pointer" : ""}`}
+      onClick={onCardClick}
+      role={onCardClick ? "button" : undefined}
+      tabIndex={onCardClick ? 0 : undefined}
+      onKeyDown={(event) => {
+        if (!onCardClick) return;
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onCardClick();
+        }
+      }}
+    >
       <button
+        type="button"
         aria-label={`Save ${pro.name}`}
+        onClick={(event) => event.stopPropagation()}
         className="absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-full bg-surface/80 text-muted-foreground hover:bg-surface hover:text-cta"
       >
         <Heart className="h-4 w-4" />
@@ -82,13 +100,27 @@ export function ProCard({
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {onShowLocation && (
-            <Button type="button" variant="outline" size="sm" className="gap-2" onClick={onShowLocation}>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={(event) => {
+                event.stopPropagation();
+                onShowLocation();
+              }}
+            >
               <MapPin className="h-4 w-4" />
               Show on map
             </Button>
           )}
           <Button asChild size="sm" className="bg-cta text-cta-foreground hover:bg-cta/90">
-            <Link href={`/pro/${pro.id}`}>Hire</Link>
+            <Link
+              href={profileHref ?? `/pro/${pro.id}`}
+              onClick={(event) => event.stopPropagation()}
+            >
+              Hire
+            </Link>
           </Button>
         </div>
       </div>

@@ -11,7 +11,7 @@ import {
   phoneProofCookieOptions,
 } from "@/lib/dev-phone-otp";
 import { requestPhoneOtp, verifyPhoneOtp } from "@/lib/phone-otp-provider";
-import { rateLimit } from "@/lib/rate-limit";
+import { clearRateLimit, rateLimit } from "@/lib/rate-limit";
 import { sendAuthEmail, sendVerificationCodeEmail } from "@/lib/email";
 
 const registerSchema = z
@@ -19,13 +19,13 @@ const registerSchema = z
     firstName: z.string().min(1).max(80),
     lastName: z.string().min(1).max(80),
     email: z.string().email(),
-    phone: z.string().min(7).max(25).optional(),
+    phone: z.string().min(7).max(25),
     password: z.string().min(8).regex(/[A-Z]/).regex(/[a-z]/).regex(/\d/),
     role: z.enum(["CLIENT", "PROFESSIONAL"]),
     terms: z.literal(true),
   })
   .superRefine((value, context) => {
-    if (value.role === "CLIENT" && !value.phone?.trim()) {
+    if (!value.phone?.trim()) {
       context.addIssue({ code: "custom", path: ["phone"], message: "A phone number is required." });
     }
   });
@@ -132,7 +132,7 @@ export async function GET(
         user.role === "CLIENT"
           ? "/client-profile"
           : user.role === "PROFESSIONAL"
-            ? "/professional-profile"
+            ? "/professional/setup"
             : "/admin";
       const response = NextResponse.redirect(new URL(redirect, request.url));
       response.cookies.set(
@@ -180,12 +180,29 @@ export async function POST(
   { params }: { params: Promise<{ action: string }> },
 ) {
   const { action } = await params;
-  if (!rateLimit(`${action}:${clientKey(request)}`))
-    return safe("Too many attempts. Please try again shortly.", 429);
   const body = await request.json().catch(() => null);
+  // Credential attempts are scoped to an address as well as the browser IP.
+  // In local development every user shares the "local" client key; using only
+  // that key locks every account after five attempts from any account.
+  const loginEmail =
+    action === "login" && typeof body?.email === "string" ? body.email.trim().toLowerCase() : null;
+  const rateLimitKey = loginEmail
+    ? `${action}:${clientKey(request)}:${loginEmail}`
+    : `${action}:${clientKey(request)}`;
+  if (!rateLimit(rateLimitKey))
+    return safe("Too many attempts. Please try again shortly.", 429);
   if (action === "send-phone-otp") {
     const parsed = z.object({ phone: z.string().min(7).max(25) }).safeParse(body);
     if (!parsed.success) return safe("Enter a valid phone number.");
+    const existingUser = await db.user.findFirst({ where: { phone: parsed.data.phone } });
+    if (existingUser)
+      return NextResponse.json(
+        {
+          error:
+            "This phone number is already registered. Please log in or use a different number.",
+        },
+        { status: 409 },
+      );
     if (
       !rateLimit(`send-phone-otp:${clientKey(request)}:${parsed.data.phone.trim()}`, 3, 10 * 60_000)
     )
@@ -216,6 +233,28 @@ export async function POST(
     );
     return response;
   }
+  if (action === "check-availability") {
+    const parsed = z
+      .object({ email: z.string().email().optional(), phone: z.string().min(7).max(25).optional() })
+      .refine((value) => Boolean(value.email || value.phone), {
+        message: "Email or phone is required.",
+      })
+      .safeParse(body);
+    if (!parsed.success) {
+      return safe("Enter a valid email or phone number.");
+    }
+    const fields: Record<string, string> = {};
+    if (parsed.data.email) {
+      const emailTaken = await db.user.findUnique({ where: { email: parsed.data.email } });
+      if (emailTaken) fields.email = "Email is already registered.";
+    }
+    if (parsed.data.phone) {
+      const phoneTaken = await db.user.findFirst({ where: { phone: parsed.data.phone } });
+      if (phoneTaken) fields.phone = "Phone number is already registered.";
+    }
+    return NextResponse.json({ fields }, { status: 200 });
+  }
+
   if (action === "register") {
     const parsed = registerSchema.safeParse(body);
     if (!parsed.success) {
@@ -229,28 +268,38 @@ export async function POST(
     }
     const data = parsed.data;
     if (
-      data.role === "CLIENT" &&
       !(await hasValidPhoneVerificationProof(
         request.cookies.get(phoneProofCookie)?.value,
         data.phone!,
       ))
     ) {
-      return safe("Verify this phone number before creating a client account.", 403);
+      return safe("Verify this phone number before creating an account.", 403);
     }
-    const exists = await db.user.findFirst({
-      where: { OR: [{ email: data.email }, { phone: data.phone ?? undefined }] },
-      select: { id: true },
-    });
-    if (exists) return safe("An account already exists with that email or phone.", 409);
+    const [existingEmailUser, existingPhoneUser] = await Promise.all([
+      db.user.findUnique({ where: { email: data.email } }),
+      db.user.findFirst({ where: { phone: data.phone } }),
+    ]);
+    const duplicateFields: Record<string, string> = {};
+    if (existingEmailUser) duplicateFields.email = "Email is already registered.";
+    if (existingPhoneUser) duplicateFields.phone = "Phone number is already registered.";
+    if (existingEmailUser || existingPhoneUser) {
+      return NextResponse.json(
+        {
+          error: "An account already exists with that email or phone.",
+          fields: duplicateFields,
+        },
+        { status: 409 },
+      );
+    }
     const user = await db.user.create({
       data: {
         firstName: data.firstName,
         lastName: data.lastName,
         email: data.email,
-        phone: data.phone || null,
+        phone: data.phone,
         passwordHash: await bcrypt.hash(data.password, 12),
         role: data.role,
-        phoneVerifiedAt: data.role === "CLIENT" ? new Date() : null,
+        phoneVerifiedAt: new Date(),
       },
     });
     const code = verificationCode();
@@ -275,9 +324,7 @@ export async function POST(
       await createSession({ userId: user.id, role: user.role }),
       sessionOptions,
     );
-    if (data.role === "CLIENT") {
-      response.cookies.set(phoneProofCookie, "", { ...phoneProofCookieOptions, maxAge: 0 });
-    }
+    response.cookies.set(phoneProofCookie, "", { ...phoneProofCookieOptions, maxAge: 0 });
     return response;
   }
   if (action === "login") {
@@ -290,6 +337,7 @@ export async function POST(
       !(await bcrypt.compare(parsed.data.password, user.passwordHash))
     )
       return safe("Invalid email or password.", 401);
+    clearRateLimit(rateLimitKey);
     const response = NextResponse.json({
       success: true,
       redirect:
@@ -298,7 +346,9 @@ export async function POST(
           : !user.emailVerifiedAt
             ? "/verify"
             : user.role === "PROFESSIONAL"
-              ? "/professional-profile"
+              ? user.professionalCategory && user.professionalCity
+                ? "/professional/dashboard"
+                : "/professional/setup"
               : "/dashboard",
     });
     response.cookies.set(
@@ -313,6 +363,58 @@ export async function POST(
     response.cookies.set(sessionCookie, "", { ...sessionOptions, maxAge: 0 });
     return response;
   }
+  if (action === "update-email") {
+    const parsed = z.object({ email: z.string().email() }).safeParse(body);
+    if (!parsed.success) return safe("Enter a valid email address.");
+    const token = request.cookies.get(sessionCookie)?.value;
+    if (!token) return safe("Please sign in again.", 401);
+    try {
+      const session = await verifySession(token);
+      const user = await db.user.findUniqueOrThrow({ where: { id: session.userId } });
+      const existingEmailUser = await db.user.findUnique({ where: { email: parsed.data.email } });
+      if (existingEmailUser && existingEmailUser.id !== user.id) {
+        return NextResponse.json(
+          {
+            error: "This email address is already registered.",
+            fields: { email: "Email is already registered." },
+          },
+          { status: 409 },
+        );
+      }
+      const code = verificationCode();
+      await db.$transaction([
+        db.apiToken.updateMany({
+          where: {
+            userId: user.id,
+            kind: "EMAIL_VERIFICATION",
+            usedAt: null,
+          },
+          data: { usedAt: new Date() },
+        }),
+        db.user.update({
+          where: { id: user.id },
+          data: { email: parsed.data.email, emailVerifiedAt: null },
+        }),
+        db.apiToken.create({
+          data: {
+            userId: user.id,
+            tokenHash: tokenHash(code),
+            kind: "EMAIL_VERIFICATION",
+            expiresAt: new Date(Date.now() + 15 * 60 * 1000),
+          },
+        }),
+      ]);
+      await sendVerificationCodeEmail(parsed.data.email, code);
+      return NextResponse.json({
+        success: true,
+        message: "Email updated. A new code has been sent.",
+        email: parsed.data.email,
+      });
+    } catch {
+      return safe("Unable to update your email.", 500);
+    }
+  }
+
   if (action === "resend-verification") {
     const token = request.cookies.get(sessionCookie)?.value;
     if (!token) return safe("Please sign in again.", 401);
@@ -381,7 +483,7 @@ export async function POST(
       ]);
       return NextResponse.json({
         success: true,
-        redirect: session.role === "CLIENT" ? "/client-profile" : "/professional-profile",
+        redirect: session.role === "CLIENT" ? "/client-profile" : "/professional/setup",
       });
     } catch {
       return safe("Unable to verify your email.", 500);

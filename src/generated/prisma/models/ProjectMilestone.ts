@@ -52,6 +52,8 @@ export type ProjectMilestoneMinAggregateOutputType = {
   amount: number | null
   dueDate: Date | null
   status: string | null
+  submittedAt: Date | null
+  approvedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -66,6 +68,8 @@ export type ProjectMilestoneMaxAggregateOutputType = {
   amount: number | null
   dueDate: Date | null
   status: string | null
+  submittedAt: Date | null
+  approvedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -80,6 +84,8 @@ export type ProjectMilestoneCountAggregateOutputType = {
   amount: number
   dueDate: number
   status: number
+  submittedAt: number
+  approvedAt: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -112,6 +118,8 @@ export type ProjectMilestoneMinAggregateInputType = {
   amount?: true
   dueDate?: true
   status?: true
+  submittedAt?: true
+  approvedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -126,6 +134,8 @@ export type ProjectMilestoneMaxAggregateInputType = {
   amount?: true
   dueDate?: true
   status?: true
+  submittedAt?: true
+  approvedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -140,6 +150,8 @@ export type ProjectMilestoneCountAggregateInputType = {
   amount?: true
   dueDate?: true
   status?: true
+  submittedAt?: true
+  approvedAt?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -241,6 +253,8 @@ export type ProjectMilestoneGroupByOutputType = {
   amount: number
   dueDate: Date | null
   status: string
+  submittedAt: Date | null
+  approvedAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: ProjectMilestoneCountAggregateOutputType | null
@@ -278,6 +292,8 @@ export type ProjectMilestoneWhereInput = {
   amount?: Prisma.IntFilter<"ProjectMilestone"> | number
   dueDate?: Prisma.DateTimeNullableFilter<"ProjectMilestone"> | Date | string | null
   status?: Prisma.StringFilter<"ProjectMilestone"> | string
+  submittedAt?: Prisma.DateTimeNullableFilter<"ProjectMilestone"> | Date | string | null
+  approvedAt?: Prisma.DateTimeNullableFilter<"ProjectMilestone"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"ProjectMilestone"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ProjectMilestone"> | Date | string
 }
@@ -292,6 +308,8 @@ export type ProjectMilestoneOrderByWithRelationInput = {
   amount?: Prisma.SortOrder
   dueDate?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
+  submittedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  approvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -309,6 +327,8 @@ export type ProjectMilestoneWhereUniqueInput = Prisma.AtLeast<{
   amount?: Prisma.IntFilter<"ProjectMilestone"> | number
   dueDate?: Prisma.DateTimeNullableFilter<"ProjectMilestone"> | Date | string | null
   status?: Prisma.StringFilter<"ProjectMilestone"> | string
+  submittedAt?: Prisma.DateTimeNullableFilter<"ProjectMilestone"> | Date | string | null
+  approvedAt?: Prisma.DateTimeNullableFilter<"ProjectMilestone"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"ProjectMilestone"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ProjectMilestone"> | Date | string
 }, "id">
@@ -323,6 +343,8 @@ export type ProjectMilestoneOrderByWithAggregationInput = {
   amount?: Prisma.SortOrder
   dueDate?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
+  submittedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  approvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ProjectMilestoneCountOrderByAggregateInput
@@ -345,6 +367,8 @@ export type ProjectMilestoneScalarWhereWithAggregatesInput = {
   amount?: Prisma.IntWithAggregatesFilter<"ProjectMilestone"> | number
   dueDate?: Prisma.DateTimeNullableWithAggregatesFilter<"ProjectMilestone"> | Date | string | null
   status?: Prisma.StringWithAggregatesFilter<"ProjectMilestone"> | string
+  submittedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ProjectMilestone"> | Date | string | null
+  approvedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ProjectMilestone"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ProjectMilestone"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"ProjectMilestone"> | Date | string
 }
@@ -358,6 +382,8 @@ export type ProjectMilestoneCreateInput = {
   amount: number
   dueDate?: Date | string | null
   status?: string
+  submittedAt?: Date | string | null
+  approvedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -372,6 +398,8 @@ export type ProjectMilestoneUncheckedCreateInput = {
   amount: number
   dueDate?: Date | string | null
   status?: string
+  submittedAt?: Date | string | null
+  approvedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -385,6 +413,8 @@ export type ProjectMilestoneUpdateInput = {
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -399,6 +429,8 @@ export type ProjectMilestoneUncheckedUpdateInput = {
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -413,6 +445,8 @@ export type ProjectMilestoneCreateManyInput = {
   amount: number
   dueDate?: Date | string | null
   status?: string
+  submittedAt?: Date | string | null
+  approvedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -426,6 +460,8 @@ export type ProjectMilestoneUpdateManyMutationInput = {
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -440,6 +476,8 @@ export type ProjectMilestoneUncheckedUpdateManyInput = {
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -454,6 +492,8 @@ export type ProjectMilestoneCountOrderByAggregateInput = {
   amount?: Prisma.SortOrder
   dueDate?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  submittedAt?: Prisma.SortOrder
+  approvedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -476,6 +516,8 @@ export type ProjectMilestoneMaxOrderByAggregateInput = {
   amount?: Prisma.SortOrder
   dueDate?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  submittedAt?: Prisma.SortOrder
+  approvedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -490,6 +532,8 @@ export type ProjectMilestoneMinOrderByAggregateInput = {
   amount?: Prisma.SortOrder
   dueDate?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  submittedAt?: Prisma.SortOrder
+  approvedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -514,6 +558,8 @@ export type ProjectMilestoneSelect<ExtArgs extends runtime.Types.Extensions.Inte
   amount?: boolean
   dueDate?: boolean
   status?: boolean
+  submittedAt?: boolean
+  approvedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["projectMilestone"]>
@@ -528,6 +574,8 @@ export type ProjectMilestoneSelectCreateManyAndReturn<ExtArgs extends runtime.Ty
   amount?: boolean
   dueDate?: boolean
   status?: boolean
+  submittedAt?: boolean
+  approvedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["projectMilestone"]>
@@ -542,6 +590,8 @@ export type ProjectMilestoneSelectUpdateManyAndReturn<ExtArgs extends runtime.Ty
   amount?: boolean
   dueDate?: boolean
   status?: boolean
+  submittedAt?: boolean
+  approvedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["projectMilestone"]>
@@ -556,11 +606,13 @@ export type ProjectMilestoneSelectScalar = {
   amount?: boolean
   dueDate?: boolean
   status?: boolean
+  submittedAt?: boolean
+  approvedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ProjectMilestoneOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "trackingId" | "clientId" | "professionalId" | "title" | "description" | "amount" | "dueDate" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["projectMilestone"]>
+export type ProjectMilestoneOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "trackingId" | "clientId" | "professionalId" | "title" | "description" | "amount" | "dueDate" | "status" | "submittedAt" | "approvedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["projectMilestone"]>
 
 export type $ProjectMilestonePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "ProjectMilestone"
@@ -575,6 +627,8 @@ export type $ProjectMilestonePayload<ExtArgs extends runtime.Types.Extensions.In
     amount: number
     dueDate: Date | null
     status: string
+    submittedAt: Date | null
+    approvedAt: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["projectMilestone"]>
@@ -1009,6 +1063,8 @@ export interface ProjectMilestoneFieldRefs {
   readonly amount: Prisma.FieldRef<"ProjectMilestone", 'Int'>
   readonly dueDate: Prisma.FieldRef<"ProjectMilestone", 'DateTime'>
   readonly status: Prisma.FieldRef<"ProjectMilestone", 'String'>
+  readonly submittedAt: Prisma.FieldRef<"ProjectMilestone", 'DateTime'>
+  readonly approvedAt: Prisma.FieldRef<"ProjectMilestone", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"ProjectMilestone", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"ProjectMilestone", 'DateTime'>
 }

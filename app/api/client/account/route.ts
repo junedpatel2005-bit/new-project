@@ -16,10 +16,7 @@ export async function GET(request: NextRequest) {
   const session = await getSession(request);
   if (!session) return NextResponse.json({ error: "Client sign-in is required." }, { status: 401 });
   if (session.role !== "CLIENT")
-    return NextResponse.json(
-      { error: "Access denied for this account type." },
-      { status: 403 },
-    );
+    return NextResponse.json({ error: "Access denied for this account type." }, { status: 403 });
 
   const user = await db.user.findUnique({
     where: { id: session.userId },

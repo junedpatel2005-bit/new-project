@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
   try {
     if (role !== "CLIENT")
       return NextResponse.json({ error: "Client access required" }, { status: 403 });
-    const [user, jobs, proposals, notifications, spent] = await Promise.all([
+    const [user, jobs, proposals, notifications, spent, runningProjects] = await Promise.all([
       db.user.findUniqueOrThrow({
         where: { id: userId },
         select: { firstName: true, averageRating: true },
@@ -44,10 +44,18 @@ export async function GET(request: NextRequest) {
         },
         _sum: { amount: true },
       }),
+      db.projectTracking.findMany({
+        where: { clientId: userId, status: { not: "COMPLETED" } },
+        select: { jobId: true },
+      }),
     ]);
+    const runningJobIds = new Set(runningProjects.map((project) => project.jobId));
     return NextResponse.json({
       user,
-      jobs,
+      jobs: jobs.map((job) => ({
+        ...job,
+        status: runningJobIds.has(job.id) ? "RUNNING" : job.status,
+      })),
       proposals,
       notifications,
       spent: spent._sum.amount ?? 0,

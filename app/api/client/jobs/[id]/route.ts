@@ -19,7 +19,8 @@ const bodySchema = z.object({
   locationAddress: z.string().trim().max(300).nullable().optional(),
   locationLat: z.coerce.number().min(-90).max(90).nullable().optional(),
   locationLng: z.coerce.number().min(-180).max(180).nullable().optional(),
-  mode: z.enum(["draft", "publish"]),
+  status: z.enum(["OPEN", "CLOSED"]).optional(),
+  mode: z.enum(["draft", "publish"]).optional(),
 });
 async function client(request: NextRequest) {
   try {
@@ -37,7 +38,7 @@ function idOf(value: string) {
   return Number.isSafeInteger(id) && id > 0 ? id : null;
 }
 function dataOf(d: z.infer<typeof bodySchema>) {
-  return {
+  const update: Record<string, unknown> = {
     title: d.title || null,
     category: d.category || null,
     description: d.description || null,
@@ -54,6 +55,8 @@ function dataOf(d: z.infer<typeof bodySchema>) {
     locationLat: d.locationLat ?? null,
     locationLng: d.locationLng ?? null,
   };
+  if (d.status) update.status = d.status;
+  return update;
 }
 async function errors(d: z.infer<typeof bodySchema>) {
   const fields: Record<string, string> = {};
@@ -87,12 +90,53 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   const job = await db.clientJob.findFirst({
     where: { id, userId },
     include: {
-      attachments: { select: { id: true, fileName: true, fileType: true, fileSize: true, previewUrl: true } },
+      attachments: {
+        select: { id: true, fileName: true, fileType: true, fileSize: true, previewUrl: true },
+      },
     },
   });
-  return job
-    ? NextResponse.json({ job })
-    : NextResponse.json({ error: "Not found." }, { status: 404 });
+  if (!job) return NextResponse.json({ error: "Not found." }, { status: 404 });
+
+  const project = await db.projectTracking.findFirst({
+    where: { jobId: id, clientId: userId },
+    select: { id: true },
+  });
+  const proposals = await db.projectRequest.findMany({
+    where: { jobId: id, clientId: userId, origin: "PROFESSIONAL_PROPOSAL" },
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      professionalId: true,
+      bidAmount: true,
+      duration: true,
+      coverLetter: true,
+      status: true,
+      createdAt: true,
+    },
+  });
+  const professionals = await db.user.findMany({
+    where: { id: { in: proposals.map((proposal) => proposal.professionalId) } },
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      professionalCategory: true,
+      professionalCity: true,
+      averageRating: true,
+      reviewCount: true,
+      isVerified: true,
+    },
+  });
+  const professionalById = new Map(
+    professionals.map((professional) => [professional.id, professional]),
+  );
+  return NextResponse.json({
+    job: { ...job, projectId: project?.id ?? null },
+    proposals: proposals.map((proposal) => ({
+      ...proposal,
+      professional: professionalById.get(proposal.professionalId) ?? null,
+    })),
+  });
 }
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const userId = await client(request);
@@ -105,18 +149,21 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   const parsed = bodySchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success)
     return NextResponse.json({ error: "Please review the job details." }, { status: 400 });
+  if ((current.status as string) === "CLOSED" && parsed.data.status !== "OPEN")
+    return NextResponse.json({ error: "Closed jobs cannot be changed." }, { status: 409 });
   const fields = parsed.data.mode === "publish" ? await errors(parsed.data) : {};
   if (Object.keys(fields).length)
     return NextResponse.json(
       { error: "Please correct the highlighted fields.", fields },
       { status: 400 },
     );
+  const updateData = dataOf(parsed.data);
+  if (parsed.data.mode === "publish" && !parsed.data.status) {
+    updateData.status = "OPEN";
+  }
   const job = await db.clientJob.update({
     where: { id },
-    data: {
-      ...dataOf(parsed.data),
-      status: parsed.data.mode === "publish" ? "OPEN" : current.status,
-    },
+    data: updateData,
   });
   return NextResponse.json({ job });
 }

@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { getDistanceBoundingBox, getDistanceKm, createDisplayPoint } from "@/lib/geo";
+import type { Prisma } from "@/generated/prisma/client";
 import type { ProfessionalDiscoveryResult } from "@/lib/types/professional-discovery";
 
 export type ProfessionalDiscoveryFilter = {
@@ -21,7 +22,7 @@ const MAX_RESULTS_PER_PAGE = 50;
 const DEFAULT_RESULTS_PER_PAGE = 20;
 
 function buildSearchWhere(filter: ProfessionalDiscoveryFilter) {
-  const where: any = {
+  const where: Prisma.UserWhereInput = {
     role: "PROFESSIONAL",
     isActive: true,
   };
@@ -61,7 +62,9 @@ function buildSearchWhere(filter: ProfessionalDiscoveryFilter) {
   return where;
 }
 
-function buildOrderBy(filter: ProfessionalDiscoveryFilter): Array<{ [key: string]: "asc" | "desc" }> {
+function buildOrderBy(
+  filter: ProfessionalDiscoveryFilter,
+): Array<{ [key: string]: "asc" | "desc" }> {
   if (filter.sort === "rating") {
     return [{ averageRating: "desc" }, { reviewCount: "desc" }, { updatedAt: "desc" }];
   }
@@ -75,7 +78,9 @@ function parseSkills(value: string | null): string[] {
   if (!value) return [];
   try {
     const parsed: unknown = JSON.parse(value);
-    return Array.isArray(parsed) && parsed.every((skill) => typeof skill === "string") ? parsed : [];
+    return Array.isArray(parsed) && parsed.every((skill) => typeof skill === "string")
+      ? parsed
+      : [];
   } catch {
     return [];
   }
@@ -117,11 +122,11 @@ function toPublicProfessional(
     bio: professional.companyDescription,
     displayPoint:
       professional.professionalLatitude !== null && professional.professionalLongitude !== null
-        ? createDisplayPoint(
+        ? (createDisplayPoint(
             professional.id,
             professional.professionalLatitude,
             professional.professionalLongitude,
-          ) ?? undefined
+          ) ?? undefined)
         : undefined,
   };
 }
@@ -168,14 +173,18 @@ function applyDistanceFilter(
       );
       return { professional, distance };
     })
-    .filter((item): item is { professional: typeof professionals[number]; distance: number } =>
-      item !== null && item.distance <= distanceKm,
+    .filter(
+      (item): item is { professional: (typeof professionals)[number]; distance: number } =>
+        item !== null && item.distance <= distanceKm,
     );
 }
 
 export async function searchProfessionals(filter: ProfessionalDiscoveryFilter) {
   const page = Math.max(filter.page ?? 1, 1);
-  const limit = Math.min(Math.max(filter.limit ?? DEFAULT_RESULTS_PER_PAGE, 1), MAX_RESULTS_PER_PAGE);
+  const limit = Math.min(
+    Math.max(filter.limit ?? DEFAULT_RESULTS_PER_PAGE, 1),
+    MAX_RESULTS_PER_PAGE,
+  );
   const pageStart = (page - 1) * limit;
   const pageEnd = pageStart + limit;
   const useExactDistanceFiltering =
@@ -193,15 +202,22 @@ export async function searchProfessionals(filter: ProfessionalDiscoveryFilter) {
     const originLng = filter.originLng!;
     const distanceKm = filter.distanceKm!;
     const bbox = getDistanceBoundingBox(originLat, distanceKm);
-    baseWhere.professionalLatitude = { gte: originLat - bbox.latDelta, lte: originLat + bbox.latDelta };
-    baseWhere.professionalLongitude = { gte: originLng - bbox.lngDelta, lte: originLng + bbox.lngDelta };
+    baseWhere.professionalLatitude = {
+      gte: originLat - bbox.latDelta,
+      lte: originLat + bbox.latDelta,
+    };
+    baseWhere.professionalLongitude = {
+      gte: originLng - bbox.lngDelta,
+      lte: originLng + bbox.lngDelta,
+    };
     baseWhere.AND = [
       { professionalLatitude: { not: null } },
       { professionalLongitude: { not: null } },
     ];
   }
 
-  const candidateTake = useExactDistanceFiltering || useDistanceOrdering ? Math.min(page * limit + 20, 200) : limit + 1;
+  const candidateTake =
+    useExactDistanceFiltering || useDistanceOrdering ? Math.min(page * limit + 20, 200) : limit + 1;
   const candidateSkip = useExactDistanceFiltering || useDistanceOrdering ? 0 : pageStart;
 
   const candidateUsersQuery = {
@@ -230,8 +246,14 @@ export async function searchProfessionals(filter: ProfessionalDiscoveryFilter) {
 
   const professionals = (await db.user.findMany(candidateUsersQuery)) as UserProfessionalRecord[];
 
-  let distanceFilteredResults: Array<{ professional: UserProfessionalRecord; distance: number }> | null = null;
-  let sortedByDistanceResults: Array<{ professional: UserProfessionalRecord; distance: number }> | null = null;
+  let distanceFilteredResults: Array<{
+    professional: UserProfessionalRecord;
+    distance: number;
+  }> | null = null;
+  let sortedByDistanceResults: Array<{
+    professional: UserProfessionalRecord;
+    distance: number;
+  }> | null = null;
   let pagedProfessionals: UserProfessionalRecord[] = professionals;
 
   if (useExactDistanceFiltering) {
@@ -246,7 +268,9 @@ export async function searchProfessionals(filter: ProfessionalDiscoveryFilter) {
       distanceFilteredResults.sort((a, b) => a.distance - b.distance);
     }
 
-    pagedProfessionals = distanceFilteredResults.slice(pageStart, pageEnd).map((item) => item.professional);
+    pagedProfessionals = distanceFilteredResults
+      .slice(pageStart, pageEnd)
+      .map((item) => item.professional);
   } else if (useDistanceOrdering) {
     sortedByDistanceResults = professionals
       .map((professional) => {
@@ -270,7 +294,9 @@ export async function searchProfessionals(filter: ProfessionalDiscoveryFilter) {
       })
       .sort((a, b) => a.distance - b.distance);
 
-    pagedProfessionals = sortedByDistanceResults.slice(pageStart, pageEnd).map((item) => item.professional);
+    pagedProfessionals = sortedByDistanceResults
+      .slice(pageStart, pageEnd)
+      .map((item) => item.professional);
   } else {
     pagedProfessionals = professionals.slice(0, limit);
   }
@@ -290,7 +316,9 @@ export async function searchProfessionals(filter: ProfessionalDiscoveryFilter) {
   const hasMore =
     useExactDistanceFiltering || useDistanceOrdering
       ? Boolean(
-          (distanceFilteredResults?.length ?? sortedByDistanceResults?.length ?? professionals.length) > pageEnd,
+          (distanceFilteredResults?.length ??
+            sortedByDistanceResults?.length ??
+            professionals.length) > pageEnd,
         )
       : professionals.length > limit;
 

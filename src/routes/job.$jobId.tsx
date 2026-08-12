@@ -1,11 +1,35 @@
 "use client";
 
 import { useParams } from "next/navigation";
+import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Briefcase, Clock, MapPin, Calendar, DollarSign, FileText, Paperclip, AlertTriangle } from "lucide-react";
+import {
+  Briefcase,
+  Clock,
+  MapPin,
+  Calendar,
+  DollarSign,
+  FileText,
+  Paperclip,
+  AlertTriangle,
+  Search,
+  Star,
+} from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import type { MarketplaceJob } from "@/lib/types/marketplace";
+import type {
+  ProfessionalDiscoveryResponse,
+  ProfessionalDiscoveryResult,
+} from "@/lib/types/professional-discovery";
 
 type OwnerJob = {
   id: number;
@@ -18,13 +42,22 @@ type OwnerJob = {
   workMode: "ON_SITE" | "REMOTE" | "BOTH";
   locationLabel: string | null;
   locationAddress: string | null;
+  locationLat: number | null;
+  locationLng: number | null;
   jobDate: string | null;
   deadline: string | null;
   timingType: "FIXED" | "HOURLY";
   hourlyRate: number | null;
+  projectId: number | null;
   status: "DRAFT" | "OPEN" | "CLOSED";
   createdAt: string;
-  attachments: { id: number; fileName: string; fileType: string | null; fileSize: number | null; previewUrl: string | null }[];
+  attachments: {
+    id: number;
+    fileName: string;
+    fileType: string | null;
+    fileSize: number | null;
+    previewUrl: string | null;
+  }[];
 };
 
 type ViewJob = {
@@ -37,20 +70,50 @@ type ViewJob = {
   workMode: "ON_SITE" | "REMOTE" | "BOTH";
   location: string | null;
   locationAddress: string | null;
+  locationLat: number | null;
+  locationLng: number | null;
   jobDate: string | null;
   deadline: string | null;
   timingType: "FIXED" | "HOURLY";
   hourlyRate: number | null;
+  projectId?: number | null;
   createdAt: string;
   status?: "DRAFT" | "OPEN" | "CLOSED";
   proposalCount?: number;
   client?: { name: string; avatar: string | null; rating: number };
-  attachments: { id: number; fileName: string; fileType: string | null; fileSize: number | null; previewUrl: string | null }[];
+  attachments: {
+    id: number;
+    fileName: string;
+    fileType: string | null;
+    fileSize: number | null;
+    previewUrl: string | null;
+  }[];
+};
+type JobProposal = {
+  id: number;
+  professionalId: number;
+  bidAmount: number;
+  duration: string;
+  coverLetter: string;
+  status: string;
+  createdAt: string;
+  professional: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    professionalCategory: string | null;
+    professionalCity: string | null;
+    averageRating: number;
+    reviewCount: number;
+    isVerified: boolean;
+  } | null;
 };
 
 function fromMarketplace(job: MarketplaceJob): ViewJob {
   return {
     ...job,
+    locationLat: job.locationLat,
+    locationLng: job.locationLng,
     proposalCount: job.proposalCount,
     client: job.client,
     attachments: job.attachments,
@@ -68,10 +131,13 @@ function fromOwner(job: OwnerJob): ViewJob {
     workMode: job.workMode,
     location: job.locationLabel,
     locationAddress: job.locationAddress,
+    locationLat: job.locationLat,
+    locationLng: job.locationLng,
     jobDate: job.jobDate,
     deadline: job.deadline,
     timingType: job.timingType,
     hourlyRate: job.hourlyRate,
+    projectId: job.projectId,
     createdAt: job.createdAt,
     status: job.status,
     attachments: job.attachments,
@@ -108,22 +174,150 @@ export default function JobDetails() {
   const { jobId } = useParams<{ jobId: string }>();
   const [job, setJob] = useState<ViewJob | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "missing" | "error">("loading");
+  const [finderOpen, setFinderOpen] = useState(false);
+  const [professionals, setProfessionals] = useState<ProfessionalDiscoveryResult[]>([]);
+  const [finderQuery, setFinderQuery] = useState("");
+  const [finderStatus, setFinderStatus] = useState<"idle" | "loading" | "error">("idle");
+  const [viewerRole, setViewerRole] = useState<"CLIENT" | "PROFESSIONAL" | null>(null);
+  const [ownProposal, setOwnProposal] = useState<{ id: number; status: string } | null>(null);
+  const [clientProposals, setClientProposals] = useState<JobProposal[]>([]);
+  const [showProposalForm, setShowProposalForm] = useState(false);
+  const [proposalPrice, setProposalPrice] = useState("");
+  const [proposalDuration, setProposalDuration] = useState("");
+  const [proposalMessage, setProposalMessage] = useState("");
+  const [proposalBusy, setProposalBusy] = useState(false);
+  const [proposalError, setProposalError] = useState<string | null>(null);
   useEffect(() => {
-    void fetch(`/api/marketplace/job?id=${encodeURIComponent(jobId)}`)
-      .then(async (response) => {
-        if (response.status === 404) {
-          const ownerResponse = await fetch(`/api/client/jobs/${encodeURIComponent(jobId)}`);
-          if (!ownerResponse.ok) return setStatus("missing");
-          const { job: ownerJob } = (await ownerResponse.json()) as { job: OwnerJob };
+    async function loadJob() {
+      try {
+        const authResponse = await fetch("/api/auth/me");
+        const auth = (await authResponse.json().catch(() => null)) as {
+          user?: { role?: "CLIENT" | "PROFESSIONAL" } | null;
+        } | null;
+        setViewerRole(auth?.user?.role ?? null);
+        const ownerResponse = await fetch(`/api/client/jobs/${encodeURIComponent(jobId)}`);
+        if (ownerResponse.ok) {
+          const { job: ownerJob, proposals } = (await ownerResponse.json()) as {
+            job: OwnerJob;
+            proposals: JobProposal[];
+          };
           setJob(fromOwner(ownerJob));
-          return setStatus("ready");
+          setClientProposals(proposals ?? []);
+          setStatus("ready");
+          return;
         }
-        if (!response.ok) throw new Error("Unable to load job");
-        setJob(fromMarketplace((await response.json()) as MarketplaceJob));
+        if (ownerResponse.status !== 404) throw new Error("Unable to load job");
+
+        const response = await fetch(`/api/marketplace/job?id=${encodeURIComponent(jobId)}`);
+        if (!response.ok) {
+          if (response.status === 404) return setStatus("missing");
+          throw new Error("Unable to load job");
+        }
+        const marketplaceJob = fromMarketplace((await response.json()) as MarketplaceJob);
+        marketplaceJob.status = marketplaceJob.status ?? "OPEN";
+        if (auth?.user?.role === "PROFESSIONAL") {
+          const proposalResponse = await fetch(
+            `/api/professional/proposals?jobId=${encodeURIComponent(jobId)}`,
+          );
+          if (proposalResponse.ok) {
+            const proposalData = (await proposalResponse.json()) as {
+              proposal: { id: number; status: string } | null;
+            };
+            setOwnProposal(proposalData.proposal);
+          }
+        }
+        const projectResponse = await fetch(
+          `/api/portal/project?jobId=${encodeURIComponent(jobId)}`,
+        );
+        if (projectResponse.ok) {
+          const projectData = (await projectResponse.json()) as { project: { id: number } };
+          marketplaceJob.projectId = projectData.project.id;
+        }
+        setJob(marketplaceJob);
         setStatus("ready");
-      })
-      .catch(() => setStatus("error"));
+      } catch {
+        setStatus("error");
+      }
+    }
+
+    void loadJob();
   }, [jobId]);
+
+  async function searchProfessionals(query = finderQuery) {
+    setFinderStatus("loading");
+    try {
+      const params = new URLSearchParams({ limit: "50" });
+      if (query.trim()) params.set("query", query.trim());
+      const response = await fetch(`/api/v1/professionals?${params.toString()}`);
+      if (!response.ok) throw new Error();
+      const data = (await response.json()) as ProfessionalDiscoveryResponse;
+      setProfessionals(data.professionals);
+      setFinderStatus("idle");
+    } catch {
+      setFinderStatus("error");
+    }
+  }
+
+  function openFinder() {
+    setFinderOpen(true);
+    if (!professionals.length) void searchProfessionals("");
+  }
+  async function sendProposal() {
+    const bidAmount = Number(proposalPrice);
+    if (
+      !Number.isSafeInteger(bidAmount) ||
+      bidAmount < 1 ||
+      !proposalDuration.trim() ||
+      !proposalMessage.trim()
+    ) {
+      setProposalError("Enter a valid price, delivery estimate, and message.");
+      return;
+    }
+    setProposalBusy(true);
+    setProposalError(null);
+    try {
+      const response = await fetch("/api/professional/proposals", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          jobId: Number(jobId),
+          bidAmount,
+          duration: proposalDuration,
+          coverLetter: proposalMessage,
+        }),
+      });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(payload?.error || "Unable to send your proposal.");
+      setOwnProposal({ id: payload.proposal.id, status: payload.proposal.status });
+      setShowProposalForm(false);
+    } catch (error) {
+      setProposalError(error instanceof Error ? error.message : "Unable to send your proposal.");
+    } finally {
+      setProposalBusy(false);
+    }
+  }
+  async function reviewProposal(proposal: JobProposal, action: "accept" | "reject") {
+    const verb = action === "accept" ? "Hire" : "Reject";
+    const details =
+      action === "accept"
+        ? `\n\nJob: ${job?.title ?? "This job"}\nAgreed amount: $${proposal.bidAmount.toLocaleString()}`
+        : "";
+    if (!confirm(`${verb} ${proposal.professional?.firstName ?? "this professional"}?${details}`))
+      return;
+    const response = await fetch(`/api/client/proposals/${proposal.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action }),
+    });
+    const payload = await response.json().catch(() => null);
+    if (!response.ok) return alert(payload?.error || "Unable to update this proposal.");
+    if (action === "accept" && payload.project?.id)
+      window.location.assign(`/project/${payload.project.id}/tracking`);
+    else
+      setClientProposals((items) =>
+        items.map((item) => (item.id === proposal.id ? { ...item, status: "REJECTED" } : item)),
+      );
+  }
   if (status === "loading")
     return (
       <AppShell>
@@ -161,11 +355,15 @@ export default function JobDetails() {
             {job.urgency.toLowerCase()} urgency
           </span>
           {job.status && (
-            <span className={`rounded-full px-3 py-1 ${
-              job.status === "OPEN" ? "bg-green/10 text-green" :
-              job.status === "CLOSED" ? "bg-red/10 text-red" :
-              "bg-muted"
-            }`}>
+            <span
+              className={`rounded-full px-3 py-1 ${
+                job.status === "OPEN"
+                  ? "bg-green/10 text-green"
+                  : job.status === "CLOSED"
+                    ? "bg-red/10 text-red"
+                    : "bg-muted"
+              }`}
+            >
               {job.status.toLowerCase()}
             </span>
           )}
@@ -224,7 +422,9 @@ export default function JobDetails() {
               </dt>
               <dd className={`mt-1 font-semibold ${isDeadlinePassed ? "text-destructive" : ""}`}>
                 {deadlineFormatted}
-                {isDeadlinePassed && <span className="ml-1 text-xs text-destructive">(Passed)</span>}
+                {isDeadlinePassed && (
+                  <span className="ml-1 text-xs text-destructive">(Passed)</span>
+                )}
               </dd>
             </div>
           )}
@@ -247,6 +447,28 @@ export default function JobDetails() {
             </div>
           )}
         </dl>
+
+        {(job.locationAddress || (job.locationLat !== null && job.locationLng !== null)) && (
+          <section className="mt-6">
+            <div className="flex items-center gap-2">
+              <MapPin className="h-5 w-5 text-primary" />
+              <div>
+                <h2 className="text-lg font-semibold">Project location</h2>
+                <p className="text-sm text-muted-foreground">Where this job was posted</p>
+              </div>
+            </div>
+            <iframe
+              title={`Map for ${job.title}`}
+              className="mt-3 h-[320px] w-full max-w-xl rounded-2xl border border-border"
+              loading="lazy"
+              src={
+                job.locationLat !== null && job.locationLng !== null
+                  ? `https://www.openstreetmap.org/export/embed.html?bbox=${job.locationLng - 0.01}%2C${job.locationLat - 0.01}%2C${job.locationLng + 0.01}%2C${job.locationLat + 0.01}&layer=mapnik&marker=${job.locationLat}%2C${job.locationLng}`
+                  : `https://www.google.com/maps?q=${encodeURIComponent(job.locationAddress ?? job.location ?? "")}&output=embed`
+              }
+            />
+          </section>
+        )}
 
         {/* Attachments */}
         {job.attachments && job.attachments.length > 0 && (
@@ -287,17 +509,115 @@ export default function JobDetails() {
             {job.description}
           </p>
         </section>
-
+        {isOwner && (
+          <section className="mt-8 border-t border-border pt-6">
+            <h2 className="text-xl font-semibold">Proposals / Applicants</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Review proposals sent by professionals for this job.
+            </p>
+            <div className="mt-4 space-y-3">
+              {clientProposals.map((proposal) => (
+                <article key={proposal.id} className="rounded-xl border border-border p-4">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <h3 className="font-semibold">
+                        {proposal.professional
+                          ? `${proposal.professional.firstName} ${proposal.professional.lastName}`
+                          : "Professional"}
+                      </h3>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        {proposal.professional?.professionalCategory ?? "Professional"}
+                        {proposal.professional?.professionalCity
+                          ? ` · ${proposal.professional.professionalCity}`
+                          : ""}
+                      </p>
+                    </div>
+                    <span className="rounded-full bg-muted px-2.5 py-1 text-xs font-medium">
+                      {proposal.status === "PENDING" ? "Pending review" : proposal.status}
+                    </span>
+                  </div>
+                  <p className="mt-3 text-sm">
+                    Proposed price: <strong>${proposal.bidAmount.toLocaleString()}</strong> ·
+                    Delivery: {proposal.duration}
+                  </p>
+                  <p className="mt-3 whitespace-pre-wrap text-sm text-muted-foreground">
+                    {proposal.coverLetter}
+                  </p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {proposal.professional && (
+                      <Button variant="outline" size="sm" asChild>
+                        <Link href={`/pro/${proposal.professional.id}`}>View Professional</Link>
+                      </Button>
+                    )}
+                    {proposal.status === "PENDING" && job.status === "OPEN" && (
+                      <>
+                        <Button size="sm" onClick={() => void reviewProposal(proposal, "accept")}>
+                          Accept & Hire
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => void reviewProposal(proposal, "reject")}
+                        >
+                          Reject
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </article>
+              ))}
+              {!clientProposals.length && (
+                <p className="rounded-xl border border-dashed p-5 text-sm text-muted-foreground">
+                  No proposals have been received yet.
+                </p>
+              )}
+            </div>
+          </section>
+        )}
         {/* Actions */}
         <div className="mt-8 border-t border-border pt-6">
           {job.client ? (
             <>
               <p className="font-medium">Posted by {job.client.name}</p>
-              {job.status === "OPEN" && !isOwner && (
-                <Button className="mt-4 w-full sm:w-auto" size="lg">
-                  Submit Proposal
+              {job.projectId && (
+                <Button className="mt-4 w-full sm:w-auto" asChild>
+                  <Link href={`/project/${job.projectId}/tracking`}>Track Project</Link>
                 </Button>
               )}
+              {job.projectId && !isOwner && (
+                <p className="mt-4 rounded-xl border border-primary/20 bg-primary/5 p-3 text-sm text-primary">
+                  This job has already been accepted. Track the active project instead of sending a new proposal.
+                </p>
+              )}
+              {!job.projectId && job.status === "OPEN" &&
+                !isOwner &&
+                viewerRole === "PROFESSIONAL" &&
+                (ownProposal ? (
+                  <p className="mt-4 rounded-xl border border-primary/20 bg-primary/5 p-3 text-sm text-primary">
+                    {ownProposal.status === "PENDING"
+                      ? "Proposal Sent — Pending Client Response"
+                      : ownProposal.status === "REJECTED"
+                        ? "Proposal Declined"
+                        : "Proposal Accepted"}
+                  </p>
+                ) : (
+                  <Button
+                    className="mt-4 w-full sm:w-auto"
+                    size="lg"
+                    onClick={() => {
+                      setProposalPrice(
+                        String(
+                          job.timingType === "HOURLY"
+                            ? (job.hourlyRate ?? "")
+                            : (job.budgetMax ?? job.budgetMin ?? ""),
+                        ),
+                      );
+                      setShowProposalForm(true);
+                    }}
+                  >
+                    Send Proposal
+                  </Button>
+                ))}
               {job.status !== "OPEN" && !isOwner && (
                 <p className="mt-4 text-muted-foreground">
                   This job is no longer accepting proposals.
@@ -305,24 +625,212 @@ export default function JobDetails() {
               )}
             </>
           ) : (
-            <div className="flex flex-wrap gap-3">
-              <p className="font-medium text-muted-foreground self-center">This is your job posting.</p>
-              {job.status === "OPEN" && (
-                <>
-                  <Button variant="outline">Edit Job</Button>
-                  <Button variant="destructive">Close Job</Button>
-                </>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <p className="font-medium text-muted-foreground">This is your job posting.</p>
+              {job.projectId ? (
+                <Button className="w-full sm:w-auto" asChild>
+                  <Link href={`/project/${job.projectId}`}>Track Project</Link>
+                </Button>
+              ) : (
+                job.status === "OPEN" && (
+                  <>
+                    <Button className="w-full sm:w-auto" onClick={openFinder}>
+                      Find a professional
+                    </Button>
+                    <Button variant="outline" asChild>
+                      <a href={`/post-job?edit=${jobId}`} className="w-full sm:w-auto">
+                        Edit Job
+                      </a>
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      className="w-full sm:w-auto"
+                      onClick={async () => {
+                        if (
+                          !confirm("Close this job? It will no longer appear in the marketplace.")
+                        )
+                          return;
+                        const response = await fetch(`/api/client/jobs/${jobId}`, {
+                          method: "PATCH",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ status: "CLOSED" }),
+                        });
+                        if (!response.ok) {
+                          const data = await response.json().catch(() => null);
+                          alert(data?.error || "Unable to close job.");
+                          return;
+                        }
+                        const { job: updatedJob } = await response.json();
+                        setJob(fromOwner(updatedJob));
+                      }}
+                    >
+                      Close Job
+                    </Button>
+                  </>
+                )
               )}
               {job.status === "CLOSED" && (
-                <Button variant="outline">Reopen Job</Button>
+                <Button
+                  variant="outline"
+                  className="w-full sm:w-auto"
+                  onClick={async () => {
+                    if (!confirm("Reopen this job? It will appear again in the marketplace."))
+                      return;
+                    const response = await fetch(`/api/client/jobs/${jobId}`, {
+                      method: "PATCH",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ status: "OPEN" }),
+                    });
+                    if (!response.ok) {
+                      const data = await response.json().catch(() => null);
+                      alert(data?.error || "Unable to reopen job.");
+                      return;
+                    }
+                    const { job: updatedJob } = await response.json();
+                    setJob(fromOwner(updatedJob));
+                  }}
+                >
+                  Reopen Job
+                </Button>
               )}
-              {job.status === "DRAFT" && (
-                <Button>Publish Job</Button>
-              )}
+              {job.status === "DRAFT" && <Button className="w-full sm:w-auto">Publish Job</Button>}
             </div>
+          )}
+          {showProposalForm && (
+            <section className="mt-5 rounded-xl border bg-muted/30 p-4">
+              <h2 className="text-lg font-semibold">Send Proposal</h2>
+              <div className="mt-3 grid gap-3 [&_input]:rounded-md [&_input]:border [&_input]:bg-background [&_input]:px-3 [&_input]:py-2 [&_textarea]:rounded-md [&_textarea]:border [&_textarea]:bg-background [&_textarea]:px-3 [&_textarea]:py-2">
+                <input
+                  type="number"
+                  min="1"
+                  value={proposalPrice}
+                  onChange={(event) => setProposalPrice(event.target.value)}
+                  placeholder="Your price"
+                />
+                <input
+                  value={proposalDuration}
+                  onChange={(event) => setProposalDuration(event.target.value)}
+                  placeholder="Estimated delivery (for example, 14 days)"
+                />
+                <textarea
+                  value={proposalMessage}
+                  onChange={(event) => setProposalMessage(event.target.value)}
+                  placeholder="Message to Client"
+                  rows={5}
+                />
+              </div>
+              {proposalError && <p className="mt-3 text-sm text-destructive">{proposalError}</p>}
+              <div className="mt-4 flex gap-2">
+                <Button variant="outline" onClick={() => setShowProposalForm(false)}>
+                  Cancel
+                </Button>
+                <Button disabled={proposalBusy} onClick={() => void sendProposal()}>
+                  {proposalBusy ? "Sending…" : "Send Proposal"}
+                </Button>
+              </div>
+            </section>
           )}
         </div>
       </article>
+      <Dialog open={finderOpen} onOpenChange={setFinderOpen}>
+        <DialogContent className="max-h-[85vh] max-w-4xl overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Find a professional</DialogTitle>
+            <DialogDescription>
+              Choose a verified professional for {job.title}. Their hire request will include this
+              job.
+            </DialogDescription>
+          </DialogHeader>
+          <form
+            className="flex gap-2"
+            onSubmit={(event) => {
+              event.preventDefault();
+              void searchProfessionals();
+            }}
+          >
+            <div className="relative flex-1">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={finderQuery}
+                onChange={(event) => setFinderQuery(event.target.value)}
+                placeholder="Search by name, service, or skill"
+                className="pl-9"
+              />
+            </div>
+            <Button type="submit" disabled={finderStatus === "loading"}>
+              {finderStatus === "loading" ? "Searching..." : "Search"}
+            </Button>
+          </form>
+          {finderStatus === "error" && (
+            <p className="rounded-xl border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
+              Professionals could not be loaded. Please try again.
+            </p>
+          )}
+          {finderStatus === "loading" && !professionals.length && (
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="h-36 animate-pulse rounded-2xl bg-muted" />
+              <div className="h-36 animate-pulse rounded-2xl bg-muted" />
+            </div>
+          )}
+          {finderStatus !== "loading" && professionals.length > 0 && (
+            <div className="grid gap-3 sm:grid-cols-2">
+              {professionals.map((professional) => (
+                <article key={professional.id} className="rounded-2xl border border-border p-4">
+                  <div className="flex items-start gap-3">
+                    {professional.avatarUrl ? (
+                      <img
+                        src={professional.avatarUrl}
+                        alt={professional.name}
+                        className="h-11 w-11 rounded-xl object-cover"
+                      />
+                    ) : (
+                      <div className="grid h-11 w-11 place-items-center rounded-xl bg-muted font-semibold">
+                        {professional.name.slice(0, 1)}
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-semibold">{professional.name}</p>
+                      <p className="truncate text-sm text-muted-foreground">{professional.title}</p>
+                      <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+                        <Star className="h-3.5 w-3.5 fill-warning text-warning" />
+                        {professional.rating.toFixed(1)} · {professional.reviewCount} reviews
+                      </p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {professional.verified ? "Verified professional" : "Verification pending"}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+                    <p className="text-xs text-muted-foreground">
+                      {professional.hourlyRate == null
+                        ? "Contact for pricing"
+                        : `$${professional.hourlyRate}/hr`}{" "}
+                      · {professional.location ?? "Remote"}
+                    </p>
+                    <Button asChild size="sm">
+                      <Link href={`/pro/${professional.id}?jobId=${encodeURIComponent(jobId)}`}>
+                        Select
+                      </Link>
+                    </Button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+          {finderStatus === "idle" && professionals.length === 0 && (
+            <p className="py-8 text-center text-sm text-muted-foreground">
+              No verified professionals match this search.
+            </p>
+          )}
+          <div className="border-t border-border pt-4 text-right">
+            <Button variant="link" asChild>
+              <Link href={`/discover?jobId=${encodeURIComponent(jobId)}`}>
+                Open full professional search
+              </Link>
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }

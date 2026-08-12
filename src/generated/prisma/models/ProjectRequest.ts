@@ -51,6 +51,7 @@ export type ProjectRequestMinAggregateOutputType = {
   duration: string | null
   coverLetter: string | null
   status: string | null
+  origin: string | null
   attachmentsJson: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -65,6 +66,7 @@ export type ProjectRequestMaxAggregateOutputType = {
   duration: string | null
   coverLetter: string | null
   status: string | null
+  origin: string | null
   attachmentsJson: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -79,6 +81,7 @@ export type ProjectRequestCountAggregateOutputType = {
   duration: number
   coverLetter: number
   status: number
+  origin: number
   attachmentsJson: number
   createdAt: number
   updatedAt: number
@@ -111,6 +114,7 @@ export type ProjectRequestMinAggregateInputType = {
   duration?: true
   coverLetter?: true
   status?: true
+  origin?: true
   attachmentsJson?: true
   createdAt?: true
   updatedAt?: true
@@ -125,6 +129,7 @@ export type ProjectRequestMaxAggregateInputType = {
   duration?: true
   coverLetter?: true
   status?: true
+  origin?: true
   attachmentsJson?: true
   createdAt?: true
   updatedAt?: true
@@ -139,6 +144,7 @@ export type ProjectRequestCountAggregateInputType = {
   duration?: true
   coverLetter?: true
   status?: true
+  origin?: true
   attachmentsJson?: true
   createdAt?: true
   updatedAt?: true
@@ -240,6 +246,7 @@ export type ProjectRequestGroupByOutputType = {
   duration: string
   coverLetter: string
   status: string
+  origin: string
   attachmentsJson: string | null
   createdAt: Date
   updatedAt: Date
@@ -277,6 +284,7 @@ export type ProjectRequestWhereInput = {
   duration?: Prisma.StringFilter<"ProjectRequest"> | string
   coverLetter?: Prisma.StringFilter<"ProjectRequest"> | string
   status?: Prisma.StringFilter<"ProjectRequest"> | string
+  origin?: Prisma.StringFilter<"ProjectRequest"> | string
   attachmentsJson?: Prisma.StringNullableFilter<"ProjectRequest"> | string | null
   createdAt?: Prisma.DateTimeFilter<"ProjectRequest"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ProjectRequest"> | Date | string
@@ -291,6 +299,7 @@ export type ProjectRequestOrderByWithRelationInput = {
   duration?: Prisma.SortOrder
   coverLetter?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  origin?: Prisma.SortOrder
   attachmentsJson?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -308,6 +317,7 @@ export type ProjectRequestWhereUniqueInput = Prisma.AtLeast<{
   duration?: Prisma.StringFilter<"ProjectRequest"> | string
   coverLetter?: Prisma.StringFilter<"ProjectRequest"> | string
   status?: Prisma.StringFilter<"ProjectRequest"> | string
+  origin?: Prisma.StringFilter<"ProjectRequest"> | string
   attachmentsJson?: Prisma.StringNullableFilter<"ProjectRequest"> | string | null
   createdAt?: Prisma.DateTimeFilter<"ProjectRequest"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ProjectRequest"> | Date | string
@@ -322,6 +332,7 @@ export type ProjectRequestOrderByWithAggregationInput = {
   duration?: Prisma.SortOrder
   coverLetter?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  origin?: Prisma.SortOrder
   attachmentsJson?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -344,6 +355,7 @@ export type ProjectRequestScalarWhereWithAggregatesInput = {
   duration?: Prisma.StringWithAggregatesFilter<"ProjectRequest"> | string
   coverLetter?: Prisma.StringWithAggregatesFilter<"ProjectRequest"> | string
   status?: Prisma.StringWithAggregatesFilter<"ProjectRequest"> | string
+  origin?: Prisma.StringWithAggregatesFilter<"ProjectRequest"> | string
   attachmentsJson?: Prisma.StringNullableWithAggregatesFilter<"ProjectRequest"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ProjectRequest"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"ProjectRequest"> | Date | string
@@ -357,6 +369,7 @@ export type ProjectRequestCreateInput = {
   duration: string
   coverLetter: string
   status?: string
+  origin?: string
   attachmentsJson?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -371,6 +384,7 @@ export type ProjectRequestUncheckedCreateInput = {
   duration: string
   coverLetter: string
   status?: string
+  origin?: string
   attachmentsJson?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -384,6 +398,7 @@ export type ProjectRequestUpdateInput = {
   duration?: Prisma.StringFieldUpdateOperationsInput | string
   coverLetter?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  origin?: Prisma.StringFieldUpdateOperationsInput | string
   attachmentsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -398,6 +413,7 @@ export type ProjectRequestUncheckedUpdateInput = {
   duration?: Prisma.StringFieldUpdateOperationsInput | string
   coverLetter?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  origin?: Prisma.StringFieldUpdateOperationsInput | string
   attachmentsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -412,6 +428,7 @@ export type ProjectRequestCreateManyInput = {
   duration: string
   coverLetter: string
   status?: string
+  origin?: string
   attachmentsJson?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -425,6 +442,7 @@ export type ProjectRequestUpdateManyMutationInput = {
   duration?: Prisma.StringFieldUpdateOperationsInput | string
   coverLetter?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  origin?: Prisma.StringFieldUpdateOperationsInput | string
   attachmentsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -439,6 +457,7 @@ export type ProjectRequestUncheckedUpdateManyInput = {
   duration?: Prisma.StringFieldUpdateOperationsInput | string
   coverLetter?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  origin?: Prisma.StringFieldUpdateOperationsInput | string
   attachmentsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -453,6 +472,7 @@ export type ProjectRequestCountOrderByAggregateInput = {
   duration?: Prisma.SortOrder
   coverLetter?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  origin?: Prisma.SortOrder
   attachmentsJson?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -475,6 +495,7 @@ export type ProjectRequestMaxOrderByAggregateInput = {
   duration?: Prisma.SortOrder
   coverLetter?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  origin?: Prisma.SortOrder
   attachmentsJson?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -489,6 +510,7 @@ export type ProjectRequestMinOrderByAggregateInput = {
   duration?: Prisma.SortOrder
   coverLetter?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  origin?: Prisma.SortOrder
   attachmentsJson?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -513,6 +535,7 @@ export type ProjectRequestSelect<ExtArgs extends runtime.Types.Extensions.Intern
   duration?: boolean
   coverLetter?: boolean
   status?: boolean
+  origin?: boolean
   attachmentsJson?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -527,6 +550,7 @@ export type ProjectRequestSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   duration?: boolean
   coverLetter?: boolean
   status?: boolean
+  origin?: boolean
   attachmentsJson?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -541,6 +565,7 @@ export type ProjectRequestSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   duration?: boolean
   coverLetter?: boolean
   status?: boolean
+  origin?: boolean
   attachmentsJson?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -555,12 +580,13 @@ export type ProjectRequestSelectScalar = {
   duration?: boolean
   coverLetter?: boolean
   status?: boolean
+  origin?: boolean
   attachmentsJson?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ProjectRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "jobId" | "clientId" | "professionalId" | "bidAmount" | "duration" | "coverLetter" | "status" | "attachmentsJson" | "createdAt" | "updatedAt", ExtArgs["result"]["projectRequest"]>
+export type ProjectRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "jobId" | "clientId" | "professionalId" | "bidAmount" | "duration" | "coverLetter" | "status" | "origin" | "attachmentsJson" | "createdAt" | "updatedAt", ExtArgs["result"]["projectRequest"]>
 
 export type $ProjectRequestPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "ProjectRequest"
@@ -574,6 +600,7 @@ export type $ProjectRequestPayload<ExtArgs extends runtime.Types.Extensions.Inte
     duration: string
     coverLetter: string
     status: string
+    origin: string
     attachmentsJson: string | null
     createdAt: Date
     updatedAt: Date
@@ -1008,6 +1035,7 @@ export interface ProjectRequestFieldRefs {
   readonly duration: Prisma.FieldRef<"ProjectRequest", 'String'>
   readonly coverLetter: Prisma.FieldRef<"ProjectRequest", 'String'>
   readonly status: Prisma.FieldRef<"ProjectRequest", 'String'>
+  readonly origin: Prisma.FieldRef<"ProjectRequest", 'String'>
   readonly attachmentsJson: Prisma.FieldRef<"ProjectRequest", 'String'>
   readonly createdAt: Prisma.FieldRef<"ProjectRequest", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"ProjectRequest", 'DateTime'>

@@ -1,0 +1,86 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { AppShell } from "@/components/AppShell";
+import { Button } from "@/components/ui/button";
+import { Star, Loader2 } from "lucide-react";
+
+type Review = {
+  id: number;
+  rating: number;
+  comment: string | null;
+  clientName: string | null;
+  createdAt: string;
+};
+
+export default function ProfessionalReviews() {
+  const [reviews, setReviews] = useState<Review[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    void fetch("/api/portal/reviews")
+      .then(async (response) => {
+        if (!response.ok) throw new Error();
+        return response.json() as Promise<Review[]>;
+      })
+      .then(setReviews)
+      .catch(() => setError("Unable to load reviews."));
+  }, []);
+
+  return (
+    <AppShell title="Reviews">
+      <div className="space-y-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">Reviews</h1>
+            <p className="mt-1 text-muted-foreground">
+              See what clients are saying about your work.
+            </p>
+          </div>
+          <Button asChild>
+            <a href="/professional/my-jobs?tab=completed">Completed projects</a>
+          </Button>
+        </div>
+
+        {error ? (
+          <div className="rounded-3xl border border-destructive/30 bg-destructive/5 p-6 text-destructive">
+            {error}
+          </div>
+        ) : !reviews ? (
+          <div className="space-y-4">
+            <div className="h-24 animate-pulse rounded-3xl bg-muted" />
+            <div className="h-72 animate-pulse rounded-3xl bg-muted" />
+          </div>
+        ) : reviews.length === 0 ? (
+          <div className="rounded-3xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
+            No reviews yet. Your clients will see them here once work is complete.
+          </div>
+        ) : (
+          <ul className="grid gap-4">
+            {reviews.map((review) => (
+              <li key={review.id} className="rounded-3xl border border-border bg-card p-6">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-sm font-semibold">{review.clientName ?? "Client"}</p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {new Date(review.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
+                    <Star className="h-4 w-4" />
+                    {review.rating.toFixed(1)}
+                  </div>
+                </div>
+                {review.comment ? (
+                  <p className="mt-4 text-sm text-muted-foreground">{review.comment}</p>
+                ) : (
+                  <p className="mt-4 text-sm text-muted-foreground">No comment provided.</p>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </AppShell>
+  );
+}

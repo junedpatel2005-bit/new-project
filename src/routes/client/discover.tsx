@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, lazy } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { AppShell } from "@/components/AppShell";
 const ProfessionalDiscoveryMap = lazy(() => import("@/components/ProfessionalDiscoveryMap"));
 import { ProCard } from "@/components/ProCard";
@@ -32,7 +33,10 @@ function toMarketplaceProfessional(
   };
 }
 
-export default function Discover() {
+function DiscoverContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const jobId = searchParams.get("jobId");
   const [results, setResults] = useState<ProfessionalDiscoveryResponse | null>(null);
   const [categories, setCategories] = useState<MarketplaceCategory[]>([]);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
@@ -44,7 +48,7 @@ export default function Discover() {
   const [distanceKm, setDistanceKm] = useState<number | "">("");
   const [originLat, setOriginLat] = useState<number | null>(null);
   const [originLng, setOriginLng] = useState<number | null>(null);
-  const [verifiedOnly, setVerifiedOnly] = useState(true);
+  const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [showMap, setShowMap] = useState(false);
   const [selectedPoint, setSelectedPoint] = useState<{ lat: number; lng: number } | null>(null);
   const [page, setPage] = useState(1);
@@ -112,7 +116,18 @@ export default function Discover() {
 
     void loadProfessionals();
     return () => controller.abort();
-  }, [query, category, city, minRating, availability, distanceKm, originLat, originLng, verifiedOnly, page]);
+  }, [
+    query,
+    category,
+    city,
+    minRating,
+    availability,
+    distanceKm,
+    originLat,
+    originLng,
+    verifiedOnly,
+    page,
+  ]);
 
   const totalProfessionals = results?.total ?? 0;
 
@@ -128,6 +143,20 @@ export default function Discover() {
           </p>
         </div>
       </div>
+
+      {jobId && (
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-primary/30 bg-primary/5 p-4">
+          <div>
+            <p className="font-semibold">Choose a professional for your job</p>
+            <p className="text-sm text-muted-foreground">
+              When you select Hire, your job details will be included in the request.
+            </p>
+          </div>
+          <Button variant="outline" size="sm" onClick={() => router.push(`/job/${jobId}`)}>
+            Back to job
+          </Button>
+        </div>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
         <aside className="rounded-2xl border border-border bg-card p-5 shadow-soft h-fit lg:sticky lg:top-20">
@@ -145,7 +174,7 @@ export default function Discover() {
                 setDistanceKm("");
                 setOriginLat(null);
                 setOriginLng(null);
-                setVerifiedOnly(true);
+                setVerifiedOnly(false);
                 setPage(1);
               }}
             >
@@ -222,8 +251,10 @@ export default function Discover() {
                             };
                           },
                           () => {
-                            alert("Unable to retrieve your location. Please enable location access or enter a city.");
-                          }
+                            alert(
+                              "Unable to retrieve your location. Please enable location access or enter a city.",
+                            );
+                          },
                         );
                       }
                     } else {
@@ -237,7 +268,7 @@ export default function Discover() {
                 />
                 <span>Use my location</span>
               </label>
-              {(distanceKm !== "" && originLat !== null && originLng !== null) && (
+              {distanceKm !== "" && originLat !== null && originLng !== null && (
                 <div className="space-y-2">
                   <label className="flex items-center gap-2 text-sm">
                     <span className="w-20">Within</span>
@@ -455,13 +486,20 @@ export default function Discover() {
                   <ProCard
                     key={p.id}
                     pro={p}
+                    onCardClick={() => router.push(`/pro/${p.id}`)}
+                    profileHref={
+                      jobId ? `/pro/${p.id}?jobId=${encodeURIComponent(jobId)}` : undefined
+                    }
                     onShowLocation={() => {
                       const proResult = results?.professionals.find((item) => item.id === p.id);
                       if (!proResult?.displayPoint) return;
                       setSelectedPoint(proResult.displayPoint);
                       setShowMap(true);
                       window.requestAnimationFrame(() => {
-                        mapSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                        mapSectionRef.current?.scrollIntoView({
+                          behavior: "smooth",
+                          block: "start",
+                        });
                       });
                     }}
                   />
@@ -469,7 +507,8 @@ export default function Discover() {
               </div>
               <div className="mt-8 flex items-center justify-between gap-3 text-sm text-muted-foreground">
                 <p>
-                  Showing {professionals.length} of {results?.total ?? professionals.length} professionals.
+                  Showing {professionals.length} of {results?.total ?? professionals.length}{" "}
+                  professionals.
                 </p>
                 <div className="flex flex-wrap items-center gap-2">
                   <Button
@@ -495,6 +534,14 @@ export default function Discover() {
         </div>
       </div>
     </AppShell>
+  );
+}
+
+export default function Discover() {
+  return (
+    <Suspense fallback={<ResultSkeleton />}>
+      <DiscoverContent />
+    </Suspense>
   );
 }
 

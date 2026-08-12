@@ -92,7 +92,7 @@ export default function Dashboard() {
             Welcome back{data ? `, ${data.user.firstName}` : ""}
           </h1>
           <p className="text-sm text-muted-foreground">
-            Here's what's happening with your projects today.
+            Here's what's happening with your Projects today.
           </p>
         </div>
         <Button asChild>
@@ -134,10 +134,9 @@ export default function Dashboard() {
               </div>
               <div className="mt-4 divide-y divide-border">
                 {data?.jobs.map((job) => (
-                  <Link
+                  <div
                     key={job.id}
-                    href={`/job/${job.id}`}
-                    className="-mx-2 flex items-center gap-4 rounded-lg px-2 py-4 transition-colors hover:bg-muted/50"
+                    className="-mx-2 flex flex-col gap-3 rounded-lg border border-border px-2 py-4 transition-colors hover:bg-muted/50 sm:flex-row sm:items-center sm:gap-4"
                   >
                     <div className="grid h-10 w-10 place-items-center rounded-lg bg-primary/10 text-primary">
                       <Briefcase className="h-4 w-4" />
@@ -149,12 +148,16 @@ export default function Dashboard() {
                         {new Date(job.createdAt).toLocaleDateString()}
                       </p>
                     </div>
-                    <span className="hidden rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary md:inline-block">
-                      {job.status}
-                    </span>
-                    <span className="text-sm font-medium">${job.budgetMin ?? 0}</span>
-                    <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
-                  </Link>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="hidden rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary md:inline-block">
+                        {job.status}
+                      </span>
+                      <span className="text-sm font-medium">${job.budgetMin ?? 0}</span>
+                      <Button asChild size="sm">
+                        <Link href={`/job/${job.id}`}>View job</Link>
+                      </Button>
+                    </div>
+                  </div>
                 ))}
                 {data?.jobs.length === 0 && (
                   <p className="py-6 text-sm text-muted-foreground">No jobs posted yet.</p>

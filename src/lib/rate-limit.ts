@@ -11,3 +11,8 @@ export function rateLimit(key: string, limit = 5, windowMs = 60_000) {
   entry.count += 1;
   return true;
 }
+
+/** Clear a successful credential attempt so a previous typo cannot lock a user out. */
+export function clearRateLimit(key: string) {
+  attempts.delete(key);
+}

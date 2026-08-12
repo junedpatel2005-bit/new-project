@@ -26,6 +26,7 @@ export type DetailedProfessional = MarketplaceProfessional & {
   experienceYears: number | null;
   fixedRate: number | null;
   portfolioUrl: string | null;
+  address: string | null;
   workPhotos: string[];
   certifications: string[];
   tradeLicenseUrl: string | null;
@@ -77,12 +78,21 @@ export type MarketplaceJob = {
   workMode: "ON_SITE" | "REMOTE" | "BOTH";
   location: string | null;
   locationAddress: string | null;
+  locationLat: number | null;
+  locationLng: number | null;
   jobDate: string | null;
   deadline: string | null;
   timingType: "FIXED" | "HOURLY";
   hourlyRate: number | null;
   createdAt: string;
+  status: "OPEN" | "CLOSED" | "DRAFT";
   proposalCount: number;
   client: { name: string; avatar: string | null; rating: number };
-  attachments: { id: number; fileName: string; fileType: string | null; fileSize: number | null; previewUrl: string | null }[];
+  attachments: {
+    id: number;
+    fileName: string;
+    fileType: string | null;
+    fileSize: number | null;
+    previewUrl: string | null;
+  }[];
 };

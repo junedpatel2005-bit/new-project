@@ -38,7 +38,7 @@ The required public About, Contact, Privacy Policy, and Terms pages do not exist
 
 ## Current API surface
 
-The application has six API route handlers. They are functional but are not versioned under `/api/v1` and have no OpenAPI specification.
+The application currently has 23 API route handlers, including shared project-tracking actions and authenticated project-file upload/access routes. Most are not versioned under `/api/v1`. The initial API contract is tracked in `openapi.yaml`; it must be expanded whenever an endpoint changes.
 
 | Endpoint family | Current capabilities |
 |---|---|
@@ -64,7 +64,7 @@ The current implementation does not have access/refresh token pairs, refresh-tok
 
 ## Database and Prisma
 
-`prisma/schema.prisma` is the active schema. It defines 58 models, including users, client profiles/jobs, projects, verification records, notifications, messages, payments/wallet records, CMS content, legacy migration records, and generated-content support.
+`prisma/schema.prisma` is the active schema. It defines 58 models, including users, client profiles/jobs, Projects, verification records, notifications, messages, payments/wallet records, CMS content, legacy migration records, and generated-content support.
 
 Prisma is accessed through a shared client in `src/lib/db.ts`. The current data model includes plain latitude/longitude fields and does not contain PostGIS geography columns, a `GeoRepository`, an audit-log model, or a background-job queue model.
 
@@ -113,6 +113,15 @@ Only variable names are recorded here. Never add secret values to documentation.
 6. Secure storage, verification-document review, audit logs, background jobs, and observability.
 7. A product-approved geospatial/privacy design before PostGIS or map features are implemented.
 8. Legal approval before Stripe, escrow, wallet, tax, or payout work begins.
+
+## Project-work file storage deployment note
+
+Project Tracking files are private and are served only through the authenticated
+`/api/portal/project-files/:fileId` route after confirming the requester is the
+project's Client or Professional. The current development implementation stores
+the bytes on the application server. Before a serverless production deployment,
+configure persistent object storage or a persistent volume while retaining this
+authenticated file-access route and the stable stored-file key.
 
 ## Commands
 

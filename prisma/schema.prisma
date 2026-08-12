@@ -322,6 +322,7 @@ model ProjectRequest {
   duration        String
   coverLetter     String
   status          String   @default("PENDING")
+  origin          String   @default("CLIENT_HIRE")
   attachmentsJson String?  @default("[]")
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -338,8 +339,12 @@ model ProjectTracking {
   jobId          Int
   clientId       Int
   professionalId Int
-  status         String   @default("RUNNING")
+  status         String   @default("READY_TO_START")
+  progress       Int      @default(0)
+  currentStage   String?
   acceptedAt     DateTime @default(now())
+  startedAt      DateTime?
+  completedAt    DateTime?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -348,6 +353,25 @@ model ProjectTracking {
   @@index([professionalId])
   @@map("ProjectTracking")
 }
+
+model ProjectTimelineEvent {
+  id             Int      @id @default(autoincrement())
+  trackingId     Int
+  milestoneId    Int?
+  actorId        Int
+  actorRole      String
+  type           String
+  title          String
+  description    String?
+  progress       Int?
+  stage          String?
+  attachmentJson String?  @default("[]")
+  createdAt      DateTime @default(now())
+
+  @@index([trackingId, createdAt])
+  @@map("ProjectTimelineEvent")
+}
+
 
 model ProjectMilestone {
   id             Int       @id @default(autoincrement())
@@ -358,7 +382,9 @@ model ProjectMilestone {
   description    String?
   amount         Int
   dueDate        DateTime?
-  status         String    @default("PENDING")
+  status         String    @default("UPCOMING")
+  submittedAt    DateTime?
+  approvedAt     DateTime?
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
@@ -369,6 +395,8 @@ model ProjectMilestone {
 model ProjectWorkUpload {
   id          Int      @id @default(autoincrement())
   trackingId  Int
+  milestoneId Int?
+  status      String   @default("UPLOADED")
   roundNumber Int      @default(1)
   title       String
   note        String?

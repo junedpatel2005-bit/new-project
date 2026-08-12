@@ -10,8 +10,7 @@ export function getDistanceKm(lat1: number, lon1: number, lat2: number, lon2: nu
   const φ2 = toRadians(lat2);
   const Δφ = toRadians(lat2 - lat1);
   const Δλ = toRadians(lon2 - lon1);
-  const a =
-    Math.sin(Δφ / 2) ** 2 + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) ** 2;
+  const a = Math.sin(Δφ / 2) ** 2 + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) ** 2;
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return EARTH_RADIUS_KM * c;
 }
@@ -43,5 +42,5 @@ export function createDisplayPoint(id: number, lat: number, lng: number): LatLng
       Math.sin(bearingRad) * Math.sin(distanceKm / EARTH_RADIUS_KM) * Math.cos(φ1),
       Math.cos(distanceKm / EARTH_RADIUS_KM) - Math.sin(φ1) * Math.sin(φ2),
     );
-  return { lat: (φ2 * 180) / Math.PI, lng: ((λ2 * 180) / Math.PI + 540) % 360 - 180 };
+  return { lat: (φ2 * 180) / Math.PI, lng: (((λ2 * 180) / Math.PI + 540) % 360) - 180 };
 }

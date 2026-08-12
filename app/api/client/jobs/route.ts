@@ -90,7 +90,21 @@ export async function GET(request: NextRequest) {
     where: { userId: user.id },
     orderBy: { updatedAt: "desc" },
   });
-  return NextResponse.json({ jobs });
+  const tracking = await db.projectTracking.findMany({
+    where: {
+      clientId: user.id,
+      jobId: { in: jobs.map((job) => job.id) },
+      status: { not: "COMPLETED" },
+    },
+    select: { id: true, jobId: true, status: true },
+  });
+  const trackingByJob = new Map(tracking.map((project) => [project.jobId, project]));
+  return NextResponse.json({
+    jobs: jobs.map((job) => {
+      const project = trackingByJob.get(job.id);
+      return { ...job, status: project ? "RUNNING" : job.status, projectId: project?.id ?? null };
+    }),
+  });
 }
 
 export async function POST(request: NextRequest) {

@@ -71,6 +71,7 @@ export const ModelName = {
   ProjectReview: 'ProjectReview',
   ProjectRequest: 'ProjectRequest',
   ProjectTracking: 'ProjectTracking',
+  ProjectTimelineEvent: 'ProjectTimelineEvent',
   ProjectMilestone: 'ProjectMilestone',
   ProjectWorkUpload: 'ProjectWorkUpload',
   HireJob: 'HireJob',
@@ -439,6 +440,7 @@ export const ProjectRequestScalarFieldEnum = {
   duration: 'duration',
   coverLetter: 'coverLetter',
   status: 'status',
+  origin: 'origin',
   attachmentsJson: 'attachmentsJson',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -454,12 +456,34 @@ export const ProjectTrackingScalarFieldEnum = {
   clientId: 'clientId',
   professionalId: 'professionalId',
   status: 'status',
+  progress: 'progress',
+  currentStage: 'currentStage',
   acceptedAt: 'acceptedAt',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type ProjectTrackingScalarFieldEnum = (typeof ProjectTrackingScalarFieldEnum)[keyof typeof ProjectTrackingScalarFieldEnum]
+
+
+export const ProjectTimelineEventScalarFieldEnum = {
+  id: 'id',
+  trackingId: 'trackingId',
+  milestoneId: 'milestoneId',
+  actorId: 'actorId',
+  actorRole: 'actorRole',
+  type: 'type',
+  title: 'title',
+  description: 'description',
+  progress: 'progress',
+  stage: 'stage',
+  attachmentJson: 'attachmentJson',
+  createdAt: 'createdAt'
+} as const
+
+export type ProjectTimelineEventScalarFieldEnum = (typeof ProjectTimelineEventScalarFieldEnum)[keyof typeof ProjectTimelineEventScalarFieldEnum]
 
 
 export const ProjectMilestoneScalarFieldEnum = {
@@ -472,6 +496,8 @@ export const ProjectMilestoneScalarFieldEnum = {
   amount: 'amount',
   dueDate: 'dueDate',
   status: 'status',
+  submittedAt: 'submittedAt',
+  approvedAt: 'approvedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -482,6 +508,8 @@ export type ProjectMilestoneScalarFieldEnum = (typeof ProjectMilestoneScalarFiel
 export const ProjectWorkUploadScalarFieldEnum = {
   id: 'id',
   trackingId: 'trackingId',
+  milestoneId: 'milestoneId',
+  status: 'status',
   roundNumber: 'roundNumber',
   title: 'title',
   note: 'note',
