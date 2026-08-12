@@ -194,6 +194,21 @@ export default function SharedProjectTrackingPage() {
       actionInFlight.current = false;
     }
   };
+
+  // This effect must run on every render. Keeping it below the loading return
+  // changes the hook order as soon as project data arrives, which crashes the
+  // production build with React error #310.
+  const defaultMilestoneAmount = data
+    ? (data.agreedAmount ?? data.job?.budgetMax ?? 0)
+      ? Math.floor((data.agreedAmount ?? data.job?.budgetMax ?? 0) / 5)
+      : 0
+    : 0;
+  useEffect(() => {
+    if (showMilestoneModal && milestoneAmount === "") {
+      setMilestoneAmount(defaultMilestoneAmount || "");
+    }
+  }, [showMilestoneModal, milestoneAmount, defaultMilestoneAmount]);
+
   if (!data)
     return (
       <AppShell>
@@ -210,7 +225,6 @@ export default function SharedProjectTrackingPage() {
     ["IN_PROGRESS", "REVISION_REQUESTED", "AWAITING_CLIENT_REVIEW"].includes(m.status),
   );
   const totalBudget = data.agreedAmount ?? data.job?.budgetMax ?? 0;
-  const defaultMilestoneAmount = totalBudget ? Math.floor(totalBudget / 5) : 0;
   const completed = data.milestones.filter((m) => m.status === "APPROVED").length;
   const remaining = data.job?.deadline
     ? Math.ceil((new Date(data.job.deadline).getTime() - Date.now()) / 86400000)
@@ -257,12 +271,6 @@ export default function SharedProjectTrackingPage() {
       return setMessage("Enter a completion note and choose at least one file.");
     void actionWithFiles("submit-milestone", { milestoneId, note });
   };
-
-  useEffect(() => {
-    if (showMilestoneModal && milestoneAmount === "") {
-      setMilestoneAmount(defaultMilestoneAmount || "");
-    }
-  }, [showMilestoneModal, milestoneAmount, defaultMilestoneAmount]);
 
   return (
     <AppShell>
