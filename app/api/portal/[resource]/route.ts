@@ -30,11 +30,11 @@ export async function GET(
         }),
       );
     if (resource === "earnings") {
-      if (session.role !== "PROFESSIONAL")
-        return NextResponse.json({ error: "Professional access required." }, { status: 403 });
+      if (!["PROFESSIONAL", "CLIENT"].includes(session.role))
+        return NextResponse.json({ error: "Account access required." }, { status: 403 });
       return NextResponse.json(
         await db.projectTransaction.findMany({
-          where: { professionalId: session.userId },
+          where: session.role === "PROFESSIONAL" ? { professionalId: session.userId } : { clientId: session.userId },
           orderBy: { createdAt: "desc" },
           take: 50,
         }),
@@ -69,20 +69,58 @@ export async function GET(
         },
       });
 
+      const blockedJobs = await db.$transaction(async (tx) => {
+        const [trackingJobs, acceptedRequests] = await Promise.all([
+          tx.projectTracking.findMany({
+            where: { status: { notIn: ["COMPLETED", "CANCELLED"] } },
+            select: { jobId: true },
+          }),
+          tx.projectRequest.findMany({
+            where: { status: "ACCEPTED" },
+            select: { jobId: true },
+          }),
+        ]);
+        return new Set([
+          ...trackingJobs.map((job) => job.jobId),
+          ...acceptedRequests.map((request) => request.jobId),
+        ]);
+      });
+
       const [openJobs, savedJobs, proposals, offers, activeProjects, completedProjects] =
         await Promise.all([
           db.clientJob.findMany({
-            where: { status: "OPEN" },
+            where: {
+              status: "OPEN",
+              id: { notIn: [...blockedJobs] },
+            },
             orderBy: { createdAt: "desc" },
             take: 20,
-            include: { user: { select: { firstName: true, lastName: true } } },
+            include: {
+              user: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                  averageRating: true,
+                  isVerified: true,
+                },
+              },
+            },
           }),
           db.favoriteJob.findMany({
             where: { userId: session.userId, job: { status: "OPEN" } },
             take: 20,
             include: {
               job: {
-                include: { user: { select: { firstName: true, lastName: true } } },
+                include: {
+                  user: {
+                    select: {
+                      firstName: true,
+                      lastName: true,
+                      averageRating: true,
+                      isVerified: true,
+                    },
+                  },
+                },
               },
             },
           }),
@@ -108,10 +146,16 @@ export async function GET(
           }),
         ]);
 
+      const hiddenJobIds = blockedJobs;
+      const visibleOpenJobs = openJobs.filter((job) => !hiddenJobIds.has(job.id));
+      const visibleSavedJobs = savedJobs.filter(
+        (favorite) => !hiddenJobIds.has(favorite.job.id),
+      );
+
       const clientIds = [
         ...new Set([
-          ...openJobs.map((job) => job.userId),
-          ...savedJobs.map((favorite) => favorite.job.userId),
+          ...visibleOpenJobs.map((job) => job.userId),
+          ...visibleSavedJobs.map((favorite) => favorite.job.userId),
           ...proposals.map((request) => request.clientId),
           ...activeProjects.map((project) => project.clientId),
           ...offers.map((request) => request.clientId),
@@ -127,8 +171,8 @@ export async function GET(
 
       const jobIds = [
         ...new Set([
-          ...openJobs.map((job) => job.id),
-          ...savedJobs.map((favorite) => favorite.jobId),
+          ...visibleOpenJobs.map((job) => job.id),
+          ...visibleSavedJobs.map((favorite) => favorite.jobId),
           ...proposals.map((request) => request.jobId),
           ...activeProjects.map((project) => project.jobId),
           ...offers.map((request) => request.jobId),
@@ -146,14 +190,17 @@ export async function GET(
           budgetMax: true,
           hourlyRate: true,
           timingType: true,
+          deadline: true,
         },
       });
       const jobMap = new Map(jobs.map((job) => [job.id, job]));
       const activeJobIds = new Set(activeProjects.map((project) => project.jobId));
+      const visibleProposals = proposals.filter((request) => !activeJobIds.has(request.jobId));
+      const visibleOffers = offers.filter((request) => !activeJobIds.has(request.jobId));
 
       return NextResponse.json({
         professional,
-        openJobs: openJobs
+        openJobs: visibleOpenJobs
           .filter((job) => !activeJobIds.has(job.id))
           .map((job) => ({
             id: job.id,
@@ -165,12 +212,16 @@ export async function GET(
             hourlyRate: job.hourlyRate,
             timingType: job.timingType,
             locationAddress: job.locationAddress,
+            locationLat: job.locationLat,
+            locationLng: job.locationLng,
             description: job.description,
             clientName: clientMap.get(job.userId) ?? "Client",
+            clientRating: job.user.averageRating ?? 0,
+            clientVerified: job.user.isVerified ?? false,
             createdAt: job.createdAt.toISOString(),
             proposalCount: 0,
           })),
-        savedJobs: savedJobs
+        savedJobs: visibleSavedJobs
           .filter((favorite) => !activeJobIds.has(favorite.job.id))
           .map((favorite) => ({
             id: favorite.job.id,
@@ -182,12 +233,16 @@ export async function GET(
             hourlyRate: favorite.job.hourlyRate,
             timingType: favorite.job.timingType,
             locationAddress: favorite.job.locationAddress,
+            locationLat: favorite.job.locationLat,
+            locationLng: favorite.job.locationLng,
             description: favorite.job.description,
             clientName: clientMap.get(favorite.job.userId) ?? "Client",
+            clientRating: favorite.job.user.averageRating ?? 0,
+            clientVerified: favorite.job.user.isVerified ?? false,
             createdAt: favorite.job.createdAt.toISOString(),
             proposalCount: 0,
           })),
-        proposals: proposals.map((request) => {
+        proposals: visibleProposals.map((request) => {
           const job = jobMap.get(request.jobId);
           return {
             id: request.id,
@@ -201,7 +256,7 @@ export async function GET(
             createdAt: request.createdAt.toISOString(),
           };
         }),
-        offers: offers.map((request) => {
+        offers: visibleOffers.map((request) => {
           const job = jobMap.get(request.jobId);
           return {
             id: request.id,
@@ -222,6 +277,14 @@ export async function GET(
           clientName: clientMap.get(project.clientId) ?? "Client",
           status: project.status,
           acceptedAt: project.acceptedAt.toISOString(),
+          deadline: jobMap.get(project.jobId)?.deadline?.toISOString() ?? null,
+          budget:
+            jobMap.get(project.jobId)?.timingType === "HOURLY"
+              ? jobMap.get(project.jobId)?.hourlyRate ?? null
+              : jobMap.get(project.jobId)?.budgetMax ?? jobMap.get(project.jobId)?.budgetMin ?? null,
+          timingType: jobMap.get(project.jobId)?.timingType ?? "FIXED",
+          progress: project.progress,
+          currentStage: project.currentStage,
         })),
         completedProjects: completedProjects.map((project) => ({
           id: project.id,
@@ -267,7 +330,7 @@ export async function GET(
         where: { trackingId: project.id },
         orderBy: { createdAt: "asc" },
       });
-      const [job, professional, client, uploads, revisions, timeline, projectRequest] =
+      const [job, professional, client, uploads, revisions, timeline, projectRequest, review, dispute] =
         await Promise.all([
           db.clientJob.findUnique({
             where: { id: project.jobId },
@@ -312,6 +375,11 @@ export async function GET(
             where: { id: project.requestId },
             select: { bidAmount: true },
           }),
+          db.projectReview.findUnique({ where: { trackingId: project.id } }),
+          db.projectDispute.findFirst({
+            where: { trackingId: project.id, reporterId: session.userId },
+            orderBy: { createdAt: "desc" },
+          }),
         ]);
       return NextResponse.json({
         project,
@@ -324,6 +392,8 @@ export async function GET(
         revisions,
         timeline,
         agreedAmount: projectRequest?.bidAmount ?? null,
+        review,
+        dispute,
       });
     }
     return NextResponse.json({ error: "Not found." }, { status: 404 });

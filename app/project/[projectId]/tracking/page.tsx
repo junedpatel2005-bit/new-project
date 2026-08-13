@@ -69,6 +69,8 @@ type Data = {
   revisions: { note: string | null; createdAt: string }[];
   timeline: Event[];
   agreedAmount: number | null;
+  review: { id: number; rating: number; comment: string | null; createdAt: string; professionalResponse: string | null; professionalResponseAt: string | null } | null;
+  dispute: { id: number; issueType: string; message: string; status: string; createdAt: string } | null;
 };
 
 const name = (p: Person, fallback: string) => (p ? `${p.firstName} ${p.lastName}` : fallback);
@@ -114,6 +116,15 @@ export default function SharedProjectTrackingPage() {
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [requestTitle, setRequestTitle] = useState("");
   const [requestMessage, setRequestMessage] = useState("");
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState("");
+  const [showReviewResponseForm, setShowReviewResponseForm] = useState(false);
+  const [reviewResponse, setReviewResponse] = useState("");
+  const [showDisputeForm, setShowDisputeForm] = useState(false);
+  const [disputeType, setDisputeType] = useState("PAYMENT");
+  const [disputePriority, setDisputePriority] = useState("MEDIUM");
+  const [disputeMessage, setDisputeMessage] = useState("");
   const actionInFlight = useRef(false);
 
   const refresh = useCallback(async () => {
@@ -386,6 +397,7 @@ export default function SharedProjectTrackingPage() {
             )}
           </div>
         </section>
+
         {isClient && data.project.status !== "COMPLETED" && data.milestones.length < 5 && (
           <section className="rounded-2xl border bg-card p-5">
             <div className="flex flex-wrap items-center justify-between gap-4">
@@ -790,6 +802,198 @@ export default function SharedProjectTrackingPage() {
                 Submit Final Work
               </Button>
             </div>
+          </section>
+        )}
+        {data.project.status === "COMPLETED" && (
+          <section className="rounded-3xl border border-primary/20 bg-primary/5 p-5 sm:p-6">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-primary">
+                  Project completion
+                </p>
+                <h2 className="mt-1 text-xl font-semibold">Project feedback</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Tell us about your experience with {isClient ? professional : client}.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-5 grid gap-4 md:grid-cols-2">
+              <div className="rounded-xl border bg-card p-4">
+                <p className="font-medium">{isClient ? "Rate professional" : "View ratings & client reviews"}</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {isClient
+                    ? data.review ? `Submitted: ${data.review.rating}/5` : "Share your feedback and experience."
+                    : data.review ? `${data.review.rating}/5${data.review.comment ? ` · “${data.review.comment}”` : ""}` : "The client has not left a review yet."}
+                </p>
+                {isClient && !data.review && (
+                  <Button className="mt-4" size="sm" onClick={() => setShowReviewForm(true)}>
+                    {isClient ? "Rate professional" : "Rate client"}
+                  </Button>
+                )}
+              </div>
+              <div className="rounded-xl border bg-card p-4">
+                <p className="font-medium">{isClient ? "Report issue / Raise dispute" : "Respond to review"}</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {data.dispute
+                    ? `${data.dispute.issueType} · ${data.dispute.status}`
+                    : isClient
+                      ? "Escalate any unresolved payment, quality, or delivery issue."
+                      : data.review?.professionalResponse
+                        ? `Your response: ${data.review.professionalResponse}`
+                        : data.review
+                          ? "Thank the client or provide helpful context."
+                          : "A response becomes available after the client submits a review."}
+                </p>
+                {isClient && !data.dispute && (
+                  <Button className="mt-4" variant="outline" size="sm" onClick={() => setShowDisputeForm((value) => !value)}>
+                    {showDisputeForm ? "Hide dispute form" : "Report an issue"}
+                  </Button>
+                )}
+                {!isClient && data.review && !data.review.professionalResponse && (
+                  <Button className="mt-4" variant="outline" size="sm" onClick={() => setShowReviewResponseForm(true)}>
+                    Respond to review
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            {showReviewForm && !data.review && (
+              <div className="mt-4 rounded-xl border bg-card p-4">
+                <div className="grid gap-3">
+                  <label className="grid gap-2 text-sm font-medium">
+                    Rating
+                    <select
+                      value={reviewRating}
+                      onChange={(event) => setReviewRating(Number(event.target.value))}
+                      className="rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    >
+                      {[5, 4, 3, 2, 1].map((value) => (
+                        <option key={value} value={value}>{value} / 5</option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="grid gap-2 text-sm font-medium">
+                    Review comment
+                    <textarea
+                      value={reviewComment}
+                      onChange={(event) => setReviewComment(event.target.value)}
+                      placeholder="Share what went well, or what could be improved."
+                      className="min-h-[100px] rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    />
+                  </label>
+                </div>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setShowReviewForm(false);
+                      setReviewComment("");
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      if (!reviewRating) return;
+                      void action("submit-review", {
+                        rating: reviewRating,
+                        comment: reviewComment.trim() || null,
+                      });
+                      setShowReviewForm(false);
+                      setReviewComment("");
+                    }}
+                  >
+                    Save rating & review
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {showReviewResponseForm && !isClient && data.review && !data.review.professionalResponse && (
+              <div className="mt-4 rounded-xl border bg-card p-4">
+                <label className="grid gap-2 text-sm font-medium">
+                  Response to client review
+                  <textarea
+                    value={reviewResponse}
+                    onChange={(event) => setReviewResponse(event.target.value)}
+                    placeholder="Thank the client or add helpful context."
+                    className="min-h-[100px] rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  />
+                </label>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <Button variant="outline" onClick={() => { setShowReviewResponseForm(false); setReviewResponse(""); }}>Cancel</Button>
+                  <Button onClick={() => { if (!reviewResponse.trim()) return; void action("respond-to-review", { response: reviewResponse.trim() }); setShowReviewResponseForm(false); setReviewResponse(""); }}>Save response</Button>
+                </div>
+              </div>
+            )}
+
+            {showDisputeForm && !data.dispute && (
+              <div className="mt-4 rounded-xl border bg-card p-4">
+                <div className="grid gap-3">
+                  <label className="grid gap-2 text-sm font-medium">
+                    Issue type
+                    <select
+                      value={disputeType}
+                      onChange={(event) => setDisputeType(event.target.value)}
+                      className="rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    >
+                      <option value="PAYMENT">Payment</option>
+                      <option value="QUALITY">Quality</option>
+                      <option value="COMMUNICATION">Communication</option>
+                      <option value="DELIVERY">Delivery</option>
+                      <option value="OTHER">Other</option>
+                    </select>
+                  </label>
+                  <label className="grid gap-2 text-sm font-medium">
+                    Priority
+                    <select
+                      value={disputePriority}
+                      onChange={(event) => setDisputePriority(event.target.value)}
+                      className="rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    >
+                      <option value="LOW">Low</option>
+                      <option value="MEDIUM">Medium</option>
+                      <option value="HIGH">High</option>
+                    </select>
+                  </label>
+                  <label className="grid gap-2 text-sm font-medium">
+                    Message
+                    <textarea
+                      value={disputeMessage}
+                      onChange={(event) => setDisputeMessage(event.target.value)}
+                      placeholder="Describe the issue clearly and include any relevant context."
+                      className="min-h-[120px] rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    />
+                  </label>
+                </div>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setShowDisputeForm(false);
+                      setDisputeMessage("");
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      if (!disputeMessage.trim()) return setMessage("Add a dispute message.");
+                      void action("submit-dispute", {
+                        issueType: disputeType,
+                        priority: disputePriority,
+                        message: disputeMessage.trim(),
+                      });
+                      setShowDisputeForm(false);
+                      setDisputeMessage("");
+                    }}
+                  >
+                    Raise dispute
+                  </Button>
+                </div>
+              </div>
+            )}
           </section>
         )}
         <section className="rounded-2xl border bg-card p-6">

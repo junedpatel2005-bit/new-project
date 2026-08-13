@@ -2,15 +2,19 @@
 
 import { useEffect } from "react";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
-import L from "leaflet";
 import type { ProfessionalDiscoveryResult } from "@/lib/types/professional-discovery";
 
-const markerIcon = L.divIcon({
-  className: "",
-  html: '<div class="text-2xl">📍</div>',
-  iconSize: [28, 28],
-  iconAnchor: [14, 28],
-});
+const markerIcon = typeof window !== "undefined"
+  ? (() => {
+      const L = require("leaflet") as typeof import("leaflet");
+      return L.divIcon({
+        className: "",
+        html: '<div class="text-2xl">📍</div>',
+        iconSize: [28, 28],
+        iconAnchor: [14, 28],
+      }) as any;
+    })()
+  : null;
 
 function FitBounds({ bounds }: { bounds: [number, number][] }) {
   const map = useMap();
@@ -65,7 +69,7 @@ export default function ProfessionalDiscoveryMap({
           const point = professional.displayPoint;
           if (!point) return null;
           return (
-            <Marker key={professional.id} position={[point.lat, point.lng]} icon={markerIcon}>
+            <Marker key={professional.id} position={[point.lat, point.lng]} icon={markerIcon as any}>
               <Popup>
                 <div className="max-w-xs">
                   <strong>{professional.name}</strong>

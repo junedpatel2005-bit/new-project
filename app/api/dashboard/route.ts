@@ -23,7 +23,6 @@ export async function GET(request: NextRequest) {
       db.clientJob.findMany({
         where: { userId },
         orderBy: { createdAt: "desc" },
-        take: 4,
         include: { _count: { select: { favoriteJobs: true } } },
       }),
       db.projectRequest.findMany({
@@ -50,13 +49,33 @@ export async function GET(request: NextRequest) {
       }),
     ]);
     const runningJobIds = new Set(runningProjects.map((project) => project.jobId));
+    const professionals = await db.user.findMany({
+      where: { id: { in: [...new Set(proposals.map((proposal) => proposal.professionalId))] } },
+      select: { id: true, firstName: true, lastName: true },
+    });
+    const professionalNames = new Map(
+      professionals.map((professional) => [
+        professional.id,
+        `${professional.firstName} ${professional.lastName}`.trim(),
+      ]),
+    );
+    const jobsWithStatus = jobs.map((job) => ({
+      ...job,
+      status: runningJobIds.has(job.id) ? "RUNNING" : job.status,
+    }));
     return NextResponse.json({
       user,
-      jobs: jobs.map((job) => ({
-        ...job,
-        status: runningJobIds.has(job.id) ? "RUNNING" : job.status,
+      jobs: jobsWithStatus.slice(0, 4),
+      projectSummary: {
+        total: jobsWithStatus.length,
+        open: jobsWithStatus.filter((job) => job.status === "OPEN").length,
+        running: jobsWithStatus.filter((job) => job.status === "RUNNING").length,
+        drafts: jobsWithStatus.filter((job) => job.status === "DRAFT").length,
+      },
+      proposals: proposals.map((proposal) => ({
+        ...proposal,
+        professionalName: professionalNames.get(proposal.professionalId) ?? "Professional",
       })),
-      proposals,
       notifications,
       spent: spent._sum.amount ?? 0,
     });

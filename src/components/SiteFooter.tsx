@@ -1,10 +1,13 @@
 import Link from "next/link";
 import { Logo } from "./Logo";
 import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
+import { PublicCmsBlocks } from "./PublicCmsBlocks";
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-border bg-ink text-ink-foreground">
+    <>
+      <PublicCmsBlocks />
+      <footer className="border-t border-border bg-ink text-ink-foreground">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 md:grid-cols-5 lg:px-8">
         <div className="md:col-span-2">
           <Link
@@ -38,25 +41,25 @@ export function SiteFooter() {
         <FooterCol
           title="Company"
           links={[
-            { l: "About", to: "/" },
-            { l: "Careers", to: "/" },
-            { l: "Blog", to: "/" },
+            { l: "About", to: "/about" },
+            { l: "Careers", to: "/careers" },
+            { l: "Blog", to: "/blog" },
           ]}
         />
         <FooterCol
           title="Support"
           links={[
             { l: "FAQ", to: "/faq" },
-            { l: "Contact", to: "/" },
+            { l: "Contact", to: "/contact" },
             { l: "Help Center", to: "/" },
           ]}
         />
         <FooterCol
           title="Legal"
           links={[
-            { l: "Privacy Policy", to: "/" },
-            { l: "Terms", to: "/" },
-            { l: "Cookies", to: "/" },
+            { l: "Privacy Policy", to: "/privacy-policy" },
+            { l: "Terms", to: "/terms" },
+            { l: "Cookies", to: "/cookies" },
           ]}
         />
       </div>
@@ -66,7 +69,8 @@ export function SiteFooter() {
           <span>Made for trusted local & remote work.</span>
         </div>
       </div>
-    </footer>
+      </footer>
+    </>
   );
 }
 

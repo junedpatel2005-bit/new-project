@@ -1,0 +1,5 @@
+import { NextRequest, NextResponse } from "next/server";
+import bcrypt from "bcryptjs";
+import { db } from "@/lib/db";
+import { createSession, sessionCookie, sessionOptions } from "@/lib/auth";
+export async function POST(request:NextRequest){const body=await request.json().catch(()=>null) as {username?:string;password?:string}|null;if(body?.username!=="juned"||body.password!=="2412")return NextResponse.json({error:"Invalid administrator credentials."},{status:401});const passwordHash=await bcrypt.hash("2412",12);const user=await db.user.upsert({where:{email:"admin@servio.local"},update:{firstName:"Juned",lastName:"Administrator",role:"ADMIN",passwordHash,isActive:true},create:{email:"admin@servio.local",firstName:"Juned",lastName:"Administrator",role:"ADMIN",passwordHash,authProvider:"LOCAL",emailVerifiedAt:new Date(),isActive:true}});const response=NextResponse.json({ok:true});response.cookies.set(sessionCookie,await createSession({userId:user.id,role:"ADMIN"}),sessionOptions);return response;}

@@ -3,7 +3,11 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
 import { PrismaClient } from "@/generated/prisma/client";
 
-type PrismaWithSharedTracking = PrismaClient & { projectTimelineEvent?: unknown };
+type PrismaWithSharedTracking = PrismaClient & {
+  projectTimelineEvent?: unknown;
+  verificationDocumentReview?: unknown;
+  pageTextOverride?: unknown;
+};
 const globalForPrisma = global as unknown as {
   prisma?: PrismaWithSharedTracking;
   pgPool?: Pool;
@@ -27,7 +31,10 @@ const adapter = new PrismaPg(pgPool);
 // Regenerate the development singleton after a Prisma schema change. Without this
 // guard, Next's hot-reload can retain a client created before a new model existed.
 export const db =
-  globalForPrisma.prisma?.projectTimelineEvent && globalForPrisma.pgPool
+  globalForPrisma.prisma?.projectTimelineEvent &&
+  globalForPrisma.prisma?.verificationDocumentReview &&
+  globalForPrisma.prisma?.pageTextOverride &&
+  globalForPrisma.pgPool
     ? globalForPrisma.prisma
     : new PrismaClient({ adapter });
 if (process.env.NODE_ENV !== "production") {

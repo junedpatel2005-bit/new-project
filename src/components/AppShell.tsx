@@ -32,12 +32,13 @@ const clientItems = [
   { to: "/earnings", icon: Wallet, label: "Earnings" },
   { to: "/verification", icon: BadgeCheck, label: "Verification" },
   { to: "/notifications", icon: BellRing, label: "Notifications" },
-  { to: "/admin", icon: ShieldCheck, label: "Admin" },
 ];
 
 const professionalItems = [
   { to: "/professional/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { to: "/professional/my-jobs", icon: FolderKanban, label: "My Jobs" },
+  { to: "/professional/running-projects", icon: Briefcase, label: "Running Projects" },
+  { to: "/verification", icon: BadgeCheck, label: "Verification" },
   { to: "/professional/reviews", icon: Star, label: "Reviews" },
   { to: "/earnings", icon: Wallet, label: "Earnings" },
   { to: "/notifications", icon: BellRing, label: "Notifications" },
@@ -55,6 +56,7 @@ const clientMobileItems = [
 const professionalMobileItems = [
   { to: "/professional/dashboard", icon: Home, label: "Home" },
   { to: "/professional/my-jobs", icon: Briefcase, label: "Jobs" },
+  { to: "/professional/running-projects", icon: Briefcase, label: "Running" },
   { to: "/professional/reviews", icon: Star, label: "Reviews" },
   { to: "/earnings", icon: Wallet, label: "Earnings" },
   { to: "/notifications", icon: BellRing, label: "Notifications" },

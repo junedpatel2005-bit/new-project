@@ -98,11 +98,26 @@ export async function GET(request: NextRequest) {
     },
     select: { id: true, jobId: true, status: true },
   });
+  const proposalCounts = await db.projectRequest.groupBy({
+    by: ["jobId"],
+    where: { clientId: user.id, origin: "PROFESSIONAL_PROPOSAL" },
+    _count: { id: true },
+  });
   const trackingByJob = new Map(tracking.map((project) => [project.jobId, project]));
+  const proposalCountByJob = new Map(
+    proposalCounts.map((item) => [item.jobId, item._count.id]),
+  );
+
   return NextResponse.json({
     jobs: jobs.map((job) => {
       const project = trackingByJob.get(job.id);
-      return { ...job, status: project ? "RUNNING" : job.status, projectId: project?.id ?? null };
+      const status = project ? (project.status === "COMPLETED" ? "CLOSED" : "RUNNING") : job.status;
+      return {
+        ...job,
+        status,
+        projectId: project?.id ?? null,
+        proposalCount: status === "RUNNING" ? 0 : (proposalCountByJob.get(job.id) ?? 0),
+      };
     }),
   });
 }

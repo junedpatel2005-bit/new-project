@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { AppShell } from "@/components/AppShell";
 const ProfessionalDiscoveryMap = lazy(() => import("@/components/ProfessionalDiscoveryMap"));
 import { ProCard } from "@/components/ProCard";
+import Skeleton from "react-loading-skeleton";
 import type { MarketplaceCategory, MarketplaceProfessional } from "@/lib/types/marketplace";
 import type { ProfessionalDiscoveryResponse } from "@/lib/types/professional-discovery";
 import { Map, SlidersHorizontal, Search } from "lucide-react";
@@ -49,8 +50,11 @@ function DiscoverContent() {
   const [originLat, setOriginLat] = useState<number | null>(null);
   const [originLng, setOriginLng] = useState<number | null>(null);
   const [verifiedOnly, setVerifiedOnly] = useState(false);
-  const [showMap, setShowMap] = useState(false);
+  const [showMap, setShowMap] = useState(true);
   const [selectedPoint, setSelectedPoint] = useState<{ lat: number; lng: number } | null>(null);
+  const [sort, setSort] = useState<"recommended" | "rating" | "distance" | "most-reviewed">(
+    "recommended",
+  );
   const [page, setPage] = useState(1);
   const mapSectionRef = useRef<HTMLDivElement | null>(null);
   const userLocationRef = useRef<{ lat: number; lng: number } | null>(null);
@@ -547,7 +551,12 @@ export default function Discover() {
 
 function ResultSkeleton() {
   return (
-    <div aria-hidden className="h-64 animate-pulse rounded-2xl border border-border bg-muted/40" />
+    <div aria-hidden className="rounded-2xl border border-border bg-card p-5">
+      <Skeleton height={18} width="38%" />
+      <Skeleton className="mt-4" height={24} width="72%" />
+      <Skeleton className="mt-6" height={14} count={2} />
+      <Skeleton className="mt-5" height={38} borderRadius={8} />
+    </div>
   );
 }
 

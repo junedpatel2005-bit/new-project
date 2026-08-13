@@ -243,6 +243,11 @@ export type ProjectReviewRequest = Prisma.ProjectReviewRequestModel
  */
 export type ProfessionalVerification = Prisma.ProfessionalVerificationModel
 /**
+ * Model VerificationDocumentReview
+ * 
+ */
+export type VerificationDocumentReview = Prisma.VerificationDocumentReviewModel
+/**
  * Model StoredFile
  * 
  */

@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { sessionCookie, verifySession } from "@/lib/auth";
+import { MAX_HIRE_REQUEST_BUDGET } from "@/lib/constants/hiring";
 
 const bodySchema = z.object({
   jobId: z.coerce.number().int().positive(),
   professionalId: z.coerce.number().int().positive(),
-  bidAmount: z.coerce.number().int().positive(),
+  bidAmount: z.coerce.number().int().positive().max(MAX_HIRE_REQUEST_BUDGET),
   duration: z.string().trim().max(100),
   coverLetter: z.string().trim().max(5000).optional().or(z.literal("")),
 });

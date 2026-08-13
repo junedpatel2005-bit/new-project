@@ -11,9 +11,12 @@
     "typecheck": "tsc --noEmit",
     "test:project-flow": "tsx scripts/test-professional-proposal-flow.ts",
     "db:seed": "tsx prisma/seed.ts",
+    "db:add-juned-jobs": "tsx scripts/add-faker-jobs-for-juned.ts",
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@ckeditor/ckeditor5-build-classic": "^41.4.2",
+    "@ckeditor/ckeditor5-react": "^11.2.0",
     "@hookform/resolvers": "^5.2.2",
     "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.9.1",
@@ -63,6 +66,7 @@
     "react-dom": "^19.2.0",
     "react-hook-form": "^7.71.2",
     "react-leaflet": "^5.0.0",
+    "react-loading-skeleton": "^3.5.0",
     "react-resizable-panels": "^4.6.5",
     "recharts": "^2.15.4",
     "sonner": "^2.0.7",

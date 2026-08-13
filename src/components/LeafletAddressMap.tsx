@@ -1,14 +1,18 @@
 "use client";
 
-import L from "leaflet";
 import { useEffect, useRef } from "react";
 
-const markerIcon = L.divIcon({
-  className: "",
-  html: '<div style="font-size:28px">📍</div>',
-  iconSize: [28, 28],
-  iconAnchor: [14, 28],
-});
+const markerIcon = typeof window !== "undefined"
+  ? (() => {
+      const L = require("leaflet") as typeof import("leaflet");
+      return L.divIcon({
+        className: "",
+        html: '<div style="font-size:28px">📍</div>',
+        iconSize: [28, 28],
+        iconAnchor: [14, 28],
+      }) as any;
+    })()
+  : null;
 
 export default function LeafletAddressMap({
   point,
@@ -32,13 +36,14 @@ export default function LeafletAddressMap({
     if (!container || mapRef.current) return;
 
     const initialPoint = initialPointRef.current;
+    const L = require("leaflet") as typeof import("leaflet");
     const map = L.map(container, { scrollWheelZoom: true }).setView(initialPoint, 5);
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(map);
 
-    const marker = L.marker(initialPoint, { draggable: true, icon: markerIcon }).addTo(map);
+    const marker = L.marker(initialPoint, { draggable: true, icon: markerIcon as any }).addTo(map);
     map.on("click", (event: L.LeafletMouseEvent) => {
       marker.setLatLng(event.latlng);
       pointChangeRef.current(event.latlng.lat, event.latlng.lng);

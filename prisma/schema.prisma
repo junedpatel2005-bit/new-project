@@ -729,6 +729,20 @@ model ProfessionalVerification {
   user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+model VerificationDocumentReview {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  documentKey String
+  status    String   @default("PENDING")
+  reviewedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, documentKey])
+  @@index([userId])
+  @@map("verification_document_reviews")
+}
+
 model StoredFile {
   id         Int      @id @default(autoincrement())
   ownerId    Int

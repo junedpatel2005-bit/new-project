@@ -187,6 +187,7 @@ export default function JobDetails() {
   const [proposalMessage, setProposalMessage] = useState("");
   const [proposalBusy, setProposalBusy] = useState(false);
   const [proposalError, setProposalError] = useState<string | null>(null);
+  const [pendingAcceptProposal, setPendingAcceptProposal] = useState<JobProposal | null>(null);
   useEffect(() => {
     async function loadJob() {
       try {
@@ -297,13 +298,6 @@ export default function JobDetails() {
     }
   }
   async function reviewProposal(proposal: JobProposal, action: "accept" | "reject") {
-    const verb = action === "accept" ? "Hire" : "Reject";
-    const details =
-      action === "accept"
-        ? `\n\nJob: ${job?.title ?? "This job"}\nAgreed amount: $${proposal.bidAmount.toLocaleString()}`
-        : "";
-    if (!confirm(`${verb} ${proposal.professional?.firstName ?? "this professional"}?${details}`))
-      return;
     const response = await fetch(`/api/client/proposals/${proposal.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -449,7 +443,7 @@ export default function JobDetails() {
         </dl>
 
         {(job.locationAddress || (job.locationLat !== null && job.locationLng !== null)) && (
-          <section className="mt-6">
+          <section className="mt-6 max-w-2xl">
             <div className="flex items-center gap-2">
               <MapPin className="h-5 w-5 text-primary" />
               <div>
@@ -459,7 +453,7 @@ export default function JobDetails() {
             </div>
             <iframe
               title={`Map for ${job.title}`}
-              className="mt-3 h-[320px] w-full max-w-xl rounded-2xl border border-border"
+              className="mt-3 h-[220px] w-full rounded-2xl border border-border"
               loading="lazy"
               src={
                 job.locationLat !== null && job.locationLng !== null
@@ -551,7 +545,10 @@ export default function JobDetails() {
                     )}
                     {proposal.status === "PENDING" && job.status === "OPEN" && (
                       <>
-                        <Button size="sm" onClick={() => void reviewProposal(proposal, "accept")}>
+                        <Button
+                          size="sm"
+                          onClick={() => setPendingAcceptProposal(proposal)}
+                        >
                           Accept & Hire
                         </Button>
                         <Button
@@ -732,6 +729,51 @@ export default function JobDetails() {
           )}
         </div>
       </article>
+      <Dialog
+        open={pendingAcceptProposal !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingAcceptProposal(null);
+        }}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Confirm hire</DialogTitle>
+            <DialogDescription>
+              {pendingAcceptProposal
+                ? `Hire ${pendingAcceptProposal.professional?.firstName ?? "this professional"} for $${pendingAcceptProposal.bidAmount.toLocaleString()}?`
+                : "Hire this professional?"}
+            </DialogDescription>
+          </DialogHeader>
+
+          {pendingAcceptProposal && (
+            <div className="space-y-3 py-2 text-sm text-muted-foreground">
+              <p>
+                <span className="font-semibold text-foreground">Job:</span> {job.title}
+              </p>
+              <p>
+                <span className="font-semibold text-foreground">Agreed amount:</span> ${" "}
+                {pendingAcceptProposal.bidAmount.toLocaleString()}
+              </p>
+            </div>
+          )}
+
+          <div className="mt-4 flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setPendingAcceptProposal(null)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={async () => {
+                if (!pendingAcceptProposal) return;
+                setPendingAcceptProposal(null);
+                await reviewProposal(pendingAcceptProposal, "accept");
+              }}
+            >
+              Confirm
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={finderOpen} onOpenChange={setFinderOpen}>
         <DialogContent className="max-h-[85vh] max-w-4xl overflow-y-auto">
           <DialogHeader>

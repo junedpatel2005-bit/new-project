@@ -96,6 +96,7 @@ export const ModelName = {
   ProjectRevisionRequest: 'ProjectRevisionRequest',
   ProjectReviewRequest: 'ProjectReviewRequest',
   ProfessionalVerification: 'ProfessionalVerification',
+  VerificationDocumentReview: 'VerificationDocumentReview',
   StoredFile: 'StoredFile',
   ApiToken: 'ApiToken',
   BrowserSubscription: 'BrowserSubscription',
@@ -839,6 +840,19 @@ export const ProfessionalVerificationScalarFieldEnum = {
 } as const
 
 export type ProfessionalVerificationScalarFieldEnum = (typeof ProfessionalVerificationScalarFieldEnum)[keyof typeof ProfessionalVerificationScalarFieldEnum]
+
+
+export const VerificationDocumentReviewScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  documentKey: 'documentKey',
+  status: 'status',
+  reviewedAt: 'reviewedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type VerificationDocumentReviewScalarFieldEnum = (typeof VerificationDocumentReviewScalarFieldEnum)[keyof typeof VerificationDocumentReviewScalarFieldEnum]
 
 
 export const StoredFileScalarFieldEnum = {

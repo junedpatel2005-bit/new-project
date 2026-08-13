@@ -61,6 +61,24 @@ const bodySchema = z.discriminatedUnion("action", [
     note: z.string().trim().min(2).max(2000),
   }),
   z.object({ action: z.literal("complete-project"), projectId: z.number().int().positive() }),
+  z.object({
+    action: z.literal("respond-to-review"),
+    projectId: z.number().int().positive(),
+    response: z.string().trim().min(2).max(2000),
+  }),
+  z.object({
+    action: z.literal("submit-review"),
+    projectId: z.number().int().positive(),
+    rating: z.number().int().min(1).max(5),
+    comment: z.string().trim().max(2000).nullish(),
+  }),
+  z.object({
+    action: z.literal("submit-dispute"),
+    projectId: z.number().int().positive(),
+    issueType: z.string().trim().min(2).max(80),
+    priority: z.enum(["LOW", "MEDIUM", "HIGH"]).default("MEDIUM").optional(),
+    message: z.string().trim().min(10).max(4000),
+  }),
 ]);
 
 const clientActions = new Set([
@@ -69,6 +87,7 @@ const clientActions = new Set([
   "approve-milestone",
   "complete-project",
 ]);
+const sharedActions = new Set(["submit-review", "submit-dispute"]);
 
 export async function POST(request: NextRequest) {
   try {
@@ -83,9 +102,11 @@ export async function POST(request: NextRequest) {
       );
     const input = parsed.data;
     const isClientAction = clientActions.has(input.action);
+    const isSharedAction = sharedActions.has(input.action);
+    const isProfessionalAction = !isClientAction && !isSharedAction;
     if (
       (isClientAction && session.role !== "CLIENT") ||
-      (!isClientAction && session.role !== "PROFESSIONAL")
+      (isProfessionalAction && session.role !== "PROFESSIONAL")
     )
       return NextResponse.json(
         { error: `${isClientAction ? "Client" : "Professional"} access required.` },
@@ -94,7 +115,7 @@ export async function POST(request: NextRequest) {
     const project = await db.projectTracking.findFirst({
       where: {
         id: input.projectId,
-        ...(isClientAction ? { clientId: session.userId } : { professionalId: session.userId }),
+        OR: [{ clientId: session.userId }, { professionalId: session.userId }],
       },
     });
     if (!project) return NextResponse.json({ error: "Project not found." }, { status: 404 });
@@ -311,6 +332,18 @@ export async function POST(request: NextRequest) {
         where: { id: milestone.id },
         data: { status: "APPROVED", approvedAt: new Date() },
       });
+      await db.projectTransaction.create({
+        data: {
+          trackingId: project.id,
+          milestoneId: milestone.id,
+          clientId: project.clientId,
+          professionalId: project.professionalId,
+          amount: milestone.amount,
+          type: "MILESTONE_PAYMENT",
+          status: "COMPLETED",
+          description: `Milestone payment: ${milestone.title}`,
+        },
+      });
       const approvedCount = await db.projectMilestone.count({
         where: { trackingId: project.id, status: "APPROVED" },
       });
@@ -407,6 +440,76 @@ export async function POST(request: NextRequest) {
         "The client approved the final work and completed the project.",
         { progress: 100 },
       );
+    }
+    if (input.action === "submit-review") {
+      if (session.role !== "CLIENT")
+        return NextResponse.json({ error: "Only clients can submit a professional review." }, { status: 403 });
+      const review = await db.projectReview.upsert({
+        where: { trackingId: project.id },
+        update: {
+          rating: input.rating,
+          comment: input.comment ?? null,
+          updatedAt: new Date(),
+        },
+        create: {
+          trackingId: project.id,
+          clientId: project.clientId,
+          professionalId: project.professionalId,
+          rating: input.rating,
+          comment: input.comment ?? null,
+        },
+      });
+      const targetReviews = await db.projectReview.findMany({
+        where: { professionalId: project.professionalId },
+      });
+      if (targetReviews.length > 0) {
+        const average =
+          targetReviews.reduce((sum, item) => sum + item.rating, 0) / targetReviews.length;
+        await db.user.update({
+          where: { id: project.professionalId },
+          data: {
+            averageRating: Number(average.toFixed(1)),
+            reviewCount: targetReviews.length,
+          },
+        });
+      }
+      await event(
+        "PROJECT_REVIEW_SUBMITTED",
+        "Professional review submitted",
+        input.comment ?? `Rated the project ${input.rating}/5.`,
+      );
+      return NextResponse.json({ ok: true, reviewId: review.id });
+    }
+    if (input.action === "respond-to-review") {
+      const review = await db.projectReview.findUnique({ where: { trackingId: project.id } });
+      if (!review) return NextResponse.json({ error: "No client review is available yet." }, { status: 409 });
+      await db.projectReview.update({
+        where: { trackingId: project.id },
+        data: { professionalResponse: input.response, professionalResponseAt: new Date() },
+      });
+      await event("REVIEW_RESPONSE_SUBMITTED", "Response to client review submitted", input.response);
+      return NextResponse.json({ ok: true });
+    }
+    if (input.action === "submit-dispute") {
+      const dispute = await db.projectDispute.create({
+        data: {
+          trackingId: project.id,
+          reporterId: session.userId,
+          reporterRole: session.role,
+          clientId: project.clientId,
+          professionalId: project.professionalId,
+          issueType: input.issueType,
+          priority: input.priority ?? "MEDIUM",
+          message: input.message,
+          status: "OPEN",
+        },
+      });
+      await event(
+        "DISPUTE_RAISED",
+        "Dispute raised",
+        `Issue type: ${input.issueType}. ${input.message}`,
+      );
+      return NextResponse.json({ ok: true, disputeId: dispute.id });
     }
     return NextResponse.json({ ok: true });
   } catch (error) {

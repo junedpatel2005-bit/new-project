@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Skeleton from "react-loading-skeleton";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -56,7 +57,7 @@ export function ClientAccountMenu() {
   }
 
   if (loading) {
-    return <div className="h-9 w-32 rounded-full bg-muted/70" />;
+    return <Skeleton width={128} height={36} borderRadius={999} />;
   }
 
   if (!user) {

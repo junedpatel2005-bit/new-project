@@ -1,0 +1,1 @@
+import { AdminDataPage } from "@/components/AdminDataPage";export default function Page(){return <AdminDataPage resource="jobs" title="Jobs & dispute management" description="Marketplace jobs and open dispute records."/>}

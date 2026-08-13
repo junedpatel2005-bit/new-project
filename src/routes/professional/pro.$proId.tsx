@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import type { DetailedProfessional } from "@/lib/types/marketplace";
+import { MAX_HIRE_REQUEST_BUDGET } from "@/lib/constants/hiring";
 
 type ClientJob = {
   id: number;
@@ -97,7 +98,9 @@ function ProProfileContent() {
   const canSubmitRequest =
     selectedJob !== null &&
     selectedJob.status === "OPEN" &&
-    bidAmount.trim().length > 0 &&
+    Number.isFinite(Number(bidAmount)) &&
+    Number(bidAmount) > 0 &&
+    Number(bidAmount) <= MAX_HIRE_REQUEST_BUDGET &&
     requestStatus !== "loading";
 
   async function submitRequest() {
@@ -107,8 +110,10 @@ function ProProfileContent() {
       return;
     }
     const parsedBid = Number(bidAmount);
-    if (!Number.isFinite(parsedBid) || parsedBid <= 0) {
-      setRequestMessage("Enter a valid bid amount.");
+    if (!Number.isFinite(parsedBid) || parsedBid <= 0 || parsedBid > MAX_HIRE_REQUEST_BUDGET) {
+      setRequestMessage(
+        `Enter a bid amount between $1 and $${MAX_HIRE_REQUEST_BUDGET.toLocaleString()}.`,
+      );
       setRequestStatus("error");
       return;
     }
@@ -269,11 +274,18 @@ function ProProfileContent() {
                           <Input
                             id="bidAmount"
                             type="number"
+                            min="1"
+                            max={MAX_HIRE_REQUEST_BUDGET}
+                            step="1"
                             value={bidAmount}
                             onChange={(event) => setBidAmount(event.target.value)}
                             placeholder="Enter your proposed bid"
                             className="mt-2"
                           />
+                          <p className="mt-2 text-xs text-muted-foreground">
+                            Maximum hire-request budget: ${MAX_HIRE_REQUEST_BUDGET.toLocaleString()}
+                            .
+                          </p>
                         </div>
                       )}
                       {hireStep === 2 && (
@@ -359,7 +371,9 @@ function ProProfileContent() {
                       disabled={
                         hireStep === 1
                           ? !selectedJob || selectedJob.status !== "OPEN"
-                          : !bidAmount.trim()
+                          : !bidAmount.trim() ||
+                            Number(bidAmount) <= 0 ||
+                            Number(bidAmount) > MAX_HIRE_REQUEST_BUDGET
                       }
                       className="w-full sm:w-auto"
                     >
@@ -381,7 +395,7 @@ function ProProfileContent() {
           <div className="mt-6 flex flex-wrap gap-4 text-sm text-muted-foreground">
             <span className="inline-flex items-center gap-1">
               <Star className="h-4 w-4 fill-warning text-warning" />
-              {professional.rating.toFixed(1)} ({professional.reviews} reviews)
+              Client rating: {professional.rating.toFixed(1)} ({professional.reviews} reviews)
             </span>
             <span className="inline-flex items-center gap-1">
               <MapPin className="h-4 w-4" />

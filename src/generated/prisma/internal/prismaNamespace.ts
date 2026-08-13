@@ -442,6 +442,7 @@ export const ModelName = {
   ProjectRevisionRequest: 'ProjectRevisionRequest',
   ProjectReviewRequest: 'ProjectReviewRequest',
   ProfessionalVerification: 'ProfessionalVerification',
+  VerificationDocumentReview: 'VerificationDocumentReview',
   StoredFile: 'StoredFile',
   ApiToken: 'ApiToken',
   BrowserSubscription: 'BrowserSubscription',
@@ -471,7 +472,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "cmsPage" | "cmsPageVersion" | "cmsMedia" | "sQLiteMigrationTableArchive" | "sQLiteMigrationAudit" | "websitePage" | "legalPage" | "serviceCategory" | "user" | "clientProfile" | "clientSavedLocation" | "clientHiringNeed" | "clientJob" | "favoriteJob" | "clientJobAttachment" | "projectTransaction" | "projectNegotiation" | "projectReview" | "projectRequest" | "projectTracking" | "projectTimelineEvent" | "projectMilestone" | "projectWorkUpload" | "hireJob" | "hireContract" | "hireAttachment" | "hireMilestone" | "directHireNegotiation" | "socketConversation" | "socketMessage" | "socketConversationClear" | "callSession" | "messageConversation" | "message" | "userNotification" | "userNotificationState" | "payment" | "wallet" | "walletTransaction" | "projectWithdrawal" | "projectDispute" | "projectCompletionRequest" | "projectRevisionRequest" | "projectReviewRequest" | "professionalVerification" | "storedFile" | "apiToken" | "browserSubscription" | "faq" | "contactRequest" | "service" | "pageConfiguration" | "websitePageOverride" | "pageTextOverride" | "legacyUser" | "legacyUserProfile" | "legacyProfessionalDetail" | "legacyLocation" | "legacyVerification"
+    modelProps: "cmsPage" | "cmsPageVersion" | "cmsMedia" | "sQLiteMigrationTableArchive" | "sQLiteMigrationAudit" | "websitePage" | "legalPage" | "serviceCategory" | "user" | "clientProfile" | "clientSavedLocation" | "clientHiringNeed" | "clientJob" | "favoriteJob" | "clientJobAttachment" | "projectTransaction" | "projectNegotiation" | "projectReview" | "projectRequest" | "projectTracking" | "projectTimelineEvent" | "projectMilestone" | "projectWorkUpload" | "hireJob" | "hireContract" | "hireAttachment" | "hireMilestone" | "directHireNegotiation" | "socketConversation" | "socketMessage" | "socketConversationClear" | "callSession" | "messageConversation" | "message" | "userNotification" | "userNotificationState" | "payment" | "wallet" | "walletTransaction" | "projectWithdrawal" | "projectDispute" | "projectCompletionRequest" | "projectRevisionRequest" | "projectReviewRequest" | "professionalVerification" | "verificationDocumentReview" | "storedFile" | "apiToken" | "browserSubscription" | "faq" | "contactRequest" | "service" | "pageConfiguration" | "websitePageOverride" | "pageTextOverride" | "legacyUser" | "legacyUserProfile" | "legacyProfessionalDetail" | "legacyLocation" | "legacyVerification"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -3805,6 +3806,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    VerificationDocumentReview: {
+      payload: Prisma.$VerificationDocumentReviewPayload<ExtArgs>
+      fields: Prisma.VerificationDocumentReviewFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.VerificationDocumentReviewFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationDocumentReviewPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.VerificationDocumentReviewFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationDocumentReviewPayload>
+        }
+        findFirst: {
+          args: Prisma.VerificationDocumentReviewFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationDocumentReviewPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.VerificationDocumentReviewFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationDocumentReviewPayload>
+        }
+        findMany: {
+          args: Prisma.VerificationDocumentReviewFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationDocumentReviewPayload>[]
+        }
+        create: {
+          args: Prisma.VerificationDocumentReviewCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationDocumentReviewPayload>
+        }
+        createMany: {
+          args: Prisma.VerificationDocumentReviewCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.VerificationDocumentReviewCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationDocumentReviewPayload>[]
+        }
+        delete: {
+          args: Prisma.VerificationDocumentReviewDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationDocumentReviewPayload>
+        }
+        update: {
+          args: Prisma.VerificationDocumentReviewUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationDocumentReviewPayload>
+        }
+        deleteMany: {
+          args: Prisma.VerificationDocumentReviewDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.VerificationDocumentReviewUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.VerificationDocumentReviewUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationDocumentReviewPayload>[]
+        }
+        upsert: {
+          args: Prisma.VerificationDocumentReviewUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationDocumentReviewPayload>
+        }
+        aggregate: {
+          args: Prisma.VerificationDocumentReviewAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateVerificationDocumentReview>
+        }
+        groupBy: {
+          args: Prisma.VerificationDocumentReviewGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VerificationDocumentReviewGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.VerificationDocumentReviewCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VerificationDocumentReviewCountAggregateOutputType> | number
+        }
+      }
+    }
     StoredFile: {
       payload: Prisma.$StoredFilePayload<ExtArgs>
       fields: Prisma.StoredFileFieldRefs
@@ -5593,6 +5668,19 @@ export const ProfessionalVerificationScalarFieldEnum = {
 export type ProfessionalVerificationScalarFieldEnum = (typeof ProfessionalVerificationScalarFieldEnum)[keyof typeof ProfessionalVerificationScalarFieldEnum]
 
 
+export const VerificationDocumentReviewScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  documentKey: 'documentKey',
+  status: 'status',
+  reviewedAt: 'reviewedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type VerificationDocumentReviewScalarFieldEnum = (typeof VerificationDocumentReviewScalarFieldEnum)[keyof typeof VerificationDocumentReviewScalarFieldEnum]
+
+
 export const StoredFileScalarFieldEnum = {
   id: 'id',
   ownerId: 'ownerId',
@@ -6181,6 +6269,7 @@ export type GlobalOmitConfig = {
   projectRevisionRequest?: Prisma.ProjectRevisionRequestOmit
   projectReviewRequest?: Prisma.ProjectReviewRequestOmit
   professionalVerification?: Prisma.ProfessionalVerificationOmit
+  verificationDocumentReview?: Prisma.VerificationDocumentReviewOmit
   storedFile?: Prisma.StoredFileOmit
   apiToken?: Prisma.ApiTokenOmit
   browserSubscription?: Prisma.BrowserSubscriptionOmit

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "../src/styles.css";
+import "react-loading-skeleton/dist/skeleton.css";
 import { Providers } from "@/components/providers";
+import { CmsLiveEditor } from "@/components/CmsLiveEditor";
 
 export const metadata: Metadata = {
   title: { default: "Servio — Hire trusted professionals near you", template: "%s | Servio" },
@@ -11,7 +13,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <body>
-        <Providers>{children}</Providers>
+        <Providers><CmsLiveEditor />{children}</Providers>
       </body>
     </html>
   );

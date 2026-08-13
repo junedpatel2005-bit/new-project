@@ -1,5 +1,33 @@
 @import "tailwindcss" source(none);
 @source "../src";
+@source "../app";
+
+.cms-live-editable {
+  cursor: text !important;
+  outline: 2px dashed color-mix(in srgb, var(--color-primary) 45%, transparent);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+.cms-live-editable:focus {
+  outline-style: solid;
+}
+
+/* Admin document preview modal: guarantee readable text on its light close button. */
+.fixed .mt-6.w-full.border.border-input.bg-background {
+  background: #fff;
+  color: #0f172a;
+}
+
+.fixed .mt-6.w-full.border.border-input.bg-background:hover {
+  background: #e2e8f0;
+  color: #020617;
+}
+
+body:has(.cms-live-editable) a,
+body:has(.cms-live-editable) button {
+  cursor: text;
+}
 @import "tw-animate-css";
 @import "leaflet/dist/leaflet.css";
 
@@ -220,6 +248,16 @@
   }
 }
 
+@keyframes login-button-shimmer {
+  from { transform: translateX(-60%) skewX(-12deg); }
+  to { transform: translateX(430%) skewX(-12deg); }
+}
+
+@keyframes login-dot {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.45; }
+  40% { transform: translateY(-3px); opacity: 1; }
+}
+
 @layer utilities {
   .animate-fade-in {
     animation: fade-in 0.3s ease-out forwards;
@@ -231,5 +269,11 @@
   
   .animate-scale-in {
     animation: scale-in 0.3s ease-out forwards;
+  }
+  .animate-login-button-shimmer {
+    animation: login-button-shimmer 1s ease-in-out infinite;
+  }
+  .animate-login-dot {
+    animation: login-dot 0.9s ease-in-out infinite;
   }
 }

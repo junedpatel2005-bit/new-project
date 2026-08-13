@@ -262,7 +262,7 @@ export default function ViewProfessionalProfile() {
             <div className="mt-6 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
               <span className="inline-flex items-center gap-1">
                 <Star className="h-4 w-4 fill-warning text-warning" />
-                {professional.rating.toFixed(1)} ({professional.reviews} reviews)
+                Client rating: {professional.rating.toFixed(1)} ({professional.reviews} reviews)
               </span>
               {professional.location && (
                 <span className="inline-flex items-center gap-1">

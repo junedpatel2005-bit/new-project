@@ -1,0 +1,1 @@
+export const MAX_HIRE_REQUEST_BUDGET = 1_000;
