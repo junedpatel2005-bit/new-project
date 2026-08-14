@@ -48,16 +48,18 @@ export default function CmsPage() {
       .then((response) => response.json())
       .then((data) => pick(data.pages?.[0] ?? null, data.pages ?? []));
   }, [pick]);
-  async function save() {
+  async function publish() {
     if (!selected) return;
+    const nextStatus = status === "PUBLISHED" ? "DRAFT" : "PUBLISHED";
     const response = await fetch(`/api/v1/admin/cms/${selected.id}`, {
       method: "PUT",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ title, content, status }),
+      body: JSON.stringify({ title, content, status: nextStatus }),
     });
     const data = await response.json();
-    if (!response.ok) return setMessage(data.error ?? "Save failed.");
-    setMessage("Page saved.");
+    if (!response.ok) return setMessage(data.error ?? "Could not update status.");
+    setStatus(nextStatus);
+    setMessage(nextStatus === "PUBLISHED" ? "Page published." : "Page moved to draft.");
     setPages((current) => current.map((page) => (page.id === selected.id ? data.page : page)));
     setSelected(data.page);
   }
@@ -73,6 +75,28 @@ export default function CmsPage() {
           ? "Edit the real homepage layout directly. Click text in the page to change it."
           : "Edit content with CKEditor and preview the actual website page using its original CSS."}
       </p>
+      {selected && (
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <span
+            className={`rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide ${
+              status === "PUBLISHED"
+                ? "bg-emerald-500/15 text-emerald-300"
+                : "bg-amber-500/15 text-amber-300"
+            }`}
+          >
+            {status}
+          </span>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => void publish()}
+            className="border-white/15 bg-transparent text-white hover:bg-white/10 hover:text-white"
+          >
+            {status === "PUBLISHED" ? "Move to draft" : "Publish page"}
+          </Button>
+          {message && <span className="text-sm text-emerald-400">{message}</span>}
+        </div>
+      )}
       <div className="mt-8 grid gap-6 lg:grid-cols-[260px_1fr]">
         <aside className="rounded-2xl border border-white/10 bg-white/[.035] p-3">
           <p className="px-3 py-2 text-xs font-bold uppercase tracking-wide text-slate-400">
