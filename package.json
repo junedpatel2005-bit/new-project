@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1110.0",
-    "@ckeditor/ckeditor5-build-classic": "^41.4.2",
+    "@ckeditor/ckeditor5-build-classic": "^44.3.0",
     "@ckeditor/ckeditor5-react": "^11.2.0",
     "@hookform/resolvers": "^5.2.2",
     "@prisma/adapter-pg": "^7.9.1",
@@ -104,5 +104,8 @@
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.56.1",
     "vitest": "^4.1.10"
+  },
+  "overrides": {
+    "lodash-es": "4.18.1"
   }
 }

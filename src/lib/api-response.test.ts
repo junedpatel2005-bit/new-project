@@ -1,8 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { ApiErrorCode, apiError } from "./api-response";
+import { ApiErrorCode, apiError, apiSuccess } from "./api-response";
 import { DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE, parsePagination } from "./pagination";
 
 describe("API response envelope", () => {
+  it("wraps successful values in data", async () => {
+    const response = apiSuccess({ id: 24 }, 201);
+
+    expect(response.status).toBe(201);
+    await expect(response.json()).resolves.toEqual({ data: { id: 24 } });
+  });
+
   it("returns the documented error structure", async () => {
     const response = apiError(ApiErrorCode.validation, "A title is required.", 400, {
       field: "title",
