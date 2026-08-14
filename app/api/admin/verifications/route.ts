@@ -3,6 +3,90 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { sessionCookie, verifySession } from "@/lib/auth";
 
-async function admin(request: NextRequest) { const token = request.cookies.get(sessionCookie)?.value; if (!token) return null; try { const session = await verifySession(token); return session.role === "ADMIN" ? session : null; } catch { return null; } }
-export async function GET(request: NextRequest) { try { if (!await admin(request)) return NextResponse.json({ error: "Admin access required." }, { status: 403 }); const verifications = await db.professionalVerification.findMany({ where: { status: { in: ["PENDING", "REJECTED"] } }, include: { user: { select: { id: true, firstName: true, lastName: true, email: true, professionalCategory: true } } }, orderBy: { updatedAt: "desc" } }); const reviews = await db.verificationDocumentReview.findMany({ where: { userId: { in: verifications.map((item) => item.userId) } } }); return NextResponse.json({ verifications: verifications.map((item) => ({ ...item, reviews: reviews.filter((review) => review.userId === item.userId) })) }); } catch (error) { console.error("admin.verifications.load.failed", error); return NextResponse.json({ error: "Unable to load verification records.", verifications: [] }, { status: 500 }); } }
-export async function PATCH(request: NextRequest) { if (!await admin(request)) return NextResponse.json({ error: "Admin access required." }, { status: 403 }); const parsed = z.object({ userId: z.number().int().positive(), status: z.enum(["APPROVED", "REJECTED"]), documentKey: z.enum(["governmentIdUrl", "licenseUrl", "certificationsJson", "insuranceUrl", "selfieUrl"]).optional() }).safeParse(await request.json().catch(() => null)); if (!parsed.success) return NextResponse.json({ error: "Invalid verification decision." }, { status: 400 }); if (parsed.data.documentKey) { const review = await db.verificationDocumentReview.upsert({ where: { userId_documentKey: { userId: parsed.data.userId, documentKey: parsed.data.documentKey } }, create: { userId: parsed.data.userId, documentKey: parsed.data.documentKey, status: parsed.data.status, reviewedAt: new Date() }, update: { status: parsed.data.status, reviewedAt: new Date() } }); return NextResponse.json({ review }); } await db.$transaction([db.professionalVerification.update({ where: { userId: parsed.data.userId }, data: { status: parsed.data.status } }), db.user.update({ where: { id: parsed.data.userId }, data: { isVerified: parsed.data.status === "APPROVED" } })]); return NextResponse.json({ ok: true }); }
+async function admin(request: NextRequest) {
+  const token = request.cookies.get(sessionCookie)?.value;
+  if (!token) return null;
+  try {
+    const session = await verifySession(token);
+    return session.role === "ADMIN" ? session : null;
+  } catch {
+    return null;
+  }
+}
+export async function GET(request: NextRequest) {
+  try {
+    if (!(await admin(request)))
+      return NextResponse.json({ error: "Admin access required." }, { status: 403 });
+    const verifications = await db.professionalVerification.findMany({
+      where: { status: { in: ["PENDING", "REJECTED"] } },
+      include: {
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            professionalCategory: true,
+          },
+        },
+      },
+      orderBy: { updatedAt: "desc" },
+    });
+    const reviews = await db.verificationDocumentReview.findMany({
+      where: { userId: { in: verifications.map((item) => item.userId) } },
+    });
+    return NextResponse.json({
+      verifications: verifications.map((item) => ({
+        ...item,
+        reviews: reviews.filter((review) => review.userId === item.userId),
+      })),
+    });
+  } catch (error) {
+    console.error("admin.verifications.load.failed", error);
+    return NextResponse.json(
+      { error: "Unable to load verification records.", verifications: [] },
+      { status: 500 },
+    );
+  }
+}
+export async function PATCH(request: NextRequest) {
+  if (!(await admin(request)))
+    return NextResponse.json({ error: "Admin access required." }, { status: 403 });
+  const parsed = z
+    .object({
+      userId: z.number().int().positive(),
+      status: z.enum(["APPROVED", "REJECTED"]),
+      documentKey: z
+        .enum(["governmentIdUrl", "licenseUrl", "certificationsJson", "insuranceUrl", "selfieUrl"])
+        .optional(),
+    })
+    .safeParse(await request.json().catch(() => null));
+  if (!parsed.success)
+    return NextResponse.json({ error: "Invalid verification decision." }, { status: 400 });
+  if (parsed.data.documentKey) {
+    const review = await db.verificationDocumentReview.upsert({
+      where: {
+        userId_documentKey: { userId: parsed.data.userId, documentKey: parsed.data.documentKey },
+      },
+      create: {
+        userId: parsed.data.userId,
+        documentKey: parsed.data.documentKey,
+        status: parsed.data.status,
+        reviewedAt: new Date(),
+      },
+      update: { status: parsed.data.status, reviewedAt: new Date() },
+    });
+    return NextResponse.json({ review });
+  }
+  await db.$transaction([
+    db.professionalVerification.update({
+      where: { userId: parsed.data.userId },
+      data: { status: parsed.data.status },
+    }),
+    db.user.update({
+      where: { id: parsed.data.userId },
+      data: { isVerified: parsed.data.status === "APPROVED" },
+    }),
+  ]);
+  return NextResponse.json({ ok: true });
+}

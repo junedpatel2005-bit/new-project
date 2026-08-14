@@ -3,7 +3,7 @@ import { z } from "zod";
 import {
   getOpenJob,
   getProfessional,
-  getDetailedProfessional,
+  getPublicProfessionalProfile,
   listCategories,
   listOpenJobs,
   listProfessionals,
@@ -36,7 +36,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ reso
           { error: "A valid professional id is required." },
           { status: 400 },
         );
-      const professional = await getDetailedProfessional(id.data);
+      const professional = await getPublicProfessionalProfile(id.data);
       return professional
         ? NextResponse.json(professional)
         : NextResponse.json({ error: "Professional not found." }, { status: 404 });

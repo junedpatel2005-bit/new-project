@@ -28,7 +28,7 @@ export function ProfileSetup({ role }: { role: "client" | "professional" }) {
   const isClient = role === "client";
 
   async function loadClientProfile() {
-    const response = await fetch("/api/profile");
+    const response = await fetch("/api/v1/profile");
     if (!response.ok) return;
     const result = (await response.json()) as { profile: ClientProfile | null };
     setProfile(result.profile);
@@ -42,7 +42,7 @@ export function ProfileSetup({ role }: { role: "client" | "professional" }) {
     setPending(true);
     setError(null);
     setNotice(null);
-    const response = await fetch("/api/profile", {
+    const response = await fetch("/api/v1/profile", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify(Object.fromEntries(formData)),
@@ -180,7 +180,7 @@ function SavedLocations({ initialLocations }: { initialLocations: SavedLocation[
 
   async function saveLocation() {
     setError(null);
-    const target = editing ? `/api/profile/locations/${editing}` : "/api/profile/locations";
+    const target = editing ? `/api/v1/profile/locations/${editing}` : "/api/v1/profile/locations";
     const response = await fetch(target, {
       method: editing ? "PATCH" : "POST",
       headers: { "content-type": "application/json" },
@@ -202,7 +202,7 @@ function SavedLocations({ initialLocations }: { initialLocations: SavedLocation[
   }
 
   async function removeLocation(id: number) {
-    const response = await fetch(`/api/profile/locations/${id}`, { method: "DELETE" });
+    const response = await fetch(`/api/v1/profile/locations/${id}`, { method: "DELETE" });
     if (response.ok) setLocations((current) => current.filter((item) => item.id !== id));
     else setError("Unable to delete the location.");
   }

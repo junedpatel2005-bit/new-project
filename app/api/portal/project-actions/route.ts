@@ -157,7 +157,7 @@ export async function POST(request: NextRequest) {
         name: file.fileName,
         mimeType: file.mimeType,
         sizeBytes: file.sizeBytes,
-        url: `/api/portal/project-files/${file.id}`,
+        url: `/api/v1/portal/project-files/${file.id}`,
       }));
     };
 
@@ -443,7 +443,10 @@ export async function POST(request: NextRequest) {
     }
     if (input.action === "submit-review") {
       if (session.role !== "CLIENT")
-        return NextResponse.json({ error: "Only clients can submit a professional review." }, { status: 403 });
+        return NextResponse.json(
+          { error: "Only clients can submit a professional review." },
+          { status: 403 },
+        );
       const review = await db.projectReview.upsert({
         where: { trackingId: project.id },
         update: {
@@ -482,12 +485,17 @@ export async function POST(request: NextRequest) {
     }
     if (input.action === "respond-to-review") {
       const review = await db.projectReview.findUnique({ where: { trackingId: project.id } });
-      if (!review) return NextResponse.json({ error: "No client review is available yet." }, { status: 409 });
+      if (!review)
+        return NextResponse.json({ error: "No client review is available yet." }, { status: 409 });
       await db.projectReview.update({
         where: { trackingId: project.id },
         data: { professionalResponse: input.response, professionalResponseAt: new Date() },
       });
-      await event("REVIEW_RESPONSE_SUBMITTED", "Response to client review submitted", input.response);
+      await event(
+        "REVIEW_RESPONSE_SUBMITTED",
+        "Response to client review submitted",
+        input.response,
+      );
       return NextResponse.json({ ok: true });
     }
     if (input.action === "submit-dispute") {

@@ -33,8 +33,8 @@ produce more drift.
 
 `Business_Requirements_Document.md` and `Software_Requirements_Specification.md` are both marked
 **v0.1 — Draft, pending sign-off**, full of `[TO BE CONFIRMED]` placeholders, and structured
-around a **feature-scope** Phase 1/Phase 2 split: BRD assumption A-04 states *"Phase 1 payment
-happens off-platform, directly between client and professional"* — i.e. no Stripe, no escrow, no
+around a **feature-scope** Phase 1/Phase 2 split: BRD assumption A-04 states _"Phase 1 payment
+happens off-platform, directly between client and professional"_ — i.e. no Stripe, no escrow, no
 wallet in Phase 1 at all, deferred to a Phase 2 that also includes messaging and the full
 notification set. `Scope_Of_Development_MASTER.md`'s "Decision 1" leaves this genuinely open
 ("bring client payments into Phase 1, or move the whole wallet to Phase 2").
@@ -42,9 +42,9 @@ notification set. `Scope_Of_Development_MASTER.md`'s "Decision 1" leaves this ge
 `CLAUDE.md`, `ADR-001`, `technical-architecture.md`, and `project-delivery-plan.md` are all
 dated the same day but read as a later, resolved generation: they use "Phase 1 / Phase 2" to mean
 **web now, Flutter later** — and in that framing, Stripe Connect escrow and PostGIS geo-matching
-are both mandatory *inside* Phase 1 (web), scheduled at M6 and M3 respectively, weeks before
-launch. `technical-architecture.md`'s own open-items list even notes *"Resolved since v1: launch
-market and timeline, map provider (Google), design tokens, mobile sequencing"* — implying a v1 of
+are both mandatory _inside_ Phase 1 (web), scheduled at M6 and M3 respectively, weeks before
+launch. `technical-architecture.md`'s own open-items list even notes _"Resolved since v1: launch
+market and timeline, map provider (Google), design tokens, mobile sequencing"_ — implying a v1 of
 this planning existed and was superseded, consistent with BRD/SRS being that superseded v1 left
 in the folder without a note pointing readers to the newer decision.
 
@@ -53,8 +53,8 @@ this**, but it matters for reading the rest of `src/routes/docs` — a developer
 first will reasonably conclude payments are out of scope for now, while `CLAUDE.md` (which the
 harness treats as the operational source of truth) says the opposite. Worth either deleting the
 superseded BRD/SRS or adding a banner pointing to `CLAUDE.md` as authoritative, per that file's
-own rule: *"`CLAUDE.md` is the single operational source of truth and is updated the same day a
-decision changes."* That update evidently didn't happen for BRD/SRS.
+own rule: _"`CLAUDE.md` is the single operational source of truth and is updated the same day a
+decision changes."_ That update evidently didn't happen for BRD/SRS.
 
 The geo-matching requirement, by contrast, is consistent across every document, old and new alike
 (BRD's `MAP-01…10`/`PRI-01…04`, SRS's `SRS-PRI-03` obfuscated markers, `CLAUDE.md`'s
@@ -65,15 +65,15 @@ obfuscation are optional or deferred. That finding stands unweakened.
 
 ## 🔴 Architecture-level — code and docs describe different systems
 
-| CLAUDE.md mandate | Actual code |
-|---|---|
-| Monorepo: `/packages/{db,core,contracts}`, `/apps/web` | Flat repo — `app/`, `src/lib`, `src/routes` at root. No `/packages`, no `/apps`. |
-| Payments: Stripe Connect, escrow, commission, invoices, `StripeEvent` idempotency | **No Stripe integration anywhere** — not in `package.json`, not in any source file. |
-| SMS/OTP: Twilio | **No Twilio integration anywhere.** Verification currently uses emailed 6-digit codes only. |
+| CLAUDE.md mandate                                                                                                                            | Actual code                                                                                                                                                                                                                                                                                       |
+| -------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Monorepo: `/packages/{db,core,contracts}`, `/apps/web`                                                                                       | Flat repo — `app/`, `src/lib`, `src/routes` at root. No `/packages`, no `/apps`.                                                                                                                                                                                                                  |
+| Payments: Stripe Connect, escrow, commission, invoices, `StripeEvent` idempotency                                                            | **No Stripe integration anywhere** — not in `package.json`, not in any source file.                                                                                                                                                                                                               |
+| SMS/OTP: Twilio                                                                                                                              | **No Twilio integration anywhere.** Verification currently uses emailed 6-digit codes only.                                                                                                                                                                                                       |
 | Geo-matching: PostGIS via `GeoRepository`, radius queries only through `$queryRaw`, `base_point`/`display_point` unreadable by Prisma Client | **No PostGIS, no `GeoRepository`, no geospatial query anywhere.** `User.professionalLatitude` / `professionalLongitude` are plain `Float?` columns on the `User` model (`prisma/schema.prisma:~140`), fully readable by any ordinary `db.user.findMany()` — the opposite of the mandated lockout. |
-| "Never store badges as editable flags... admin approves a *document*; the badge follows" | `User.isVerified` is a plain, independently-settable `Boolean` on `User` (`prisma/schema.prisma:132`), not derived from `ProfessionalVerification` state. |
-| Auth: JWT access + refresh, **RS256** | Single 7-day session JWT, **HS256**, no refresh token (`src/lib/auth.ts`). Functionally fine for web-only today, but not what's documented, and not ready for a mobile client per ADR-001. |
-| `/api/v1` REST surface + `openapi.yaml`, contract-first | No version prefix on any route, no `openapi.yaml` in the repo. (Detailed in the section below.) |
+| "Never store badges as editable flags... admin approves a _document_; the badge follows"                                                     | `User.isVerified` is a plain, independently-settable `Boolean` on `User` (`prisma/schema.prisma:132`), not derived from `ProfessionalVerification` state.                                                                                                                                         |
+| Auth: JWT access + refresh, **RS256**                                                                                                        | Single 7-day session JWT, **HS256**, no refresh token (`src/lib/auth.ts`). Functionally fine for web-only today, but not what's documented, and not ready for a mobile client per ADR-001.                                                                                                        |
+| `/api/v1` REST surface + `openapi.yaml`, contract-first                                                                                      | No version prefix on any route, no `openapi.yaml` in the repo. (Detailed in the section below.)                                                                                                                                                                                                   |
 
 **Net:** the payments and geo-matching systems — arguably the two things that make this a
 "location-aware marketplace with escrow" rather than a generic job board — don't exist in code

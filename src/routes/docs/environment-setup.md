@@ -6,12 +6,12 @@ Local development for the Service Marketplace Platform. Follow top to bottom; ea
 
 ## 1. PREREQUISITES
 
-| Tool | Version | Note |
-|---|---|---|
-| Node.js | 20 LTS or 22 LTS | Not 21 — odd releases aren't LTS |
-| pnpm | 9+ | `corepack enable && corepack prepare pnpm@latest --activate` |
-| Docker | latest | For local Postgres + PostGIS |
-| Git | 2.40+ | |
+| Tool    | Version          | Note                                                         |
+| ------- | ---------------- | ------------------------------------------------------------ |
+| Node.js | 20 LTS or 22 LTS | Not 21 — odd releases aren't LTS                             |
+| pnpm    | 9+               | `corepack enable && corepack prepare pnpm@latest --activate` |
+| Docker  | latest           | For local Postgres + PostGIS                                 |
+| Git     | 2.40+            |                                                              |
 
 ---
 
@@ -19,17 +19,17 @@ Local development for the Service Marketplace Platform. Follow top to bottom; ea
 
 Ordered by when you need them. Nothing in M0 requires a paid account.
 
-| Service | Needed by | Cost | Notes |
-|---|---|---|---|
-| GitHub | M0 | Free | Actions minutes free on public, 2000/mo private |
-| Supabase | M0 | Free → $25/mo | **Verify PostGIS is enabled** on the project |
-| Vercel | M0 | $20/user/mo | Hobby prohibits commercial use — Pro from the start |
-| Google Cloud | M3 | Pay-as-you-go | Maps JS, Places, Geocoding, Distance Matrix. **Set a billing alert immediately** |
-| Twilio | M1 | ~$0.0079/SMS | Trial only sends to verified numbers — upgrade before real OTP testing |
-| Mailtrap | M1 | Free | Dev email capture |
-| SendGrid | M8 | Free → $20/mo | Production email |
-| Stripe | M6 | 2.9% + $0.30 | **Enable Connect in test mode early** — onboarding flows need it |
-| Sentry | M8 | Free tier | Error tracking |
+| Service      | Needed by | Cost          | Notes                                                                            |
+| ------------ | --------- | ------------- | -------------------------------------------------------------------------------- |
+| GitHub       | M0        | Free          | Actions minutes free on public, 2000/mo private                                  |
+| Supabase     | M0        | Free → $25/mo | **Verify PostGIS is enabled** on the project                                     |
+| Vercel       | M0        | $20/user/mo   | Hobby prohibits commercial use — Pro from the start                              |
+| Google Cloud | M3        | Pay-as-you-go | Maps JS, Places, Geocoding, Distance Matrix. **Set a billing alert immediately** |
+| Twilio       | M1        | ~$0.0079/SMS  | Trial only sends to verified numbers — upgrade before real OTP testing           |
+| Mailtrap     | M1        | Free          | Dev email capture                                                                |
+| SendGrid     | M8        | Free → $20/mo | Production email                                                                 |
+| Stripe       | M6        | 2.9% + $0.30  | **Enable Connect in test mode early** — onboarding flows need it                 |
+| Sentry       | M8        | Free tier     | Error tracking                                                                   |
 
 ---
 
@@ -173,18 +173,18 @@ docker compose exec db psql -U marketplace -d marketplace_dev -c \
 
 The seed must produce data that actually exercises geo matching. Three professionals in one city proves nothing.
 
-| Set | Content |
-|---|---|
-| Platform config | Single row, 10% commission, CAD, ON default |
-| Tax rates | All 13 provinces/territories, 2026 rates |
-| Categories | Development → Frontend, Backend, Mobile · Data → Analytics, ML, Engineering |
-| Skills | ~40 IT skills |
-| Admin | One SUPER_ADMIN, one VERIFICATION_REVIEWER |
-| Clients | 20 across Toronto, Vancouver, Calgary, Montreal, Ottawa |
-| Professionals | 60 — varied radii (5–100km), mixed ONSITE/REMOTE/BOTH, mixed verification states, some with no badges |
-| Jobs | 40 across all statuses, mixed urgency, some remote |
-| Quotes | 60 across submitted/accepted/rejected |
-| Reviews | Enough to exercise the 3-review rating threshold |
+| Set             | Content                                                                                               |
+| --------------- | ----------------------------------------------------------------------------------------------------- |
+| Platform config | Single row, 10% commission, CAD, ON default                                                           |
+| Tax rates       | All 13 provinces/territories, 2026 rates                                                              |
+| Categories      | Development → Frontend, Backend, Mobile · Data → Analytics, ML, Engineering                           |
+| Skills          | ~40 IT skills                                                                                         |
+| Admin           | One SUPER_ADMIN, one VERIFICATION_REVIEWER                                                            |
+| Clients         | 20 across Toronto, Vancouver, Calgary, Montreal, Ottawa                                               |
+| Professionals   | 60 — varied radii (5–100km), mixed ONSITE/REMOTE/BOTH, mixed verification states, some with no badges |
+| Jobs            | 40 across all statuses, mixed urgency, some remote                                                    |
+| Quotes          | 60 across submitted/accepted/rejected                                                                 |
+| Reviews         | Enough to exercise the 3-review rating threshold                                                      |
 
 **Deterministic seed** — fix the random seed so both developers get identical data and bug reports are reproducible.
 
@@ -192,15 +192,15 @@ The seed must produce data that actually exercises geo matching. Three professio
 
 ## 7. COMMON PROBLEMS
 
-| Symptom | Cause |
-|---|---|
-| `type "geography" does not exist` | Plain `postgres` image instead of `postgis/postgis` |
-| `prisma migrate` hangs on Supabase | Using pooler URL — migrations need `DIRECT_URL` on port 5432 |
-| Radius queries slow | GiST indexes not created; they're in the hand-written migration, not the Prisma schema |
-| `Unsupported` field errors in Prisma Client | Expected — geography columns are unreadable by Prisma. Use `GeoRepository` |
-| Twilio 21608 | Trial account, unverified destination number |
-| Maps blank, console 403 | Key restrictions exclude `localhost:3000` |
-| Tailwind classes missing | `@source` in `styles.css` not updated for the App Router path |
+| Symptom                                     | Cause                                                                                  |
+| ------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `type "geography" does not exist`           | Plain `postgres` image instead of `postgis/postgis`                                    |
+| `prisma migrate` hangs on Supabase          | Using pooler URL — migrations need `DIRECT_URL` on port 5432                           |
+| Radius queries slow                         | GiST indexes not created; they're in the hand-written migration, not the Prisma schema |
+| `Unsupported` field errors in Prisma Client | Expected — geography columns are unreadable by Prisma. Use `GeoRepository`             |
+| Twilio 21608                                | Trial account, unverified destination number                                           |
+| Maps blank, console 403                     | Key restrictions exclude `localhost:3000`                                              |
+| Tailwind classes missing                    | `@source` in `styles.css` not updated for the App Router path                          |
 
 ---
 

@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
       const attachments = [];
       for (const { file, bytes } of uploadFiles) {
         const storageKey = createProjectStorageKey(project.id, file.name);
-        await storeProjectFile(storageKey, bytes);
+        await storeProjectFile(storageKey, bytes, file.type || "application/octet-stream");
         const storedFile: { id?: number; storageKey: string } = { storageKey };
         stored.push(storedFile);
         const record = await db.storedFile.create({
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
           name: record.fileName,
           mimeType: record.mimeType,
           sizeBytes: record.sizeBytes,
-          url: `/api/portal/project-files/${record.id}`,
+          url: `/api/v1/portal/project-files/${record.id}`,
         });
       }
       return NextResponse.json({ attachments }, { status: 201 });

@@ -18,6 +18,7 @@ type Profile = {
   professionalCategory: string | null;
   experienceYears: number | null;
   hourlyRate: number | null;
+  serviceRadiusKm: number | null;
   professionalLatitude: number | null;
   professionalLongitude: number | null;
   workMode: string;
@@ -32,9 +33,10 @@ export function ProfessionalProfileSetup() {
   const [pending, setPending] = useState(false);
   const [skills, setSkills] = useState("");
   const [location, setLocation] = useState<[number, number]>([20.5937, 78.9629]);
+  const [serviceRadiusKm, setServiceRadiusKm] = useState<string>("25");
 
   useEffect(() => {
-    void fetch("/api/professional/profile")
+    void fetch("/api/v1/professional/profile")
       .then((response) => (response.ok ? response.json() : null))
       .then((data: { profile?: Profile | null } | null) => {
         if (!data?.profile) return;
@@ -44,6 +46,9 @@ export function ProfessionalProfileSetup() {
           data.profile.professionalLongitude !== null
         ) {
           setLocation([data.profile.professionalLatitude, data.profile.professionalLongitude]);
+        }
+        if (data.profile.serviceRadiusKm !== null) {
+          setServiceRadiusKm(data.profile.serviceRadiusKm.toString());
         }
         try {
           setSkills(
@@ -60,13 +65,14 @@ export function ProfessionalProfileSetup() {
     setError(null);
     setPending(true);
     const form = new FormData(event.currentTarget);
-    const response = await fetch("/api/professional/profile", {
+    const response = await fetch("/api/v1/professional/profile", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
         category: form.get("category"),
         experienceYears: form.get("experienceYears") ? Number(form.get("experienceYears")) : null,
         hourlyRate: form.get("hourlyRate") ? Number(form.get("hourlyRate")) : null,
+        serviceRadiusKm: serviceRadiusKm ? Number(serviceRadiusKm) : null,
         latitude: location[0],
         longitude: location[1],
         workMode: form.get("workMode"),
@@ -135,6 +141,21 @@ export function ProfessionalProfileSetup() {
           >
             Use my current location
           </Button>
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="serviceRadiusKm">Service radius (km)</Label>
+          <Input
+            id="serviceRadiusKm"
+            type="number"
+            min="1"
+            max="500"
+            value={serviceRadiusKm}
+            onChange={(e) => setServiceRadiusKm(e.target.value)}
+            placeholder="25"
+          />
+          <p className="text-xs text-muted-foreground">
+            How far you're willing to travel or work. Defaults to 25 km.
+          </p>
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="workMode">Work mode</Label>

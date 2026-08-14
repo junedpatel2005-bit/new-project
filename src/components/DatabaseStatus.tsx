@@ -15,7 +15,7 @@ export function DatabaseStatus() {
   const checkConnection = useCallback(async () => {
     setStatus({ state: "checking" });
     try {
-      const response = await fetch("/api/admin/database-status", { cache: "no-store" });
+      const response = await fetch("/api/v1/admin/database-status", { cache: "no-store" });
       const data = (await response.json()) as {
         connected?: boolean;
         checkedAt?: string;

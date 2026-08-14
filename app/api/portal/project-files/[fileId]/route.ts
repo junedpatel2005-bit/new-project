@@ -30,7 +30,9 @@ export async function GET(
     if (!project) return NextResponse.json({ error: "File not found." }, { status: 404 });
     const bytes = await readProjectFile(file.storageKey);
     const safeName = file.fileName.replace(/[\\\r\n"]/g, "_");
-    return new NextResponse(bytes, {
+    const body = new Uint8Array(bytes.byteLength);
+    body.set(bytes);
+    return new NextResponse(body.buffer, {
       headers: {
         "Content-Type": file.mimeType,
         "Content-Length": String(file.sizeBytes),

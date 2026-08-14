@@ -69,8 +69,21 @@ type Data = {
   revisions: { note: string | null; createdAt: string }[];
   timeline: Event[];
   agreedAmount: number | null;
-  review: { id: number; rating: number; comment: string | null; createdAt: string; professionalResponse: string | null; professionalResponseAt: string | null } | null;
-  dispute: { id: number; issueType: string; message: string; status: string; createdAt: string } | null;
+  review: {
+    id: number;
+    rating: number;
+    comment: string | null;
+    createdAt: string;
+    professionalResponse: string | null;
+    professionalResponseAt: string | null;
+  } | null;
+  dispute: {
+    id: number;
+    issueType: string;
+    message: string;
+    status: string;
+    createdAt: string;
+  } | null;
 };
 
 const name = (p: Person, fallback: string) => (p ? `${p.firstName} ${p.lastName}` : fallback);
@@ -128,7 +141,7 @@ export default function SharedProjectTrackingPage() {
   const actionInFlight = useRef(false);
 
   const refresh = useCallback(async () => {
-    const response = await fetch(`/api/portal/project?id=${encodeURIComponent(projectId)}`, {
+    const response = await fetch(`/api/v1/portal/project?id=${encodeURIComponent(projectId)}`, {
       cache: "no-store",
     });
     if (!response.ok) throw new Error("Unable to load this project.");
@@ -150,7 +163,7 @@ export default function SharedProjectTrackingPage() {
     setBusy(key);
     setMessage(null);
     try {
-      const response = await fetch("/api/portal/project-actions", {
+      const response = await fetch("/api/v1/portal/project-actions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: key, projectId: Number(projectId), ...payload }),
@@ -186,7 +199,7 @@ export default function SharedProjectTrackingPage() {
       const form = new FormData();
       form.set("projectId", String(projectId));
       selectedFiles.forEach((file) => form.append("files", file));
-      const response = await fetch("/api/portal/project-files", { method: "POST", body: form });
+      const response = await fetch("/api/v1/portal/project-files", { method: "POST", body: form });
       const result = (await response.json().catch(() => null)) as {
         attachments?: Attachment[];
         error?: string;
@@ -408,7 +421,8 @@ export default function SharedProjectTrackingPage() {
                   divided into 5 equal milestone amounts.
                 </p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {5 - data.milestones.length} milestone{5 - data.milestones.length === 1 ? "" : "s"} remaining.
+                  {5 - data.milestones.length} milestone
+                  {5 - data.milestones.length === 1 ? "" : "s"} remaining.
                 </p>
               </div>
               <Button onClick={() => setShowMilestoneModal(true)}>
@@ -673,7 +687,8 @@ export default function SharedProjectTrackingPage() {
                       <div>
                         <p className="font-semibold">{upload.title}</p>
                         <p className="mt-1 text-sm text-muted-foreground">
-                          {upload.note || "No description."} · {upload.roundNumber > 1 ? "Revision" : "Work"}
+                          {upload.note || "No description."} ·{" "}
+                          {upload.roundNumber > 1 ? "Revision" : "Work"}
                         </p>
                       </div>
                       <span className="rounded-full bg-muted px-2 py-1 text-xs text-muted-foreground">
@@ -820,11 +835,17 @@ export default function SharedProjectTrackingPage() {
 
             <div className="mt-5 grid gap-4 md:grid-cols-2">
               <div className="rounded-xl border bg-card p-4">
-                <p className="font-medium">{isClient ? "Rate professional" : "View ratings & client reviews"}</p>
+                <p className="font-medium">
+                  {isClient ? "Rate professional" : "View ratings & client reviews"}
+                </p>
                 <p className="mt-1 text-sm text-muted-foreground">
                   {isClient
-                    ? data.review ? `Submitted: ${data.review.rating}/5` : "Share your feedback and experience."
-                    : data.review ? `${data.review.rating}/5${data.review.comment ? ` · “${data.review.comment}”` : ""}` : "The client has not left a review yet."}
+                    ? data.review
+                      ? `Submitted: ${data.review.rating}/5`
+                      : "Share your feedback and experience."
+                    : data.review
+                      ? `${data.review.rating}/5${data.review.comment ? ` · “${data.review.comment}”` : ""}`
+                      : "The client has not left a review yet."}
                 </p>
                 {isClient && !data.review && (
                   <Button className="mt-4" size="sm" onClick={() => setShowReviewForm(true)}>
@@ -833,7 +854,9 @@ export default function SharedProjectTrackingPage() {
                 )}
               </div>
               <div className="rounded-xl border bg-card p-4">
-                <p className="font-medium">{isClient ? "Report issue / Raise dispute" : "Respond to review"}</p>
+                <p className="font-medium">
+                  {isClient ? "Report issue / Raise dispute" : "Respond to review"}
+                </p>
                 <p className="mt-1 text-sm text-muted-foreground">
                   {data.dispute
                     ? `${data.dispute.issueType} · ${data.dispute.status}`
@@ -846,12 +869,22 @@ export default function SharedProjectTrackingPage() {
                           : "A response becomes available after the client submits a review."}
                 </p>
                 {isClient && !data.dispute && (
-                  <Button className="mt-4" variant="outline" size="sm" onClick={() => setShowDisputeForm((value) => !value)}>
+                  <Button
+                    className="mt-4"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowDisputeForm((value) => !value)}
+                  >
                     {showDisputeForm ? "Hide dispute form" : "Report an issue"}
                   </Button>
                 )}
                 {!isClient && data.review && !data.review.professionalResponse && (
-                  <Button className="mt-4" variant="outline" size="sm" onClick={() => setShowReviewResponseForm(true)}>
+                  <Button
+                    className="mt-4"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowReviewResponseForm(true)}
+                  >
                     Respond to review
                   </Button>
                 )}
@@ -869,7 +902,9 @@ export default function SharedProjectTrackingPage() {
                       className="rounded-md border border-input bg-background px-3 py-2 text-sm"
                     >
                       {[5, 4, 3, 2, 1].map((value) => (
-                        <option key={value} value={value}>{value} / 5</option>
+                        <option key={value} value={value}>
+                          {value} / 5
+                        </option>
                       ))}
                     </select>
                   </label>
@@ -910,23 +945,43 @@ export default function SharedProjectTrackingPage() {
               </div>
             )}
 
-            {showReviewResponseForm && !isClient && data.review && !data.review.professionalResponse && (
-              <div className="mt-4 rounded-xl border bg-card p-4">
-                <label className="grid gap-2 text-sm font-medium">
-                  Response to client review
-                  <textarea
-                    value={reviewResponse}
-                    onChange={(event) => setReviewResponse(event.target.value)}
-                    placeholder="Thank the client or add helpful context."
-                    className="min-h-[100px] rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  />
-                </label>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <Button variant="outline" onClick={() => { setShowReviewResponseForm(false); setReviewResponse(""); }}>Cancel</Button>
-                  <Button onClick={() => { if (!reviewResponse.trim()) return; void action("respond-to-review", { response: reviewResponse.trim() }); setShowReviewResponseForm(false); setReviewResponse(""); }}>Save response</Button>
+            {showReviewResponseForm &&
+              !isClient &&
+              data.review &&
+              !data.review.professionalResponse && (
+                <div className="mt-4 rounded-xl border bg-card p-4">
+                  <label className="grid gap-2 text-sm font-medium">
+                    Response to client review
+                    <textarea
+                      value={reviewResponse}
+                      onChange={(event) => setReviewResponse(event.target.value)}
+                      placeholder="Thank the client or add helpful context."
+                      className="min-h-[100px] rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    />
+                  </label>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setShowReviewResponseForm(false);
+                        setReviewResponse("");
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        if (!reviewResponse.trim()) return;
+                        void action("respond-to-review", { response: reviewResponse.trim() });
+                        setShowReviewResponseForm(false);
+                        setReviewResponse("");
+                      }}
+                    >
+                      Save response
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
             {showDisputeForm && !data.dispute && (
               <div className="mt-4 rounded-xl border bg-card p-4">

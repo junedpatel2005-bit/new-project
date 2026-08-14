@@ -13,7 +13,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <body>
-        <Providers><CmsLiveEditor />{children}</Providers>
+        <Providers>
+          <CmsLiveEditor />
+          {children}
+        </Providers>
       </body>
     </html>
   );

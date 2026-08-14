@@ -1,12 +1,24 @@
 import "server-only";
+import {
+  DeleteObjectCommand,
+  GetObjectCommand,
+  PutObjectCommand,
+  S3Client,
+} from "@aws-sdk/client-s3";
+import { randomUUID } from "node:crypto";
 import { mkdir, readFile, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { randomUUID } from "node:crypto";
 
-const storageRoot = path.join(process.cwd(), ".project-work-files");
+const localStorageRoot = path.join(process.cwd(), ".project-work-files");
 
 export const maxProjectFileSize = 15 * 1024 * 1024;
 export const maxProjectFiles = 10;
+
+type FileStorageProvider = {
+  put(storageKey: string, bytes: Uint8Array, contentType: string): Promise<void>;
+  get(storageKey: string): Promise<Uint8Array>;
+  remove(storageKey: string): Promise<void>;
+};
 
 const allowedTypes: Record<string, string[]> = {
   ".pdf": ["application/pdf"],
@@ -21,6 +33,86 @@ const allowedTypes: Record<string, string[]> = {
   ],
   ".txt": ["text/plain", "application/octet-stream"],
 };
+
+function localPath(storageKey: string) {
+  const resolved = path.resolve(localStorageRoot, storageKey);
+  if (!resolved.startsWith(`${path.resolve(localStorageRoot)}${path.sep}`))
+    throw new Error("Invalid storage key.");
+  return resolved;
+}
+
+function createLocalProvider(): FileStorageProvider {
+  if (process.env.NODE_ENV === "production") {
+    throw new Error(
+      "Local file storage is disabled in production. Configure S3-compatible storage.",
+    );
+  }
+
+  return {
+    async put(storageKey, bytes) {
+      const destination = localPath(storageKey);
+      await mkdir(path.dirname(destination), { recursive: true });
+      await writeFile(destination, bytes, { flag: "wx" });
+    },
+    get(storageKey) {
+      return readFile(localPath(storageKey));
+    },
+    async remove(storageKey) {
+      await unlink(localPath(storageKey)).catch(() => undefined);
+    },
+  };
+}
+
+function createS3Provider(): FileStorageProvider {
+  const bucket = process.env.FILE_STORAGE_BUCKET;
+  const region = process.env.FILE_STORAGE_REGION;
+  if (!bucket || !region)
+    throw new Error("FILE_STORAGE_BUCKET and FILE_STORAGE_REGION are required for S3 storage.");
+
+  const client = new S3Client({
+    region,
+    endpoint: process.env.FILE_STORAGE_ENDPOINT || undefined,
+    forcePathStyle: process.env.FILE_STORAGE_FORCE_PATH_STYLE === "true",
+    credentials:
+      process.env.FILE_STORAGE_ACCESS_KEY_ID && process.env.FILE_STORAGE_SECRET_ACCESS_KEY
+        ? {
+            accessKeyId: process.env.FILE_STORAGE_ACCESS_KEY_ID,
+            secretAccessKey: process.env.FILE_STORAGE_SECRET_ACCESS_KEY,
+          }
+        : undefined,
+  });
+
+  return {
+    async put(storageKey, bytes, contentType) {
+      await client.send(
+        new PutObjectCommand({
+          Bucket: bucket,
+          Key: storageKey,
+          Body: bytes,
+          ContentType: contentType,
+        }),
+      );
+    },
+    async get(storageKey) {
+      const result = await client.send(new GetObjectCommand({ Bucket: bucket, Key: storageKey }));
+      if (!result.Body) throw new Error("Stored file has no content.");
+      return new Uint8Array(await result.Body.transformToByteArray());
+    },
+    async remove(storageKey) {
+      await client.send(new DeleteObjectCommand({ Bucket: bucket, Key: storageKey }));
+    },
+  };
+}
+
+let storageProvider: FileStorageProvider | undefined;
+
+function getStorageProvider() {
+  if (!storageProvider) {
+    storageProvider =
+      process.env.FILE_STORAGE_PROVIDER === "s3" ? createS3Provider() : createLocalProvider();
+  }
+  return storageProvider;
+}
 
 function startsWith(bytes: Uint8Array, signature: number[]) {
   return signature.every((value, index) => bytes[index] === value);
@@ -64,27 +156,25 @@ export function validateProjectFile(file: File, bytes: Uint8Array) {
 }
 
 export function createProjectStorageKey(projectId: number, fileName: string) {
-  const extension = path.extname(fileName).toLowerCase();
-  return `projects/${projectId}/${randomUUID()}${extension}`;
+  return `projects/${projectId}/${randomUUID()}${path.extname(fileName).toLowerCase()}`;
 }
 
-function filePath(storageKey: string) {
-  const resolved = path.resolve(storageRoot, storageKey);
-  if (!resolved.startsWith(`${path.resolve(storageRoot)}${path.sep}`))
-    throw new Error("Invalid storage key.");
-  return resolved;
+export function createVerificationStorageKey(userId: number, fileName: string) {
+  return `verification/${userId}/${randomUUID()}${path.extname(fileName).toLowerCase()}`;
 }
 
-export async function storeProjectFile(storageKey: string, bytes: Uint8Array) {
-  const destination = filePath(storageKey);
-  await mkdir(path.dirname(destination), { recursive: true });
-  await writeFile(destination, bytes, { flag: "wx" });
+export async function storeProjectFile(
+  storageKey: string,
+  bytes: Uint8Array,
+  contentType = "application/octet-stream",
+) {
+  await getStorageProvider().put(storageKey, bytes, contentType);
 }
 
 export async function readProjectFile(storageKey: string) {
-  return readFile(filePath(storageKey));
+  return getStorageProvider().get(storageKey);
 }
 
 export async function removeProjectFile(storageKey: string) {
-  await unlink(filePath(storageKey)).catch(() => undefined);
+  await getStorageProvider().remove(storageKey);
 }

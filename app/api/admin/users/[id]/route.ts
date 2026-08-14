@@ -7,30 +7,86 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   const token = request.cookies.get(sessionCookie)?.value;
   if (!token) return NextResponse.json({ error: "Admin access required." }, { status: 401 });
   try {
-    if ((await verifySession(token)).role !== "ADMIN") return NextResponse.json({ error: "Admin access required." }, { status: 403 });
+    if ((await verifySession(token)).role !== "ADMIN")
+      return NextResponse.json({ error: "Admin access required." }, { status: 403 });
     const body = z.object({ isActive: z.boolean() }).safeParse(await request.json());
     const { id } = await params;
-    if (!body.success || !Number.isInteger(Number(id))) return NextResponse.json({ error: "Invalid account update." }, { status: 400 });
-    const user = await db.user.update({ where: { id: Number(id) }, data: { isActive: body.data.isActive }, select: { id: true, isActive: true } });
+    if (!body.success || !Number.isInteger(Number(id)))
+      return NextResponse.json({ error: "Invalid account update." }, { status: 400 });
+    const user = await db.user.update({
+      where: { id: Number(id) },
+      data: { isActive: body.data.isActive },
+      select: { id: true, isActive: true },
+    });
     return NextResponse.json({ user });
-  } catch { return NextResponse.json({ error: "Unable to update account." }, { status: 500 }); }
+  } catch {
+    return NextResponse.json({ error: "Unable to update account." }, { status: 500 });
+  }
 }
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const token = request.cookies.get(sessionCookie)?.value;
   if (!token) return NextResponse.json({ error: "Admin access required." }, { status: 401 });
   try {
-    if ((await verifySession(token)).role !== "ADMIN") return NextResponse.json({ error: "Admin access required." }, { status: 403 });
-    const { id } = await params; const userId = Number(id);
-    if (!Number.isInteger(userId)) return NextResponse.json({ error: "Invalid user." }, { status: 400 });
-    const user = await db.user.findUnique({ where: { id: userId }, select: { id: true, firstName: true, lastName: true, email: true, phone: true, role: true, isActive: true, isVerified: true, createdAt: true, professionalCategory: true, professionalCity: true, hourlyRate: true, fixedRate: true, averageRating: true, reviewCount: true, companyName: true, address: true, services: { select: { id: true } } } });
+    if ((await verifySession(token)).role !== "ADMIN")
+      return NextResponse.json({ error: "Admin access required." }, { status: 403 });
+    const { id } = await params;
+    const userId = Number(id);
+    if (!Number.isInteger(userId))
+      return NextResponse.json({ error: "Invalid user." }, { status: 400 });
+    const user = await db.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        phone: true,
+        role: true,
+        isActive: true,
+        isVerified: true,
+        createdAt: true,
+        professionalCategory: true,
+        professionalCity: true,
+        hourlyRate: true,
+        fixedRate: true,
+        averageRating: true,
+        reviewCount: true,
+        companyName: true,
+        address: true,
+        services: { select: { id: true } },
+      },
+    });
     if (!user) return NextResponse.json({ error: "User not found." }, { status: 404 });
     const [jobsPosted, proposals, projects, completedPayments] = await Promise.all([
       db.clientJob.count({ where: { userId } }),
-      db.projectRequest.count({ where: user.role === "CLIENT" ? { clientId: userId } : { professionalId: userId } }),
-      db.projectTracking.count({ where: user.role === "CLIENT" ? { clientId: userId } : { professionalId: userId } }),
-      db.projectTransaction.aggregate({ where: { ...(user.role === "CLIENT" ? { clientId: userId } : { professionalId: userId }), status: "COMPLETED" }, _sum: { amount: true }, _count: true }),
+      db.projectRequest.count({
+        where: user.role === "CLIENT" ? { clientId: userId } : { professionalId: userId },
+      }),
+      db.projectTracking.count({
+        where: user.role === "CLIENT" ? { clientId: userId } : { professionalId: userId },
+      }),
+      db.projectTransaction.aggregate({
+        where: {
+          ...(user.role === "CLIENT" ? { clientId: userId } : { professionalId: userId }),
+          status: "COMPLETED",
+        },
+        _sum: { amount: true },
+        _count: true,
+      }),
     ]);
-    return NextResponse.json({ user, stats: { jobsPosted, proposals, projects, completedPayments: completedPayments._count, money: completedPayments._sum.amount ?? 0, services: user.services.length } });
-  } catch { return NextResponse.json({ error: "Unable to load user details." }, { status: 500 }); }
+    return NextResponse.json({
+      user,
+      stats: {
+        jobsPosted,
+        proposals,
+        projects,
+        completedPayments: completedPayments._count,
+        money: completedPayments._sum.amount ?? 0,
+        services: user.services.length,
+      },
+    });
+  } catch {
+    return NextResponse.json({ error: "Unable to load user details." }, { status: 500 });
+  }
 }

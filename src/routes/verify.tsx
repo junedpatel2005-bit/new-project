@@ -28,7 +28,7 @@ export default function Verify() {
   };
 
   useEffect(() => {
-    void fetch("/api/auth/me")
+    void fetch("/api/v1/auth/me")
       .then(async (response) => {
         if (!response.ok) return;
         const result = await response.json();
@@ -40,7 +40,7 @@ export default function Verify() {
   async function verify() {
     setPending(true);
     setError(null);
-    const response = await fetch("/api/auth/verify-email", {
+    const response = await fetch("/api/v1/auth/verify-email", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ code: code.join("") }),
@@ -54,7 +54,7 @@ export default function Verify() {
   async function resend() {
     setError(null);
     setMessage(null);
-    const response = await fetch("/api/auth/resend-verification", { method: "POST" });
+    const response = await fetch("/api/v1/auth/resend-verification", { method: "POST" });
     const result = (await response.json()) as { error?: string };
     if (!response.ok) setError(result.error ?? "Unable to resend the code.");
     else setMessage("A new code has been sent to your email.");
@@ -63,7 +63,7 @@ export default function Verify() {
   async function updateEmail() {
     setEmailError(null);
     setEmailMessage(null);
-    const response = await fetch("/api/auth/update-email", {
+    const response = await fetch("/api/v1/auth/update-email", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ email: newEmail.trim() }),

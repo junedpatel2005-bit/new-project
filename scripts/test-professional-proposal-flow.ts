@@ -1,15 +1,18 @@
 import "dotenv/config";
+import { spawn, type ChildProcess } from "node:child_process";
 import { SignJWT } from "jose";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
 
-const base = "http://localhost:3000";
+const base = process.env.TEST_BASE_URL ?? process.env.APP_URL ?? "http://localhost:3000";
 const clientId = 43;
 const professionalId = 76;
 const db = new PrismaClient({
   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
 });
-const secret = new TextEncoder().encode(process.env.AUTH_SECRET!);
+const authSecret = process.env.AUTH_SECRET;
+if (!authSecret) throw new Error("AUTH_SECRET is required to run the project-flow test.");
+const secret = new TextEncoder().encode(authSecret);
 const cookie = async (userId: number, role: "CLIENT" | "PROFESSIONAL") =>
   `servio_session=${await new SignJWT({ userId, role }).setProtectedHeader({ alg: "HS256" }).setExpirationTime("1h").sign(secret)}`;
 
@@ -17,13 +20,50 @@ let jobOne: number | undefined;
 let jobTwo: number | undefined;
 const requestIds: number[] = [];
 const projectIds: number[] = [];
+let managedServer: ChildProcess | undefined;
+
+async function serverIsAvailable() {
+  try {
+    const response = await fetch(`${base}/api/v1/auth/me`, { signal: AbortSignal.timeout(1_000) });
+    return response.status < 500;
+  } catch {
+    return false;
+  }
+}
+
+async function ensureServer() {
+  if (await serverIsAvailable()) return;
+
+  const url = new URL(base);
+  if (url.hostname !== "127.0.0.1" && url.hostname !== "localhost") {
+    throw new Error(
+      `Test server is not reachable at ${base}. Start the configured test server first.`,
+    );
+  }
+
+  managedServer = spawn(process.execPath, ["server.mjs"], {
+    cwd: process.cwd(),
+    env: { ...process.env, PORT: url.port || "3000" },
+    stdio: "ignore",
+  });
+
+  const deadline = Date.now() + 45_000;
+  while (Date.now() < deadline) {
+    if (await serverIsAvailable()) return;
+    if (managedServer.exitCode !== null) break;
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  }
+
+  throw new Error(`Servio test server did not start at ${base} within 45 seconds.`);
+}
 
 async function postProposal(jobId: number, price = 1500) {
-  const response = await fetch(`${base}/api/professional/proposals`, {
+  const response = await fetch(`${base}/api/v1/professional/proposals`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Cookie: await cookie(professionalId, "PROFESSIONAL"),
+      Origin: base,
     },
     body: JSON.stringify({
       jobId,
@@ -36,18 +76,27 @@ async function postProposal(jobId: number, price = 1500) {
 }
 
 async function clientProposalAction(proposalId: number, action: "accept" | "reject") {
-  const response = await fetch(`${base}/api/client/proposals/${proposalId}`, {
+  const response = await fetch(`${base}/api/v1/client/proposals/${proposalId}`, {
     method: "PATCH",
-    headers: { "Content-Type": "application/json", Cookie: await cookie(clientId, "CLIENT") },
+    headers: {
+      "Content-Type": "application/json",
+      Cookie: await cookie(clientId, "CLIENT"),
+      Origin: base,
+    },
     body: JSON.stringify({ action }),
   });
   return { status: response.status, body: await response.json() };
 }
 
 try {
-  const unauthorizedProposal = await fetch(`${base}/api/professional/proposals`, {
+  await ensureServer();
+  const unauthorizedProposal = await fetch(`${base}/api/v1/professional/proposals`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", Cookie: await cookie(clientId, "CLIENT") },
+    headers: {
+      "Content-Type": "application/json",
+      Cookie: await cookie(clientId, "CLIENT"),
+      Origin: base,
+    },
     body: JSON.stringify({
       jobId: 1,
       bidAmount: 1,
@@ -83,13 +132,13 @@ try {
   const duplicate = await postProposal(first.id);
   if (duplicate.status !== 409)
     throw new Error(`duplicate proposal was not rejected: ${JSON.stringify(duplicate)}`);
-  const professionalView = await fetch(`${base}/api/professional/proposals?jobId=${first.id}`, {
+  const professionalView = await fetch(`${base}/api/v1/professional/proposals?jobId=${first.id}`, {
     headers: { Cookie: await cookie(professionalId, "PROFESSIONAL") },
   });
   const professionalData = await professionalView.json();
   if (professionalView.status !== 200 || professionalData.proposal?.id !== sent.body.proposal.id)
     throw new Error("professional proposal did not persist");
-  const professionalJobs = await fetch(`${base}/api/portal/professional-jobs`, {
+  const professionalJobs = await fetch(`${base}/api/v1/portal/professional-jobs`, {
     headers: { Cookie: await cookie(professionalId, "PROFESSIONAL") },
   });
   const professionalJobsData = await professionalJobs.json();
@@ -100,7 +149,7 @@ try {
     )
   )
     throw new Error("proposal did not appear in Professional My Jobs");
-  const clientView = await fetch(`${base}/api/client/jobs/${first.id}`, {
+  const clientView = await fetch(`${base}/api/v1/client/jobs/${first.id}`, {
     headers: { Cookie: await cookie(clientId, "CLIENT") },
   });
   const clientData = await clientView.json();
@@ -126,10 +175,10 @@ try {
     throw new Error(`hire failed: ${JSON.stringify(accepted)}`);
   projectIds.push(accepted.body.project.id);
   const [clientProject, professionalProject] = await Promise.all([
-    fetch(`${base}/api/portal/project?id=${accepted.body.project.id}`, {
+    fetch(`${base}/api/v1/portal/project?id=${accepted.body.project.id}`, {
       headers: { Cookie: await cookie(clientId, "CLIENT") },
     }),
-    fetch(`${base}/api/portal/project?id=${accepted.body.project.id}`, {
+    fetch(`${base}/api/v1/portal/project?id=${accepted.body.project.id}`, {
       headers: { Cookie: await cookie(professionalId, "PROFESSIONAL") },
     }),
   ]);
@@ -173,4 +222,5 @@ try {
       },
     });
   await db.$disconnect();
+  if (managedServer && managedServer.exitCode === null) managedServer.kill();
 }

@@ -32,7 +32,7 @@ export function ClientAccountMenu() {
 
   useEffect(() => {
     let active = true;
-    void fetch("/api/auth/me")
+    void fetch("/api/v1/auth/me")
       .then(async (response) => {
         if (!response.ok) return null;
         const data = (await response.json()) as { user: AccountUser | null };
@@ -52,7 +52,7 @@ export function ClientAccountMenu() {
   }, []);
 
   async function logout() {
-    await fetch("/api/auth/logout", { method: "POST" });
+    await fetch("/api/v1/auth/logout", { method: "POST" });
     router.replace("/login");
   }
 

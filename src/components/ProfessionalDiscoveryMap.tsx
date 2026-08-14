@@ -1,26 +1,14 @@
 "use client";
 
-import { useEffect } from "react";
+import type { DivIcon } from "leaflet";
+import { useEffect, useState } from "react";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import type { ProfessionalDiscoveryResult } from "@/lib/types/professional-discovery";
-
-const markerIcon = typeof window !== "undefined"
-  ? (() => {
-      const L = require("leaflet") as typeof import("leaflet");
-      return L.divIcon({
-        className: "",
-        html: '<div class="text-2xl">📍</div>',
-        iconSize: [28, 28],
-        iconAnchor: [14, 28],
-      }) as any;
-    })()
-  : null;
 
 function FitBounds({ bounds }: { bounds: [number, number][] }) {
   const map = useMap();
   useEffect(() => {
-    if (bounds.length === 0) return;
-    map.fitBounds(bounds, { padding: [30, 30] });
+    if (bounds.length > 0) map.fitBounds(bounds, { padding: [30, 30] });
   }, [bounds, map]);
   return null;
 }
@@ -28,8 +16,7 @@ function FitBounds({ bounds }: { bounds: [number, number][] }) {
 function SelectedPointFocus({ point }: { point?: { lat: number; lng: number } }) {
   const map = useMap();
   useEffect(() => {
-    if (!point) return;
-    map.flyTo([point.lat, point.lng], 12, { duration: 0.75 });
+    if (point) map.flyTo([point.lat, point.lng], 12, { duration: 0.75 });
   }, [point, map]);
   return null;
 }
@@ -41,10 +28,23 @@ export default function ProfessionalDiscoveryMap({
   professionals: ProfessionalDiscoveryResult[];
   selectedPoint?: { lat: number; lng: number };
 }) {
+  const [markerIcon, setMarkerIcon] = useState<DivIcon | null>(null);
+  useEffect(() => {
+    void import("leaflet").then((leaflet) => {
+      setMarkerIcon(
+        leaflet.divIcon({
+          className: "",
+          html: '<div class="text-2xl">📍</div>',
+          iconSize: [28, 28],
+          iconAnchor: [14, 28],
+        }),
+      );
+    });
+  }, []);
+
   const points = professionals
     .map((professional) => professional.displayPoint)
     .filter((point): point is { lat: number; lng: number } => Boolean(point));
-
   const initialPoint = points[0] ?? { lat: 37.7749, lng: -122.4194 };
   const bounds = points.map((point) => [point.lat, point.lng] as [number, number]);
 
@@ -69,7 +69,11 @@ export default function ProfessionalDiscoveryMap({
           const point = professional.displayPoint;
           if (!point) return null;
           return (
-            <Marker key={professional.id} position={[point.lat, point.lng]} icon={markerIcon as any}>
+            <Marker
+              key={professional.id}
+              position={[point.lat, point.lng]}
+              icon={markerIcon ?? undefined}
+            >
               <Popup>
                 <div className="max-w-xs">
                   <strong>{professional.name}</strong>

@@ -6,12 +6,12 @@ Every feature from both documents appears below. Nothing has been dropped. Each 
 
 ## Legend
 
-| Tag | Meaning |
-|---|---|
-| **[P1]** | In Phase 1 — present in both source documents |
-| **[P2]** | Phase 2 — in the full scope, removed from Phase 1 |
-| **[FUTURE]** | Explicitly marked "Future Scope" in the source document |
-| **⚠** | Conflict or dependency gap — see *Open Decisions* at the end of this document |
+| Tag          | Meaning                                                                       |
+| ------------ | ----------------------------------------------------------------------------- |
+| **[P1]**     | In Phase 1 — present in both source documents                                 |
+| **[P2]**     | Phase 2 — in the full scope, removed from Phase 1                             |
+| **[FUTURE]** | Explicitly marked "Future Scope" in the source document                       |
+| **⚠**        | Conflict or dependency gap — see _Open Decisions_ at the end of this document |
 
 **Platforms:** All client-side and professional-side features apply to the **Website Portal**, **iOS App**, and **Android App** unless stated otherwise.
 
@@ -39,7 +39,7 @@ For visitors landing on the platform for the first time.
 
 # 2) 👤 CLIENT SIDE FEATURES
 
-*Client = person or business posting a job.*
+_Client = person or business posting a job._
 
 Available in: **Website Portal**, **iOS App**, **Android App**
 
@@ -66,10 +66,10 @@ Client should be able to:
 
 ## C. Job / Project Posting
 
-*Core feature.* Client should be able to:
+_Core feature._ Client should be able to:
 
 - Post new job / project **[P1]**
-- Select category **[P1]** — *category list to be shared at a later stage*
+- Select category **[P1]** — _category list to be shared at a later stage_
 - Add title **[P1]**
 - Add description **[P1]**
 - Upload photos / documents **[P1]**
@@ -87,7 +87,7 @@ Client should be able to:
 
 - Search professionals **[P1]**
 - Filter by:
-  - Category **[P1]** — *category list to be shared at a later stage*
+  - Category **[P1]** — _category list to be shared at a later stage_
   - City **[P1]**
   - Distance **[P1]**
   - Rating **[P1]**
@@ -100,12 +100,12 @@ Client should be able to:
 
 Client should be able to:
 
-- Receive proposals **[P2]** ⚠ *Recommend moving to P1 — see Decision 2*
+- Receive proposals **[P2]** ⚠ _Recommend moving to P1 — see Decision 2_
 - View professional profile **[P1]**
 - View pricing **[P1]**
 - Chat before hiring **[P2]**
 - Shortlist professional **[P1]**
-- Accept / reject proposal **[P2]** ⚠ *Recommend moving to P1 — see Decision 2*
+- Accept / reject proposal **[P2]** ⚠ _Recommend moving to P1 — see Decision 2_
 - Hire professional **[P1]**
 
 ## F. Payment Features
@@ -116,7 +116,7 @@ Client should be able to:
 - See invoice **[P2]**
 - See payment breakdown **[P2]**
 - Release payment after completion **[P2]**
-- Request refund / dispute **[P2]** ⚠ *See Decision 4*
+- Request refund / dispute **[P2]** ⚠ _See Decision 4_
 
 ## G. Project Tracking
 
@@ -135,24 +135,24 @@ Client should be able to:
 - Rate professional **[P1]**
 - Leave review **[P1]**
 - Report issue **[P1]**
-- Raise dispute **[P1]** ⚠ *See Decision 4*
+- Raise dispute **[P1]** ⚠ _See Decision 4_
 
 ## I. Notifications
 
 Client should receive:
 
-- Proposal received **[P2]** ⚠ *Recommend P1 — see Decision 5*
+- Proposal received **[P2]** ⚠ _Recommend P1 — see Decision 5_
 - Message received **[P2]**
-- Professional hired **[P2]** ⚠ *Recommend P1 — see Decision 5*
+- Professional hired **[P2]** ⚠ _Recommend P1 — see Decision 5_
 - Payment successful **[P2]**
-- Job completed **[P2]** ⚠ *Recommend P1 — see Decision 5*
-- Review request **[P2]** ⚠ *Recommend P1 — see Decision 5*
+- Job completed **[P2]** ⚠ _Recommend P1 — see Decision 5_
+- Review request **[P2]** ⚠ _Recommend P1 — see Decision 5_
 
 ---
 
 # 3) 🛠️ PROFESSIONAL SIDE FEATURES
 
-*Professional = worker / freelancer / service provider.*
+_Professional = worker / freelancer / service provider._
 
 Available in: **Website Portal**, **iOS App**, **Android App**
 
@@ -205,7 +205,7 @@ Professional should be able to:
 - Filter by:
   - Distance **[P1]**
   - City **[P1]**
-  - Category **[P1]** — *category list to be shared at a later stage*
+  - Category **[P1]** — _category list to be shared at a later stage_
   - Budget **[P1]**
   - Urgency **[P1]**
   - On-site / remote **[P1]**
@@ -217,11 +217,11 @@ Professional should be able to:
 Professional should be able to:
 
 - Apply to jobs **[P1]**
-- Send proposal **[P2]** ⚠ *Same action as "Apply to jobs" — see Decision 2*
+- Send proposal **[P2]** ⚠ _Same action as "Apply to jobs" — see Decision 2_
 - Add quote **[P1]**
 - Add timeline **[P1]**
 - Add cover message **[P1]**
-- Negotiate if needed **[P1]** ⚠ *Requires a channel — see Decision 3*
+- Negotiate if needed **[P1]** ⚠ _Requires a channel — see Decision 3_
 
 ## F. Work Management
 
@@ -232,18 +232,18 @@ Professional should be able to:
 - Update progress **[P1]**
 - Upload work proof / photos **[P1]**
 - Mark job complete **[P1]**
-- Request milestone payment **[P1]** ⚠ *Depends on payments — see Decision 1*
+- Request milestone payment **[P1]** ⚠ _Depends on payments — see Decision 1_
 
 ## G. Earnings & Wallet
 
 Professional should be able to:
 
-- View earnings **[P1]** ⚠ *Depends on payments — see Decision 1*
+- View earnings **[P1]** ⚠ _Depends on payments — see Decision 1_
 - View completed jobs **[P1]**
-- See pending payouts **[P1]** ⚠ *Depends on payments*
-- Withdraw money **[P1]** ⚠ *Depends on payments*
-- View invoices **[P1]** ⚠ *Depends on payments*
-- View platform commission deduction **[P1]** ⚠ *Depends on payments*
+- See pending payouts **[P1]** ⚠ _Depends on payments_
+- Withdraw money **[P1]** ⚠ _Depends on payments_
+- View invoices **[P1]** ⚠ _Depends on payments_
+- View platform commission deduction **[P1]** ⚠ _Depends on payments_
 
 ## H. Reviews & Ratings
 
@@ -261,7 +261,7 @@ Professional should receive:
 - Proposal accepted **[P1]**
 - Message received **[P2]**
 - Verification approved **[P1]**
-- Payment released **[P1]** ⚠ *Depends on payments — see Decision 1*
+- Payment released **[P1]** ⚠ _Depends on payments — see Decision 1_
 - Review received **[P1]**
 
 ---
@@ -301,7 +301,7 @@ Show instead:
 - Service radius
 - Distance
 
-✔ Correct: *"Based in Surat – 12 km away"*
+✔ Correct: _"Based in Surat – 12 km away"_
 ❌ Wrong: showing house address, company name, or phone number publicly
 
 ---
@@ -319,26 +319,26 @@ All client payment features were cut from Phase 1, but the professional's **Earn
 
 ### Decision 2 — How a proposal becomes a hire
 
-Professionals can still *Apply to jobs* and *Add quote* in Phase 1, but the client's *Receive proposals* and *Accept / reject proposal* were cut — while *Hire professional* stayed. There is no path from a proposal to a hire. Also note *Apply to jobs* and *Send proposal* are the same action written twice; keep one label.
+Professionals can still _Apply to jobs_ and _Add quote_ in Phase 1, but the client's _Receive proposals_ and _Accept / reject proposal_ were cut — while _Hire professional_ stayed. There is no path from a proposal to a hire. Also note _Apply to jobs_ and _Send proposal_ are the same action written twice; keep one label.
 
-**Recommendation:** Move *Receive proposals* and *Accept / reject proposal* into Phase 1.
+**Recommendation:** Move _Receive proposals_ and _Accept / reject proposal_ into Phase 1.
 **Decision:** ______________________
 
 ### Decision 3 — Negotiation without chat
 
-*Chat before hiring* and both *Message received* notifications were cut from Phase 1, but the professional's *Negotiate if needed* remains. Negotiation needs a channel.
+_Chat before hiring_ and both _Message received_ notifications were cut from Phase 1, but the professional's _Negotiate if needed_ remains. Negotiation needs a channel.
 
 **Options:** (a) add basic in-app chat to Phase 1, (b) allow revised quotes only, (c) drop negotiation from Phase 1.
 **Decision:** ______________________
 
 ### Decision 4 — Disputes with no remedy
 
-Client *Report issue* and *Raise dispute* stayed in Phase 1, but *Request refund / dispute* left with the payment section. Define what a Phase-1 dispute actually does — most likely an admin ticket with no financial action.
+Client _Report issue_ and _Raise dispute_ stayed in Phase 1, but _Request refund / dispute_ left with the payment section. Define what a Phase-1 dispute actually does — most likely an admin ticket with no financial action.
 **Decision:** ______________________
 
 ### Decision 5 — One-sided notifications
 
-Professional notifications were kept almost in full; client notifications were removed entirely. This looks like an oversight. At minimum the client needs *Professional hired*, *Job completed*, and *Review request*.
+Professional notifications were kept almost in full; client notifications were removed entirely. This looks like an oversight. At minimum the client needs _Professional hired_, _Job completed_, and _Review request_.
 **Decision:** ______________________
 
 ---
@@ -346,7 +346,7 @@ Professional notifications were kept almost in full; client notifications were r
 # 6) ITEMS PENDING FROM CLIENT
 
 - **Service / job category list** — referenced in three places (job posting, client discovery filter, professional discovery filter) and marked "will share at a later stage." Blocks database schema and filter UI.
-- **Commission / fee structure** — the public *Pricing / Fees / Commission* page and the professional's *platform commission deduction* both need the actual numbers.
+- **Commission / fee structure** — the public _Pricing / Fees / Commission_ page and the professional's _platform commission deduction_ both need the actual numbers.
 
 ---
 

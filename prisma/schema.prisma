@@ -99,14 +99,14 @@ model ServiceCategory {
 }
 
 model User {
-  id                                  Int             @id @default(autoincrement())
-  role                                UserRole        @default(CLIENT)
+  id                                  Int                       @id @default(autoincrement())
+  role                                UserRole                  @default(CLIENT)
   firstName                           String
   lastName                            String
-  email                               String          @unique
-  phone                               String?         @unique
+  email                               String                    @unique
+  phone                               String?                   @unique
   passwordHash                        String?
-  googleId                            String?         @unique
+  googleId                            String?                   @unique
   avatarUrl                           String?
   companyName                         String?
   companyWebsite                      String?
@@ -125,33 +125,34 @@ model User {
   certificationsJson                  String?
   tradeLicenseUrl                     String?
   serviceArea                         String?
-  workMode                            String          @default("both")
+  workMode                            String                    @default("both")
   serviceRadiusKm                     Int?
-  averageRating                       Float           @default(0)
-  reviewCount                         Int             @default(0)
-  isVerified                          Boolean         @default(false)
-  availabilityStatus                  String          @default("available")
+  averageRating                       Float                     @default(0)
+  reviewCount                         Int                       @default(0)
+  isVerified                          Boolean                   @default(false)
+  availabilityStatus                  String                    @default("available")
   savedLocationsJson                  String?
   hiringNeedsJson                     String?
-  authProvider                        String          @default("LOCAL")
-  isActive                            Boolean         @default(true)
+  authProvider                        String                    @default("LOCAL")
+  isActive                            Boolean                   @default(true)
   lastLoginAt                         DateTime?
-  createdAt                           DateTime        @default(now())
-  updatedAt                           DateTime        @updatedAt
+  createdAt                           DateTime                  @default(now())
+  updatedAt                           DateTime                  @updatedAt
   professionalLatitude                Float?
   professionalLongitude               Float?
-  biometricEnabled                    Boolean         @default(false)
+  biometricEnabled                    Boolean                   @default(false)
   biometricType                       String?
-  browserNotificationsEnabled         Boolean         @default(true)
-  emailNotificationsEnabled           Boolean         @default(true)
+  browserNotificationsEnabled         Boolean                   @default(true)
+  emailNotificationsEnabled           Boolean                   @default(true)
   emailVerifiedAt                     DateTime?
   phoneVerifiedAt                     DateTime?
-  projectActivityNotificationsEnabled Boolean         @default(true)
+  projectActivityNotificationsEnabled Boolean                   @default(true)
   clientJobs                          ClientJob[]
   clientProfiles                      ClientProfile[]
   favoriteJobs                        FavoriteJob[]
   verification                        ProfessionalVerification?
   services                            Service[]
+  auditLogs                           AuditLog[]                @relation("AuditActor")
 }
 
 model ClientProfile {
@@ -334,19 +335,19 @@ model ProjectRequest {
 }
 
 model ProjectTracking {
-  id             Int      @id @default(autoincrement())
-  requestId      Int      @unique
+  id             Int       @id @default(autoincrement())
+  requestId      Int       @unique
   jobId          Int
   clientId       Int
   professionalId Int
-  status         String   @default("READY_TO_START")
-  progress       Int      @default(0)
+  status         String    @default("READY_TO_START")
+  progress       Int       @default(0)
   currentStage   String?
-  acceptedAt     DateTime @default(now())
+  acceptedAt     DateTime  @default(now())
   startedAt      DateTime?
   completedAt    DateTime?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   @@index([jobId])
   @@index([clientId])
@@ -371,7 +372,6 @@ model ProjectTimelineEvent {
   @@index([trackingId, createdAt])
   @@map("ProjectTimelineEvent")
 }
-
 
 model ProjectMilestone {
   id             Int       @id @default(autoincrement())
@@ -730,13 +730,13 @@ model ProfessionalVerification {
 }
 
 model VerificationDocumentReview {
-  id        Int      @id @default(autoincrement())
-  userId    Int
+  id          Int       @id @default(autoincrement())
+  userId      Int
   documentKey String
-  status    String   @default("PENDING")
-  reviewedAt DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  status      String    @default("PENDING")
+  reviewedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   @@unique([userId, documentKey])
   @@index([userId])
@@ -755,6 +755,23 @@ model StoredFile {
   createdAt  DateTime @default(now())
 
   @@index([ownerId])
+}
+
+model AuditLog {
+  id         Int      @id @default(autoincrement())
+  actorId    Int?
+  action     String
+  entityType String
+  entityId   String
+  requestId  String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+  actor      User?    @relation("AuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([actorId, createdAt])
+  @@index([entityType, entityId, createdAt])
+  @@index([action, createdAt])
+  @@map("audit_logs")
 }
 
 model ApiToken {

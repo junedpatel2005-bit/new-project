@@ -16,7 +16,7 @@ async function request(
   action: string,
   input: Record<string, unknown> = {},
 ) {
-  const response = await fetch(`${base}/api/portal/project-actions`, {
+  const response = await fetch(`${base}/api/v1/portal/project-actions`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -28,7 +28,7 @@ async function request(
   return { action, status: response.status, body };
 }
 async function project(userId: number, role: "CLIENT" | "PROFESSIONAL") {
-  const response = await fetch(`${base}/api/portal/project?id=81`, {
+  const response = await fetch(`${base}/api/v1/portal/project?id=81`, {
     headers: { Cookie: `servio_session=${await token(userId, role)}` },
   });
   return { status: response.status, body: await response.json() };

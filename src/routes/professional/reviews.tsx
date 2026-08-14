@@ -18,7 +18,7 @@ export default function ProfessionalReviews() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    void fetch("/api/portal/reviews")
+    void fetch("/api/v1/portal/reviews")
       .then(async (response) => {
         if (!response.ok) throw new Error();
         return response.json() as Promise<Review[]>;

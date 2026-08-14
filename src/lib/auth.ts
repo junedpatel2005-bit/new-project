@@ -2,7 +2,9 @@ import "server-only";
 import { SignJWT, jwtVerify } from "jose";
 import type { UserRole } from "@/generated/prisma/client";
 
-const secret = new TextEncoder().encode(process.env.AUTH_SECRET!);
+const authSecret = process.env.AUTH_SECRET;
+if (!authSecret) throw new Error("AUTH_SECRET is required.");
+const secret = new TextEncoder().encode(authSecret);
 export const sessionCookie = "servio_session";
 export type Session = { userId: number; role: UserRole };
 export async function createSession(session: Session) {

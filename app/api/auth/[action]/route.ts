@@ -13,6 +13,11 @@ import {
 import { requestPhoneOtp, verifyPhoneOtp } from "@/lib/phone-otp-provider";
 import { clearRateLimit, rateLimit } from "@/lib/rate-limit";
 import { sendAuthEmail, sendVerificationCodeEmail } from "@/lib/email";
+import { enqueueBackgroundJob } from "@/lib/background-jobs";
+import {
+  notifyAdminsOfNewAccount,
+  notifyClientsOfNewProfessional,
+} from "@/lib/marketplace-notifications";
 
 const registerSchema = z
   .object({
@@ -45,7 +50,7 @@ export async function GET(
     const clientId = process.env.GOOGLE_CLIENT_ID;
     const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
     const appUrl = process.env.APP_URL ?? new URL(request.url).origin;
-    const callbackUrl = `${appUrl}/api/auth/google`;
+    const callbackUrl = `${appUrl}/api/v1/auth/google`;
 
     if (!clientId || !clientSecret) {
       return NextResponse.redirect(new URL("/login?oauthError=google-not-configured", request.url));
@@ -109,6 +114,7 @@ export async function GET(
       let user = await db.user.findFirst({
         where: { OR: [{ googleId: profile.sub }, { email: profile.email }] },
       });
+      let createdAccount = false;
       if (!user) {
         const names = (profile.name ?? "New User").trim().split(/\s+/, 2);
         user = await db.user.create({
@@ -122,11 +128,18 @@ export async function GET(
             emailVerifiedAt: new Date(),
           },
         });
+        createdAccount = true;
       } else if (!user.googleId) {
         user = await db.user.update({
           where: { id: user.id },
           data: { googleId: profile.sub, authProvider: "GOOGLE", emailVerifiedAt: new Date() },
         });
+      }
+      if (createdAccount && user.role !== "ADMIN") {
+        await Promise.all([
+          notifyAdminsOfNewAccount(user),
+          ...(user.role === "PROFESSIONAL" ? [notifyClientsOfNewProfessional(user)] : []),
+        ]);
       }
       const redirect =
         user.role === "CLIENT"
@@ -189,8 +202,7 @@ export async function POST(
   const rateLimitKey = loginEmail
     ? `${action}:${clientKey(request)}:${loginEmail}`
     : `${action}:${clientKey(request)}`;
-  if (!rateLimit(rateLimitKey))
-    return safe("Too many attempts. Please try again shortly.", 429);
+  if (!rateLimit(rateLimitKey)) return safe("Too many attempts. Please try again shortly.", 429);
   if (action === "send-phone-otp") {
     const parsed = z.object({ phone: z.string().min(7).max(25) }).safeParse(body);
     if (!parsed.success) return safe("Enter a valid phone number.");
@@ -302,6 +314,10 @@ export async function POST(
         phoneVerifiedAt: new Date(),
       },
     });
+    await Promise.all([
+      notifyAdminsOfNewAccount(user),
+      ...(user.role === "PROFESSIONAL" ? [notifyClientsOfNewProfessional(user)] : []),
+    ]);
     const code = verificationCode();
     await db.apiToken.create({
       data: {
@@ -311,7 +327,9 @@ export async function POST(
         expiresAt: new Date(Date.now() + 15 * 60 * 1000),
       },
     });
-    await sendVerificationCodeEmail(user.email, code);
+    enqueueBackgroundJob("email.verification", () => sendVerificationCodeEmail(user.email, code), {
+      userId: user.id,
+    });
     const response = NextResponse.json(
       {
         success: true,
@@ -337,21 +355,51 @@ export async function POST(
       !(await bcrypt.compare(parsed.data.password, user.passwordHash))
     )
       return safe("Invalid email or password.", 401);
+
+    const isFirstLogin = !user.lastLoginAt;
+    const nextRedirect =
+      user.role === "ADMIN"
+        ? "/admin"
+        : !user.emailVerifiedAt
+          ? "/verify"
+          : user.role === "PROFESSIONAL"
+            ? user.professionalCategory &&
+              user.professionalLatitude !== null &&
+              user.professionalLongitude !== null
+              ? "/professional/dashboard"
+              : "/professional/setup"
+            : "/dashboard";
+
+    await db.$transaction([
+      db.user.update({
+        where: { id: user.id },
+        data: { lastLoginAt: new Date() },
+      }),
+      ...(isFirstLogin
+        ? [
+            db.userNotification.create({
+              data: {
+                userId: user.id,
+                type: user.role === "PROFESSIONAL" ? "WELCOME_PROFESSIONAL" : "WELCOME_CLIENT",
+                title:
+                  user.role === "PROFESSIONAL"
+                    ? "Welcome to your professional dashboard"
+                    : "Welcome to Servio",
+                description:
+                  user.role === "PROFESSIONAL"
+                    ? "Your profile is ready. Update your setup and start getting matched with clients."
+                    : "Your account is ready. Start exploring professionals or post your first project.",
+                href: user.role === "PROFESSIONAL" ? "/professional/dashboard" : "/dashboard",
+              },
+            }),
+          ]
+        : []),
+    ]);
+
     clearRateLimit(rateLimitKey);
     const response = NextResponse.json({
       success: true,
-      redirect:
-        user.role === "ADMIN"
-          ? "/admin"
-          : !user.emailVerifiedAt
-            ? "/verify"
-            : user.role === "PROFESSIONAL"
-              ? user.professionalCategory &&
-                user.professionalLatitude !== null &&
-                user.professionalLongitude !== null
-                ? "/professional/dashboard"
-                : "/professional/setup"
-              : "/dashboard",
+      redirect: nextRedirect,
     });
     response.cookies.set(
       sessionCookie,
@@ -406,7 +454,11 @@ export async function POST(
           },
         }),
       ]);
-      await sendVerificationCodeEmail(parsed.data.email, code);
+      enqueueBackgroundJob(
+        "email.verification",
+        () => sendVerificationCodeEmail(parsed.data.email, code),
+        { userId: user.id },
+      );
       return NextResponse.json({
         success: true,
         message: "Email updated. A new code has been sent.",
@@ -433,7 +485,13 @@ export async function POST(
           expiresAt: new Date(Date.now() + 15 * 60 * 1000),
         },
       });
-      await sendVerificationCodeEmail(user.email, code);
+      enqueueBackgroundJob(
+        "email.verification",
+        () => sendVerificationCodeEmail(user.email, code),
+        {
+          userId: user.id,
+        },
+      );
       return NextResponse.json({ success: true });
     } catch {
       return safe("Unable to send a new verification code.", 500);
@@ -453,12 +511,17 @@ export async function POST(
           expiresAt: new Date(Date.now() + 3600000),
         },
       });
-      await sendAuthEmail(
-        user.email,
-        "Reset your Servio password",
-        "Reset your password",
-        `${process.env.APP_URL}/reset-password?token=${raw}`,
-        "Reset password",
+      enqueueBackgroundJob(
+        "email.password-reset",
+        () =>
+          sendAuthEmail(
+            user.email,
+            "Reset your Servio password",
+            "Reset your password",
+            `${process.env.APP_URL}/reset-password?token=${raw}`,
+            "Reset password",
+          ),
+        { userId: user.id },
       );
     }
     return NextResponse.json({ success: true });

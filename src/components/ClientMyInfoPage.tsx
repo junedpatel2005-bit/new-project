@@ -64,7 +64,7 @@ export function ClientMyInfoPage({ data }: { data: ClientAccountSummaryResponse 
 
   async function handleLogout() {
     setLoggingOut(true);
-    await fetch("/api/auth/logout", { method: "POST" });
+    await fetch("/api/v1/auth/logout", { method: "POST" });
     router.replace("/login");
   }
 

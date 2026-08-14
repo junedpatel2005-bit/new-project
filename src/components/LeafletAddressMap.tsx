@@ -1,18 +1,7 @@
 "use client";
 
+import type { Map as LeafletMap, Marker } from "leaflet";
 import { useEffect, useRef } from "react";
-
-const markerIcon = typeof window !== "undefined"
-  ? (() => {
-      const L = require("leaflet") as typeof import("leaflet");
-      return L.divIcon({
-        className: "",
-        html: '<div style="font-size:28px">📍</div>',
-        iconSize: [28, 28],
-        iconAnchor: [14, 28],
-      }) as any;
-    })()
-  : null;
 
 export default function LeafletAddressMap({
   point,
@@ -22,8 +11,8 @@ export default function LeafletAddressMap({
   onPointChange: (lat: number, lon: number) => void;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<L.Map | null>(null);
-  const markerRef = useRef<L.Marker | null>(null);
+  const mapRef = useRef<LeafletMap | null>(null);
+  const markerRef = useRef<Marker | null>(null);
   const pointChangeRef = useRef(onPointChange);
   const initialPointRef = useRef(point);
 
@@ -35,30 +24,43 @@ export default function LeafletAddressMap({
     const container = containerRef.current;
     if (!container || mapRef.current) return;
 
-    const initialPoint = initialPointRef.current;
-    const L = require("leaflet") as typeof import("leaflet");
-    const map = L.map(container, { scrollWheelZoom: true }).setView(initialPoint, 5);
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    }).addTo(map);
+    let disposed = false;
+    void import("leaflet").then((leaflet) => {
+      if (disposed || mapRef.current) return;
 
-    const marker = L.marker(initialPoint, { draggable: true, icon: markerIcon as any }).addTo(map);
-    map.on("click", (event: L.LeafletMouseEvent) => {
-      marker.setLatLng(event.latlng);
-      pointChangeRef.current(event.latlng.lat, event.latlng.lng);
-    });
-    marker.on("dragend", () => {
-      const selectedPoint = marker.getLatLng();
-      pointChangeRef.current(selectedPoint.lat, selectedPoint.lng);
+      const initialPoint = initialPointRef.current;
+      const map = leaflet.map(container, { scrollWheelZoom: true }).setView(initialPoint, 5);
+      leaflet
+        .tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution:
+            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        })
+        .addTo(map);
+      const icon = leaflet.divIcon({
+        className: "",
+        html: '<div style="font-size:28px">📍</div>',
+        iconSize: [28, 28],
+        iconAnchor: [14, 28],
+      });
+      const marker = leaflet.marker(initialPoint, { draggable: true, icon }).addTo(map);
+      map.on("click", (event) => {
+        marker.setLatLng(event.latlng);
+        pointChangeRef.current(event.latlng.lat, event.latlng.lng);
+      });
+      marker.on("dragend", () => {
+        const selectedPoint = marker.getLatLng();
+        pointChangeRef.current(selectedPoint.lat, selectedPoint.lng);
+      });
+      mapRef.current = map;
+      markerRef.current = marker;
     });
 
-    mapRef.current = map;
-    markerRef.current = marker;
     return () => {
+      disposed = true;
       markerRef.current = null;
+      const map = mapRef.current;
       mapRef.current = null;
-      map.remove();
+      map?.remove();
     };
   }, []);
 

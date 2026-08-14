@@ -12,7 +12,7 @@ export default function Forgot() {
   const [pending, setPending] = useState(false);
   async function submit(formData: FormData) {
     setPending(true);
-    await fetch("/api/auth/forgot-password", {
+    await fetch("/api/v1/auth/forgot-password", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ email: formData.get("email") }),

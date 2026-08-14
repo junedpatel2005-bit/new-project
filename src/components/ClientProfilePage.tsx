@@ -70,7 +70,7 @@ export function ClientProfilePage() {
   async function load() {
     setLoading(true);
     try {
-      const response = await fetch("/api/profile");
+      const response = await fetch("/api/v1/profile");
       const result = (await response.json()) as Data & { error?: string };
       if (!response.ok) throw new Error(result.error ?? "Unable to load your profile.");
       setData(result);
@@ -96,7 +96,7 @@ export function ClientProfilePage() {
     setSaving(true);
     setMessage(null);
     try {
-      const response = await fetch("/api/profile", {
+      const response = await fetch("/api/v1/profile", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify(form),
@@ -119,7 +119,7 @@ export function ClientProfilePage() {
     const isEditing = "id" in location;
     try {
       const response = await fetch(
-        isEditing ? `/api/profile/locations/${location.id}` : "/api/profile/locations",
+        isEditing ? `/api/v1/profile/locations/${location.id}` : "/api/v1/profile/locations",
         {
           method: isEditing ? "PATCH" : "POST",
           headers: { "content-type": "application/json" },
@@ -142,7 +142,7 @@ export function ClientProfilePage() {
     const id = deleting.id;
     setDeleting(null);
     setMessage(null);
-    const response = await fetch(`/api/profile/locations/${id}`, { method: "DELETE" });
+    const response = await fetch(`/api/v1/profile/locations/${id}`, { method: "DELETE" });
     if (response.ok) {
       setMessage("Location deleted successfully.");
       await load();

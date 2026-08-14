@@ -30,7 +30,7 @@ async function action(
   userId = professionalId,
   role: "CLIENT" | "PROFESSIONAL" = "PROFESSIONAL",
 ) {
-  const response = await fetch(`${base}/api/portal/project-actions`, {
+  const response = await fetch(`${base}/api/v1/portal/project-actions`, {
     method: "POST",
     headers: { "Content-Type": "application/json", Cookie: await cookie(userId, role) },
     body: JSON.stringify({ action: actionName, projectId: trackingId, ...values }),
@@ -45,7 +45,7 @@ async function upload(files: File[]) {
   const form = new FormData();
   form.set("projectId", String(trackingId));
   files.forEach((file) => form.append("files", file));
-  const response = await fetch(`${base}/api/portal/project-files`, {
+  const response = await fetch(`${base}/api/v1/portal/project-files`, {
     method: "POST",
     headers: { Cookie: await cookie(professionalId, "PROFESSIONAL") },
     body: form,
@@ -140,7 +140,7 @@ try {
       clientId,
       "CLIENT",
     );
-  const view = await fetch(`${base}/api/portal/project?id=${trackingId}`, {
+  const view = await fetch(`${base}/api/v1/portal/project?id=${trackingId}`, {
     headers: { Cookie: await cookie(clientId, "CLIENT") },
   });
   const data = await view.json();
@@ -176,7 +176,7 @@ try {
   await action("approve-milestone", { milestoneId: first.id }, clientId, "CLIENT");
 
   let current = await (
-    await fetch(`${base}/api/portal/project?id=${trackingId}`, {
+    await fetch(`${base}/api/v1/portal/project?id=${trackingId}`, {
       headers: { Cookie: await cookie(clientId, "CLIENT") },
     })
   ).json();
@@ -197,7 +197,7 @@ try {
     });
     await action("approve-milestone", { milestoneId: milestone.id }, clientId, "CLIENT");
     current = await (
-      await fetch(`${base}/api/portal/project?id=${trackingId}`, {
+      await fetch(`${base}/api/v1/portal/project?id=${trackingId}`, {
         headers: { Cookie: await cookie(clientId, "CLIENT") },
       })
     ).json();
@@ -214,7 +214,7 @@ try {
   });
   if (denied.status !== 404) throw new Error(`unauthorized access returned ${denied.status}`);
   const persisted = await (
-    await fetch(`${base}/api/portal/project?id=${trackingId}`, {
+    await fetch(`${base}/api/v1/portal/project?id=${trackingId}`, {
       headers: { Cookie: await cookie(clientId, "CLIENT") },
     })
   ).json();

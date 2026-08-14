@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { sessionCookie, verifySession } from "@/lib/auth";
+import { notifyAdminsOfNewProposal } from "@/lib/marketplace-notifications";
 
 const proposalSchema = z.object({
   jobId: z.number().int().positive(),
@@ -98,6 +99,13 @@ export async function POST(request: NextRequest) {
         description: `${professional ? `${professional.firstName} ${professional.lastName}` : "A professional"} sent a proposal for ${job.title ?? "your job"}.`,
         href: `/job/${job.id}`,
       },
+    });
+    await notifyAdminsOfNewProposal({
+      jobId: job.id,
+      jobTitle: job.title,
+      professionalName: professional
+        ? `${professional.firstName} ${professional.lastName}`.trim()
+        : "A professional",
     });
     return NextResponse.json({ proposal }, { status: 201 });
   } catch (error) {

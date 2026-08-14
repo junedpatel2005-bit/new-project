@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { sessionCookie, verifySession } from "@/lib/auth";
+import { notifyAdminsOfNewJob, notifyProfessionalsOfNewJob } from "@/lib/marketplace-notifications";
 
 const jobInput = z.object({
   title: z.string().trim().max(160).optional().or(z.literal("")),
@@ -104,9 +105,7 @@ export async function GET(request: NextRequest) {
     _count: { id: true },
   });
   const trackingByJob = new Map(tracking.map((project) => [project.jobId, project]));
-  const proposalCountByJob = new Map(
-    proposalCounts.map((item) => [item.jobId, item._count.id]),
-  );
+  const proposalCountByJob = new Map(proposalCounts.map((item) => [item.jobId, item._count.id]));
 
   return NextResponse.json({
     jobs: jobs.map((job) => {
@@ -144,5 +143,8 @@ export async function POST(request: NextRequest) {
       status: parsed.data.mode === "publish" ? "OPEN" : "DRAFT",
     },
   });
+  if (job.status === "OPEN") {
+    await Promise.all([notifyProfessionalsOfNewJob(job), notifyAdminsOfNewJob(job)]);
+  }
   return NextResponse.json({ job }, { status: 201 });
 }

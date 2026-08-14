@@ -2,7 +2,16 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { ArrowRight, BellRing, BriefcaseBusiness, CircleDollarSign, FileText, Plus, Star, UsersRound } from "lucide-react";
+import {
+  ArrowRight,
+  BellRing,
+  BriefcaseBusiness,
+  CircleDollarSign,
+  FileText,
+  Plus,
+  Star,
+  UsersRound,
+} from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { DashboardSkeleton } from "@/components/LoadingSkeleton";
@@ -11,9 +20,31 @@ type DashboardData = {
   user: { firstName: string; averageRating: number };
   spent: number;
   projectSummary: { total: number; open: number; running: number; drafts: number };
-  jobs: { id: number; title: string; category: string; status: string; budgetMin: number | null; budgetMax: number | null; createdAt: string; _count: { favoriteJobs: number } }[];
-  proposals: { id: number; professionalId: number; professionalName: string; bidAmount: number; duration: string; coverLetter: string }[];
-  notifications: { id: number; title: string; description: string | null; createdAt: string; readAt: string | null }[];
+  jobs: {
+    id: number;
+    title: string;
+    category: string;
+    status: string;
+    budgetMin: number | null;
+    budgetMax: number | null;
+    createdAt: string;
+    _count: { favoriteJobs: number };
+  }[];
+  proposals: {
+    id: number;
+    professionalId: number;
+    professionalName: string;
+    bidAmount: number;
+    duration: string;
+    coverLetter: string;
+  }[];
+  notifications: {
+    id: number;
+    title: string;
+    description: string | null;
+    createdAt: string;
+    readAt: string | null;
+  }[];
 };
 
 function formatBudget(job: DashboardData["jobs"][number]) {
@@ -25,30 +56,301 @@ export default function Dashboard() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
-    void fetch("/api/dashboard", { cache: "no-store" }).then((response) => response.ok ? response.json() as Promise<DashboardData> : Promise.reject()).then(setData).catch(() => setError("Sign in as a client to view your dashboard."));
+    void fetch("/api/v1/dashboard", { cache: "no-store" })
+      .then((response) =>
+        response.ok ? (response.json() as Promise<DashboardData>) : Promise.reject(),
+      )
+      .then(setData)
+      .catch(() => setError("Sign in as a client to view your dashboard."));
   }, []);
-  return <AppShell>
-    {error ? <div className="rounded-2xl border border-destructive/20 bg-destructive/5 p-6 text-sm text-destructive">{error}</div> : !data ? <DashboardSkeleton /> : <div className="space-y-7">
-      <section className="relative overflow-hidden rounded-3xl bg-[linear-gradient(120deg,var(--color-ink),var(--color-primary))] px-6 py-7 text-white shadow-card sm:px-8 sm:py-8">
-        <div className="absolute -right-12 -top-24 h-64 w-64 rounded-full bg-cta/20 blur-3xl" /><div className="absolute -bottom-24 left-1/3 h-48 w-48 rounded-full bg-white/10 blur-3xl" />
-        <div className="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between"><div><p className="text-xs font-bold uppercase tracking-[0.2em] text-white/65">Client workspace</p><h1 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl">Good to see you, {data.user.firstName}.</h1><p className="mt-2 max-w-xl text-sm leading-6 text-white/75">Everything you need to hire confidently and keep your projects on track.</p></div><Button asChild className="bg-white text-primary shadow-lg hover:bg-white/90"><Link href="/post-job"><Plus className="mr-2 h-4 w-4" />Post a new job</Link></Button></div>
-      </section>
+  return (
+    <AppShell>
+      {error ? (
+        <div className="rounded-2xl border border-destructive/20 bg-destructive/5 p-6 text-sm text-destructive">
+          {error}
+        </div>
+      ) : !data ? (
+        <DashboardSkeleton />
+      ) : (
+        <div className="space-y-7">
+          <section className="relative overflow-hidden rounded-3xl bg-[linear-gradient(120deg,var(--color-ink),var(--color-primary))] px-6 py-7 text-white shadow-card sm:px-8 sm:py-8">
+            <div className="absolute -right-12 -top-24 h-64 w-64 rounded-full bg-cta/20 blur-3xl" />
+            <div className="absolute -bottom-24 left-1/3 h-48 w-48 rounded-full bg-white/10 blur-3xl" />
+            <div className="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/65">
+                  Client workspace
+                </p>
+                <h1 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl">
+                  Good to see you, {data.user.firstName}.
+                </h1>
+                <p className="mt-2 max-w-xl text-sm leading-6 text-white/75">
+                  Everything you need to hire confidently and keep your projects on track.
+                </p>
+              </div>
+              <Button asChild className="bg-white text-primary shadow-lg hover:bg-white/90">
+                <Link href="/post-job">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Post a new job
+                </Link>
+              </Button>
+            </div>
+          </section>
 
-      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <Metric href="/my-jobs" icon={BriefcaseBusiness} label="Total projects" value={data.projectSummary.total} tint="bg-primary/10 text-primary" />
-        <Metric href="/my-jobs" icon={FileText} label="Open for proposals" value={data.projectSummary.open} tint="bg-emerald-500/10 text-emerald-600" />
-        <Metric href="/my-jobs" icon={CircleDollarSign} label="Currently active" value={data.projectSummary.running} tint="bg-blue-500/10 text-blue-600" />
-        <Metric href="/my-jobs" icon={BellRing} label="Saved drafts" value={data.projectSummary.drafts} tint="bg-amber-500/10 text-amber-600" />
-      </section>
+          <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <Metric
+              href="/my-jobs"
+              icon={BriefcaseBusiness}
+              label="Total projects"
+              value={data.projectSummary.total}
+              tint="bg-primary/10 text-primary"
+            />
+            <Metric
+              href="/my-jobs"
+              icon={FileText}
+              label="Open for proposals"
+              value={data.projectSummary.open}
+              tint="bg-emerald-500/10 text-emerald-600"
+            />
+            <Metric
+              href="/my-jobs"
+              icon={CircleDollarSign}
+              label="Currently active"
+              value={data.projectSummary.running}
+              tint="bg-blue-500/10 text-blue-600"
+            />
+            <Metric
+              href="/my-jobs"
+              icon={BellRing}
+              label="Saved drafts"
+              value={data.projectSummary.drafts}
+              tint="bg-amber-500/10 text-amber-600"
+            />
+          </section>
 
-      <section className="grid gap-6 xl:grid-cols-[minmax(0,1.65fr)_minmax(300px,0.8fr)]">
-        <div className="rounded-3xl border border-border bg-card p-5 shadow-soft sm:p-6"><div className="flex items-center justify-between"><div><h2 className="font-display text-xl font-semibold">Your projects</h2><p className="mt-1 text-sm text-muted-foreground">Review and manage your latest postings.</p></div><Link href="/my-jobs" className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline">View all <ArrowRight className="h-4 w-4" /></Link></div><div className="mt-5 space-y-3">{data.jobs.slice(0, 4).map((job) => <Link key={job.id} href={`/job/${job.id}`} className="group flex flex-col gap-4 rounded-2xl border border-border bg-background p-4 transition-all hover:border-primary/25 hover:shadow-soft sm:flex-row sm:items-center"><div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary"><BriefcaseBusiness className="h-5 w-5" /></div><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><h3 className="truncate font-semibold">{job.title}</h3><span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary">{job.status}</span></div><p className="mt-1 text-sm text-muted-foreground">{job.category} · {job._count.favoriteJobs} saved · {new Date(job.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}</p></div><div className="flex items-center justify-between gap-3 sm:block sm:text-right"><p className="text-sm font-semibold">{formatBudget(job)}</p><span className="mt-1 inline-flex items-center text-sm font-medium text-primary">Open <ArrowRight className="ml-1 h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" /></span></div></Link>)}{!data.jobs.length ? <Empty text="Post your first job to start receiving proposals." href="/post-job" label="Post a job" /> : null}</div></div>
-        <aside className="rounded-3xl border border-border bg-card p-5 shadow-soft sm:p-6"><div className="flex items-center justify-between"><div><h2 className="font-display text-xl font-semibold">Activity</h2><p className="mt-1 text-sm text-muted-foreground">Recent project updates</p></div><BellRing className="h-5 w-5 text-primary" /></div><div className="mt-5 space-y-5">{data.notifications.slice(0, 5).map((notification) => <Link key={notification.id} href="/notifications" className="group flex gap-3"><span className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${notification.readAt ? "bg-muted" : "bg-cta ring-4 ring-cta/15"}`} /><div className="min-w-0"><p className="text-sm font-semibold leading-snug group-hover:text-primary">{notification.title}</p>{notification.description ? <p className="mt-1 line-clamp-2 text-xs leading-5 text-muted-foreground">{notification.description}</p> : null}<p className="mt-1 text-[11px] text-muted-foreground">{new Date(notification.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}</p></div></Link>)}{!data.notifications.length ? <p className="py-6 text-sm text-muted-foreground">You’re all caught up—no new notifications.</p> : null}</div></aside>
-      </section>
+          <section className="grid gap-6 xl:grid-cols-[minmax(0,1.65fr)_minmax(300px,0.8fr)]">
+            <div className="rounded-3xl border border-border bg-card p-5 shadow-soft sm:p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="font-display text-xl font-semibold">Your projects</h2>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Review and manage your latest postings.
+                  </p>
+                </div>
+                <Link
+                  href="/my-jobs"
+                  className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
+                >
+                  View all <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+              <div className="mt-5 space-y-3">
+                {data.jobs.slice(0, 4).map((job) => (
+                  <Link
+                    key={job.id}
+                    href={`/job/${job.id}`}
+                    className="group flex flex-col gap-4 rounded-2xl border border-border bg-background p-4 transition-all hover:border-primary/25 hover:shadow-soft sm:flex-row sm:items-center"
+                  >
+                    <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+                      <BriefcaseBusiness className="h-5 w-5" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="truncate font-semibold">{job.title}</h3>
+                        <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary">
+                          {job.status}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        {job.category} · {job._count.favoriteJobs} saved ·{" "}
+                        {new Date(job.createdAt).toLocaleDateString(undefined, {
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-between gap-3 sm:block sm:text-right">
+                      <p className="text-sm font-semibold">{formatBudget(job)}</p>
+                      <span className="mt-1 inline-flex items-center text-sm font-medium text-primary">
+                        Open{" "}
+                        <ArrowRight className="ml-1 h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+                {!data.jobs.length ? (
+                  <Empty
+                    text="Post your first job to start receiving proposals."
+                    href="/post-job"
+                    label="Post a job"
+                  />
+                ) : null}
+              </div>
+            </div>
+            <aside className="rounded-3xl border border-border bg-card p-5 shadow-soft sm:p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="font-display text-xl font-semibold">Activity</h2>
+                  <p className="mt-1 text-sm text-muted-foreground">Recent project updates</p>
+                </div>
+                <BellRing className="h-5 w-5 text-primary" />
+              </div>
+              <div className="mt-5 space-y-5">
+                {data.notifications.slice(0, 5).map((notification) => (
+                  <Link key={notification.id} href="/notifications" className="group flex gap-3">
+                    <span
+                      className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${notification.readAt ? "bg-muted" : "bg-cta ring-4 ring-cta/15"}`}
+                    />
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold leading-snug group-hover:text-primary">
+                        {notification.title}
+                      </p>
+                      {notification.description ? (
+                        <p className="mt-1 line-clamp-2 text-xs leading-5 text-muted-foreground">
+                          {notification.description}
+                        </p>
+                      ) : null}
+                      <p className="mt-1 text-[11px] text-muted-foreground">
+                        {new Date(notification.createdAt).toLocaleDateString(undefined, {
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </p>
+                    </div>
+                  </Link>
+                ))}
+                {!data.notifications.length ? (
+                  <p className="py-6 text-sm text-muted-foreground">
+                    You’re all caught up—no new notifications.
+                  </p>
+                ) : null}
+              </div>
+            </aside>
+          </section>
 
-      <section className="grid gap-6 lg:grid-cols-[minmax(0,1.65fr)_minmax(300px,0.8fr)]"><div className="rounded-3xl border border-border bg-card p-5 shadow-soft sm:p-6"><div className="flex items-center justify-between"><div><h2 className="font-display text-xl font-semibold">Recent proposals</h2><p className="mt-1 text-sm text-muted-foreground">Compare offers and choose the right professional.</p></div><FileText className="h-5 w-5 text-primary" /></div><div className="mt-5 space-y-3">{data.proposals.slice(0, 3).map((proposal) => { const name = proposal.professionalName?.trim() || `Professional #${proposal.professionalId}`; return <div key={proposal.id} className="rounded-2xl border border-border bg-background p-4"><div className="flex items-start justify-between gap-4"><div className="flex items-center gap-3"><div className="grid h-9 w-9 place-items-center rounded-full bg-primary/10 text-xs font-bold text-primary">{name.split(" ").map((part) => part[0]).join("").slice(0, 2).toUpperCase()}</div><div><p className="font-semibold">{name}</p><p className="mt-0.5 text-xs text-muted-foreground">Delivery estimate: {proposal.duration}</p></div></div><p className="text-lg font-bold text-primary">${proposal.bidAmount.toLocaleString()}</p></div><p className="mt-3 line-clamp-2 text-sm leading-6 text-muted-foreground">{proposal.coverLetter}</p></div>; })}{!data.proposals.length ? <Empty text="New proposals will show up here as professionals respond." href="/discover" label="Find professionals" /> : null}</div></div><div className="rounded-3xl bg-[linear-gradient(145deg,var(--color-primary),var(--color-ink))] p-6 text-white shadow-card"><UsersRound className="h-6 w-6 text-white/75" /><h2 className="mt-8 font-display text-2xl font-semibold">Find your next expert.</h2><p className="mt-2 text-sm leading-6 text-white/70">Browse trusted professionals and invite the right person to your next project.</p><Button asChild variant="secondary" className="mt-6 bg-white text-primary hover:bg-white/90"><Link href="/discover">Explore professionals <ArrowRight className="ml-2 h-4 w-4" /></Link></Button><div className="mt-8 border-t border-white/15 pt-4"><div className="flex items-center gap-2 text-sm"><Star className="h-4 w-4 fill-cta text-cta" />Your average rating: <strong>{data.user.averageRating.toFixed(1)}</strong></div></div></div></section>
-    </div>}</AppShell>;
+          <section className="grid gap-6 lg:grid-cols-[minmax(0,1.65fr)_minmax(300px,0.8fr)]">
+            <div className="rounded-3xl border border-border bg-card p-5 shadow-soft sm:p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="font-display text-xl font-semibold">Recent proposals</h2>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Compare offers and choose the right professional.
+                  </p>
+                </div>
+                <FileText className="h-5 w-5 text-primary" />
+              </div>
+              <div className="mt-5 space-y-3">
+                {data.proposals.slice(0, 3).map((proposal) => {
+                  const name =
+                    proposal.professionalName?.trim() || `Professional #${proposal.professionalId}`;
+                  return (
+                    <div
+                      key={proposal.id}
+                      className="rounded-2xl border border-border bg-background p-4"
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex items-center gap-3">
+                          <div className="grid h-9 w-9 place-items-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                            {name
+                              .split(" ")
+                              .map((part) => part[0])
+                              .join("")
+                              .slice(0, 2)
+                              .toUpperCase()}
+                          </div>
+                          <div>
+                            <p className="font-semibold">{name}</p>
+                            <p className="mt-0.5 text-xs text-muted-foreground">
+                              Delivery estimate: {proposal.duration}
+                            </p>
+                          </div>
+                        </div>
+                        <p className="text-lg font-bold text-primary">
+                          ${proposal.bidAmount.toLocaleString()}
+                        </p>
+                      </div>
+                      <p className="mt-3 line-clamp-2 text-sm leading-6 text-muted-foreground">
+                        {proposal.coverLetter}
+                      </p>
+                    </div>
+                  );
+                })}
+                {!data.proposals.length ? (
+                  <Empty
+                    text="New proposals will show up here as professionals respond."
+                    href="/discover"
+                    label="Find professionals"
+                  />
+                ) : null}
+              </div>
+            </div>
+            <div className="rounded-3xl bg-[linear-gradient(145deg,var(--color-primary),var(--color-ink))] p-6 text-white shadow-card">
+              <UsersRound className="h-6 w-6 text-white/75" />
+              <h2 className="mt-8 font-display text-2xl font-semibold">Find your next expert.</h2>
+              <p className="mt-2 text-sm leading-6 text-white/70">
+                Browse trusted professionals and invite the right person to your next project.
+              </p>
+              <Button
+                asChild
+                variant="secondary"
+                className="mt-6 bg-white text-primary hover:bg-white/90"
+              >
+                <Link href="/discover">
+                  Explore professionals <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+              <div className="mt-8 border-t border-white/15 pt-4">
+                <div className="flex items-center gap-2 text-sm">
+                  <Star className="h-4 w-4 fill-cta text-cta" />
+                  Your average rating: <strong>{data.user.averageRating.toFixed(1)}</strong>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      )}
+    </AppShell>
+  );
 }
 
-function Metric({ icon: Icon, label, value, tint, href }: { icon: typeof BriefcaseBusiness; label: string; value: string | number; tint: string; href: string }) { return <Link href={href} className="rounded-2xl border border-border bg-card p-4 shadow-soft transition-all hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-card"><div className="flex items-center justify-between"><div className={`grid h-10 w-10 place-items-center rounded-xl ${tint}`}><Icon className="h-5 w-5" /></div><p className="text-2xl font-bold tracking-tight">{value}</p></div><p className="mt-3 text-sm font-medium text-muted-foreground">{label}</p></Link>; }
-function Empty({ text, href, label }: { text: string; href: string; label: string }) { return <div className="rounded-2xl border border-dashed border-primary/20 bg-primary/[0.025] px-5 py-8 text-center"><p className="text-sm text-muted-foreground">{text}</p><Link href={href} className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline">{label} <ArrowRight className="h-3.5 w-3.5" /></Link></div>; }
+function Metric({
+  icon: Icon,
+  label,
+  value,
+  tint,
+  href,
+}: {
+  icon: typeof BriefcaseBusiness;
+  label: string;
+  value: string | number;
+  tint: string;
+  href: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className="rounded-2xl border border-border bg-card p-4 shadow-soft transition-all hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-card"
+    >
+      <div className="flex items-center justify-between">
+        <div className={`grid h-10 w-10 place-items-center rounded-xl ${tint}`}>
+          <Icon className="h-5 w-5" />
+        </div>
+        <p className="text-2xl font-bold tracking-tight">{value}</p>
+      </div>
+      <p className="mt-3 text-sm font-medium text-muted-foreground">{label}</p>
+    </Link>
+  );
+}
+function Empty({ text, href, label }: { text: string; href: string; label: string }) {
+  return (
+    <div className="rounded-2xl border border-dashed border-primary/20 bg-primary/[0.025] px-5 py-8 text-center">
+      <p className="text-sm text-muted-foreground">{text}</p>
+      <Link
+        href={href}
+        className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
+      >
+        {label} <ArrowRight className="h-3.5 w-3.5" />
+      </Link>
+    </div>
+  );
+}

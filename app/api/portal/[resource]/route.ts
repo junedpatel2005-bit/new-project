@@ -26,7 +26,6 @@ export async function GET(
         await db.userNotification.findMany({
           where: { userId: session.userId, clearedAt: null },
           orderBy: { createdAt: "desc" },
-          take: 50,
         }),
       );
     if (resource === "earnings") {
@@ -34,7 +33,10 @@ export async function GET(
         return NextResponse.json({ error: "Account access required." }, { status: 403 });
       return NextResponse.json(
         await db.projectTransaction.findMany({
-          where: session.role === "PROFESSIONAL" ? { professionalId: session.userId } : { clientId: session.userId },
+          where:
+            session.role === "PROFESSIONAL"
+              ? { professionalId: session.userId }
+              : { clientId: session.userId },
           orderBy: { createdAt: "desc" },
           take: 50,
         }),
@@ -148,9 +150,7 @@ export async function GET(
 
       const hiddenJobIds = blockedJobs;
       const visibleOpenJobs = openJobs.filter((job) => !hiddenJobIds.has(job.id));
-      const visibleSavedJobs = savedJobs.filter(
-        (favorite) => !hiddenJobIds.has(favorite.job.id),
-      );
+      const visibleSavedJobs = savedJobs.filter((favorite) => !hiddenJobIds.has(favorite.job.id));
 
       const clientIds = [
         ...new Set([
@@ -280,8 +280,10 @@ export async function GET(
           deadline: jobMap.get(project.jobId)?.deadline?.toISOString() ?? null,
           budget:
             jobMap.get(project.jobId)?.timingType === "HOURLY"
-              ? jobMap.get(project.jobId)?.hourlyRate ?? null
-              : jobMap.get(project.jobId)?.budgetMax ?? jobMap.get(project.jobId)?.budgetMin ?? null,
+              ? (jobMap.get(project.jobId)?.hourlyRate ?? null)
+              : (jobMap.get(project.jobId)?.budgetMax ??
+                jobMap.get(project.jobId)?.budgetMin ??
+                null),
           timingType: jobMap.get(project.jobId)?.timingType ?? "FIXED",
           progress: project.progress,
           currentStage: project.currentStage,
@@ -314,7 +316,11 @@ export async function GET(
       let project = null;
       if (id.success) {
         project = await db.projectTracking.findUnique({ where: { id: id.data } });
-        if (project && project.clientId !== session.userId && project.professionalId !== session.userId) {
+        if (
+          project &&
+          project.clientId !== session.userId &&
+          project.professionalId !== session.userId
+        ) {
           project = null;
         }
       } else {
@@ -330,57 +336,66 @@ export async function GET(
         where: { trackingId: project.id },
         orderBy: { createdAt: "asc" },
       });
-      const [job, professional, client, uploads, revisions, timeline, projectRequest, review, dispute] =
-        await Promise.all([
-          db.clientJob.findUnique({
-            where: { id: project.jobId },
-            select: {
-              title: true,
-              category: true,
-              urgency: true,
-              workMode: true,
-              jobDate: true,
-              deadline: true,
-              locationAddress: true,
-              locationLat: true,
-              locationLng: true,
-              description: true,
-              budgetMin: true,
-              budgetMax: true,
-              hourlyRate: true,
-              timingType: true,
-            },
-          }),
-          db.user.findUnique({
-            where: { id: project.professionalId },
-            select: { firstName: true, lastName: true },
-          }),
-          db.user.findUnique({
-            where: { id: project.clientId },
-            select: { firstName: true, lastName: true },
-          }),
-          db.projectWorkUpload.findMany({
-            where: { trackingId: project.id },
-            orderBy: { createdAt: "desc" },
-          }),
-          db.projectRevisionRequest.findMany({
-            where: { trackingId: project.id },
-            orderBy: { createdAt: "desc" },
-          }),
-          db.projectTimelineEvent.findMany({
-            where: { trackingId: project.id },
-            orderBy: { createdAt: "desc" },
-          }),
-          db.projectRequest.findUnique({
-            where: { id: project.requestId },
-            select: { bidAmount: true },
-          }),
-          db.projectReview.findUnique({ where: { trackingId: project.id } }),
-          db.projectDispute.findFirst({
-            where: { trackingId: project.id, reporterId: session.userId },
-            orderBy: { createdAt: "desc" },
-          }),
-        ]);
+      const [
+        job,
+        professional,
+        client,
+        uploads,
+        revisions,
+        timeline,
+        projectRequest,
+        review,
+        dispute,
+      ] = await Promise.all([
+        db.clientJob.findUnique({
+          where: { id: project.jobId },
+          select: {
+            title: true,
+            category: true,
+            urgency: true,
+            workMode: true,
+            jobDate: true,
+            deadline: true,
+            locationAddress: true,
+            locationLat: true,
+            locationLng: true,
+            description: true,
+            budgetMin: true,
+            budgetMax: true,
+            hourlyRate: true,
+            timingType: true,
+          },
+        }),
+        db.user.findUnique({
+          where: { id: project.professionalId },
+          select: { firstName: true, lastName: true },
+        }),
+        db.user.findUnique({
+          where: { id: project.clientId },
+          select: { firstName: true, lastName: true },
+        }),
+        db.projectWorkUpload.findMany({
+          where: { trackingId: project.id },
+          orderBy: { createdAt: "desc" },
+        }),
+        db.projectRevisionRequest.findMany({
+          where: { trackingId: project.id },
+          orderBy: { createdAt: "desc" },
+        }),
+        db.projectTimelineEvent.findMany({
+          where: { trackingId: project.id },
+          orderBy: { createdAt: "desc" },
+        }),
+        db.projectRequest.findUnique({
+          where: { id: project.requestId },
+          select: { bidAmount: true },
+        }),
+        db.projectReview.findUnique({ where: { trackingId: project.id } }),
+        db.projectDispute.findFirst({
+          where: { trackingId: project.id, reporterId: session.userId },
+          orderBy: { createdAt: "desc" },
+        }),
+      ]);
       return NextResponse.json({
         project,
         milestones,

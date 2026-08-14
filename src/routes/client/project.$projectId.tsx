@@ -51,13 +51,13 @@ export default function ProjectPage() {
   const [submittingMilestone, setSubmittingMilestone] = useState(false);
 
   async function refresh() {
-    const response = await fetch(`/api/portal/project?id=${encodeURIComponent(projectId)}`);
+    const response = await fetch(`/api/v1/portal/project?id=${encodeURIComponent(projectId)}`);
     if (!response.ok) throw new Error("Unable to refresh the project.");
     setData((await response.json()) as ProjectData);
   }
 
   async function clientAction(payload: Record<string, unknown>) {
-    const response = await fetch("/api/portal/project-actions", {
+    const response = await fetch("/api/v1/portal/project-actions", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...payload, projectId: Number(projectId) }),
@@ -68,7 +68,7 @@ export default function ProjectPage() {
   }
 
   useEffect(() => {
-    void fetch(`/api/portal/project?id=${encodeURIComponent(projectId)}`)
+    void fetch(`/api/v1/portal/project?id=${encodeURIComponent(projectId)}`)
       .then(async (response) => {
         if (response.status === 404) return setState("missing");
         if (!response.ok) throw new Error();

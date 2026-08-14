@@ -9,31 +9,31 @@ The visual layer transfers near-1:1. The routing and data layers are a rewrite e
 
 ## 1. WHAT MOVES UNCHANGED
 
-| Asset | Action |
-|---|---|
-| `src/styles.css` | Copy verbatim, adjust two lines (§3) |
-| `src/components/ui/*` — 49 shadcn components | Copy verbatim, add `"use client"` where needed (§4) |
-| `src/lib/utils.ts` (`cn` helper) | Copy verbatim |
-| `ProCard`, `Logo`, `SiteHeader`, `SiteFooter` | Copy, swap `Link` import |
-| Marketing page compositions | Copy JSX bodies into new `page.tsx` files |
-| `components.json` | Copy, update aliases (§2) |
+| Asset                                         | Action                                              |
+| --------------------------------------------- | --------------------------------------------------- |
+| `src/styles.css`                              | Copy verbatim, adjust two lines (§3)                |
+| `src/components/ui/*` — 49 shadcn components  | Copy verbatim, add `"use client"` where needed (§4) |
+| `src/lib/utils.ts` (`cn` helper)              | Copy verbatim                                       |
+| `ProCard`, `Logo`, `SiteHeader`, `SiteFooter` | Copy, swap `Link` import                            |
+| Marketing page compositions                   | Copy JSX bodies into new `page.tsx` files           |
+| `components.json`                             | Copy, update aliases (§2)                           |
 
 **Dependencies that work unchanged:** all `@radix-ui/*`, `lucide-react`, `sonner`, `react-hook-form`, `@hookform/resolvers`, `zod`, `class-variance-authority`, `clsx`, `tailwind-merge`, `date-fns`, `recharts`, `embla-carousel-react`, `input-otp`, `cmdk`, `vaul`, `react-day-picker`, `tw-animate-css`.
 
-**Keep TanStack Query.** It's already a dependency and remains the right tool for client-side mutations, optimistic updates, and cache invalidation in the authenticated portals. Only the *router* is replaced.
+**Keep TanStack Query.** It's already a dependency and remains the right tool for client-side mutations, optimistic updates, and cache invalidation in the authenticated portals. Only the _router_ is replaced.
 
 ## 2. WHAT GOES
 
-| Remove | Why |
-|---|---|
-| `@tanstack/react-router`, `react-start`, `router-plugin` | Replaced by App Router |
-| `src/routeTree.gen.ts`, `src/router.tsx`, `src/routes/*` | Regenerated as `app/` |
-| `src/server.ts`, `src/start.ts` | Next.js owns the server |
-| `wrangler.jsonc` | Cloudflare Workers — not the target |
-| `vercel.json` | Rewrites everything to `index.html`, killing SEO |
-| `@cloudflare/vite-plugin`, `@lovable.dev/vite-tanstack-config`, `vite.config.ts` | Vite replaced by Next build |
-| `src/lib/mock-data.ts` | Replaced by real API — see §7 |
-| `src/lib/error-capture.ts`, `error-page.ts` | Next `error.tsx` / `not-found.tsx` |
+| Remove                                                                           | Why                                              |
+| -------------------------------------------------------------------------------- | ------------------------------------------------ |
+| `@tanstack/react-router`, `react-start`, `router-plugin`                         | Replaced by App Router                           |
+| `src/routeTree.gen.ts`, `src/router.tsx`, `src/routes/*`                         | Regenerated as `app/`                            |
+| `src/server.ts`, `src/start.ts`                                                  | Next.js owns the server                          |
+| `wrangler.jsonc`                                                                 | Cloudflare Workers — not the target              |
+| `vercel.json`                                                                    | Rewrites everything to `index.html`, killing SEO |
+| `@cloudflare/vite-plugin`, `@lovable.dev/vite-tanstack-config`, `vite.config.ts` | Vite replaced by Next build                      |
+| `src/lib/mock-data.ts`                                                           | Replaced by real API — see §7                    |
+| `src/lib/error-capture.ts`, `error-page.ts`                                      | Next `error.tsx` / `not-found.tsx`               |
 
 `components.json` aliases become:
 
@@ -58,7 +58,7 @@ In `styles.css`, change only the source directive:
 
 ```css
 @import "tailwindcss";
-@source "../";        /* was: source(none) + @source "../src" */
+@source "../"; /* was: source(none) + @source "../src" */
 @import "tw-animate-css";
 ```
 
@@ -81,13 +81,18 @@ The prototype references Inter and Poppins by family name, which means a render-
 import { Inter, Poppins } from "next/font/google";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
-const poppins = Poppins({ subsets: ["latin"], weight: ["600","700"], variable: "--font-poppins", display: "swap" });
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["600", "700"],
+  variable: "--font-poppins",
+  display: "swap",
+});
 ```
 
 Apply `${inter.variable} ${poppins.variable}` on `<html>`, then in `styles.css`:
 
 ```css
---font-sans:    var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+--font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 --font-display: var(--font-poppins), var(--font-inter), sans-serif;
 ```
 
@@ -157,15 +162,15 @@ Do it in this sequence; each step leaves a working build.
 
 ## 8. FIX WHILE PORTING
 
-| Issue | Fix |
-|---|---|
-| US mock data (SF, Brooklyn, Austin) | Seed Toronto, Vancouver, Calgary, Montreal — CAD |
-| 12 categories incl. trades | Seed IT only: Development → Frontend/Backend/Mobile, Data → Analytics/ML/Engineering |
-| `i.pravatar.cc` avatars | Supabase Storage; add domain to `next.config` `images.remotePatterns` |
-| `ProCard` shows "San Francisco, CA" + exact distance | City + distance only: "Toronto · 12km" (SRS-PRI-02) |
-| `<img>` tags | `next/image` for portfolio and work proof — real bandwidth saving on photo-heavy pages |
-| No route guards | Middleware + server-side authorization |
-| No dark-mode toggle | `next-themes`; tokens already exist, don't waste them |
+| Issue                                                | Fix                                                                                    |
+| ---------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| US mock data (SF, Brooklyn, Austin)                  | Seed Toronto, Vancouver, Calgary, Montreal — CAD                                       |
+| 12 categories incl. trades                           | Seed IT only: Development → Frontend/Backend/Mobile, Data → Analytics/ML/Engineering   |
+| `i.pravatar.cc` avatars                              | Supabase Storage; add domain to `next.config` `images.remotePatterns`                  |
+| `ProCard` shows "San Francisco, CA" + exact distance | City + distance only: "Toronto · 12km" (SRS-PRI-02)                                    |
+| `<img>` tags                                         | `next/image` for portfolio and work proof — real bandwidth saving on photo-heavy pages |
+| No route guards                                      | Middleware + server-side authorization                                                 |
+| No dark-mode toggle                                  | `next-themes`; tokens already exist, don't waste them                                  |
 
 ## 9. RESPONSIVE IS NOW LOAD-BEARING
 

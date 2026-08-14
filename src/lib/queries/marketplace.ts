@@ -5,6 +5,7 @@ import type {
   MarketplaceJob,
   MarketplaceProfessional,
   DetailedProfessional,
+  PublicProfessionalProfile,
   ProfessionalService,
 } from "@/lib/types/marketplace";
 
@@ -257,7 +258,9 @@ export async function listOpenJobs(): Promise<MarketplaceJob[]> {
       createdAt: true,
       user: { select: { firstName: true, lastName: true, avatarUrl: true, averageRating: true } },
       _count: { select: { favoriteJobs: true } },
-      attachments: { select: { id: true, fileName: true, fileType: true, fileSize: true, previewUrl: true } },
+      attachments: {
+        select: { id: true, fileName: true, fileType: true, fileSize: true, previewUrl: true },
+      },
     },
     orderBy: { createdAt: "desc" },
     take: 50,
@@ -318,7 +321,7 @@ export async function getProfessional(id: number): Promise<MarketplaceProfession
 }
 
 export async function getDetailedProfessional(id: number): Promise<DetailedProfessional | null> {
-  const  professional = await db.user.findFirst({
+  const professional = await db.user.findFirst({
     where: { id, role: "PROFESSIONAL", isActive: true },
     select: {
       id: true,
@@ -382,6 +385,31 @@ export async function getDetailedProfessional(id: number): Promise<DetailedProfe
   return professional ? toDetailedProfessional(professional) : null;
 }
 
+/**
+ * Public marketplace profiles must never include contact details, verification documents,
+ * exact coordinates, or security/account-activity fields.
+ */
+export async function getPublicProfessionalProfile(
+  id: number,
+): Promise<PublicProfessionalProfile | null> {
+  const professional = await getDetailedProfessional(id);
+  if (!professional) return null;
+  const {
+    email: _email,
+    phone: _phone,
+    address: _address,
+    professionalLatitude: _professionalLatitude,
+    professionalLongitude: _professionalLongitude,
+    lastLoginAt: _lastLoginAt,
+    governmentIdUrl: _governmentIdUrl,
+    licenseUrl: _licenseUrl,
+    insuranceUrl: _insuranceUrl,
+    selfieUrl: _selfieUrl,
+    ...publicProfile
+  } = professional;
+  return publicProfile;
+}
+
 export async function getOpenJob(id: number): Promise<MarketplaceJob | null> {
   const runningProject = await db.projectTracking.findFirst({
     where: { jobId: id, status: { notIn: ["COMPLETED", "CANCELLED"] } },
@@ -411,7 +439,9 @@ export async function getOpenJob(id: number): Promise<MarketplaceJob | null> {
       createdAt: true,
       user: { select: { firstName: true, lastName: true, avatarUrl: true, averageRating: true } },
       _count: { select: { favoriteJobs: true } },
-      attachments: { select: { id: true, fileName: true, fileType: true, fileSize: true, previewUrl: true } },
+      attachments: {
+        select: { id: true, fileName: true, fileType: true, fileSize: true, previewUrl: true },
+      },
     },
   });
   if (!job || !job.title || !job.description || !job.category) return null;

@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import ProfessionalDashboard from "@/routes/professional/dashboard";
 
 export default function ProfessionalIndexPage() {
-  redirect("/professional/dashboard");
+  return <ProfessionalDashboard />;
 }

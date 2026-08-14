@@ -20,7 +20,7 @@ function ResetPasswordContent() {
     if (password !== confirmation) return setError("Passwords do not match.");
     setPending(true);
     setError(null);
-    const response = await fetch("/api/auth/reset-password", {
+    const response = await fetch("/api/v1/auth/reset-password", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ token: params.get("token"), password }),

@@ -74,7 +74,7 @@ function SignupContent() {
       return;
     }
     setSendingCode(true);
-    const response = await fetch("/api/auth/send-phone-otp", {
+    const response = await fetch("/api/v1/auth/send-phone-otp", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ phone }),
@@ -117,7 +117,7 @@ function SignupContent() {
     }
     setPhoneError(null);
     setVerifyingPhone(true);
-    const response = await fetch("/api/auth/verify-phone", {
+    const response = await fetch("/api/v1/auth/verify-phone", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ phone, code }),
@@ -135,7 +135,7 @@ function SignupContent() {
   async function checkAvailability(field: "email" | "phone", value: string) {
     const trimmed = value.trim();
     if (!trimmed) return;
-    const response = await fetch("/api/auth/check-availability", {
+    const response = await fetch("/api/v1/auth/check-availability", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ [field]: trimmed }),
@@ -191,7 +191,7 @@ function SignupContent() {
       return;
     }
     setPending(true);
-    const response = await fetch("/api/auth/register", {
+    const response = await fetch("/api/v1/auth/register", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
@@ -251,7 +251,7 @@ function SignupContent() {
         variant="outline"
         className="mb-4 w-full"
         onClick={() => {
-          window.location.href = `/api/auth/google?role=${role === "pro" ? "PROFESSIONAL" : "CLIENT"}`;
+          window.location.href = `/api/v1/auth/google?role=${role === "pro" ? "PROFESSIONAL" : "CLIENT"}`;
         }}
       >
         Continue with Google

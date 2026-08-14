@@ -5,6 +5,7 @@ import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Map, SlidersHorizontal, Star, ShieldCheck } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
 
 const PAGE_SIZE = 20;
@@ -44,25 +45,16 @@ function formatBudgetAmount(value: number | null | undefined, timingType?: strin
   return `$${value.toLocaleString()}`;
 }
 
-function formatBudgetRange(min: number | null | undefined, max: number | null | undefined, timingType?: string | null) {
+function formatBudgetRange(
+  min: number | null | undefined,
+  max: number | null | undefined,
+  timingType?: string | null,
+) {
   if (timingType === "HOURLY") {
     return min == null ? "Hourly rate not set" : `$${min.toLocaleString()}/hr`;
   }
   if (min == null && max == null) return "Budget on request";
   return `$${min?.toLocaleString() ?? "—"} – $${max?.toLocaleString() ?? "—"}`;
-}
-
-function createMarkerIcon(active: boolean) {
-  if (typeof window === "undefined") return null;
-
-  const L = require("leaflet") as typeof import("leaflet");
-
-  return L.divIcon({
-    className: "",
-    html: `<span style="display:block; width:${active ? 22 : 15}px; height:${active ? 22 : 15}px; border-radius:9999px; background:${active ? "#ff4d7d" : "#f26b9a"}; border:2px solid white; box-shadow:0 0 0 2px rgba(255,255,255,0.4), 0 6px 18px rgba(0,0,0,0.18);"></span>`,
-    iconSize: [active ? 22 : 15, active ? 22 : 15],
-    iconAnchor: [active ? 11 : 7.5, active ? 11 : 7.5],
-  }) as any;
 }
 
 function MapCenterController({ center }: { center: [number, number] }) {
@@ -76,6 +68,7 @@ function MapCenterController({ center }: { center: [number, number] }) {
 }
 
 function ProfessionalJobsContent() {
+  const router = useRouter();
   const [jobs, setJobs] = useState<JobListItem[]>([]);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("");
@@ -95,7 +88,7 @@ function ProfessionalJobsContent() {
       try {
         setLoading(true);
         setError(null);
-        const response = await fetch("/api/portal/professional-jobs", { cache: "no-store" });
+        const response = await fetch("/api/v1/portal/professional-jobs", { cache: "no-store" });
         if (!response.ok) throw new Error("Unable to load jobs");
         const payload = (await response.json()) as JobsResponse;
         if (!active) return;
@@ -129,7 +122,8 @@ function ProfessionalJobsContent() {
           .filter(Boolean)
           .some((field) => String(field).toLowerCase().includes(value));
       const matchesCategory = !category || job.category === category;
-      const matchesCity = !city || (job.locationAddress ?? "").toLowerCase().includes(city.toLowerCase());
+      const matchesCity =
+        !city || (job.locationAddress ?? "").toLowerCase().includes(city.toLowerCase());
       const matchesRating = minRating === "" || (job.clientRating ?? 0) >= Number(minRating);
       const matchesVerified = !verifiedOnly || job.clientVerified;
       return matchesQuery && matchesCategory && matchesCity && matchesRating && matchesVerified;
@@ -189,7 +183,8 @@ function ProfessionalJobsContent() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Find jobs</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {visibleJobs.length} jobs available{jobs.length ? ` across ${jobs.length} listings` : ""}
+            {visibleJobs.length} jobs available
+            {jobs.length ? ` across ${jobs.length} listings` : ""}
           </p>
         </div>
       </div>
@@ -276,7 +271,9 @@ function ProfessionalJobsContent() {
               </p>
               <select
                 value={minRating}
-                onChange={(event) => setMinRating(event.target.value === "" ? "" : Number(event.target.value))}
+                onChange={(event) =>
+                  setMinRating(event.target.value === "" ? "" : Number(event.target.value))
+                }
                 className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
               >
                 <option value="">Any rating</option>
@@ -311,7 +308,11 @@ function ProfessionalJobsContent() {
                   <option>Newest</option>
                 </select>
               </div>
-              <Button variant="outline" onClick={() => setShowMap((current) => !current)} className="gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setShowMap((current) => !current)}
+                className="gap-2"
+              >
                 <Map className="h-4 w-4" />
                 {showMap ? "Hide map" : "Show map"}
               </Button>
@@ -337,7 +338,12 @@ function ProfessionalJobsContent() {
               <div className="relative mb-4 h-[320px] overflow-hidden rounded-2xl border border-border">
                 {mapJobs.length > 0 ? (
                   <>
-                    <MapContainer center={mapCenter} zoom={6} scrollWheelZoom className="h-full w-full z-0">
+                    <MapContainer
+                      center={mapCenter}
+                      zoom={6}
+                      scrollWheelZoom
+                      className="h-full w-full z-0"
+                    >
                       <TileLayer
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -350,7 +356,6 @@ function ProfessionalJobsContent() {
                           <Marker
                             key={job.id}
                             position={[lat, lng]}
-                            icon={createMarkerIcon(selectedJobId === job.id) as any}
                             eventHandlers={{ click: () => setSelectedJobId(job.id) }}
                           >
                             <Popup>
@@ -359,7 +364,10 @@ function ProfessionalJobsContent() {
                                 <span className="mt-1 block text-xs text-muted-foreground">
                                   {job.locationAddress ?? "Remote"}
                                 </span>
-                                <a href={`/job/${job.id}`} className="mt-2 inline-block text-xs text-primary">
+                                <a
+                                  href={`/job/${job.id}`}
+                                  className="mt-2 inline-block text-xs text-primary"
+                                >
                                   View details
                                 </a>
                               </div>
@@ -393,8 +401,21 @@ function ProfessionalJobsContent() {
                 {visibleJobs.map((job) => (
                   <article
                     key={job.id}
-                    onClick={() => setSelectedJobId(job.id)}
-                    className={`cursor-pointer rounded-2xl border bg-background p-4 transition ${
+                    tabIndex={0}
+                    role="link"
+                    aria-label={`Open ${job.title}`}
+                    onClick={(event) => {
+                      if (event.target instanceof Element && event.target.closest("a, button"))
+                        return;
+                      router.push(`/job/${job.id}`);
+                    }}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        router.push(`/job/${job.id}`);
+                      }
+                    }}
+                    className={`cursor-pointer rounded-2xl border bg-background p-4 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                       selectedJobId === job.id ? "border-primary shadow-soft" : "border-border"
                     }`}
                   >
@@ -444,7 +465,9 @@ function ProfessionalJobsContent() {
                       <Button asChild size="sm">
                         <a href={`/job/${job.id}`}>View details</a>
                       </Button>
-                      <span className="text-xs text-muted-foreground">{job.proposalCount} saved</span>
+                      <span className="text-xs text-muted-foreground">
+                        {job.proposalCount} saved
+                      </span>
                     </div>
                   </article>
                 ))}

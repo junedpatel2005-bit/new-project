@@ -76,11 +76,11 @@ export default function PostJob() {
     });
   };
   useEffect(() => {
-    void fetch("/api/marketplace/categories")
+    void fetch("/api/v1/marketplace/categories")
       .then((r) => (r.ok ? r.json() : []))
       .then(setCategories)
       .catch(() => setMessage("Categories could not be loaded."));
-    void fetch("/api/profile")
+    void fetch("/api/v1/profile")
       .then((r) => (r.ok ? r.json() : null))
       .then(
         (
@@ -105,7 +105,7 @@ export default function PostJob() {
       .catch(() => {});
     const edit = new URLSearchParams(window.location.search).get("edit");
     if (edit && /^\d+$/.test(edit)) {
-      void fetch(`/api/client/jobs/${edit}`)
+      void fetch(`/api/v1/client/jobs/${edit}`)
         .then((r) => (r.ok ? r.json() : Promise.reject()))
         .then(({ job }) => {
           setId(job.id);
@@ -163,7 +163,7 @@ export default function PostJob() {
     setSaving(true);
     setMessage("");
     try {
-      const url = id ? `/api/client/jobs/${id}` : "/api/client/jobs";
+      const url = id ? `/api/v1/client/jobs/${id}` : "/api/v1/client/jobs";
       const r = await fetch(url, {
         method: id ? "PATCH" : "POST",
         headers: { "content-type": "application/json" },

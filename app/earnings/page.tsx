@@ -29,7 +29,11 @@ export default async function EarningsPage() {
   const token = await getSessionTokenFromCookies();
   if (!token) redirect("/login");
   let session;
-  try { session = await verifySession(token); } catch { redirect("/login"); }
+  try {
+    session = await verifySession(token);
+  } catch {
+    redirect("/login");
+  }
   if (session.role === "CLIENT") return <ClientEarnings />;
   if (session.role === "PROFESSIONAL") return <Earnings />;
   redirect("/admin");

@@ -211,15 +211,16 @@ before touching admin approval UI if a Server Action there needs to change.
 
 `project-delivery-plan.md` lists **FINTRAC/escrow legal status** as a Critical-impact risk
 ("holding client funds may require money-services-business registration... get counsel's
-opinion"). Separately, `Business_Requirements_Document.md` says Phase 1 has *no* on-platform
+opinion"). Separately, `Business_Requirements_Document.md` says Phase 1 has _no_ on-platform
 payments at all (off-platform, direct client-to-professional), while `CLAUDE.md` says escrow is
 mandatory before launch. Those two documents disagree, and it's a legal/business decision, not an
 engineering one.
 
 **Do not generate a Stripe Connect prompt until this is resolved.** Once it is, this phase should
 cover: Stripe Connect Express onboarding, `PaymentIntent`/escrow capture-and-transfer, commission
-+ per-province tax freezing at appointment time, and idempotent webhook handling keyed on
-`event.id` — all specified in `technical-architecture.md` section 5.
+
+- per-province tax freezing at appointment time, and idempotent webhook handling keyed on
+  `event.id` — all specified in `technical-architecture.md` section 5.
 
 ---
 

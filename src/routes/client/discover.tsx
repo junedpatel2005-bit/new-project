@@ -50,7 +50,7 @@ function DiscoverContent() {
   const [originLat, setOriginLat] = useState<number | null>(null);
   const [originLng, setOriginLng] = useState<number | null>(null);
   const [verifiedOnly, setVerifiedOnly] = useState(false);
-  const [showMap, setShowMap] = useState(true);
+  const [showMap, setShowMap] = useState(false);
   const [selectedPoint, setSelectedPoint] = useState<{ lat: number; lng: number } | null>(null);
   const [sort, setSort] = useState<"recommended" | "rating" | "distance" | "most-reviewed">(
     "recommended",
@@ -69,7 +69,9 @@ function DiscoverContent() {
 
     async function loadCategories() {
       try {
-        const response = await fetch("/api/marketplace/categories", { signal: controller.signal });
+        const response = await fetch("/api/v1/marketplace/categories", {
+          signal: controller.signal,
+        });
         if (!response.ok) throw new Error("Failed to load categories");
         setCategories((await response.json()) as MarketplaceCategory[]);
       } catch (error) {
@@ -104,7 +106,7 @@ function DiscoverContent() {
 
     async function loadProfessionals() {
       try {
-        const response = await fetch(`/api/v1/professionals?${params.toString()}`, {
+        const response = await fetch(`/api/v1/v1/professionals?${params.toString()}`, {
           signal: controller.signal,
         });
         if (!response.ok) throw new Error("Failed to load professionals");
@@ -425,12 +427,23 @@ function DiscoverContent() {
             </Button>
           </div>
 
-          <div className="mb-4 hidden h-40 overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-primary/10 via-card to-accent/10 p-6 shadow-soft md:block">
+          <button
+            onClick={() => {
+              setShowMap(true);
+              if (mapSectionRef.current) {
+                window.requestAnimationFrame(() => {
+                  mapSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                });
+              }
+            }}
+            className="mb-4 hidden h-40 w-full overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-primary/10 via-card to-accent/10 p-6 shadow-soft transition-all hover:border-primary/50 hover:shadow-elevated md:block"
+          >
             <div className="flex h-full items-center justify-between">
-              <div>
-                <p className="text-sm font-semibold">Pros near you</p>
-                <p className="text-xs text-muted-foreground">
-                  {professionals.filter((p) => p.location !== null).length} professionals available
+              <div className="text-left">
+                <p className="text-sm font-semibold">Professionals near you</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {professionals.filter((p) => p.location !== null).length} available • Click to
+                  view on map
                 </p>
               </div>
               <div className="relative h-full w-1/2">
@@ -449,7 +462,7 @@ function DiscoverContent() {
                 </div>
               </div>
             </div>
-          </div>
+          </button>
 
           {status === "loading" && (
             <div className="grid gap-4 sm:grid-cols-2">

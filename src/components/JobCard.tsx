@@ -34,7 +34,11 @@ function formatBudget(value: number | null | undefined, timingType?: string | nu
   return `$${value.toLocaleString()}`;
 }
 
-function formatBudgetRange(min: number | null | undefined, max: number | null | undefined, timingType?: string | null) {
+function formatBudgetRange(
+  min: number | null | undefined,
+  max: number | null | undefined,
+  timingType?: string | null,
+) {
   if (timingType === "HOURLY") {
     return min == null ? "Hourly rate not set" : `$${min.toLocaleString()}/hr`;
   }
@@ -65,7 +69,10 @@ export function JobCard({
   badgeLabel,
   footerText,
 }: JobCardProps) {
-  const budget = timingType === "HOURLY" ? formatBudget(hourlyRate, timingType) : formatBudgetRange(budgetMin, budgetMax, timingType);
+  const budget =
+    timingType === "HOURLY"
+      ? formatBudget(hourlyRate, timingType)
+      : formatBudgetRange(budgetMin, budgetMax, timingType);
 
   return (
     <article className="rounded-2xl border border-border bg-card p-5 transition hover:border-primary/70">
@@ -121,7 +128,9 @@ export function JobCard({
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {secondaryLabel ? (
-            actionOnClick || secondaryHref || secondaryOnClick ? null : <></>
+            actionOnClick || secondaryHref || secondaryOnClick ? null : (
+              <></>
+            )
           ) : null}
         </div>
       </div>
@@ -133,7 +142,12 @@ export function JobCard({
               <Link href={secondaryHref}>{secondaryLabel}</Link>
             </Button>
           ) : (
-            <Button variant="outline" size="sm" onClick={secondaryOnClick} disabled={secondaryDisabled}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={secondaryOnClick}
+              disabled={secondaryDisabled}
+            >
               {secondaryLabel}
             </Button>
           )

@@ -13,16 +13,20 @@ export async function PUT(request: NextRequest) {
   if (!token) return NextResponse.json({ error: "Admin access required." }, { status: 401 });
   try {
     const session = await verifySession(token);
-    if (session.role !== "ADMIN") return NextResponse.json({ error: "Admin access required." }, { status: 403 });
+    if (session.role !== "ADMIN")
+      return NextResponse.json({ error: "Admin access required." }, { status: 403 });
     const parsed = schema.safeParse(await request.json());
-    if (!parsed.success) return NextResponse.json({ error: "Invalid page changes." }, { status: 400 });
-    await db.$transaction(Object.entries(parsed.data.text).map(([elementKey, text]) =>
-      db.pageTextOverride.upsert({
-        where: { pagePath_elementKey: { pagePath: parsed.data.path, elementKey } },
-        create: { pagePath: parsed.data.path, elementKey, text, updatedAt: new Date() },
-        update: { text, updatedAt: new Date() },
-      }),
-    ));
+    if (!parsed.success)
+      return NextResponse.json({ error: "Invalid page changes." }, { status: 400 });
+    await db.$transaction(
+      Object.entries(parsed.data.text).map(([elementKey, text]) =>
+        db.pageTextOverride.upsert({
+          where: { pagePath_elementKey: { pagePath: parsed.data.path, elementKey } },
+          create: { pagePath: parsed.data.path, elementKey, text, updatedAt: new Date() },
+          update: { text, updatedAt: new Date() },
+        }),
+      ),
+    );
     return NextResponse.json({ ok: true });
   } catch (error) {
     console.error("admin.cms.visual.save.failed", error);

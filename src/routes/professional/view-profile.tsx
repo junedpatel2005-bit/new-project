@@ -164,7 +164,7 @@ export default function ViewProfessionalProfile() {
   const [status, setStatus] = useState<"loading" | "ready" | "missing" | "error">("loading");
 
   useEffect(() => {
-    void fetch(`/api/marketplace/professional-detail?id=${encodeURIComponent(proId)}`)
+    void fetch(`/api/v1/marketplace/professional-detail?id=${encodeURIComponent(proId)}`)
       .then(async (response) => {
         if (response.status === 404) return setStatus("missing");
         if (!response.ok) throw new Error("Unable to load professional");

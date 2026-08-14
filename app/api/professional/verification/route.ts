@@ -17,22 +17,36 @@ async function professionalId(request: NextRequest) {
   try {
     const session = await verifySession(token);
     return session.role === "PROFESSIONAL" ? session.userId : null;
-  } catch { return null; }
+  } catch {
+    return null;
+  }
 }
 
 export async function GET(request: NextRequest) {
   const userId = await professionalId(request);
-  if (!userId) return NextResponse.json({ error: "Professional sign-in is required." }, { status: 401 });
-  const [verification, reviews] = await Promise.all([db.professionalVerification.findUnique({ where: { userId } }), db.verificationDocumentReview.findMany({ where: { userId } })]);
+  if (!userId)
+    return NextResponse.json({ error: "Professional sign-in is required." }, { status: 401 });
+  const [verification, reviews] = await Promise.all([
+    db.professionalVerification.findUnique({ where: { userId } }),
+    db.verificationDocumentReview.findMany({ where: { userId } }),
+  ]);
   return NextResponse.json({ verification, reviews });
 }
 
 export async function PUT(request: NextRequest) {
   const userId = await professionalId(request);
-  if (!userId) return NextResponse.json({ error: "Professional sign-in is required." }, { status: 401 });
+  if (!userId)
+    return NextResponse.json({ error: "Professional sign-in is required." }, { status: 401 });
   const parsed = input.safeParse(await request.json().catch(() => null));
-  if (!parsed.success) return NextResponse.json({ error: "Invalid verification details." }, { status: 400 });
-  const hasDocument = Boolean(parsed.data.governmentIdUrl || parsed.data.licenseUrl || parsed.data.certificationsJson || parsed.data.insuranceUrl || parsed.data.selfieUrl);
+  if (!parsed.success)
+    return NextResponse.json({ error: "Invalid verification details." }, { status: 400 });
+  const hasDocument = Boolean(
+    parsed.data.governmentIdUrl ||
+    parsed.data.licenseUrl ||
+    parsed.data.certificationsJson ||
+    parsed.data.insuranceUrl ||
+    parsed.data.selfieUrl,
+  );
   const verification = await db.professionalVerification.upsert({
     where: { userId },
     update: { ...parsed.data, status: hasDocument ? "PENDING" : "PENDING" },

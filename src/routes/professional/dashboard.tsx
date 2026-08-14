@@ -60,14 +60,14 @@ export default function ProfessionalDashboard() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
   useEffect(() => {
-    void fetch("/api/portal/professional-jobs")
+    void fetch("/api/v1/portal/professional-jobs")
       .then(async (response) => {
         if (!response.ok) throw new Error();
         return response.json() as Promise<DashboardData>;
       })
       .then(setData)
       .catch(() => setError("Unable to load your professional dashboard."));
-    void fetch("/api/portal/notifications")
+    void fetch("/api/v1/portal/notifications")
       .then((response) => (response.ok ? response.json() : []))
       .then((items: Notification[]) => setNotifications(items.slice(0, 4)))
       .catch(() => setNotifications([]));

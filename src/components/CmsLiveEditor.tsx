@@ -3,7 +3,9 @@
 import { useEffect } from "react";
 
 type Overrides = Record<string, string>;
-const selector = "header a, header button, main h1, main h2, main h3, main p, main a, main button, footer h1, footer h2, footer h3, footer p, footer a";
+// Do not edit navigation or action controls. Their client-side role/state updates can
+// legitimately change after hydration, which makes DOM mutations here unsafe.
+const selector = "main h1, main h2, main h3, main p, footer h1, footer h2, footer h3, footer p";
 
 export function CmsLiveEditor() {
   useEffect(() => {
@@ -14,12 +16,16 @@ export function CmsLiveEditor() {
     if (path.startsWith("/admin")) return;
     let overrides: Overrides = {};
     let timer: number | undefined;
-    const elements = () => Array.from(document.querySelectorAll<HTMLElement>(selector)).filter((element) => element.children.length === 0 && Boolean(element.textContent?.trim()));
+    const elements = () =>
+      Array.from(document.querySelectorAll<HTMLElement>(selector)).filter(
+        (element) => element.children.length === 0 && Boolean(element.textContent?.trim()),
+      );
     const sync = () => {
       elements().forEach((element, index) => {
         const key = `content-${index}`;
         element.dataset.cmsKey = key;
-        if (overrides[key] !== undefined && element.textContent !== overrides[key]) element.textContent = overrides[key];
+        if (overrides[key] !== undefined && element.textContent !== overrides[key])
+          element.textContent = overrides[key];
         if (!editing || element.dataset.cmsBound === "true") return;
         element.dataset.cmsBound = "true";
         element.contentEditable = "true";
@@ -30,16 +36,25 @@ export function CmsLiveEditor() {
           const value = element.textContent?.trim();
           if (!value) return;
           overrides[key] = value;
-          window.parent.postMessage({ type: "servio-cms-any-text", path, key, value }, window.location.origin);
+          window.parent.postMessage(
+            { type: "servio-cms-any-text", path, key, value },
+            window.location.origin,
+          );
         });
       });
     };
     const load = async () => {
       try {
-        const saved = (await (await fetch(`/api/website/page-text?path=${encodeURIComponent(path)}`)).json()).text ?? {};
-        const draft = preview ? JSON.parse(window.sessionStorage.getItem(`servio-cms-live-preview:${path}`) ?? "{}") : {};
+        const saved =
+          (await (await fetch(`/api/v1/website/page-text?path=${encodeURIComponent(path)}`)).json())
+            .text ?? {};
+        const draft = preview
+          ? JSON.parse(window.sessionStorage.getItem(`servio-cms-live-preview:${path}`) ?? "{}")
+          : {};
         overrides = { ...saved, ...draft };
-      } catch { overrides = {}; }
+      } catch {
+        overrides = {};
+      }
       sync();
     };
     const blockActions = (event: MouseEvent) => {
@@ -53,9 +68,16 @@ export function CmsLiveEditor() {
     };
     void load();
     document.addEventListener("click", blockActions, true);
-    const observer = new MutationObserver(() => { window.clearTimeout(timer); timer = window.setTimeout(sync, 80); });
+    const observer = new MutationObserver(() => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(sync, 80);
+    });
     observer.observe(document.body, { childList: true, subtree: true });
-    return () => { observer.disconnect(); document.removeEventListener("click", blockActions, true); if (timer) window.clearTimeout(timer); };
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("click", blockActions, true);
+      if (timer) window.clearTimeout(timer);
+    };
   }, []);
   return null;
 }

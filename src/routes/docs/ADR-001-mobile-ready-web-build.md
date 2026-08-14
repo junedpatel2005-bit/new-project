@@ -61,18 +61,18 @@ Contract-first within each milestone. When Flutter starts, `pnpm contracts:gener
 
 ## Phase 2 estimate (unchanged in scope, reduced in risk)
 
-| Item | Hours |
-|---|---|
-| Flutter scaffold, theme, Riverpod, Dio, generated models | 80 |
-| Auth & onboarding | 50 |
-| Client flows | 150 |
-| Professional flows | 170 |
-| Maps (Google Maps SDK) | 50 |
-| Chat | 40 |
-| Push (FCM/APNs) | 30 |
-| Payments (Stripe SDK) | 60 |
-| Store readiness | 30 |
-| **Total** | **660** |
+| Item                                                     | Hours   |
+| -------------------------------------------------------- | ------- |
+| Flutter scaffold, theme, Riverpod, Dio, generated models | 80      |
+| Auth & onboarding                                        | 50      |
+| Client flows                                             | 150     |
+| Professional flows                                       | 170     |
+| Maps (Google Maps SDK)                                   | 50      |
+| Chat                                                     | 40      |
+| Push (FCM/APNs)                                          | 30      |
+| Payments (Stripe SDK)                                    | 60      |
+| Store readiness                                          | 30      |
+| **Total**                                                | **660** |
 
 At one developer full-time, ~4.5 months. At two, ~2.5 months. **No API work included** — that is the point of this ADR.
 

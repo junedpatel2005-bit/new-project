@@ -11,7 +11,7 @@ export default function Messages() {
   const [items, setItems] = useState<Conversation[] | null>(null);
   const [error, setError] = useState(false);
   useEffect(() => {
-    void fetch("/api/portal/messages")
+    void fetch("/api/v1/portal/messages")
       .then(async (response) => {
         if (!response.ok) throw new Error("Unable to load conversations");
         setItems((await response.json()) as Conversation[]);

@@ -49,6 +49,21 @@ export type DetailedProfessional = MarketplaceProfessional & {
   services: ProfessionalService[];
 };
 
+/** Fields that are safe to expose on the public professional marketplace profile. */
+export type PublicProfessionalProfile = Omit<
+  DetailedProfessional,
+  | "email"
+  | "phone"
+  | "address"
+  | "professionalLatitude"
+  | "professionalLongitude"
+  | "lastLoginAt"
+  | "governmentIdUrl"
+  | "licenseUrl"
+  | "insuranceUrl"
+  | "selfieUrl"
+>;
+
 export type ProfessionalService = {
   id: number;
   name: string;

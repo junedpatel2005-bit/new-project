@@ -18,22 +18,22 @@ Launch market **Canada**, currency **CAD**, English only. Launch category **IT**
 
 ## Stack — do not substitute
 
-| Layer | Choice |
-|---|---|
-| Web + API | Next.js 15 App Router, React 19, TypeScript |
-| Styling | Tailwind **v4** (CSS-first `@theme`, **no `tailwind.config.js`**) |
-| Components | shadcn/ui over Radix, ported from the prototype |
-| Database | PostgreSQL on Supabase, **PostGIS enabled** |
-| ORM | Prisma |
-| Auth | Own JWT — access + refresh, RS256. **Not NextAuth. Not Supabase Auth.** |
-| Storage | Supabase Storage, private buckets, signed URLs |
-| Payments | Stripe Connect (Express), escrow |
-| Maps | **Google Maps** — Maps JS, Places, Geocoding, Distance Matrix |
-| SMS/OTP | Twilio |
-| Email | SMTP — Mailtrap in dev, SendGrid in production |
-| Push | **Web Push (VAPID)**. FCM/APNs arrive with Flutter in phase 2 |
-| Client cache | TanStack Query |
-| Hosting | Vercel now, AWS later — keep portable |
+| Layer        | Choice                                                                  |
+| ------------ | ----------------------------------------------------------------------- |
+| Web + API    | Next.js 15 App Router, React 19, TypeScript                             |
+| Styling      | Tailwind **v4** (CSS-first `@theme`, **no `tailwind.config.js`**)       |
+| Components   | shadcn/ui over Radix, ported from the prototype                         |
+| Database     | PostgreSQL on Supabase, **PostGIS enabled**                             |
+| ORM          | Prisma                                                                  |
+| Auth         | Own JWT — access + refresh, RS256. **Not NextAuth. Not Supabase Auth.** |
+| Storage      | Supabase Storage, private buckets, signed URLs                          |
+| Payments     | Stripe Connect (Express), escrow                                        |
+| Maps         | **Google Maps** — Maps JS, Places, Geocoding, Distance Matrix           |
+| SMS/OTP      | Twilio                                                                  |
+| Email        | SMTP — Mailtrap in dev, SendGrid in production                          |
+| Push         | **Web Push (VAPID)**. FCM/APNs arrive with Flutter in phase 2           |
+| Client cache | TanStack Query                                                          |
+| Hosting      | Vercel now, AWS later — keep portable                                   |
 
 **Phase 2 (not now):** Flutter + Riverpod for iOS and Android.
 
@@ -96,7 +96,7 @@ These encode legal, financial and trust requirements. Each has burned a real mar
 
 4. **Never store money as a float or `Decimal` in application code.** Integers in **cents**, always, with an explicit currency code. Quotes, budgets, commission, tax, payouts.
 
-5. **Never store badges as editable flags.** Badges are derived from `VerificationDocument` state. An admin approves a *document*; the badge follows.
+5. **Never store badges as editable flags.** Badges are derived from `VerificationDocument` state. An admin approves a _document_; the badge follows.
 
 6. **Never write geospatial queries in application code.** Radius matching runs in PostGIS through `GeoRepository` via `$queryRaw`. Never `findMany()` then filter by distance in JS.
 
@@ -151,6 +151,7 @@ This rules out tRPC, session-cookie auth, and response shapes designed around on
 ## Code conventions
 
 **TypeScript**
+
 - `strict: true`, `noUncheckedIndexedAccess: true`. No `any`. No non-null assertions without a justifying comment.
 - Validate every API input with Zod at the route boundary; infer types from the schema rather than writing them twice.
 - Route handlers stay thin: parse → authorize → service → serialize.
@@ -158,6 +159,7 @@ This rules out tRPC, session-cookie auth, and response shapes designed around on
 - Share Zod schemas between form and endpoint so client and server validation cannot diverge.
 
 **Naming**
+
 - Database `snake_case`, mapped to `camelCase` via `@map`.
 - API `camelCase` JSON, plural resources, `/api/v1/...`.
 - Files `kebab-case`; React components `PascalCase`.
@@ -165,6 +167,7 @@ This rules out tRPC, session-cookie auth, and response shapes designed around on
 **Routing** — route groups in parentheses create no URL segment. `/client/...` and `/pro/...` are **real segments**; `(marketing)`, `(auth)` and `(public-browse)` are groups.
 
 **Database**
+
 - Every schema change is a migration. Never edit an applied migration.
 - PostGIS indexes, partial-unique indexes and the audit-log REVOKE live in a hand-written migration, not the Prisma schema.
 - Soft-delete users; hard-delete nothing a dispute might reference.
@@ -175,7 +178,7 @@ This rules out tRPC, session-cookie auth, and response shapes designed around on
 
 - Business logic in `packages/core`: unit tested, ≥70% coverage.
 - Every API route: one authorized-success and one unauthorized-failure test minimum.
-- **Privacy assertions are mandatory.** For every endpoint returning user data, assert forbidden fields are *absent* per role. Most likely to regress silently; only ones with legal consequences.
+- **Privacy assertions are mandatory.** For every endpoint returning user data, assert forbidden fields are _absent_ per role. Most likely to regress silently; only ones with legal consequences.
 - State machines: test the illegal transitions, not just the happy path.
 - Money: test commission and tax arithmetic in integer cents, including rounding.
 - Auth: test refresh replay revokes the whole family.
@@ -194,8 +197,8 @@ This rules out tRPC, session-cookie auth, and response shapes designed around on
 
 ## Milestones
 
-**M0** Foundation — monorepo, schema + PostGIS, Next.js port, CI *(95–115h)*
-**M1** Auth — JWT, OTP, login, reset, OAuth, guards, media *(81h)*
+**M0** Foundation — monorepo, schema + PostGIS, Next.js port, CI _(95–115h)_
+**M1** Auth — JWT, OTP, login, reset, OAuth, guards, media _(81h)_
 **M2** Profiles & Trust — both profiles, categories, verification, admin review
 **M3** Jobs & Geo — posting, PostGIS matching, discovery, Google Maps
 **M4** Quote & Hire — quotes, revisions, appointment, chat

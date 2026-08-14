@@ -13,6 +13,7 @@ import {
   Search,
   SlidersHorizontal,
   UserRound,
+  X,
 } from "lucide-react";
 
 type Job = {
@@ -40,6 +41,60 @@ type Dispute = {
   updatedAt: string;
 };
 type OperationsData = { jobs: Job[]; disputes: Dispute[] };
+type JobDetails = Job & {
+  budgetMin: number | null;
+  budgetMax: number | null;
+  hourlyRate: number | null;
+  timingType: string;
+  locationAddress: string | null;
+  jobDate: string | null;
+  deadline: string | null;
+  updatedAt: string;
+  attachments: {
+    id: number;
+    fileName: string;
+    fileType: string | null;
+    fileSize: number | null;
+    previewUrl: string | null;
+  }[];
+  _count: { favoriteJobs: number };
+  user: Job["user"] & {
+    id: number;
+    phone: string | null;
+    companyName: string | null;
+    address: string | null;
+    isVerified: boolean;
+    createdAt: string;
+  };
+  proposals: {
+    id: number;
+    professionalId: number;
+    bidAmount: number;
+    duration: string;
+    status: string;
+    origin: string;
+    createdAt: string;
+    professional: { firstName: string; lastName: string; email: string } | null;
+  }[];
+  project: {
+    id: number;
+    status: string;
+    progress: number;
+    currentStage: string | null;
+    startedAt: string | null;
+    completedAt: string | null;
+    milestones: {
+      id: number;
+      title: string;
+      description: string | null;
+      amount: number;
+      dueDate: string | null;
+      status: string;
+      approvedAt: string | null;
+    }[];
+    financial: { milestoneTotal: number; paidAmount: number; remainingAmount: number };
+  } | null;
+};
 
 const date = (value: string) =>
   new Intl.DateTimeFormat("en", { month: "short", day: "numeric", year: "numeric" }).format(
@@ -67,9 +122,11 @@ export default function OperationsPage() {
   const [view, setView] = useState<"jobs" | "disputes">("jobs");
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("ALL");
+  const [selectedJob, setSelectedJob] = useState<JobDetails | null>(null);
+  const [detailsStatus, setDetailsStatus] = useState<"idle" | "loading" | "error">("idle");
 
   useEffect(() => {
-    void fetch("/api/admin/data/jobs", { cache: "no-store" })
+    void fetch("/api/v1/admin/data/jobs", { cache: "no-store" })
       .then((response) => response.json())
       .then((result) => setData({ jobs: result.jobs ?? [], disputes: result.disputes ?? [] }))
       .catch(() => setData({ jobs: [], disputes: [] }));
@@ -97,12 +154,26 @@ export default function OperationsPage() {
     [data, query, filter],
   );
   const openDisputes = data?.disputes.filter((item) => item.status === "OPEN").length ?? 0;
-  const urgent =
-    data?.disputes.filter((item) => item.status === "OPEN" && item.priority === "HIGH").length ?? 0;
+  const runningProjects = data?.jobs.filter((item) => item.status === "RUNNING").length ?? 0;
+  const completedProjects = data?.jobs.filter((item) => item.status === "COMPLETED").length ?? 0;
   const options =
     view === "jobs"
-      ? ["ALL", "OPEN", "DRAFT", "CLOSED"]
+      ? ["ALL", "OPEN", "RUNNING", "COMPLETED", "DRAFT", "CLOSED"]
       : ["ALL", "OPEN", "RESOLVED", "HIGH", "MEDIUM", "LOW"];
+
+  async function openJob(id: number) {
+    setDetailsStatus("loading");
+    setSelectedJob(null);
+    try {
+      const response = await fetch(`/api/v1/admin/jobs/${id}`, { cache: "no-store" });
+      if (!response.ok) throw new Error("Unable to load job details");
+      const result = await response.json();
+      setSelectedJob(result.job);
+      setDetailsStatus("idle");
+    } catch {
+      setDetailsStatus("error");
+    }
+  }
 
   return (
     <div className="pb-5">
@@ -143,6 +214,10 @@ export default function OperationsPage() {
               value={data.jobs.length}
               detail={`${data.jobs.filter((job) => job.status === "OPEN").length} currently open`}
               color="indigo"
+              onClick={() => {
+                setView("jobs");
+                setFilter("ALL");
+              }}
             />
             <Metric
               icon={Clock3}
@@ -150,20 +225,32 @@ export default function OperationsPage() {
               value={openDisputes}
               detail="Need team attention"
               color="amber"
+              onClick={() => {
+                setView("disputes");
+                setFilter("OPEN");
+              }}
             />
             <Metric
-              icon={AlertTriangle}
-              label="High-priority cases"
-              value={urgent}
-              detail="Escalated service issues"
-              color="rose"
+              icon={BriefcaseBusiness}
+              label="Running projects"
+              value={runningProjects}
+              detail="Currently in progress"
+              color="indigo"
+              onClick={() => {
+                setView("jobs");
+                setFilter("RUNNING");
+              }}
             />
             <Metric
               icon={CheckCircle2}
-              label="Resolved disputes"
-              value={data.disputes.filter((item) => item.status === "RESOLVED").length}
-              detail="Closed out successfully"
+              label="Completed projects"
+              value={completedProjects}
+              detail="Finished work"
               color="emerald"
+              onClick={() => {
+                setView("jobs");
+                setFilter("COMPLETED");
+              }}
             />
           </div>
 
@@ -234,12 +321,22 @@ export default function OperationsPage() {
             </div>
             <div className="divide-y divide-white/10">
               {view === "jobs"
-                ? jobs.map((job) => <JobRow key={job.id} job={job} />)
+                ? jobs.map((job) => <JobRow key={job.id} job={job} onOpen={openJob} />)
                 : disputes.map((dispute) => <DisputeRow key={dispute.id} dispute={dispute} />)}
               {(view === "jobs" ? jobs : disputes).length === 0 && <Empty view={view} />}
             </div>
           </section>
         </>
+      )}
+      {(selectedJob || detailsStatus !== "idle") && (
+        <JobDetailsPanel
+          job={selectedJob}
+          status={detailsStatus}
+          onClose={() => {
+            setSelectedJob(null);
+            setDetailsStatus("idle");
+          }}
+        />
       )}
     </div>
   );
@@ -251,12 +348,14 @@ function Metric({
   value,
   detail,
   color,
+  onClick,
 }: {
   icon: typeof BriefcaseBusiness;
   label: string;
   value: number;
   detail: string;
   color: "indigo" | "amber" | "rose" | "emerald";
+  onClick: () => void;
 }) {
   const colors = {
     indigo: "bg-indigo-400/10 text-indigo-300",
@@ -265,14 +364,18 @@ function Metric({
     emerald: "bg-emerald-400/10 text-emerald-300",
   };
   return (
-    <article className="rounded-2xl border border-white/10 bg-white/[.035] p-5 transition hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/[.055]">
+    <button
+      type="button"
+      onClick={onClick}
+      className="rounded-2xl border border-white/10 bg-white/[.035] p-5 text-left transition hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/[.055] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400"
+    >
       <span className={`grid h-10 w-10 place-items-center rounded-xl ${colors[color]}`}>
         <Icon className="h-5 w-5" />
       </span>
       <p className="mt-5 text-3xl font-bold tracking-tight text-white">{value}</p>
       <p className="mt-1 text-sm font-medium text-slate-200">{text}</p>
       <p className="mt-1 text-xs text-slate-500">{detail}</p>
-    </article>
+    </button>
   );
 }
 function Tab({
@@ -304,13 +407,17 @@ function Tab({
     </button>
   );
 }
-function JobRow({ job }: { job: Job }) {
+function JobRow({ job, onOpen }: { job: Job; onOpen: (id: number) => void }) {
   const budget =
     job.budgetMin || job.budgetMax
       ? `$${(job.budgetMin ?? 0).toLocaleString()} – $${(job.budgetMax ?? job.budgetMin ?? 0).toLocaleString()}`
       : "Budget not set";
   return (
-    <article className="group flex flex-wrap items-center gap-x-5 gap-y-4 px-5 py-5 transition hover:bg-white/[.035] sm:px-6">
+    <button
+      type="button"
+      onClick={() => void onOpen(job.id)}
+      className="group flex w-full flex-wrap items-center gap-x-5 gap-y-4 px-5 py-5 text-left transition hover:bg-white/[.035] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-indigo-400 sm:px-6"
+    >
       <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-indigo-400/10 text-indigo-300">
         <BriefcaseBusiness className="h-5 w-5" />
       </span>
@@ -341,7 +448,7 @@ function JobRow({ job }: { job: Job }) {
         </p>
       </div>
       <ChevronRight className="hidden h-5 w-5 text-slate-600 transition group-hover:translate-x-1 group-hover:text-indigo-300 sm:block" />
-    </article>
+    </button>
   );
 }
 function DisputeRow({ dispute }: { dispute: Dispute }) {
@@ -390,5 +497,238 @@ function Empty({ view }: { view: "jobs" | "disputes" }) {
       <p className="mt-4 font-semibold text-white">No matching {view} found</p>
       <p className="mt-1 text-sm text-slate-400">Try changing the search or status filter.</p>
     </div>
+  );
+}
+
+function JobDetailsPanel({
+  job,
+  status,
+  onClose,
+}: {
+  job: JobDetails | null;
+  status: "idle" | "loading" | "error";
+  onClose: () => void;
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="job-details-title"
+    >
+      <section
+        className="admin-job-details-scroll max-h-[calc(100vh-2rem)] w-full max-w-5xl overflow-y-auto rounded-3xl border border-white/10 bg-[#11182b] shadow-2xl shadow-black/40"
+        aria-live="polite"
+      >
+        <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-white/10 bg-[#11182b] px-5 py-5 sm:px-6">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[.2em] text-indigo-300">
+              Job details
+            </p>
+            <h2 id="job-details-title" className="mt-1 text-xl font-semibold text-white">
+              {job?.title ?? (status === "loading" ? "Loading job…" : "Job details")}
+            </h2>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-lg p-2 text-slate-400 transition hover:bg-white/10 hover:text-white"
+            aria-label="Close job details"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+        {status === "loading" ? <div className="h-72 animate-pulse bg-white/[.025]" /> : null}
+        {status === "error" ? (
+          <p className="p-6 text-sm text-rose-300">
+            Job details could not be loaded. Please try again.
+          </p>
+        ) : null}
+        {job ? (
+          <div className="grid gap-6 p-5 sm:p-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+            <div className="space-y-6">
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge value={job.status} />
+                <Badge value={job.urgency} />
+                <span className="text-sm text-slate-400">
+                  Job #{job.id} · Updated {date(job.updatedAt)}
+                </span>
+              </div>
+              <DetailGrid
+                items={[
+                  ["Category", job.category ?? "General"],
+                  ["Work mode", label(job.workMode)],
+                  [
+                    "Budget",
+                    job.timingType === "HOURLY"
+                      ? job.hourlyRate == null
+                        ? "Not set"
+                        : `$${job.hourlyRate.toLocaleString()}/hr`
+                      : `$${job.budgetMin?.toLocaleString() ?? "—"} – $${job.budgetMax?.toLocaleString() ?? "—"}`,
+                  ],
+                  ["Location", job.locationAddress ?? job.locationLabel ?? "Not set"],
+                  ["Job date", job.jobDate ? date(job.jobDate) : "Not set"],
+                  ["Deadline", job.deadline ? date(job.deadline) : "Not set"],
+                  ["Posted", date(job.createdAt)],
+                  ["Saved", `${job._count.favoriteJobs} times`],
+                ]}
+              />
+              <div>
+                <h3 className="text-sm font-semibold text-white">Description</h3>
+                <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-300">
+                  {job.description ?? "No description was provided."}
+                </p>
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-white">
+                  Proposals ({job.proposals.length})
+                </h3>
+                <div className="mt-3 space-y-2">
+                  {job.proposals.length ? (
+                    job.proposals.map((proposal) => (
+                      <div
+                        key={proposal.id}
+                        className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-black/10 px-4 py-3 text-sm"
+                      >
+                        <div>
+                          <p className="font-medium text-white">
+                            {proposal.professional
+                              ? `${proposal.professional.firstName} ${proposal.professional.lastName}`
+                              : `Professional #${proposal.professionalId}`}
+                          </p>
+                          <p className="text-xs text-slate-400">
+                            {proposal.duration} · {date(proposal.createdAt)}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <Badge value={proposal.status} />
+                          <p className="mt-1 text-sm font-semibold text-white">
+                            ${proposal.bidAmount.toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-slate-400">No proposals have been submitted.</p>
+                  )}
+                </div>
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-white">
+                  Attachments ({job.attachments.length})
+                </h3>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {job.attachments.length ? (
+                    job.attachments.map((attachment) =>
+                      attachment.previewUrl ? (
+                        <a
+                          key={attachment.id}
+                          href={attachment.previewUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="rounded-lg border border-indigo-400/25 bg-indigo-400/10 px-3 py-2 text-sm text-indigo-200 hover:bg-indigo-400/20"
+                        >
+                          {attachment.fileName}
+                        </a>
+                      ) : (
+                        <span
+                          key={attachment.id}
+                          className="rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-300"
+                        >
+                          {attachment.fileName}
+                        </span>
+                      ),
+                    )
+                  ) : (
+                    <p className="text-sm text-slate-400">No attachments.</p>
+                  )}
+                </div>
+              </div>
+            </div>
+            <aside className="h-fit rounded-2xl border border-white/10 bg-black/10 p-5">
+              <h3 className="text-sm font-semibold text-white">Client information</h3>
+              <p className="mt-3 font-medium text-white">
+                {job.user.firstName} {job.user.lastName}
+              </p>
+              <div className="mt-3 space-y-2 text-sm text-slate-300">
+                <p>{job.user.email}</p>
+                <p>{job.user.phone ?? "Phone not provided"}</p>
+                <p>{job.user.companyName ?? "No company listed"}</p>
+                <p>{job.user.address ?? "Address not provided"}</p>
+                <p className="pt-2 text-xs text-slate-500">
+                  Account created {date(job.user.createdAt)} ·{" "}
+                  {job.user.isVerified ? "Verified" : "Not verified"}
+                </p>
+              </div>
+              {job.project ? (
+                <div className="mt-5 border-t border-white/10 pt-5">
+                  <h3 className="text-sm font-semibold text-white">Project status</h3>
+                  <p className="mt-2 text-sm text-slate-300">
+                    {label(job.project.status)} · {job.project.progress}% complete
+                  </p>
+                  <p className="mt-1 text-xs text-slate-500">
+                    {job.project.currentStage ?? "No current stage"}
+                  </p>
+                  <dl className="mt-4 grid grid-cols-3 gap-2 text-center">
+                    <div className="rounded-lg bg-white/5 p-2">
+                      <dt className="text-[10px] uppercase text-slate-500">Milestones</dt>
+                      <dd className="mt-1 text-sm font-semibold text-white">
+                        {job.project.milestones.length}
+                      </dd>
+                    </div>
+                    <div className="rounded-lg bg-white/5 p-2">
+                      <dt className="text-[10px] uppercase text-slate-500">Paid</dt>
+                      <dd className="mt-1 text-sm font-semibold text-white">
+                        ${job.project.financial.paidAmount.toLocaleString()}
+                      </dd>
+                    </div>
+                    <div className="rounded-lg bg-white/5 p-2">
+                      <dt className="text-[10px] uppercase text-slate-500">Remaining</dt>
+                      <dd className="mt-1 text-sm font-semibold text-white">
+                        ${job.project.financial.remainingAmount.toLocaleString()}
+                      </dd>
+                    </div>
+                  </dl>
+                  <div className="mt-4 space-y-2">
+                    <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                      Milestone work
+                    </h4>
+                    {job.project.milestones.length ? (
+                      job.project.milestones.map((milestone) => (
+                        <div key={milestone.id} className="rounded-lg border border-white/10 p-3">
+                          <div className="flex items-start justify-between gap-2">
+                            <p className="text-sm font-medium text-white">{milestone.title}</p>
+                            <Badge value={milestone.status} />
+                          </div>
+                          <p className="mt-1 text-xs text-slate-400">
+                            ${milestone.amount.toLocaleString()}
+                            {milestone.dueDate ? ` · Due ${date(milestone.dueDate)}` : ""}
+                          </p>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-xs text-slate-500">No milestones added.</p>
+                    )}
+                  </div>
+                </div>
+              ) : null}
+            </aside>
+          </div>
+        ) : null}
+      </section>
+    </div>
+  );
+}
+
+function DetailGrid({ items }: { items: [string, string][] }) {
+  return (
+    <dl className="grid gap-x-5 gap-y-4 rounded-2xl border border-white/10 bg-black/10 p-4 sm:grid-cols-2">
+      {items.map(([term, definition]) => (
+        <div key={term}>
+          <dt className="text-xs uppercase tracking-wider text-slate-500">{term}</dt>
+          <dd className="mt-1 text-sm text-white">{definition}</dd>
+        </div>
+      ))}
+    </dl>
   );
 }

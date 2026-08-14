@@ -15,8 +15,8 @@ async function call(
 ) {
   const response = await fetch(
     action
-      ? "http://localhost:3000/api/portal/project-actions"
-      : "http://localhost:3000/api/portal/project?id=81",
+      ? "http://localhost:3000/api/v1/portal/project-actions"
+      : "http://localhost:3000/api/v1/portal/project?id=81",
     {
       method: action ? "POST" : "GET",
       headers: {

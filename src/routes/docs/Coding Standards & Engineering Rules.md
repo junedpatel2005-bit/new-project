@@ -188,8 +188,8 @@ Recommended:
 
 - Normal component: ≤150 lines
 - Complex component: ≤250 lines
-- >250 lines requires review
-- >400 lines should normally be split
+- > 250 lines requires review
+- > 400 lines should normally be split
 
 Do not split components artificially just to satisfy line counts.
 
@@ -534,7 +534,7 @@ Use one shared Prisma client.
 Do not create:
 
 ```ts
-new PrismaClient()
+new PrismaClient();
 ```
 
 inside every request.
@@ -603,7 +603,7 @@ Example:
 Never:
 
 ```ts
-1250.50
+1250.5;
 ```
 
 Never use floating-point arithmetic for money.
@@ -698,8 +698,7 @@ Forbidden:
 ```ts
 try {
   await operation();
-} catch {
-}
+} catch {}
 ```
 
 Also forbidden:

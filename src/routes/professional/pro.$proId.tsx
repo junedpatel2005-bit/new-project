@@ -25,7 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import type { DetailedProfessional } from "@/lib/types/marketplace";
+import type { PublicProfessionalProfile } from "@/lib/types/marketplace";
 import { MAX_HIRE_REQUEST_BUDGET } from "@/lib/constants/hiring";
 
 type ClientJob = {
@@ -48,7 +48,7 @@ function ProProfileContent() {
   const { proId } = useParams<{ proId: string }>();
   const searchParams = useSearchParams();
   const requestedJobId = Number(searchParams.get("jobId"));
-  const [professional, setProfessional] = useState<DetailedProfessional | null>(null);
+  const [professional, setProfessional] = useState<PublicProfessionalProfile | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "missing" | "error">("loading");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [jobs, setJobs] = useState<ClientJob[]>([]);
@@ -64,11 +64,11 @@ function ProProfileContent() {
   const [requestMessage, setRequestMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    void fetch(`/api/marketplace/professional-detail?id=${encodeURIComponent(proId)}`)
+    void fetch(`/api/v1/marketplace/professional-detail?id=${encodeURIComponent(proId)}`)
       .then(async (response) => {
         if (response.status === 404) return setStatus("missing");
         if (!response.ok) throw new Error("Unable to load professional");
-        setProfessional((await response.json()) as DetailedProfessional);
+        setProfessional((await response.json()) as PublicProfessionalProfile);
         setStatus("ready");
       })
       .catch(() => setStatus("error"));
@@ -78,7 +78,7 @@ function ProProfileContent() {
     async function loadJobs() {
       setJobsStatus("loading");
       try {
-        const response = await fetch("/api/client/jobs");
+        const response = await fetch("/api/v1/client/jobs");
         if (!response.ok) throw new Error("Unable to load jobs");
         const data = (await response.json()) as { jobs: ClientJob[] };
         setJobs(data.jobs);
@@ -120,7 +120,7 @@ function ProProfileContent() {
     setRequestStatus("loading");
     setRequestMessage(null);
     try {
-      const response = await fetch("/api/client/project-requests", {
+      const response = await fetch("/api/v1/client/project-requests", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({

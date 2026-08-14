@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 type Notification = {
   id: number;
@@ -12,14 +12,20 @@ type Notification = {
 export default function Notifications() {
   const [items, setItems] = useState<Notification[] | null>(null);
   const [error, setError] = useState(false);
-  useEffect(() => {
-    void fetch("/api/portal/notifications")
+  const loadNotifications = useCallback(() => {
+    setError(false);
+    return fetch("/api/v1/portal/notifications", { cache: "no-store" })
       .then(async (response) => {
         if (!response.ok) throw new Error("Unable to load notifications");
         setItems((await response.json()) as Notification[]);
       })
       .catch(() => setError(true));
   }, []);
+  useEffect(() => {
+    void loadNotifications();
+    window.addEventListener("servio:notification", loadNotifications);
+    return () => window.removeEventListener("servio:notification", loadNotifications);
+  }, [loadNotifications]);
   return (
     <AppShell>
       <h1 className="text-2xl font-semibold">Notifications</h1>

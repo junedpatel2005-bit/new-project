@@ -191,12 +191,12 @@ export default function JobDetails() {
   useEffect(() => {
     async function loadJob() {
       try {
-        const authResponse = await fetch("/api/auth/me");
+        const authResponse = await fetch("/api/v1/auth/me");
         const auth = (await authResponse.json().catch(() => null)) as {
           user?: { role?: "CLIENT" | "PROFESSIONAL" } | null;
         } | null;
         setViewerRole(auth?.user?.role ?? null);
-        const ownerResponse = await fetch(`/api/client/jobs/${encodeURIComponent(jobId)}`);
+        const ownerResponse = await fetch(`/api/v1/client/jobs/${encodeURIComponent(jobId)}`);
         if (ownerResponse.ok) {
           const { job: ownerJob, proposals } = (await ownerResponse.json()) as {
             job: OwnerJob;
@@ -209,7 +209,7 @@ export default function JobDetails() {
         }
         if (ownerResponse.status !== 404) throw new Error("Unable to load job");
 
-        const response = await fetch(`/api/marketplace/job?id=${encodeURIComponent(jobId)}`);
+        const response = await fetch(`/api/v1/marketplace/job?id=${encodeURIComponent(jobId)}`);
         if (!response.ok) {
           if (response.status === 404) return setStatus("missing");
           throw new Error("Unable to load job");
@@ -218,7 +218,7 @@ export default function JobDetails() {
         marketplaceJob.status = marketplaceJob.status ?? "OPEN";
         if (auth?.user?.role === "PROFESSIONAL") {
           const proposalResponse = await fetch(
-            `/api/professional/proposals?jobId=${encodeURIComponent(jobId)}`,
+            `/api/v1/professional/proposals?jobId=${encodeURIComponent(jobId)}`,
           );
           if (proposalResponse.ok) {
             const proposalData = (await proposalResponse.json()) as {
@@ -228,7 +228,7 @@ export default function JobDetails() {
           }
         }
         const projectResponse = await fetch(
-          `/api/portal/project?jobId=${encodeURIComponent(jobId)}`,
+          `/api/v1/portal/project?jobId=${encodeURIComponent(jobId)}`,
         );
         if (projectResponse.ok) {
           const projectData = (await projectResponse.json()) as { project: { id: number } };
@@ -249,7 +249,7 @@ export default function JobDetails() {
     try {
       const params = new URLSearchParams({ limit: "50" });
       if (query.trim()) params.set("query", query.trim());
-      const response = await fetch(`/api/v1/professionals?${params.toString()}`);
+      const response = await fetch(`/api/v1/v1/professionals?${params.toString()}`);
       if (!response.ok) throw new Error();
       const data = (await response.json()) as ProfessionalDiscoveryResponse;
       setProfessionals(data.professionals);
@@ -277,7 +277,7 @@ export default function JobDetails() {
     setProposalBusy(true);
     setProposalError(null);
     try {
-      const response = await fetch("/api/professional/proposals", {
+      const response = await fetch("/api/v1/professional/proposals", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -298,7 +298,7 @@ export default function JobDetails() {
     }
   }
   async function reviewProposal(proposal: JobProposal, action: "accept" | "reject") {
-    const response = await fetch(`/api/client/proposals/${proposal.id}`, {
+    const response = await fetch(`/api/v1/client/proposals/${proposal.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action }),
@@ -505,48 +505,100 @@ export default function JobDetails() {
         </section>
         {isOwner && (
           <section className="mt-8 border-t border-border pt-6">
-            <h2 className="text-xl font-semibold">Proposals / Applicants</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Review proposals sent by professionals for this job.
-            </p>
-            <div className="mt-4 space-y-3">
+            <div className="flex items-center gap-2 mb-4">
+              <Briefcase className="h-5 w-5 text-primary" />
+              <div>
+                <h2 className="text-xl font-semibold">Proposals & Bidding</h2>
+                <p className="text-sm text-muted-foreground">
+                  Review and manage proposals from professionals
+                </p>
+              </div>
+            </div>
+            <div className="space-y-3">
+              {clientProposals.length > 0 && (
+                <div className="mb-4 rounded-xl border border-primary/20 bg-primary/5 p-4">
+                  <p className="font-semibold text-sm text-primary">
+                    {clientProposals.length} proposal{clientProposals.length !== 1 ? "s" : ""}{" "}
+                    received
+                  </p>
+                </div>
+              )}
               {clientProposals.map((proposal) => (
-                <article key={proposal.id} className="rounded-xl border border-border p-4">
+                <article
+                  key={proposal.id}
+                  className="rounded-xl border border-border p-5 hover:border-primary/30 transition-colors"
+                >
                   <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div>
-                      <h3 className="font-semibold">
-                        {proposal.professional
-                          ? `${proposal.professional.firstName} ${proposal.professional.lastName}`
-                          : "Professional"}
-                      </h3>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-semibold text-lg">
+                          {proposal.professional
+                            ? `${proposal.professional.firstName} ${proposal.professional.lastName}`
+                            : "Professional"}
+                        </h3>
+                        {proposal.professional?.isVerified && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-success/10 px-2 py-0.5 text-xs text-success">
+                            ✓ Verified
+                          </span>
+                        )}
+                      </div>
                       <p className="mt-1 text-sm text-muted-foreground">
                         {proposal.professional?.professionalCategory ?? "Professional"}
                         {proposal.professional?.professionalCity
                           ? ` · ${proposal.professional.professionalCity}`
                           : ""}
                       </p>
+                      {proposal.professional && (
+                        <p className="mt-1 text-xs text-muted-foreground flex items-center gap-1">
+                          <Star className="h-3 w-3 fill-warning text-warning" />
+                          {proposal.professional.averageRating.toFixed(1)} (
+                          {proposal.professional.reviewCount} reviews)
+                        </p>
+                      )}
                     </div>
-                    <span className="rounded-full bg-muted px-2.5 py-1 text-xs font-medium">
-                      {proposal.status === "PENDING" ? "Pending review" : proposal.status}
-                    </span>
+                    <div className="text-right">
+                      <span
+                        className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                          proposal.status === "PENDING"
+                            ? "bg-yellow/10 text-yellow"
+                            : proposal.status === "ACCEPTED"
+                              ? "bg-green/10 text-green"
+                              : "bg-red/10 text-red"
+                        }`}
+                      >
+                        {proposal.status === "PENDING" ? "Pending Review" : proposal.status}
+                      </span>
+                    </div>
                   </div>
-                  <p className="mt-3 text-sm">
-                    Proposed price: <strong>${proposal.bidAmount.toLocaleString()}</strong> ·
-                    Delivery: {proposal.duration}
-                  </p>
-                  <p className="mt-3 whitespace-pre-wrap text-sm text-muted-foreground">
-                    {proposal.coverLetter}
-                  </p>
+                  <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                    <div className="rounded-lg bg-muted p-3">
+                      <p className="text-xs text-muted-foreground">Proposed Price</p>
+                      <p className="mt-1 text-lg font-semibold">
+                        ${proposal.bidAmount.toLocaleString()}
+                      </p>
+                    </div>
+                    <div className="rounded-lg bg-muted p-3">
+                      <p className="text-xs text-muted-foreground">Delivery Time</p>
+                      <p className="mt-1 text-lg font-semibold">{proposal.duration}</p>
+                    </div>
+                  </div>
+                  <div className="mt-3 p-4 rounded-lg bg-muted/50 border border-border">
+                    <p className="text-xs text-muted-foreground mb-2">Proposal Message</p>
+                    <p className="text-sm whitespace-pre-wrap text-foreground">
+                      {proposal.coverLetter}
+                    </p>
+                  </div>
                   <div className="mt-4 flex flex-wrap gap-2">
                     {proposal.professional && (
                       <Button variant="outline" size="sm" asChild>
-                        <Link href={`/pro/${proposal.professional.id}`}>View Professional</Link>
+                        <Link href={`/pro/${proposal.professional.id}`}>View Profile</Link>
                       </Button>
                     )}
                     {proposal.status === "PENDING" && job.status === "OPEN" && (
                       <>
                         <Button
                           size="sm"
+                          className="bg-green hover:bg-green/90"
                           onClick={() => setPendingAcceptProposal(proposal)}
                         >
                           Accept & Hire
@@ -554,9 +606,10 @@ export default function JobDetails() {
                         <Button
                           variant="outline"
                           size="sm"
+                          className="text-destructive hover:text-destructive"
                           onClick={() => void reviewProposal(proposal, "reject")}
                         >
-                          Reject
+                          Decline
                         </Button>
                       </>
                     )}
@@ -564,61 +617,94 @@ export default function JobDetails() {
                 </article>
               ))}
               {!clientProposals.length && (
-                <p className="rounded-xl border border-dashed p-5 text-sm text-muted-foreground">
-                  No proposals have been received yet.
+                <p className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+                  <Briefcase className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  No proposals yet. Share this job to attract professionals.
                 </p>
               )}
             </div>
           </section>
         )}
-        {/* Actions */}
+        {!isOwner && job.client && viewerRole === "PROFESSIONAL" && (
+          <section className="mt-8 border-t border-border pt-6">
+            <div className="flex items-center gap-2 mb-4">
+              <Briefcase className="h-5 w-5 text-primary" />
+              <div>
+                <h2 className="text-xl font-semibold">Send Your Proposal</h2>
+                <p className="text-sm text-muted-foreground">
+                  Submit your bid and let the client review your offer
+                </p>
+              </div>
+            </div>
+            {ownProposal ? (
+              <div
+                className={`rounded-xl border p-5 ${
+                  ownProposal.status === "ACCEPTED"
+                    ? "border-green/30 bg-green/5"
+                    : ownProposal.status === "REJECTED"
+                      ? "border-red/30 bg-red/5"
+                      : "border-yellow/30 bg-yellow/5"
+                }`}
+              >
+                <p
+                  className={`font-semibold text-sm ${
+                    ownProposal.status === "ACCEPTED"
+                      ? "text-green"
+                      : ownProposal.status === "REJECTED"
+                        ? "text-red"
+                        : "text-yellow"
+                  }`}
+                >
+                  {ownProposal.status === "PENDING"
+                    ? "✓ Proposal Submitted — Awaiting Client Response"
+                    : ownProposal.status === "REJECTED"
+                      ? "✗ Proposal Declined — Client selected another professional"
+                      : "✓ Proposal Accepted — Project Started"}
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mt-3"
+                  onClick={() => setShowProposalForm(true)}
+                >
+                  Modify Proposal
+                </Button>
+              </div>
+            ) : (
+              <div className="rounded-xl border border-border p-6 bg-card">
+                <p className="text-sm text-muted-foreground mb-4">
+                  Submit a proposal for this job. Include your price, delivery estimate, and a
+                  message for the client.
+                </p>
+                <Button
+                  size="lg"
+                  className="w-full"
+                  onClick={() => {
+                    setProposalPrice(
+                      String(
+                        job.timingType === "HOURLY"
+                          ? (job.hourlyRate ?? "")
+                          : (job.budgetMax ?? job.budgetMin ?? ""),
+                      ),
+                    );
+                    setShowProposalForm(true);
+                  }}
+                >
+                  Submit Proposal
+                </Button>
+              </div>
+            )}
+          </section>
+        )}
+        {/* Actions - Footer Section */}
         <div className="mt-8 border-t border-border pt-6">
           {job.client ? (
             <>
-              <p className="font-medium">Posted by {job.client.name}</p>
+              <p className="font-medium mb-4">Posted by {job.client.name}</p>
               {job.projectId && (
-                <Button className="mt-4 w-full sm:w-auto" asChild>
+                <Button className="w-full sm:w-auto" asChild>
                   <Link href={`/project/${job.projectId}/tracking`}>Track Project</Link>
                 </Button>
-              )}
-              {job.projectId && !isOwner && (
-                <p className="mt-4 rounded-xl border border-primary/20 bg-primary/5 p-3 text-sm text-primary">
-                  This job has already been accepted. Track the active project instead of sending a new proposal.
-                </p>
-              )}
-              {!job.projectId && job.status === "OPEN" &&
-                !isOwner &&
-                viewerRole === "PROFESSIONAL" &&
-                (ownProposal ? (
-                  <p className="mt-4 rounded-xl border border-primary/20 bg-primary/5 p-3 text-sm text-primary">
-                    {ownProposal.status === "PENDING"
-                      ? "Proposal Sent — Pending Client Response"
-                      : ownProposal.status === "REJECTED"
-                        ? "Proposal Declined"
-                        : "Proposal Accepted"}
-                  </p>
-                ) : (
-                  <Button
-                    className="mt-4 w-full sm:w-auto"
-                    size="lg"
-                    onClick={() => {
-                      setProposalPrice(
-                        String(
-                          job.timingType === "HOURLY"
-                            ? (job.hourlyRate ?? "")
-                            : (job.budgetMax ?? job.budgetMin ?? ""),
-                        ),
-                      );
-                      setShowProposalForm(true);
-                    }}
-                  >
-                    Send Proposal
-                  </Button>
-                ))}
-              {job.status !== "OPEN" && !isOwner && (
-                <p className="mt-4 text-muted-foreground">
-                  This job is no longer accepting proposals.
-                </p>
               )}
             </>
           ) : (
@@ -647,7 +733,7 @@ export default function JobDetails() {
                           !confirm("Close this job? It will no longer appear in the marketplace.")
                         )
                           return;
-                        const response = await fetch(`/api/client/jobs/${jobId}`, {
+                        const response = await fetch(`/api/v1/client/jobs/${jobId}`, {
                           method: "PATCH",
                           headers: { "Content-Type": "application/json" },
                           body: JSON.stringify({ status: "CLOSED" }),
@@ -673,7 +759,7 @@ export default function JobDetails() {
                   onClick={async () => {
                     if (!confirm("Reopen this job? It will appear again in the marketplace."))
                       return;
-                    const response = await fetch(`/api/client/jobs/${jobId}`, {
+                    const response = await fetch(`/api/v1/client/jobs/${jobId}`, {
                       method: "PATCH",
                       headers: { "Content-Type": "application/json" },
                       body: JSON.stringify({ status: "OPEN" }),

@@ -9,24 +9,24 @@
 
 ## 1. DECISION SUMMARY
 
-| ID | Decision | Resolution |
-|---|---|---|
-| OTD-01 | Backend stack | Next.js 15 App Router route handlers as the single API; TypeScript |
-| OTD-02 | Mobile | **Deferred to phase 2** — Flutter + Riverpod, against this same API |
-| OTD-03 | Database | PostgreSQL on Supabase with **PostGIS**; Prisma ORM |
-| OTD-04 | Auth | Own JWT — 15-min access, 30-day rotating refresh, RS256 |
-| OTD-05 | Search | PostgreSQL full-text + trigram; no external search engine at V1 |
-| OTD-06 | Quote rate limit | 20 per professional per day |
-| OTD-07 | Appointment window | 48 hours, then auto-revert |
-| OTD-08 | Review window | 14 days after completion |
-| OTD-09 | Nearby-job notification cap | 10/day, digest above 5 |
-| OTD-10 | Audit log retention | 7 years |
-| OTD-11 | Min reviews for rating display | 3 |
-| OTD-12 | Providers | Twilio (SMS), Mailtrap→SendGrid (email), **Web Push/VAPID** |
-| OTD-13 | Payments | **Stripe Connect Express**, escrow |
-| OTD-14 | Environments | local → preview (per PR) → staging → production |
-| — | **Maps** | **Google Maps** — Maps JS, Places, Geocoding, Distance Matrix |
-| — | **Tax** | Per-province `TaxRate`, versioned by effective date |
+| ID     | Decision                       | Resolution                                                          |
+| ------ | ------------------------------ | ------------------------------------------------------------------- |
+| OTD-01 | Backend stack                  | Next.js 15 App Router route handlers as the single API; TypeScript  |
+| OTD-02 | Mobile                         | **Deferred to phase 2** — Flutter + Riverpod, against this same API |
+| OTD-03 | Database                       | PostgreSQL on Supabase with **PostGIS**; Prisma ORM                 |
+| OTD-04 | Auth                           | Own JWT — 15-min access, 30-day rotating refresh, RS256             |
+| OTD-05 | Search                         | PostgreSQL full-text + trigram; no external search engine at V1     |
+| OTD-06 | Quote rate limit               | 20 per professional per day                                         |
+| OTD-07 | Appointment window             | 48 hours, then auto-revert                                          |
+| OTD-08 | Review window                  | 14 days after completion                                            |
+| OTD-09 | Nearby-job notification cap    | 10/day, digest above 5                                              |
+| OTD-10 | Audit log retention            | 7 years                                                             |
+| OTD-11 | Min reviews for rating display | 3                                                                   |
+| OTD-12 | Providers                      | Twilio (SMS), Mailtrap→SendGrid (email), **Web Push/VAPID**         |
+| OTD-13 | Payments                       | **Stripe Connect Express**, escrow                                  |
+| OTD-14 | Environments                   | local → preview (per PR) → staging → production                     |
+| —      | **Maps**                       | **Google Maps** — Maps JS, Places, Geocoding, Distance Matrix       |
+| —      | **Tax**                        | Per-province `TaxRate`, versioned by effective date                 |
 
 ---
 
@@ -92,9 +92,9 @@ Cost during the web build is roughly 8–10%. It removes the entire API workstre
 
 Own JWT. Not NextAuth (session cookies don't serve Flutter) and not Supabase Auth (would bind the auth layer to Supabase precisely where portability is wanted).
 
-| Token | Lifetime | Web storage | Flutter (phase 2) |
-|---|---|---|---|
-| Access | 15 min | Memory | Memory |
+| Token   | Lifetime          | Web storage                           | Flutter (phase 2)        |
+| ------- | ----------------- | ------------------------------------- | ------------------------ |
+| Access  | 15 min            | Memory                                | Memory                   |
 | Refresh | 30 days, rotating | httpOnly, Secure, SameSite=Lax cookie | `flutter_secure_storage` |
 
 **Claims:** `sub`, `userType`, `accountStatus`, `profileComplete`, `iat`, `exp`, `jti`. Nothing else — badges, ratings and permissions come from the database, never from the token.
@@ -157,13 +157,13 @@ Distance shown to users is computed from the **true** point (accurate); the mark
 
 ### 4.4 Google Maps
 
-| Capability | Service | Cost control |
-|---|---|---|
-| Map rendering | Maps JavaScript API | — |
-| Address autocomplete | Places Autocomplete | **Session tokens mandatory** — without them each keystroke bills separately |
-| Geocode / reverse | Geocoding API | 30-day cache keyed on normalised address |
-| Distance (straight line) | PostGIS | No API call, no cost |
-| Travel time | Distance Matrix | **Detail views only**, never list views |
+| Capability               | Service             | Cost control                                                                |
+| ------------------------ | ------------------- | --------------------------------------------------------------------------- |
+| Map rendering            | Maps JavaScript API | —                                                                           |
+| Address autocomplete     | Places Autocomplete | **Session tokens mandatory** — without them each keystroke bills separately |
+| Geocode / reverse        | Geocoding API       | 30-day cache keyed on normalised address                                    |
+| Distance (straight line) | PostGIS             | No API call, no cost                                                        |
+| Travel time              | Distance Matrix     | **Detail views only**, never list views                                     |
 
 Browser key restricted by HTTP referrer; server key restricted by IP. Set a billing alert at the budget ceiling on day one — Maps is metered and this product is map-heavy.
 
@@ -194,13 +194,13 @@ Commission 10%, admin-configurable, **frozen onto the job at appointment**.
 
 Money is integer cents, CAD. Worked example on a $1,000.00 milestone in Ontario:
 
-| Line | Cents |
-|---|---|
+| Line                           | Cents  |
+| ------------------------------ | ------ |
 | Milestone amount (client pays) | 100000 |
-| Platform commission @10% | 10000 |
-| HST on commission @13% | 1300 |
-| Platform revenue | 11300 |
-| Transfer to professional | 88700 |
+| Platform commission @10%       | 10000  |
+| HST on commission @13%         | 1300   |
+| Platform revenue               | 11300  |
+| Transfer to professional       | 88700  |
 
 **Canada is not one rate.** `TaxRate` is seeded per province and versioned by effective date: ON 13% HST; NB/NL/NS/PE 15% HST; BC/MB/SK 5% GST + PST; AB/NT/NU/YT 5% GST; QC 5% GST + 9.975% QST. `Payment` freezes `taxProvince` and `taxType` at charge time so a professional relocating never alters a historical invoice.
 
@@ -220,13 +220,13 @@ A platform dispute freezes any pending release on that job. Resolution is an adm
 
 Supabase Storage, S3-compatible. **Vercel's filesystem is ephemeral — nothing is written locally.**
 
-| Bucket | Visibility | Contents |
-|---|---|---|
-| `public-media` | Public read | Profile photos, portfolio images |
-| `job-media` | Private | Job attachments — parties + admin |
-| `work-proof` | Private | Delivery evidence — parties + admin |
-| `verification` | Private, encrypted | Government IDs, licences — **admin only** |
-| `chat-attachments` | Private | Thread participants + admin |
+| Bucket             | Visibility         | Contents                                  |
+| ------------------ | ------------------ | ----------------------------------------- |
+| `public-media`     | Public read        | Profile photos, portfolio images          |
+| `job-media`        | Private            | Job attachments — parties + admin         |
+| `work-proof`       | Private            | Delivery evidence — parties + admin       |
+| `verification`     | Private, encrypted | Government IDs, licences — **admin only** |
+| `chat-attachments` | Private            | Thread participants + admin               |
 
 Upload: client requests a signed upload URL → uploads directly to Supabase → notifies the API → `Media` row created → async virus scan → `CLEAN` before the file is retrievable.
 
@@ -258,12 +258,12 @@ Polling at V1 (5s while a thread is open); WebSocket upgrade is a later optimisa
 
 ## 9. ENVIRONMENTS AND CI/CD
 
-| Environment | Host | Database |
-|---|---|---|
-| Local | Docker Compose | `postgis/postgis:16-3.4` |
-| Preview | Vercel, per PR | Supabase branch |
-| Staging | Vercel | Supabase staging, Stripe test mode |
-| Production | Vercel → AWS later | Supabase production |
+| Environment | Host               | Database                           |
+| ----------- | ------------------ | ---------------------------------- |
+| Local       | Docker Compose     | `postgis/postgis:16-3.4`           |
+| Preview     | Vercel, per PR     | Supabase branch                    |
+| Staging     | Vercel             | Supabase staging, Stripe test mode |
+| Production  | Vercel → AWS later | Supabase production                |
 
 - **PR:** typecheck → lint → unit tests → migration check → build → preview deploy
 - **Merge to `main`:** above → integration tests → staging → smoke tests
@@ -296,14 +296,14 @@ PIPEDA applies federally; Quebec's Law 25 adds stricter consent and breach rules
 
 ## 12. OPEN ITEMS
 
-| # | Item | Blocks | Owner |
-|---|---|---|---|
-| 1 | Full IT category list beyond the 6 confirmed leaves | M0-04 seed | You |
-| 2 | Provinces to support for tax | M6 invoicing | You |
-| 3 | FINTRAC / escrow legal position | M6 go-live | Counsel |
-| 4 | Stripe account with Connect enabled in test mode | M6 | You |
-| 5 | Privacy Policy + T&C copy | Launch | Lawyer |
-| 6 | Google Cloud billing account and alert | M3 | You |
-| 7 | Apple Developer account | Phase 2 | You |
+| #   | Item                                                | Blocks       | Owner   |
+| --- | --------------------------------------------------- | ------------ | ------- |
+| 1   | Full IT category list beyond the 6 confirmed leaves | M0-04 seed   | You     |
+| 2   | Provinces to support for tax                        | M6 invoicing | You     |
+| 3   | FINTRAC / escrow legal position                     | M6 go-live   | Counsel |
+| 4   | Stripe account with Connect enabled in test mode    | M6           | You     |
+| 5   | Privacy Policy + T&C copy                           | Launch       | Lawyer  |
+| 6   | Google Cloud billing account and alert              | M3           | You     |
+| 7   | Apple Developer account                             | Phase 2      | You     |
 
 Resolved since v1: launch market and timeline, map provider (Google), design tokens (from prototype), mobile sequencing (phase 2).
