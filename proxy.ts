@@ -6,8 +6,10 @@ function isTrustedStateChangingRequest(request: NextRequest) {
   const origin = request.headers.get("origin");
   if (!origin) return false;
 
+  if (origin === request.nextUrl.origin) return true;
+
   const appUrl = process.env.APP_URL;
-  return appUrl ? origin === appUrl : origin === request.nextUrl.origin;
+  return appUrl ? origin === appUrl : false;
 }
 
 /**
