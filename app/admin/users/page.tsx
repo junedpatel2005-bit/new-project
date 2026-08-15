@@ -12,8 +12,6 @@ import {
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { ExportMenu } from "@/components/reports/ExportMenu";
 
 type User = {
   id: number;
@@ -52,16 +50,12 @@ function UserGroup({
   kind,
   onToggle,
   onOpen,
-  selectedIds,
-  onToggleSelect,
 }: {
   title: string;
   users: User[];
   kind: "client" | "professional";
   onToggle: (user: User) => void;
   onOpen: (user: User) => void;
-  selectedIds: Set<number>;
-  onToggleSelect: (id: number) => void;
 }) {
   const Icon = kind === "professional" ? ShieldCheck : UsersRound;
   return (
@@ -86,12 +80,6 @@ function UserGroup({
             onClick={() => onOpen(user)}
             className="flex cursor-pointer flex-wrap items-center gap-4 px-5 py-4 transition hover:bg-white/[.045]"
           >
-            <Checkbox
-              checked={selectedIds.has(user.id)}
-              onCheckedChange={() => onToggleSelect(user.id)}
-              onClick={(event) => event.stopPropagation()}
-              aria-label={`Select ${user.firstName} ${user.lastName}`}
-            />
             <span
               className={`grid h-10 w-10 place-items-center rounded-full text-sm font-bold ${kind === "professional" ? "bg-indigo-500/15 text-indigo-200" : "bg-cyan-500/15 text-cyan-200"}`}
             >{`${user.firstName?.[0] ?? "U"}${user.lastName?.[0] ?? ""}`}</span>
@@ -146,7 +134,6 @@ export default function AdminUsersPage() {
   const [message, setMessage] = useState("");
   const [activeGroup, setActiveGroup] = useState<"clients" | "professionals">("professionals");
   const [detail, setDetail] = useState<Detail | null>(null);
-  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   useEffect(() => {
     void fetch("/api/v1/admin/data/users", { cache: "no-store" })
       .then((response) => response.json())
@@ -157,13 +144,6 @@ export default function AdminUsersPage() {
     () => users.filter((user) => user.role === "PROFESSIONAL"),
     [users],
   );
-  const toggleSelect = (id: number) =>
-    setSelectedIds((current) => {
-      const next = new Set(current);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
   const openUser = (user: User) => {
     setDetail(null);
     void fetch(`/api/v1/admin/users/${user.id}`, { cache: "no-store" })
@@ -197,13 +177,6 @@ export default function AdminUsersPage() {
         Manage Clients and Professionals independently. Deactivated accounts cannot use the
         platform.
       </p>
-      <div className="mt-5 flex justify-end">
-        <ExportMenu
-          endpoint="/api/admin/reports/users"
-          selectedIds={[...selectedIds]}
-          fileBaseName="users"
-        />
-      </div>
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <button
           onClick={() => setActiveGroup("clients")}
@@ -237,8 +210,6 @@ export default function AdminUsersPage() {
             kind="professional"
             onToggle={(user) => void toggle(user)}
             onOpen={openUser}
-            selectedIds={selectedIds}
-            onToggleSelect={toggleSelect}
           />
         ) : (
           <UserGroup
@@ -247,8 +218,6 @@ export default function AdminUsersPage() {
             kind="client"
             onToggle={(user) => void toggle(user)}
             onOpen={openUser}
-            selectedIds={selectedIds}
-            onToggleSelect={toggleSelect}
           />
         )}
       </div>

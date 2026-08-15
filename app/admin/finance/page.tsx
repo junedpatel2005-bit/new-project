@@ -9,9 +9,6 @@ import {
   ReceiptText,
   Users,
 } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
-import { ExportMenu } from "@/components/reports/ExportMenu";
-
 type Transaction = {
   id: number;
   clientId: number;
@@ -41,18 +38,6 @@ const money = (value: number) => `$${value.toLocaleString()}`;
 export default function FinancePage() {
   const [data, setData] = useState<Finance | null>(null);
   const [tab, setTab] = useState<"payments" | "payouts">("payments");
-  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
-  const toggleSelect = (id: number) =>
-    setSelectedIds((current) => {
-      const next = new Set(current);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  const changeTab = (next: "payments" | "payouts") => {
-    setTab(next);
-    setSelectedIds(new Set());
-  };
   useEffect(() => {
     void fetch("/api/v1/admin/data/finance", { cache: "no-store" })
       .then((response) => response.json())
@@ -112,56 +97,23 @@ export default function FinancePage() {
               </div>
               <div className="flex rounded-xl bg-[#0b1020] p-1">
                 <button
-                  onClick={() => changeTab("payments")}
+                  onClick={() => setTab("payments")}
                   className={`rounded-lg px-4 py-2 text-sm font-semibold ${tab === "payments" ? "bg-indigo-500 text-white" : "text-slate-400"}`}
                 >
                   Payments
                 </button>
                 <button
-                  onClick={() => changeTab("payouts")}
+                  onClick={() => setTab("payouts")}
                   className={`rounded-lg px-4 py-2 text-sm font-semibold ${tab === "payouts" ? "bg-indigo-500 text-white" : "text-slate-400"}`}
                 >
                   Payouts
                 </button>
               </div>
             </div>
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-5 py-3">
-              <label className="flex items-center gap-2 text-sm text-slate-400">
-                <Checkbox
-                  checked={
-                    (tab === "payments" ? data.transactions : data.withdrawals).length > 0 &&
-                    (tab === "payments" ? data.transactions : data.withdrawals).every((item) =>
-                      selectedIds.has(item.id),
-                    )
-                  }
-                  onCheckedChange={() =>
-                    setSelectedIds((current) => {
-                      const items = tab === "payments" ? data.transactions : data.withdrawals;
-                      const allSelected = items.every((item) => current.has(item.id));
-                      const next = new Set(current);
-                      items.forEach((item) => (allSelected ? next.delete(item.id) : next.add(item.id)));
-                      return next;
-                    })
-                  }
-                  disabled={!(tab === "payments" ? data.transactions : data.withdrawals).length}
-                />
-                {selectedIds.size > 0 ? `${selectedIds.size} selected` : "Select all shown"}
-              </label>
-              <ExportMenu
-                endpoint="/api/admin/reports/finance"
-                selectedIds={[...selectedIds]}
-                fileBaseName="finance"
-              />
-            </div>
             {tab === "payments" ? (
               <div className="divide-y divide-white/10">
                 {data.transactions.map((item) => (
                   <div key={item.id} className="flex flex-wrap items-center gap-4 px-5 py-4">
-                    <Checkbox
-                      checked={selectedIds.has(item.id)}
-                      onCheckedChange={() => toggleSelect(item.id)}
-                      aria-label={`Select payment ${item.id}`}
-                    />
                     <span className="grid h-10 w-10 place-items-center rounded-xl bg-emerald-400/10 text-emerald-300">
                       <ArrowDownLeft className="h-5 w-5" />
                     </span>
@@ -190,11 +142,6 @@ export default function FinancePage() {
               <div className="divide-y divide-white/10">
                 {data.withdrawals.map((item) => (
                   <div key={item.id} className="flex flex-wrap items-center gap-4 px-5 py-4">
-                    <Checkbox
-                      checked={selectedIds.has(item.id)}
-                      onCheckedChange={() => toggleSelect(item.id)}
-                      aria-label={`Select payout ${item.id}`}
-                    />
                     <span className="grid h-10 w-10 place-items-center rounded-xl bg-amber-400/10 text-amber-300">
                       <Landmark className="h-5 w-5" />
                     </span>
