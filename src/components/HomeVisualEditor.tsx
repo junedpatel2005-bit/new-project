@@ -22,8 +22,12 @@ export function HomeVisualEditor() {
   useEffect(() => {
     void fetch("/api/v1/website/page-text?path=/")
       .then((response) => (response.ok ? response.json() : null))
-      .then((data: { text?: Partial<typeof defaults> } | null) => {
-        if (data?.text) setText((current) => ({ ...current, ...data.text }));
+      .then((data: { text?: Record<string, string> } | null) => {
+        if (!data?.text) return;
+        const nonEmpty = Object.fromEntries(
+          Object.entries(data.text).filter(([, value]) => value.trim().length > 0),
+        );
+        setText((current) => ({ ...current, ...nonEmpty }));
       });
   }, []);
   useEffect(() => {
@@ -56,10 +60,16 @@ export function HomeVisualEditor() {
     setMessage("");
     try {
       const live = JSON.parse(window.sessionStorage.getItem("servio-cms-live-preview:/") ?? "{}");
+      const merged: Record<string, string> = { ...text, ...live };
+      const cleaned = Object.fromEntries(
+        Object.entries(merged).filter(
+          ([, value]) => typeof value === "string" && value.trim().length > 0,
+        ),
+      );
       const response = await fetch("/api/v1/admin/cms/visual", {
         method: "PUT",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ path: "/", text: { ...text, ...live } }),
+        body: JSON.stringify({ path: "/", text: cleaned }),
       });
       const data = await response.json().catch(() => ({}));
       setMessage(
