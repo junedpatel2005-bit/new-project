@@ -6,7 +6,7 @@ import { createSession, sessionCookie, sessionOptions } from "@/lib/auth";
 import { clearRateLimit, rateLimit } from "@/lib/rate-limit";
 
 const credentials = z.object({
-  email: z.string().trim().toLowerCase().email(),
+  username: z.string().trim().min(1).max(64),
   password: z.string().min(1).max(256),
 });
 
@@ -15,16 +15,17 @@ function clientKey(request: NextRequest) {
 }
 
 async function createBootstrapAdmin() {
-  const email = process.env.ADMIN_BOOTSTRAP_EMAIL?.trim().toLowerCase();
+  const username = process.env.ADMIN_BOOTSTRAP_USERNAME?.trim().toLowerCase();
   const password = process.env.ADMIN_BOOTSTRAP_PASSWORD;
-  if (!email || !password || password.length < 12) return null;
+  if (!username || !password || password.length < 12) return null;
 
-  const existing = await db.user.findUnique({ where: { email } });
+  const existing = await db.user.findUnique({ where: { username } });
   if (existing) return existing.role === "ADMIN" ? existing : null;
 
   return db.user.create({
     data: {
-      email,
+      username,
+      email: `${username}@admin.local`,
       firstName: "Platform",
       lastName: "Administrator",
       role: "ADMIN",
@@ -39,10 +40,10 @@ async function createBootstrapAdmin() {
 export async function POST(request: NextRequest) {
   const parsed = credentials.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
-    return NextResponse.json({ error: "Enter a valid admin email and password." }, { status: 400 });
+    return NextResponse.json({ error: "Enter a valid admin username and password." }, { status: 400 });
   }
 
-  const key = `admin-login:${clientKey(request)}:${parsed.data.email}`;
+  const key = `admin-login:${clientKey(request)}:${parsed.data.username}`;
   if (!rateLimit(key, 5, 15 * 60 * 1000)) {
     return NextResponse.json(
       { error: "Too many sign-in attempts. Please try again later." },
@@ -54,7 +55,7 @@ export async function POST(request: NextRequest) {
   const user =
     adminCount === 0
       ? await createBootstrapAdmin()
-      : await db.user.findFirst({ where: { email: parsed.data.email, role: "ADMIN" } });
+      : await db.user.findFirst({ where: { username: parsed.data.username, role: "ADMIN" } });
 
   if (
     !user?.passwordHash ||

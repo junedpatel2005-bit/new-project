@@ -6,7 +6,7 @@ import { LockKeyhole, ShieldCheck } from "lucide-react";
 
 export default function AdminLogin() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
@@ -18,7 +18,7 @@ export default function AdminLogin() {
     const response = await fetch("/api/v1/admin/login", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ username, password }),
     });
     const data = await response.json();
     setPending(false);
@@ -57,15 +57,15 @@ export default function AdminLogin() {
             </p>
             <form onSubmit={submit} className="mt-8 space-y-4">
               <label className="block text-sm font-medium">
-                Admin email
+                Admin username
                 <input
                   autoFocus
-                  type="email"
+                  type="text"
                   autoComplete="username"
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
+                  value={username}
+                  onChange={(event) => setUsername(event.target.value)}
                   className="mt-2 h-11 w-full rounded-xl border border-white/10 bg-[#070b16] px-3 text-sm outline-none focus:border-indigo-400"
-                  placeholder="admin@company.com"
+                  placeholder="admin"
                 />
               </label>
               <label className="block text-sm font-medium">

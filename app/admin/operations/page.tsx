@@ -15,6 +15,8 @@ import {
   UserRound,
   X,
 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ExportMenu } from "@/components/reports/ExportMenu";
 
 type Job = {
   id: number;
@@ -124,6 +126,7 @@ export default function OperationsPage() {
   const [filter, setFilter] = useState("ALL");
   const [selectedJob, setSelectedJob] = useState<JobDetails | null>(null);
   const [detailsStatus, setDetailsStatus] = useState<"idle" | "loading" | "error">("idle");
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     void fetch("/api/v1/admin/data/jobs", { cache: "no-store" })
@@ -153,6 +156,21 @@ export default function OperationsPage() {
       }),
     [data, query, filter],
   );
+  const toggleSelect = (id: number) =>
+    setSelectedIds((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  const allJobsSelected = jobs.length > 0 && jobs.every((job) => selectedIds.has(job.id));
+  const toggleSelectAllJobs = () =>
+    setSelectedIds((current) => {
+      const next = new Set(current);
+      if (allJobsSelected) jobs.forEach((job) => next.delete(job.id));
+      else jobs.forEach((job) => next.add(job.id));
+      return next;
+    });
   const openDisputes = data?.disputes.filter((item) => item.status === "OPEN").length ?? 0;
   const runningProjects = data?.jobs.filter((item) => item.status === "RUNNING").length ?? 0;
   const completedProjects = data?.jobs.filter((item) => item.status === "COMPLETED").length ?? 0;
@@ -319,9 +337,34 @@ export default function OperationsPage() {
                 ))}
               </div>
             </div>
+            {view === "jobs" && (
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-5 py-3 sm:px-6">
+                <label className="flex items-center gap-2 text-sm text-slate-400">
+                  <Checkbox
+                    checked={allJobsSelected}
+                    onCheckedChange={toggleSelectAllJobs}
+                    disabled={!jobs.length}
+                  />
+                  {selectedIds.size > 0 ? `${selectedIds.size} selected` : "Select all shown"}
+                </label>
+                <ExportMenu
+                  endpoint="/api/admin/reports/jobs"
+                  selectedIds={[...selectedIds]}
+                  fileBaseName="jobs"
+                />
+              </div>
+            )}
             <div className="divide-y divide-white/10">
               {view === "jobs"
-                ? jobs.map((job) => <JobRow key={job.id} job={job} onOpen={openJob} />)
+                ? jobs.map((job) => (
+                    <JobRow
+                      key={job.id}
+                      job={job}
+                      onOpen={openJob}
+                      selected={selectedIds.has(job.id)}
+                      onToggleSelect={toggleSelect}
+                    />
+                  ))
                 : disputes.map((dispute) => <DisputeRow key={dispute.id} dispute={dispute} />)}
               {(view === "jobs" ? jobs : disputes).length === 0 && <Empty view={view} />}
             </div>
@@ -407,17 +450,37 @@ function Tab({
     </button>
   );
 }
-function JobRow({ job, onOpen }: { job: Job; onOpen: (id: number) => void }) {
+function JobRow({
+  job,
+  onOpen,
+  selected,
+  onToggleSelect,
+}: {
+  job: Job;
+  onOpen: (id: number) => void;
+  selected: boolean;
+  onToggleSelect: (id: number) => void;
+}) {
   const budget =
     job.budgetMin || job.budgetMax
       ? `$${(job.budgetMin ?? 0).toLocaleString()} – $${(job.budgetMax ?? job.budgetMin ?? 0).toLocaleString()}`
       : "Budget not set";
   return (
-    <button
-      type="button"
+    <div
+      role="button"
+      tabIndex={0}
       onClick={() => void onOpen(job.id)}
-      className="group flex w-full flex-wrap items-center gap-x-5 gap-y-4 px-5 py-5 text-left transition hover:bg-white/[.035] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-indigo-400 sm:px-6"
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") void onOpen(job.id);
+      }}
+      className="group flex w-full cursor-pointer flex-wrap items-center gap-x-5 gap-y-4 px-5 py-5 text-left transition hover:bg-white/[.035] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-indigo-400 sm:px-6"
     >
+      <Checkbox
+        checked={selected}
+        onCheckedChange={() => onToggleSelect(job.id)}
+        onClick={(event) => event.stopPropagation()}
+        aria-label={`Select ${job.title ?? "job"}`}
+      />
       <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-indigo-400/10 text-indigo-300">
         <BriefcaseBusiness className="h-5 w-5" />
       </span>
@@ -448,7 +511,7 @@ function JobRow({ job, onOpen }: { job: Job; onOpen: (id: number) => void }) {
         </p>
       </div>
       <ChevronRight className="hidden h-5 w-5 text-slate-600 transition group-hover:translate-x-1 group-hover:text-indigo-300 sm:block" />
-    </button>
+    </div>
   );
 }
 function DisputeRow({ dispute }: { dispute: Dispute }) {

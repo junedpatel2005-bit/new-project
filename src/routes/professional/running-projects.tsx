@@ -16,7 +16,10 @@ import {
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { CardListSkeleton } from "@/components/LoadingSkeleton";
+import { ExportMenu } from "@/components/reports/ExportMenu";
+import { useRowSelection } from "@/hooks/use-row-selection";
 
 type RunningProject = {
   id: number;
@@ -80,6 +83,14 @@ export default function RunningProjectsPage() {
           ),
         );
   }, [projects, search]);
+
+  const {
+    selectedIds,
+    toggle: toggleSelected,
+    allVisibleSelected,
+    toggleAllVisible: toggleSelectAllVisible,
+  } = useRowSelection(visibleProjects);
+
   const inProgress = projects.filter((project) => project.status === "IN_PROGRESS").length;
   const totalValue = projects.reduce(
     (sum, project) => sum + (project.timingType === "HOURLY" ? 0 : (project.budget ?? 0)),
@@ -163,6 +174,21 @@ export default function RunningProjectsPage() {
               />
             </div>
           </div>
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+            <label className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Checkbox
+                checked={allVisibleSelected}
+                onCheckedChange={toggleSelectAllVisible}
+                disabled={!visibleProjects.length}
+              />
+              {selectedIds.size > 0 ? `${selectedIds.size} selected` : "Select all shown"}
+            </label>
+            <ExportMenu
+              endpoint="/api/professional/jobs/export"
+              selectedIds={[...selectedIds]}
+              fileBaseName="running-projects"
+            />
+          </div>
           {error ? (
             <p className="mt-5 rounded-xl border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive">
               {error}
@@ -181,6 +207,13 @@ export default function RunningProjectsPage() {
                   <div className="p-5 sm:p-6">
                     <div className="flex flex-col gap-5 lg:flex-row lg:items-center">
                       <div className="flex min-w-0 flex-1 gap-4">
+                        <Checkbox
+                          className="mt-1 shrink-0"
+                          checked={selectedIds.has(project.id)}
+                          onCheckedChange={() => toggleSelected(project.id)}
+                          onClick={(event) => event.stopPropagation()}
+                          aria-label={`Select ${project.jobTitle ?? "project"}`}
+                        />
                         <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-primary/10 text-primary">
                           <BriefcaseBusiness className="h-5 w-5" />
                         </div>
