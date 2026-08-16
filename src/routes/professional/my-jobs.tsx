@@ -155,22 +155,17 @@ function ProfessionalJobsContent() {
 
   const mapJobs = useMemo(
     () =>
-      visibleJobs.map((job, index) => {
-        const lat = job.locationLat ?? 43.7 + ((index % 5) - 2) * 1.4;
-        const lng = job.locationLng ?? -79.38 + ((index % 6) - 2.5) * 1.8;
-        return {
-          ...job,
-          mapX: ((lng + 180) / 360) * 100,
-          mapY: (1 - (lat + 90) / 180) * 100,
-        };
-      }),
+      visibleJobs.filter(
+        (job): job is JobListItem & { locationLat: number; locationLng: number } =>
+          job.locationLat !== null && job.locationLng !== null,
+      ),
     [visibleJobs],
   );
 
   const selectedJob = mapJobs.find((job) => job.id === selectedJobId) ?? mapJobs[0] ?? null;
   const mapCenter: [number, number] = selectedJob
-    ? [selectedJob.locationLat ?? 43.7, selectedJob.locationLng ?? -79.38]
-    : [43.7, -79.38];
+    ? [selectedJob.locationLat, selectedJob.locationLng]
+    : [20, 0];
 
   return (
     <AppShell>
@@ -346,7 +341,7 @@ function ProfessionalJobsContent() {
                   </>
                 ) : (
                   <div className="flex h-full items-center justify-center bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.35),transparent_10%),linear-gradient(180deg,#bfe8ef_0%,#b1d7df_100%)] text-sm text-muted-foreground">
-                    Add a city or location filter to view nearby jobs on the map.
+                    None of your matching jobs have a pinned location yet.
                   </div>
                 )}
               </div>

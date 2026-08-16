@@ -1,9 +1,16 @@
 "use client";
 
-import type { DivIcon } from "leaflet";
-import { useEffect, useState } from "react";
+import L from "leaflet";
+import { useEffect } from "react";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import type { ProfessionalDiscoveryResult } from "@/lib/types/professional-discovery";
+
+const markerIcon = L.divIcon({
+  className: "",
+  html: '<div class="text-2xl">📍</div>',
+  iconSize: [28, 28],
+  iconAnchor: [14, 28],
+});
 
 function FitBounds({ bounds }: { bounds: [number, number][] }) {
   const map = useMap();
@@ -28,20 +35,6 @@ export default function ProfessionalDiscoveryMap({
   professionals: ProfessionalDiscoveryResult[];
   selectedPoint?: { lat: number; lng: number };
 }) {
-  const [markerIcon, setMarkerIcon] = useState<DivIcon | null>(null);
-  useEffect(() => {
-    void import("leaflet").then((leaflet) => {
-      setMarkerIcon(
-        leaflet.divIcon({
-          className: "",
-          html: '<div class="text-2xl">📍</div>',
-          iconSize: [28, 28],
-          iconAnchor: [14, 28],
-        }),
-      );
-    });
-  }, []);
-
   const points = professionals
     .map((professional) => professional.displayPoint)
     .filter((point): point is { lat: number; lng: number } => Boolean(point));
@@ -72,7 +65,7 @@ export default function ProfessionalDiscoveryMap({
             <Marker
               key={professional.id}
               position={[point.lat, point.lng]}
-              icon={markerIcon ?? undefined}
+              icon={markerIcon}
             >
               <Popup>
                 <div className="max-w-xs">
