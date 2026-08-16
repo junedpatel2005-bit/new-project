@@ -96,7 +96,11 @@ function ProjectsReport() {
                 <span className="font-medium">{project.jobTitle ?? `Project #${project.id}`}</span>
               ),
             },
-            { key: "clientName", header: "Client", render: (project) => project.clientName ?? "Client" },
+            {
+              key: "clientName",
+              header: "Client",
+              render: (project) => project.clientName ?? "Client",
+            },
             { key: "status", header: "Status", render: (project) => displayStatus(project.status) },
             {
               key: "deadline",
@@ -229,7 +233,9 @@ export default function ProfessionalReports() {
         </div>
       </section>
 
-      <section className="mt-8">{tab === "projects" ? <ProjectsReport /> : <EarningsReport />}</section>
+      <section className="mt-8">
+        {tab === "projects" ? <ProjectsReport /> : <EarningsReport />}
+      </section>
     </AppShell>
   );
 }

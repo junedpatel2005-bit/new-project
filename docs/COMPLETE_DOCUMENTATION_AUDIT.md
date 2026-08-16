@@ -5,18 +5,18 @@
 
 ## Verification result
 
-| Check | Result |
-|---|---|
-| `npm run lint` | Passed |
-| `npm run build` | Passed; Next.js 16.3.0 resolved from the project's dependency range |
-| Application pages | 25 App Router page wrappers |
-| Route components | 23 components in `src/routes/` |
-| API handlers | 6 handlers under `app/api/` |
-| Active Prisma schema | 58 models |
-| Automated tests | None found |
-| OpenAPI contract | None found |
-| CI workflow | None found |
-| Docker Compose/PostGIS configuration | None found |
+| Check                                | Result                                                              |
+| ------------------------------------ | ------------------------------------------------------------------- |
+| `npm run lint`                       | Passed                                                              |
+| `npm run build`                      | Passed; Next.js 16.3.0 resolved from the project's dependency range |
+| Application pages                    | 25 App Router page wrappers                                         |
+| Route components                     | 23 components in `src/routes/`                                      |
+| API handlers                         | 6 handlers under `app/api/`                                         |
+| Active Prisma schema                 | 58 models                                                           |
+| Automated tests                      | None found                                                          |
+| OpenAPI contract                     | None found                                                          |
+| CI workflow                          | None found                                                          |
+| Docker Compose/PostGIS configuration | None found                                                          |
 
 ## Documents reviewed
 

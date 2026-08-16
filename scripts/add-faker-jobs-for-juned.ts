@@ -69,7 +69,12 @@ const templates = [
     timingType: "FIXED",
     budgetMin: 1200,
     budgetMax: 2400,
-    city: { label: "Mumbai, Maharashtra", address: "Mumbai, Maharashtra, India", lat: 19.076, lng: 72.8777 },
+    city: {
+      label: "Mumbai, Maharashtra",
+      address: "Mumbai, Maharashtra, India",
+      lat: 19.076,
+      lng: 72.8777,
+    },
   },
 ];
 

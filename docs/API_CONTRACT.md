@@ -26,15 +26,15 @@ Errors use:
 
 ## Access groups
 
-| Area | Prefix | Intended caller |
-| --- | --- | --- |
-| Authentication | `/api/v1/auth/*` | Public/current session |
-| Client workspace | `/api/v1/client/*` | Client account |
-| Professional workspace | `/api/v1/professional/*` | Professional account |
-| Shared project portal | `/api/v1/portal/*` | Project client or professional |
-| Marketplace | `/api/v1/marketplace/*` | Public/authenticated marketplace visitor |
-| Administration | `/api/v1/admin/*` | Administrator only |
-| Public website | `/api/v1/website/*`, `/api/v1/contact` | Public website visitor |
+| Area                   | Prefix                                 | Intended caller                          |
+| ---------------------- | -------------------------------------- | ---------------------------------------- |
+| Authentication         | `/api/v1/auth/*`                       | Public/current session                   |
+| Client workspace       | `/api/v1/client/*`                     | Client account                           |
+| Professional workspace | `/api/v1/professional/*`               | Professional account                     |
+| Shared project portal  | `/api/v1/portal/*`                     | Project client or professional           |
+| Marketplace            | `/api/v1/marketplace/*`                | Public/authenticated marketplace visitor |
+| Administration         | `/api/v1/admin/*`                      | Administrator only                       |
+| Public website         | `/api/v1/website/*`, `/api/v1/contact` | Public website visitor                   |
 
 ## Route inventory
 

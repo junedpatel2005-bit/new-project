@@ -50,8 +50,18 @@ const userColumns: ReportColumn<UserRow>[] = [
   { key: "email", header: "Email", width: 2.4, format: (row) => row.email },
   { key: "role", header: "Role", width: 1.2, format: (row) => row.role },
   { key: "active", header: "Active", width: 1, format: (row) => (row.isActive ? "Yes" : "No") },
-  { key: "verified", header: "Verified", width: 1, format: (row) => (row.isVerified ? "Yes" : "No") },
-  { key: "joined", header: "Joined", width: 1.3, format: (row) => row.createdAt.toLocaleDateString("en-US") },
+  {
+    key: "verified",
+    header: "Verified",
+    width: 1,
+    format: (row) => (row.isVerified ? "Yes" : "No"),
+  },
+  {
+    key: "joined",
+    header: "Joined",
+    width: 1.3,
+    format: (row) => row.createdAt.toLocaleDateString("en-US"),
+  },
 ];
 
 const jobColumns: ReportColumn<JobRow>[] = [
@@ -59,7 +69,12 @@ const jobColumns: ReportColumn<JobRow>[] = [
   { key: "client", header: "Client", width: 1.8, format: (row) => row.clientName },
   { key: "category", header: "Category", width: 1.4, format: (row) => row.category ?? "General" },
   { key: "status", header: "Status", width: 1.2, format: (row) => row.status },
-  { key: "createdAt", header: "Created", width: 1.3, format: (row) => row.createdAt.toLocaleDateString("en-US") },
+  {
+    key: "createdAt",
+    header: "Created",
+    width: 1.3,
+    format: (row) => row.createdAt.toLocaleDateString("en-US"),
+  },
 ];
 
 const financeColumns: ReportColumn<FinanceRow>[] = [
@@ -74,7 +89,12 @@ const financeColumns: ReportColumn<FinanceRow>[] = [
   },
   { key: "status", header: "Status", width: 1.2, format: (row) => row.status },
   { key: "party", header: "Parties", width: 2.2, format: (row) => row.party },
-  { key: "createdAt", header: "Date", width: 1.3, format: (row) => row.createdAt.toLocaleDateString("en-US") },
+  {
+    key: "createdAt",
+    header: "Date",
+    width: 1.3,
+    format: (row) => row.createdAt.toLocaleDateString("en-US"),
+  },
 ];
 
 export async function POST(
@@ -85,7 +105,8 @@ export async function POST(
   if (!session) return NextResponse.json({ error: "Admin access required." }, { status: 403 });
 
   const reportRequest = parseReportRequest(await request.json().catch(() => null));
-  if (!reportRequest) return NextResponse.json({ error: "Invalid export request." }, { status: 400 });
+  if (!reportRequest)
+    return NextResponse.json({ error: "Invalid export request." }, { status: 400 });
   const { resource } = await params;
   const selectedOnly = reportRequest.scope === "selected";
   const ids = reportRequest.ids ?? [];
@@ -155,7 +176,9 @@ export async function POST(
       where: { id: { in: userIds } },
       select: { id: true, firstName: true, lastName: true },
     });
-    const names = new Map(users.map((user) => [user.id, `${user.firstName} ${user.lastName}`.trim()]));
+    const names = new Map(
+      users.map((user) => [user.id, `${user.firstName} ${user.lastName}`.trim()]),
+    );
     const rows: FinanceRow[] = [
       ...transactions.map((item) => ({
         kind: "Payment" as const,
@@ -192,7 +215,11 @@ function buildDocument<T>(
   subtitle: string,
   columns: ReportColumn<T>[],
   rows: T[],
-  reportRequest: { scope: "all" | "selected"; pageSize?: ReportPageSize; orientation?: ReportOrientation },
+  reportRequest: {
+    scope: "all" | "selected";
+    pageSize?: ReportPageSize;
+    orientation?: ReportOrientation;
+  },
   selectedOnly: boolean,
 ) {
   return ReportDocument({

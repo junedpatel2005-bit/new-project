@@ -57,7 +57,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Professional sign-in is required." }, { status: 401 });
 
   const reportRequest = parseReportRequest(await request.json().catch(() => null));
-  if (!reportRequest) return NextResponse.json({ error: "Invalid export request." }, { status: 400 });
+  if (!reportRequest)
+    return NextResponse.json({ error: "Invalid export request." }, { status: 400 });
 
   try {
     const selectedOnly = reportRequest.scope === "selected";
@@ -116,7 +117,10 @@ export async function POST(request: NextRequest) {
 
     return pdfResponse(buffer, `my-earnings-${reportRequest.scope}.pdf`);
   } catch (error) {
-    logServerError("report.export.failed", error, { report: "professional-earnings", userId: user.id });
+    logServerError("report.export.failed", error, {
+      report: "professional-earnings",
+      userId: user.id,
+    });
     return NextResponse.json({ error: "The report could not be generated." }, { status: 500 });
   }
 }

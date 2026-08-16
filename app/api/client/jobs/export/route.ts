@@ -46,9 +46,16 @@ const columns: ReportColumn<JobRow>[] = [
     width: 1.6,
     align: "right",
     format: (row) =>
-      row.timingType === "HOURLY" ? `${money(row.hourlyRate)}/hr` : money(row.budgetMax ?? row.budgetMin),
+      row.timingType === "HOURLY"
+        ? `${money(row.hourlyRate)}/hr`
+        : money(row.budgetMax ?? row.budgetMin),
   },
-  { key: "location", header: "Location", width: 2, format: (row) => row.locationAddress ?? "Remote" },
+  {
+    key: "location",
+    header: "Location",
+    width: 2,
+    format: (row) => row.locationAddress ?? "Remote",
+  },
   {
     key: "updatedAt",
     header: "Updated",
@@ -62,7 +69,8 @@ export async function POST(request: NextRequest) {
   if (!user) return NextResponse.json({ error: "Client sign-in is required." }, { status: 401 });
 
   const reportRequest = parseReportRequest(await request.json().catch(() => null));
-  if (!reportRequest) return NextResponse.json({ error: "Invalid export request." }, { status: 400 });
+  if (!reportRequest)
+    return NextResponse.json({ error: "Invalid export request." }, { status: 400 });
 
   const jobs = await db.clientJob.findMany({
     where: {
@@ -77,7 +85,8 @@ export async function POST(request: NextRequest) {
       title: "My jobs",
       subtitle: "Client workspace — your posted projects",
       generatedFor: `${user.firstName} ${user.lastName}`,
-      filterSummary: reportRequest.scope === "selected" ? `${jobs.length} selected` : `${jobs.length} total`,
+      filterSummary:
+        reportRequest.scope === "selected" ? `${jobs.length} selected` : `${jobs.length} total`,
       columns,
       rows: jobs,
       pageSize: reportRequest.pageSize,

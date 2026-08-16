@@ -24,13 +24,13 @@ There is no `apps/`, `packages/`, `pnpm-workspace.yaml`, `turbo.json`, Docker Co
 
 ## Application routes
 
-| Area | Current routes |
-|---|---|
-| Public and marketing | `/`, `/services`, `/how-it-works`, `/for-clients`, `/for-professionals`, `/pricing`, `/faq` |
-| Authentication | `/signup`, `/login`, `/verify`, `/forgot-password`, `/reset-password` |
-| Client-facing | `/client-profile`, `/dashboard`, `/discover`, `/post-job`, `/job/[jobId]`, `/project/[projectId]` |
-| Professional-facing | `/professional-profile`, `/pro/[proId]`, `/earnings`, `/verification` |
-| Shared or administrative | `/messages`, `/notifications`, `/admin` |
+| Area                     | Current routes                                                                                    |
+| ------------------------ | ------------------------------------------------------------------------------------------------- |
+| Public and marketing     | `/`, `/services`, `/how-it-works`, `/for-clients`, `/for-professionals`, `/pricing`, `/faq`       |
+| Authentication           | `/signup`, `/login`, `/verify`, `/forgot-password`, `/reset-password`                             |
+| Client-facing            | `/client-profile`, `/dashboard`, `/discover`, `/post-job`, `/job/[jobId]`, `/project/[projectId]` |
+| Professional-facing      | `/professional-profile`, `/pro/[proId]`, `/earnings`, `/verification`                             |
+| Shared or administrative | `/messages`, `/notifications`, `/admin`                                                           |
 
 Most page wrappers in `app/` re-export components from `src/routes/`. `client-profile` and `professional-profile` directly use `ProfileSetup`.
 
@@ -40,14 +40,14 @@ The required public About, Contact, Privacy Policy, and Terms pages do not exist
 
 The application currently has 23 API route handlers, including shared project-tracking actions and authenticated project-file upload/access routes. Most are not versioned under `/api/v1`. The initial API contract is tracked in `openapi.yaml`; it must be expanded whenever an endpoint changes.
 
-| Endpoint family | Current capabilities |
-|---|---|
-| `/api/auth/[action]` | Registration, login, logout, current-user lookup, email verification/resend, password reset, and Google OAuth callback flow |
-| `/api/profile` | Client and professional profile setup/update |
-| `/api/dashboard` | Authenticated client dashboard data |
-| `/api/marketplace/[resource]` | Categories, professionals, jobs, and individual job/professional lookup |
-| `/api/portal/[resource]` | Notifications, professional earnings, messages, and project lookup |
-| `/api/admin/database-status` | Database health check; production access is admin-restricted |
+| Endpoint family               | Current capabilities                                                                                                        |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `/api/auth/[action]`          | Registration, login, logout, current-user lookup, email verification/resend, password reset, and Google OAuth callback flow |
+| `/api/profile`                | Client and professional profile setup/update                                                                                |
+| `/api/dashboard`              | Authenticated client dashboard data                                                                                         |
+| `/api/marketplace/[resource]` | Categories, professionals, jobs, and individual job/professional lookup                                                     |
+| `/api/portal/[resource]`      | Notifications, professional earnings, messages, and project lookup                                                          |
+| `/api/admin/database-status`  | Database health check; production access is admin-restricted                                                                |
 
 The API uses dynamic resource/action dispatchers rather than stable resource-specific REST paths. Errors are generally returned as `{ error: "message" }`, not a structured error contract.
 
@@ -74,34 +74,34 @@ Prisma is accessed through a shared client in `src/lib/db.ts`. The current data 
 
 Only variable names are recorded here. Never add secret values to documentation.
 
-| Variable | Used by |
-|---|---|
-| `DATABASE_URL` | Prisma database connection and seed script |
-| `AUTH_SECRET` | JWT signing and verification |
-| `APP_URL` | Google OAuth callback and reset-email links |
-| `GOOGLE_CLIENT_ID` | Google OAuth |
-| `GOOGLE_CLIENT_SECRET` | Google OAuth |
-| `SMTP_HOST` | Transactional email transport |
-| `SMTP_PORT` | Transactional email transport |
-| `SMTP_USER` | Transactional email transport |
-| `SMTP_PASS` | Transactional email transport |
-| `SMTP_FROM` | Transactional email sender |
-| `NODE_ENV` | Runtime security and development behavior |
+| Variable               | Used by                                     |
+| ---------------------- | ------------------------------------------- |
+| `DATABASE_URL`         | Prisma database connection and seed script  |
+| `AUTH_SECRET`          | JWT signing and verification                |
+| `APP_URL`              | Google OAuth callback and reset-email links |
+| `GOOGLE_CLIENT_ID`     | Google OAuth                                |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth                                |
+| `SMTP_HOST`            | Transactional email transport               |
+| `SMTP_PORT`            | Transactional email transport               |
+| `SMTP_USER`            | Transactional email transport               |
+| `SMTP_PASS`            | Transactional email transport               |
+| `SMTP_FROM`            | Transactional email sender                  |
+| `NODE_ENV`             | Runtime security and development behavior   |
 
 `.env.example` also includes Google Maps browser settings. They are not currently consumed by the application source.
 
 ## Validation and quality status
 
-| Control | Current status |
-|---|---|
-| Linting | `npm run lint` passes |
-| Production build | `npm run build` passes |
-| Automated tests | No test files or configured test runner |
-| CI | No GitHub Actions workflow directory |
-| OpenAPI | Not present |
-| Security headers/CSP | No repository-level policy configured |
-| Error monitoring | No Sentry or equivalent integration |
-| PostGIS/Docker local environment | Not configured |
+| Control                          | Current status                          |
+| -------------------------------- | --------------------------------------- |
+| Linting                          | `npm run lint` passes                   |
+| Production build                 | `npm run build` passes                  |
+| Automated tests                  | No test files or configured test runner |
+| CI                               | No GitHub Actions workflow directory    |
+| OpenAPI                          | Not present                             |
+| Security headers/CSP             | No repository-level policy configured   |
+| Error monitoring                 | No Sentry or equivalent integration     |
+| PostGIS/Docker local environment | Not configured                          |
 
 ## Missing foundations before feature expansion
 

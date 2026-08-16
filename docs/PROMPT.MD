@@ -8,14 +8,14 @@ Use this corrected prompt:
 >
 > Tech stack:
 >
-> * Next.js
-> * TypeScript
-> * Supabase
+> - Next.js
+> - TypeScript
+> - Supabase
 >
 > The website has **2 roles**:
 >
-> * Client
-> * Professional
+> - Client
+> - Professional
 >
 > For this task, focus on the **Client signup and Client profile flow**, but make sure the existing role system is respected.
 >
@@ -43,12 +43,12 @@ Use this corrected prompt:
 >
 > Signup should include:
 >
-> * Full name
-> * Email
-> * Phone number
-> * Password
-> * Confirm password
-> * Terms & Conditions checkbox
+> - Full name
+> - Email
+> - Phone number
+> - Password
+> - Confirm password
+> - Terms & Conditions checkbox
 >
 > Use proper validation for every field.
 >
@@ -96,16 +96,16 @@ Use this corrected prompt:
 >
 > Add OTP UI with:
 >
-> * 4 digit input
-> * Auto focus next digit
-> * Backspace support
-> * Paste support
-> * Numeric input only
-> * Verify button/loading state
-> * Invalid OTP message
-> * Success message
-> * Change phone number option
-> * Resend OTP option
+> - 4 digit input
+> - Auto focus next digit
+> - Backspace support
+> - Paste support
+> - Numeric input only
+> - Verify button/loading state
+> - Invalid OTP message
+> - Success message
+> - Change phone number option
+> - Resend OTP option
 >
 > ---
 >
@@ -115,19 +115,19 @@ Use this corrected prompt:
 >
 > The Client should be able to add and manage:
 >
-> * Name
-> * Company name — optional
-> * Address
-> * Profile photo
-> * Saved locations
+> - Name
+> - Company name — optional
+> - Address
+> - Profile photo
+> - Saved locations
 >
 > Also include useful Client profile information such as:
 >
-> * Email
-> * Phone number
-> * Phone verification status
-> * Preferred contact method if suitable for the existing system
-> * Client type such as individual/business if suitable
+> - Email
+> - Phone number
+> - Phone verification status
+> - Preferred contact method if suitable for the existing system
+> - Client type such as individual/business if suitable
 >
 > Do not unnecessarily add fields if the current product/database already has a defined structure.
 >
@@ -149,9 +149,9 @@ Use this corrected prompt:
 >
 > Allow the Client to:
 >
-> * Upload profile photo
-> * Replace profile photo
-> * Remove profile photo
+> - Upload profile photo
+> - Replace profile photo
+> - Remove profile photo
 >
 > Use the application's existing Supabase Storage setup if one already exists.
 >
@@ -179,18 +179,18 @@ Use this corrected prompt:
 >
 > Client should be able to:
 >
-> * Add a saved location
-> * Edit a saved location
-> * Delete a saved location
-> * Choose a default saved location if supported
-> * Reuse a saved location later
+> - Add a saved location
+> - Edit a saved location
+> - Delete a saved location
+> - Choose a default saved location if supported
+> - Reuse a saved location later
 >
 > Examples:
 >
-> * Home
-> * Office
-> * Warehouse
-> * Site
+> - Home
+> - Office
+> - Warehouse
+> - Site
 >
 > Again, inspect the existing database first and use the existing saved-location/location structure.
 >
@@ -208,18 +208,18 @@ Use this corrected prompt:
 >
 > **Step 1 — Personal Information**
 >
-> * Profile photo
-> * Name
-> * Company name if applicable
+> - Profile photo
+> - Name
+> - Company name if applicable
 >
 > **Step 2 — Address**
 >
-> * Client address
+> - Client address
 >
 > **Step 3 — Saved Locations**
 >
-> * Add first saved location
-> * Option to use current address as a saved location if appropriate
+> - Add first saved location
+> - Option to use current address as a saved location if appropriate
 >
 > **Step 4 — Complete Profile**
 >
@@ -257,18 +257,18 @@ Use this corrected prompt:
 >
 > Add complete validation for:
 >
-> * Required fields
-> * Full name
-> * Email format
-> * Duplicate email
-> * Phone format
-> * Duplicate phone if applicable
-> * OTP
-> * Password strength
-> * Confirm password
-> * Terms acceptance
-> * Address
-> * Image upload
+> - Required fields
+> - Full name
+> - Email format
+> - Duplicate email
+> - Phone format
+> - Duplicate phone if applicable
+> - OTP
+> - Password strength
+> - Confirm password
+> - Terms acceptance
+> - Address
+> - Image upload
 >
 > Handle Supabase/database errors with user-friendly messages.
 >

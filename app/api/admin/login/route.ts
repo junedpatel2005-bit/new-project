@@ -40,7 +40,10 @@ async function createBootstrapAdmin() {
 export async function POST(request: NextRequest) {
   const parsed = credentials.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
-    return NextResponse.json({ error: "Enter a valid admin username and password." }, { status: 400 });
+    return NextResponse.json(
+      { error: "Enter a valid admin username and password." },
+      { status: 400 },
+    );
   }
 
   const key = `admin-login:${clientKey(request)}:${parsed.data.username}`;

@@ -232,7 +232,9 @@ export default function ClientReports() {
         </div>
       </section>
 
-      <section className="mt-8">{tab === "projects" ? <ProjectsReport /> : <PaymentsReport />}</section>
+      <section className="mt-8">
+        {tab === "projects" ? <ProjectsReport /> : <PaymentsReport />}
+      </section>
     </AppShell>
   );
 }

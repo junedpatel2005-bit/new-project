@@ -56,7 +56,8 @@ export async function POST(request: NextRequest) {
   if (!user) return NextResponse.json({ error: "Client sign-in is required." }, { status: 401 });
 
   const reportRequest = parseReportRequest(await request.json().catch(() => null));
-  if (!reportRequest) return NextResponse.json({ error: "Invalid export request." }, { status: 400 });
+  if (!reportRequest)
+    return NextResponse.json({ error: "Invalid export request." }, { status: 400 });
 
   try {
     const payments = await db.projectTransaction.findMany({
@@ -74,7 +75,9 @@ export async function POST(request: NextRequest) {
         subtitle: "Client workspace — payments to professionals",
         generatedFor: `${user.firstName} ${user.lastName}`,
         filterSummary:
-          reportRequest.scope === "selected" ? `${payments.length} selected` : `${payments.length} total`,
+          reportRequest.scope === "selected"
+            ? `${payments.length} selected`
+            : `${payments.length} total`,
         columns,
         rows: payments,
         pageSize: reportRequest.pageSize,

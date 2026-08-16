@@ -38,7 +38,9 @@ type ProjectRow = {
 
 function money(value: number | null, timingType: string) {
   if (value == null) return "Amount pending";
-  return timingType === "HOURLY" ? `$${value.toLocaleString("en-US")}/hr` : `$${value.toLocaleString("en-US")}`;
+  return timingType === "HOURLY"
+    ? `$${value.toLocaleString("en-US")}/hr`
+    : `$${value.toLocaleString("en-US")}`;
 }
 
 const columns: ReportColumn<ProjectRow>[] = [
@@ -64,7 +66,13 @@ const columns: ReportColumn<ProjectRow>[] = [
     align: "right",
     format: (row) => money(row.budget, row.timingType),
   },
-  { key: "progress", header: "Progress", width: 1, align: "right", format: (row) => `${row.progress}%` },
+  {
+    key: "progress",
+    header: "Progress",
+    width: 1,
+    align: "right",
+    format: (row) => `${row.progress}%`,
+  },
 ];
 
 export async function POST(request: NextRequest) {
@@ -73,7 +81,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Professional sign-in is required." }, { status: 401 });
 
   const reportRequest = parseReportRequest(await request.json().catch(() => null));
-  if (!reportRequest) return NextResponse.json({ error: "Invalid export request." }, { status: 400 });
+  if (!reportRequest)
+    return NextResponse.json({ error: "Invalid export request." }, { status: 400 });
 
   const tracking = await db.projectTracking.findMany({
     where: {
@@ -118,7 +127,11 @@ export async function POST(request: NextRequest) {
       jobTitle: job?.title ?? `Job #${project.jobId}`,
       clientName: job ? (clientMap.get(job.userId) ?? "Client") : "Client",
       deadline: job?.deadline ?? null,
-      budget: job ? (job.timingType === "HOURLY" ? job.hourlyRate : (job.budgetMax ?? job.budgetMin)) : null,
+      budget: job
+        ? job.timingType === "HOURLY"
+          ? job.hourlyRate
+          : (job.budgetMax ?? job.budgetMin)
+        : null,
       timingType: job?.timingType ?? "FIXED",
     };
   });
@@ -128,7 +141,8 @@ export async function POST(request: NextRequest) {
       title: "Running projects",
       subtitle: "Professional workspace — your active projects",
       generatedFor: `${user.firstName} ${user.lastName}`,
-      filterSummary: reportRequest.scope === "selected" ? `${rows.length} selected` : `${rows.length} total`,
+      filterSummary:
+        reportRequest.scope === "selected" ? `${rows.length} selected` : `${rows.length} total`,
       columns,
       rows,
       pageSize: reportRequest.pageSize,

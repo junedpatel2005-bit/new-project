@@ -92,7 +92,10 @@ export function SelectableReportTable<T extends { id: number }>({
         ))}
         {!rows.length && (
           <TableRow>
-            <TableCell colSpan={columns.length + 1} className="py-10 text-center text-muted-foreground">
+            <TableCell
+              colSpan={columns.length + 1}
+              className="py-10 text-center text-muted-foreground"
+            >
               {emptyMessage}
             </TableCell>
           </TableRow>

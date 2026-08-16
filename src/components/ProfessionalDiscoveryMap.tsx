@@ -62,11 +62,7 @@ export default function ProfessionalDiscoveryMap({
           const point = professional.displayPoint;
           if (!point) return null;
           return (
-            <Marker
-              key={professional.id}
-              position={[point.lat, point.lng]}
-              icon={markerIcon}
-            >
+            <Marker key={professional.id} position={[point.lat, point.lng]} icon={markerIcon}>
               <Popup>
                 <div className="max-w-xs">
                   <strong>{professional.name}</strong>
