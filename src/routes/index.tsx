@@ -4,8 +4,6 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ArrowRight, Briefcase, MapPin, Search, ShieldCheck, Users } from "lucide-react";
 import { ProCard } from "@/components/ProCard";
-import { SiteFooter } from "@/components/SiteFooter";
-import { SiteHeader } from "@/components/SiteHeader";
 import { Button } from "@/components/ui/button";
 import type { MarketplaceCategory, MarketplaceProfessional } from "@/lib/types/marketplace";
 
@@ -109,7 +107,6 @@ export default function Landing() {
   }, []);
   return (
     <div className="min-h-screen bg-background">
-      <SiteHeader />
       <main>
         <section className="gradient-hero">
           <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
@@ -331,7 +328,6 @@ export default function Landing() {
           </div>
         </section>
       </main>
-      <SiteFooter />
     </div>
   );
 }

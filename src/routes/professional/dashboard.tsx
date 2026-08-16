@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { AppShell } from "@/components/AppShell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -85,25 +84,21 @@ export default function ProfessionalDashboard() {
 
   if (error)
     return (
-      <AppShell>
-        <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-6 text-destructive">
-          {error}
-        </div>
-      </AppShell>
+      <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-6 text-destructive">
+        {error}
+      </div>
     );
 
   if (!data || !data.professional)
     return (
-      <AppShell>
-        <div className="space-y-4">
-          <div className="h-48 animate-pulse rounded-3xl bg-muted" />
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {Array.from({ length: 4 }).map((_, index) => (
-              <div key={index} className="h-32 animate-pulse rounded-2xl bg-muted" />
-            ))}
-          </div>
+      <div className="space-y-4">
+        <div className="h-48 animate-pulse rounded-3xl bg-muted" />
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <div key={index} className="h-32 animate-pulse rounded-2xl bg-muted" />
+          ))}
         </div>
-      </AppShell>
+      </div>
     );
 
   const professional = data.professional;
@@ -111,9 +106,8 @@ export default function ProfessionalDashboard() {
   const availability = professional.availabilityStatus.replaceAll("_", " ");
 
   return (
-    <AppShell>
-      <div className="space-y-6">
-        <section className="overflow-hidden rounded-3xl border border-border bg-card shadow-soft">
+    <div className="space-y-6">
+      <section className="overflow-hidden rounded-3xl border border-border bg-card shadow-soft">
           <div className="h-24 gradient-primary" />
           <div className="flex flex-col gap-5 px-6 pb-6 sm:flex-row sm:items-end sm:justify-between">
             <div className="-mt-10 flex items-end gap-4">
@@ -307,7 +301,6 @@ export default function ProfessionalDashboard() {
           </div>
         </section>
       </div>
-    </AppShell>
   );
 }
 

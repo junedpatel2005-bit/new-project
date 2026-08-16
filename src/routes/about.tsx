@@ -1,7 +1,5 @@
 import type { LucideIcon } from "lucide-react";
 import { Award, HeartHandshake, ShieldCheck } from "lucide-react";
-import { SiteFooter } from "@/components/SiteFooter";
-import { SiteHeader } from "@/components/SiteHeader";
 
 const values: { icon: LucideIcon; title: string; description: string }[] = [
   {
@@ -25,7 +23,6 @@ const values: { icon: LucideIcon; title: string; description: string }[] = [
 export default function About() {
   return (
     <div className="min-h-screen bg-background">
-      <SiteHeader />
       <main>
         <section className="gradient-hero">
           <div className="mx-auto max-w-4xl px-4 py-20 text-center sm:px-6">
@@ -61,7 +58,6 @@ export default function About() {
           </div>
         </section>
       </main>
-      <SiteFooter />
     </div>
   );
 }

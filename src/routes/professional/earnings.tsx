@@ -9,7 +9,6 @@ import {
   ReceiptText,
   WalletCards,
 } from "lucide-react";
-import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 type Transaction = {
   id: number;
@@ -72,9 +71,8 @@ export default function Earnings() {
     }
   }
   return (
-    <AppShell>
-      <div className="space-y-6">
-        <section className="rounded-3xl bg-[linear-gradient(120deg,var(--color-ink),var(--color-primary))] p-7 text-white shadow-card">
+    <div className="space-y-6">
+      <section className="rounded-3xl bg-[linear-gradient(120deg,var(--color-ink),var(--color-primary))] p-7 text-white shadow-card">
           <p className="text-xs font-bold uppercase tracking-[.2em] text-white/65">
             Professional earnings
           </p>
@@ -211,8 +209,7 @@ export default function Earnings() {
             </div>
           </>
         )}
-      </div>
-    </AppShell>
+    </div>
   );
 }
 function Stat({

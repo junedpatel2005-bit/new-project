@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 import { Mail, MessageCircle, ShieldCheck } from "lucide-react";
-import { SiteHeader } from "@/components/SiteHeader";
-import { SiteFooter } from "@/components/SiteFooter";
 import { Button } from "@/components/ui/button";
 
 export default function Contact() {
@@ -29,7 +27,6 @@ export default function Contact() {
   };
   return (
     <div className="min-h-screen bg-background">
-      <SiteHeader />
       <main>
         <section className="gradient-hero">
           <div className="mx-auto max-w-3xl px-4 py-20 text-center sm:px-6 lg:px-8">
@@ -116,7 +113,6 @@ export default function Contact() {
           </form>
         </section>
       </main>
-      <SiteFooter />
     </div>
   );
 }

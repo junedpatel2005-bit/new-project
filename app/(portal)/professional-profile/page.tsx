@@ -1,7 +1,6 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { AppShell } from "@/components/AppShell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -171,9 +170,8 @@ export default async function ProfessionalProfilePage() {
   const professional = await getProfessionalProfile();
 
   return (
-    <AppShell title="Professional Profile">
-      <div className="mx-auto max-w-6xl space-y-6 p-6">
-        <article className="overflow-hidden rounded-3xl border border-border bg-card shadow-soft">
+    <div className="mx-auto max-w-6xl space-y-6 p-6">
+      <article className="overflow-hidden rounded-3xl border border-border bg-card shadow-soft">
           <div className="h-28 gradient-primary" />
           <div className="px-6 pb-8 sm:px-8">
             <div className="-mt-12 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
@@ -418,7 +416,6 @@ export default async function ProfessionalProfilePage() {
             </article>
           </aside>
         </section>
-      </div>
-    </AppShell>
+    </div>
   );
 }

@@ -13,7 +13,6 @@ import {
   Upload,
   XCircle,
 } from "lucide-react";
-import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { AppSkeleton } from "@/components/LoadingSkeleton";
 
@@ -141,9 +140,8 @@ export default function Verification() {
     }
   }
   return (
-    <AppShell>
-      <div className="space-y-7">
-        <section className="relative overflow-hidden rounded-3xl bg-[linear-gradient(120deg,var(--color-ink),var(--color-primary))] px-6 py-7 text-white shadow-card sm:px-8">
+    <div className="space-y-7">
+      <section className="relative overflow-hidden rounded-3xl bg-[linear-gradient(120deg,var(--color-ink),var(--color-primary))] px-6 py-7 text-white shadow-card sm:px-8">
           <div className="absolute -right-8 -top-20 h-60 w-60 rounded-full bg-cta/25 blur-3xl" />
           <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div>
@@ -304,7 +302,6 @@ export default function Verification() {
             </section>
           </>
         )}
-      </div>
-    </AppShell>
+    </div>
   );
 }

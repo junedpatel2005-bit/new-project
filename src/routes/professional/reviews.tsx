@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AppShell } from "@/components/AppShell";
+import { usePortalTitle } from "@/components/PortalShell";
 import { Button } from "@/components/ui/button";
 import { Star, Loader2 } from "lucide-react";
 
@@ -14,8 +14,13 @@ type Review = {
 };
 
 export default function ProfessionalReviews() {
+  const { setTitle } = usePortalTitle();
   const [reviews, setReviews] = useState<Review[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setTitle("Reviews");
+  }, [setTitle]);
 
   useEffect(() => {
     void fetch("/api/v1/portal/reviews")
@@ -28,8 +33,7 @@ export default function ProfessionalReviews() {
   }, []);
 
   return (
-    <AppShell title="Reviews">
-      <div className="space-y-6">
+    <div className="space-y-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h1 className="text-3xl font-bold">Reviews</h1>
@@ -80,7 +84,6 @@ export default function ProfessionalReviews() {
             ))}
           </ul>
         )}
-      </div>
-    </AppShell>
+    </div>
   );
 }

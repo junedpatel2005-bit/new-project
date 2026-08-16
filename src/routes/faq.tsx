@@ -1,6 +1,4 @@
 import Link from "next/link";
-import { SiteHeader } from "@/components/SiteHeader";
-import { SiteFooter } from "@/components/SiteFooter";
 import {
   Accordion,
   AccordionContent,
@@ -63,7 +61,6 @@ const groups = [
 export default function FAQ() {
   return (
     <div className="min-h-screen bg-background">
-      <SiteHeader />
       <section className="gradient-hero">
         <div className="mx-auto max-w-3xl px-4 py-20 text-center sm:px-6 lg:px-8">
           <p className="text-xs font-semibold uppercase tracking-wider text-primary">Help center</p>
@@ -105,7 +102,6 @@ export default function FAQ() {
           </Button>
         </div>
       </section>
-      <SiteFooter />
     </div>
   );
 }

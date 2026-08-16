@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { FileBarChart } from "lucide-react";
-import { AppShell } from "@/components/AppShell";
 import { ExportMenu } from "@/components/reports/ExportMenu";
 import { SelectableReportTable } from "@/components/reports/SelectableReportTable";
 import { useRowSelection } from "@/hooks/use-row-selection";
@@ -198,9 +197,9 @@ export default function ProfessionalReports() {
   const [tab, setTab] = useState<"projects" | "earnings">("projects");
 
   return (
-    <AppShell>
+    <div className="space-y-8">
       <section className="relative overflow-hidden rounded-3xl bg-[linear-gradient(120deg,var(--color-ink),var(--color-primary))] px-6 py-7 text-white shadow-card sm:px-8 sm:py-8">
-        <div className="absolute -right-10 -top-24 h-64 w-64 rounded-full bg-cta/20 blur-3xl" />
+          <div className="absolute -right-10 -top-24 h-64 w-64 rounded-full bg-cta/20 blur-3xl" />
         <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-white/65">
@@ -236,6 +235,6 @@ export default function ProfessionalReports() {
       <section className="mt-8">
         {tab === "projects" ? <ProjectsReport /> : <EarningsReport />}
       </section>
-    </AppShell>
+    </div>
   );
 }

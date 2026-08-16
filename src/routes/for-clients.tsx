@@ -1,6 +1,4 @@
 import Link from "next/link";
-import { SiteHeader } from "@/components/SiteHeader";
-import { SiteFooter } from "@/components/SiteFooter";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, ShieldCheck, Wallet, Clock, Users, Star } from "lucide-react";
 
@@ -26,7 +24,6 @@ const benefits = [
 export default function ForClients() {
   return (
     <div className="min-h-screen bg-background">
-      <SiteHeader />
       <section className="gradient-hero">
         <div className="mx-auto grid max-w-7xl gap-10 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:px-8">
           <div>
@@ -97,7 +94,6 @@ export default function ForClients() {
           ))}
         </div>
       </section>
-      <SiteFooter />
     </div>
   );
 }

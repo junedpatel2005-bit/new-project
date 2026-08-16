@@ -1,6 +1,5 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
-import { AppShell } from "@/components/AppShell";
 type Notification = {
   id: number;
   type: string;
@@ -27,7 +26,7 @@ export default function Notifications() {
     return () => window.removeEventListener("servio:notification", loadNotifications);
   }, [loadNotifications]);
   return (
-    <AppShell>
+    <div>
       <h1 className="text-2xl font-semibold">Notifications</h1>
       {!items && !error && <div className="mt-6 h-48 animate-pulse rounded-2xl bg-muted" />}
       {error && (
@@ -55,6 +54,6 @@ export default function Notifications() {
             You have no notifications.
           </p>
         ))}
-    </AppShell>
+    </div>
   );
 }

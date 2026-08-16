@@ -27,14 +27,7 @@ export function AppSidebar({ items, pathname }: { items: NavigationItem[]; pathn
             </Link>
           );
         })}
-      </nav>
-      <div className="absolute inset-x-3 bottom-3 rounded-xl bg-ink p-4 text-ink-foreground shadow-elevated">
-        <p className="font-display text-sm font-semibold text-white">Upgrade to Pro</p>
-        <p className="mt-1 text-xs text-white/70">Unlock AI proposals & priority support.</p>
-        <Button size="sm" className="mt-3 w-full bg-cta text-cta-foreground hover:bg-cta/90">
-          Upgrade
-        </Button>
-      </div>
+      </nav>  
     </aside>
   );
 }

@@ -1,8 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { SiteHeader } from "@/components/SiteHeader";
-import { SiteFooter } from "@/components/SiteFooter";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 import { useState } from "react";
@@ -59,7 +57,6 @@ export default function Pricing() {
   const [yearly, setYearly] = useState(true);
   return (
     <div className="min-h-screen bg-background">
-      <SiteHeader />
       <section className="gradient-hero">
         <div className="mx-auto max-w-3xl px-4 py-20 text-center sm:px-6 lg:px-8">
           <p className="text-xs font-semibold uppercase tracking-wider text-primary">Pricing</p>
@@ -138,7 +135,6 @@ export default function Pricing() {
           .
         </p>
       </section>
-      <SiteFooter />
     </div>
   );
 }

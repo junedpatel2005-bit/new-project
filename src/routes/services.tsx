@@ -3,8 +3,6 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { DollarSign, MapPin, Search, Star } from "lucide-react";
-import { SiteFooter } from "@/components/SiteFooter";
-import { SiteHeader } from "@/components/SiteHeader";
 import { Button } from "@/components/ui/button";
 import type { MarketplaceCategory, MarketplaceJob } from "@/lib/types/marketplace";
 
@@ -79,7 +77,6 @@ export default function Services() {
 
   return (
     <div className="min-h-screen bg-background">
-      <SiteHeader />
       <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <p className="text-xs font-semibold uppercase tracking-wider text-primary">
           Marketplace jobs
@@ -283,7 +280,6 @@ export default function Services() {
           </section>
         </div>
       </main>
-      <SiteFooter />
     </div>
   );
 }

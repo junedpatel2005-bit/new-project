@@ -1,6 +1,4 @@
 import Link from "next/link";
-import { SiteHeader } from "@/components/SiteHeader";
-import { SiteFooter } from "@/components/SiteFooter";
 import { Button } from "@/components/ui/button";
 import {
   ClipboardList,
@@ -56,7 +54,6 @@ const stepsPro = [
 export default function HowItWorks() {
   return (
     <div className="min-h-screen bg-background">
-      <SiteHeader />
       <Hero />
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <p className="text-xs font-semibold uppercase tracking-wider text-primary">For clients</p>
@@ -107,7 +104,6 @@ export default function HowItWorks() {
         </div>
       </section>
       <CTABand />
-      <SiteFooter />
     </div>
   );
 }

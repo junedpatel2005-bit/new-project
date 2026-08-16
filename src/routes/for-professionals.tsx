@@ -1,13 +1,10 @@
 import Link from "next/link";
-import { SiteHeader } from "@/components/SiteHeader";
-import { SiteFooter } from "@/components/SiteFooter";
 import { Button } from "@/components/ui/button";
 import { TrendingUp, ShieldCheck, MapPin, Wallet, BadgeCheck, Briefcase } from "lucide-react";
 
 export default function ForPros() {
   return (
     <div className="min-h-screen bg-background">
-      <SiteHeader />
       <section className="bg-ink text-ink-foreground">
         <div className="mx-auto grid max-w-7xl gap-10 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:px-8">
           <div>
@@ -115,7 +112,6 @@ export default function ForPros() {
           ))}
         </div>
       </section>
-      <SiteFooter />
     </div>
   );
 }
