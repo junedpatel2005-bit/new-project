@@ -4,9 +4,8 @@ import dynamic from "next/dynamic";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Map, SlidersHorizontal, Star, ShieldCheck } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Search, Map, MapPin, SlidersHorizontal, Star, ShieldCheck } from "lucide-react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 
 const ProfessionalJobsMap = dynamic(() => import("@/components/ProfessionalJobsMap"), {
   ssr: false,
@@ -63,7 +62,6 @@ function formatBudgetRange(
 }
 
 function ProfessionalJobsContent() {
-  const router = useRouter();
   const [jobs, setJobs] = useState<JobListItem[]>([]);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("");
@@ -75,6 +73,15 @@ function ProfessionalJobsContent() {
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const mapSectionRef = useRef<HTMLDivElement | null>(null);
+
+  function showJobLocation(jobId: number) {
+    setSelectedJobId(jobId);
+    setShowMap(true);
+    window.requestAnimationFrame(() => {
+      mapSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
 
   useEffect(() => {
     let active = true;
@@ -325,7 +332,10 @@ function ProfessionalJobsContent() {
             </div>
 
             {showMap && (
-              <div className="relative mb-4 h-[320px] overflow-hidden rounded-2xl border border-border">
+              <div
+                ref={mapSectionRef}
+                className="relative mb-4 h-[320px] overflow-hidden rounded-2xl border border-border"
+              >
                 {mapJobs.length > 0 ? (
                   <>
                     <ProfessionalJobsMap
@@ -358,21 +368,7 @@ function ProfessionalJobsContent() {
                 {visibleJobs.map((job) => (
                   <article
                     key={job.id}
-                    tabIndex={0}
-                    role="link"
-                    aria-label={`Open ${job.title}`}
-                    onClick={(event) => {
-                      if (event.target instanceof Element && event.target.closest("a, button"))
-                        return;
-                      router.push(`/job/${job.id}`);
-                    }}
-                    onKeyDown={(event) => {
-                      if (event.key === "Enter" || event.key === " ") {
-                        event.preventDefault();
-                        router.push(`/job/${job.id}`);
-                      }
-                    }}
-                    className={`cursor-pointer rounded-2xl border bg-background p-4 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
+                    className={`rounded-2xl border bg-background p-4 transition ${
                       selectedJobId === job.id ? "border-primary shadow-soft" : "border-border"
                     }`}
                   >
@@ -418,10 +414,24 @@ function ProfessionalJobsContent() {
                       <span>{formatBudgetAmount(job.hourlyRate, job.timingType)}</span>
                     </div>
 
-                    <div className="mt-5 flex items-center justify-between gap-3">
-                      <Button asChild size="sm">
-                        <a href={`/job/${job.id}`}>View details</a>
-                      </Button>
+                    <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
+                      <div className="flex items-center gap-2">
+                        <Button asChild size="sm">
+                          <a href={`/job/${job.id}`}>View details</a>
+                        </Button>
+                        {job.locationLat !== null && job.locationLng !== null && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="gap-1.5"
+                            onClick={() => showJobLocation(job.id)}
+                          >
+                            <MapPin className="h-3.5 w-3.5" />
+                            Show location
+                          </Button>
+                        )}
+                      </div>
                       <span className="text-xs text-muted-foreground">
                         {job.proposalCount} saved
                       </span>

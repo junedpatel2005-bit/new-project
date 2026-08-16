@@ -18,6 +18,7 @@ const templates = [
     timingType: "FIXED",
     budgetMin: 800,
     budgetMax: 1400,
+    city: { label: "Surat, Gujarat", address: "Surat, Gujarat, India", lat: 21.1702, lng: 72.8311 },
   },
   {
     title: "Home office electrical upgrade",
@@ -25,6 +26,12 @@ const templates = [
     timingType: "FIXED",
     budgetMin: 450,
     budgetMax: 900,
+    city: {
+      label: "Ahmedabad, Gujarat",
+      address: "Ahmedabad, Gujarat, India",
+      lat: 23.0225,
+      lng: 72.5714,
+    },
   },
   {
     title: "Product photos for an online store",
@@ -32,6 +39,12 @@ const templates = [
     timingType: "FIXED",
     budgetMin: 300,
     budgetMax: 650,
+    city: {
+      label: "Vadodara, Gujarat",
+      address: "Vadodara, Gujarat, India",
+      lat: 22.3072,
+      lng: 73.1812,
+    },
   },
   {
     title: "Website conversion audit",
@@ -39,6 +52,7 @@ const templates = [
     timingType: "FIXED",
     budgetMin: 500,
     budgetMax: 950,
+    city: null,
   },
   {
     title: "React dashboard improvements",
@@ -47,6 +61,7 @@ const templates = [
     budgetMin: null,
     budgetMax: null,
     hourlyRate: 65,
+    city: null,
   },
   {
     title: "Brand identity and design system",
@@ -54,6 +69,7 @@ const templates = [
     timingType: "FIXED",
     budgetMin: 1200,
     budgetMax: 2400,
+    city: { label: "Mumbai, Maharashtra", address: "Mumbai, Maharashtra, India", lat: 19.076, lng: 72.8777 },
   },
 ];
 
@@ -76,12 +92,32 @@ async function main() {
     await db.clientJob.updateMany({ where: { id: { in: existingIds } }, data: { status: "OPEN" } });
   }
   const existingTitles = new Set(existing.map((job) => job.title));
+  const existingByTitle = new Map(existing.map((job) => [job.title, job.id]));
   let created = 0;
+  let updated = 0;
 
   for (const item of templates) {
     const title = `${marker} ${item.title}`;
-    if (existingTitles.has(title)) continue;
-    const job = await db.clientJob.create({
+    const isRemote = item.city === null;
+
+    if (existingTitles.has(title)) {
+      const jobId = existingByTitle.get(title);
+      if (jobId) {
+        await db.clientJob.update({
+          where: { id: jobId },
+          data: {
+            locationLabel: isRemote ? "Remote" : item.city.label,
+            locationAddress: isRemote ? "Remote" : item.city.address,
+            locationLat: isRemote ? null : item.city.lat,
+            locationLng: isRemote ? null : item.city.lng,
+          },
+        });
+        updated += 1;
+      }
+      continue;
+    }
+
+    await db.clientJob.create({
       data: {
         userId: client.id,
         title,
@@ -93,27 +129,18 @@ async function main() {
         budgetMax: item.budgetMax,
         hourlyRate: item.hourlyRate ?? null,
         urgency: faker.helpers.arrayElement(["LOW", "MEDIUM", "HIGH"]),
-        workMode:
-          item.category === "Development" || item.category === "Marketing" ? "REMOTE" : "ON_SITE",
-        locationLabel:
-          item.category === "Development" || item.category === "Marketing"
-            ? "Remote"
-            : "Surat, Gujarat",
-        locationAddress:
-          item.category === "Development" || item.category === "Marketing"
-            ? "Remote"
-            : "Surat, Gujarat, India",
-        locationLat:
-          item.category === "Development" || item.category === "Marketing" ? null : 21.1702,
-        locationLng:
-          item.category === "Development" || item.category === "Marketing" ? null : 72.8311,
+        workMode: isRemote ? "REMOTE" : "ON_SITE",
+        locationLabel: isRemote ? "Remote" : item.city.label,
+        locationAddress: isRemote ? "Remote" : item.city.address,
+        locationLat: isRemote ? null : item.city.lat,
+        locationLng: isRemote ? null : item.city.lng,
         deadline: faker.date.soon({ days: 35 }),
       },
     });
     created += 1;
   }
 
-  console.info("faker.jobs.added", { account: email, created, existing: existing.length });
+  console.info("faker.jobs.added", { account: email, created, updated, existing: existing.length });
 }
 
 main()
