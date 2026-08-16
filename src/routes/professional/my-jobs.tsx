@@ -1,12 +1,17 @@
 "use client";
 
-import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
+import dynamic from "next/dynamic";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Map, SlidersHorizontal, Star, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
+
+const ProfessionalJobsMap = dynamic(() => import("@/components/ProfessionalJobsMap"), {
+  ssr: false,
+  loading: () => <div className="h-full w-full animate-pulse bg-muted" />,
+});
 
 const PAGE_SIZE = 20;
 
@@ -55,16 +60,6 @@ function formatBudgetRange(
   }
   if (min == null && max == null) return "Budget on request";
   return `$${min?.toLocaleString() ?? "—"} – $${max?.toLocaleString() ?? "—"}`;
-}
-
-function MapCenterController({ center }: { center: [number, number] }) {
-  const map = useMap();
-
-  useEffect(() => {
-    map.setView(center, 6);
-  }, [center, map]);
-
-  return null;
 }
 
 function ProfessionalJobsContent() {
@@ -338,44 +333,11 @@ function ProfessionalJobsContent() {
               <div className="relative mb-4 h-[320px] overflow-hidden rounded-2xl border border-border">
                 {mapJobs.length > 0 ? (
                   <>
-                    <MapContainer
+                    <ProfessionalJobsMap
                       center={mapCenter}
-                      zoom={6}
-                      scrollWheelZoom
-                      className="h-full w-full z-0"
-                    >
-                      <TileLayer
-                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                      />
-                      <MapCenterController center={mapCenter} />
-                      {mapJobs.map((job) => {
-                        const lat = job.locationLat ?? 43.7;
-                        const lng = job.locationLng ?? -79.38;
-                        return (
-                          <Marker
-                            key={job.id}
-                            position={[lat, lng]}
-                            eventHandlers={{ click: () => setSelectedJobId(job.id) }}
-                          >
-                            <Popup>
-                              <div className="max-w-[220px]">
-                                <strong className="block text-sm">{job.title}</strong>
-                                <span className="mt-1 block text-xs text-muted-foreground">
-                                  {job.locationAddress ?? "Remote"}
-                                </span>
-                                <a
-                                  href={`/job/${job.id}`}
-                                  className="mt-2 inline-block text-xs text-primary"
-                                >
-                                  View details
-                                </a>
-                              </div>
-                            </Popup>
-                          </Marker>
-                        );
-                      })}
-                    </MapContainer>
+                      jobs={mapJobs}
+                      onSelectJob={setSelectedJobId}
+                    />
                     {selectedJob ? (
                       <div className="pointer-events-none absolute left-1/2 top-4 z-10 -translate-x-1/2 rounded-full border-2 border-white bg-[#ff4d7d] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-white shadow-lg">
                         {selectedJob.title}

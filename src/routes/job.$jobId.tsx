@@ -249,7 +249,7 @@ export default function JobDetails() {
     try {
       const params = new URLSearchParams({ limit: "50" });
       if (query.trim()) params.set("query", query.trim());
-      const response = await fetch(`/api/v1/v1/professionals?${params.toString()}`);
+      const response = await fetch(`/api/v1/professionals?${params.toString()}`);
       if (!response.ok) throw new Error();
       const data = (await response.json()) as ProfessionalDiscoveryResponse;
       setProfessionals(data.professionals);

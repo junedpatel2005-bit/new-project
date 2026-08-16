@@ -1,9 +1,12 @@
 "use client";
 
-import { Suspense, lazy } from "react";
+import { Suspense } from "react";
+import dynamic from "next/dynamic";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AppShell } from "@/components/AppShell";
-const ProfessionalDiscoveryMap = lazy(() => import("@/components/ProfessionalDiscoveryMap"));
+const ProfessionalDiscoveryMap = dynamic(() => import("@/components/ProfessionalDiscoveryMap"), {
+  ssr: false,
+});
 import { ProCard } from "@/components/ProCard";
 import Skeleton from "react-loading-skeleton";
 import type { MarketplaceCategory, MarketplaceProfessional } from "@/lib/types/marketplace";
@@ -106,7 +109,7 @@ function DiscoverContent() {
 
     async function loadProfessionals() {
       try {
-        const response = await fetch(`/api/v1/v1/professionals?${params.toString()}`, {
+        const response = await fetch(`/api/v1/professionals?${params.toString()}`, {
           signal: controller.signal,
         });
         if (!response.ok) throw new Error("Failed to load professionals");

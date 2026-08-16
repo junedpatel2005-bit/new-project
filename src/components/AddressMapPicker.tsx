@@ -30,7 +30,7 @@ export function AddressMapPicker({
     }
     const t = setTimeout(async () => {
       try {
-        const r = await fetch(`/api/v1/geocode?q=${encodeURIComponent(value)}`);
+        const r = await fetch(`/api/geocode?q=${encodeURIComponent(value)}`);
         const d = (await r.json()) as { results?: Result[]; error?: string };
         setResults(d.results ?? []);
         if (d.error) setStatus(d.error);
@@ -45,7 +45,7 @@ export function AddressMapPicker({
     onCoordinatesChange?.(lat, lon);
     setStatus("Finding address…");
     try {
-      const r = await fetch(`/api/v1/geocode?lat=${lat}&lon=${lon}`);
+      const r = await fetch(`/api/geocode?lat=${lat}&lon=${lon}`);
       const d = (await r.json()) as { results?: Result[]; error?: string };
       if (d.results?.[0]) onChange(d.results[0].address);
       else setStatus(d.error ?? "Address not found.");
