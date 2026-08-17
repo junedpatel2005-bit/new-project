@@ -5,28 +5,11 @@ import { useEffect, useState } from "react";
 import { ArrowRight, Briefcase, MapPin, Search, ShieldCheck, Users } from "lucide-react";
 import { ProCard } from "@/components/ProCard";
 import { Button } from "@/components/ui/button";
-import type { MarketplaceCategory, MarketplaceProfessional } from "@/lib/types/marketplace";
-
-type HomeJob = {
-  id: number;
-  title: string | null;
-  category: string | null;
-  description: string | null;
-  locationAddress: string | null;
-  budgetMin: number | null;
-  budgetMax: number | null;
-  hourlyRate: number | null;
-  timingType: "HOURLY" | string;
-  clientName: string;
-};
+import type { MarketplaceProfessional } from "@/lib/types/marketplace";
+import { sanitizeInlineHtml } from "@/lib/sanitizeInlineHtml";
 
 export default function Landing() {
-  const [data, setData] = useState<{
-    categories: MarketplaceCategory[];
-    professionals: MarketplaceProfessional[];
-    jobs: HomeJob[];
-    role: string | null;
-  } | null>(null);
+  const [professionals, setProfessionals] = useState<MarketplaceProfessional[]>([]);
   const [failed, setFailed] = useState(false);
   const [pageText, setPageText] = useState<Record<string, string>>({});
   const [cmsEdit, setCmsEdit] = useState(false);
@@ -38,7 +21,8 @@ export default function Landing() {
         suppressContentEditableWarning
         onClick={(event) => event.preventDefault()}
         onBlur={(event) => {
-          const value = event.currentTarget.textContent?.trim() || fallback;
+          const value = sanitizeInlineHtml(event.currentTarget.innerHTML);
+          if (!event.currentTarget.textContent?.trim()) return;
           setPageText((current) => ({ ...current, [key]: value }));
           window.parent.postMessage(
             { type: "servio-cms-text", key, value },
@@ -47,37 +31,17 @@ export default function Landing() {
         }}
         className="rounded outline-none ring-2 ring-indigo-400/50 focus:ring-indigo-500"
         title="Click and type to edit"
-      >
-        {text(key, fallback)}
-      </span>
+        dangerouslySetInnerHTML={{ __html: text(key, fallback) }}
+      />
     ) : (
-      text(key, fallback)
+      <span dangerouslySetInnerHTML={{ __html: text(key, fallback) }} />
     );
   useEffect(() => {
     async function loadHome() {
       try {
-        const userResponse = await fetch("/api/v1/auth/me");
-        const userData = userResponse.ok
-          ? ((await userResponse.json()) as { user?: { role?: string } | null })
-          : null;
-        const role = userData?.user?.role ?? null;
-        const [categories, professionals, jobsResponse] = await Promise.all([
-          fetch("/api/v1/marketplace/categories"),
-          fetch("/api/v1/marketplace/professionals"),
-          role === "PROFESSIONAL"
-            ? fetch("/api/v1/portal/professional-jobs")
-            : Promise.resolve(null),
-        ]);
-        if (!categories.ok || !professionals.ok) throw new Error("Marketplace request failed");
-        setData({
-          categories: (await categories.json()) as MarketplaceCategory[],
-          professionals: (await professionals.json()) as MarketplaceProfessional[],
-          jobs:
-            jobsResponse && jobsResponse.ok
-              ? ((await jobsResponse.json()) as { openJobs: HomeJob[] }).openJobs
-              : [],
-          role,
-        });
+        const response = await fetch("/api/v1/marketplace/professionals");
+        if (!response.ok) throw new Error("Marketplace request failed");
+        setProfessionals((await response.json()) as MarketplaceProfessional[]);
       } catch {
         setFailed(true);
       }
@@ -112,58 +76,30 @@ export default function Landing() {
           <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
             <p className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground">
               <ShieldCheck className="h-3.5 w-3.5 text-success" />
-              {data?.role === "PROFESSIONAL"
-                ? editableText("prof-badge", "Grow your professional business")
-                : editableText("badge", "Verified marketplace professionals")}
+              {editableText("badge", "Verified marketplace professionals")}
             </p>
             <h1 className="mt-5 max-w-3xl font-display text-4xl font-bold tracking-tight sm:text-5xl">
-              {data?.role === "PROFESSIONAL"
-                ? editableText("prof-heading", "Find projects that match your skills")
-                : editableText("heading", "Find trusted professionals for work that matters.")}
+              {editableText("heading", "Find trusted professionals for work that matters.")}
             </h1>
             <p className="mt-5 max-w-2xl text-lg text-muted-foreground">
-              {data?.role === "PROFESSIONAL"
-                ? editableText(
-                    "prof-description",
-                    "Browse available projects, bid on work, and build your reputation with satisfied clients worldwide.",
-                  )
-                : editableText(
-                    "description",
-                    "Post work, compare qualified professionals, and manage every project in one place.",
-                  )}
+              {editableText(
+                "description",
+                "Post work, compare qualified professionals, and manage every project in one place.",
+              )}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              {data?.role === "PROFESSIONAL" ? (
-                <>
-                  <Button asChild size="lg">
-                    <Link href="/professional/my-jobs?tab=find">
-                      <Search className="mr-2 h-4 w-4" />
-                      {editableText("prof-browse", "Find Projects")}
-                    </Link>
-                  </Button>
-                  <Button asChild size="lg" variant="outline">
-                    <Link href="/professional/dashboard">
-                      <Briefcase className="mr-2 h-4 w-4" />
-                      {editableText("prof-dashboard", "My Dashboard")}
-                    </Link>
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Button asChild size="lg">
-                    <Link href="/discover">
-                      <Search className="mr-2 h-4 w-4" />
-                      {editableText("browse", "Browse professionals")}
-                    </Link>
-                  </Button>
-                  <Button asChild size="lg" variant="outline">
-                    <Link href="/post-job">
-                      <Briefcase className="mr-2 h-4 w-4" />
-                      {editableText("post", "Post a job")}
-                    </Link>
-                  </Button>
-                </>
-              )}
+              <Button asChild size="lg">
+                <Link href="/discover">
+                  <Search className="mr-2 h-4 w-4" />
+                  {editableText("browse", "Browse professionals")}
+                </Link>
+              </Button>
+              <Button asChild size="lg" variant="outline">
+                <Link href="/post-job">
+                  <Briefcase className="mr-2 h-4 w-4" />
+                  {editableText("post", "Post a job")}
+                </Link>
+              </Button>
             </div>
           </div>
         </section>
@@ -187,60 +123,84 @@ export default function Landing() {
               <div className="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
                 <ShieldCheck className="h-6 w-6" />
               </div>
-              <h3 className="mt-4 font-display font-semibold">Verified Professionals</h3>
+              <h3 className="mt-4 font-display font-semibold">
+                {editableText("feature-1-title", "Verified Professionals")}
+              </h3>
               <p className="mt-2 text-sm text-muted-foreground">
-                All professionals are verified and vetted to ensure quality work and your peace of
-                mind.
+                {editableText(
+                  "feature-1-text",
+                  "All professionals are verified and vetted to ensure quality work and your peace of mind.",
+                )}
               </p>
             </div>
             <div className="rounded-2xl border border-border bg-card p-8 shadow-soft">
               <div className="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
                 <Briefcase className="h-6 w-6" />
               </div>
-              <h3 className="mt-4 font-display font-semibold">Project Management</h3>
+              <h3 className="mt-4 font-display font-semibold">
+                {editableText("feature-2-title", "Project Management")}
+              </h3>
               <p className="mt-2 text-sm text-muted-foreground">
-                Track progress, communicate in real-time, and manage all projects in one centralized
-                dashboard.
+                {editableText(
+                  "feature-2-text",
+                  "Track progress, communicate in real-time, and manage all projects in one centralized dashboard.",
+                )}
               </p>
             </div>
             <div className="rounded-2xl border border-border bg-card p-8 shadow-soft">
               <div className="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
                 <Users className="h-6 w-6" />
               </div>
-              <h3 className="mt-4 font-display font-semibold">Expert Matching</h3>
+              <h3 className="mt-4 font-display font-semibold">
+                {editableText("feature-3-title", "Expert Matching")}
+              </h3>
               <p className="mt-2 text-sm text-muted-foreground">
-                Get matched with professionals that best fit your project needs and budget
-                requirements.
+                {editableText(
+                  "feature-3-text",
+                  "Get matched with professionals that best fit your project needs and budget requirements.",
+                )}
               </p>
             </div>
             <div className="rounded-2xl border border-border bg-card p-8 shadow-soft">
               <div className="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
                 <MapPin className="h-6 w-6" />
               </div>
-              <h3 className="mt-4 font-display font-semibold">Local & Remote</h3>
+              <h3 className="mt-4 font-display font-semibold">
+                {editableText("feature-4-title", "Local & Remote")}
+              </h3>
               <p className="mt-2 text-sm text-muted-foreground">
-                Work with professionals near you or globally - choose what works best for your
-                project.
+                {editableText(
+                  "feature-4-text",
+                  "Work with professionals near you or globally - choose what works best for your project.",
+                )}
               </p>
             </div>
             <div className="rounded-2xl border border-border bg-card p-8 shadow-soft">
               <div className="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
                 <Search className="h-6 w-6" />
               </div>
-              <h3 className="mt-4 font-display font-semibold">Easy Discovery</h3>
+              <h3 className="mt-4 font-display font-semibold">
+                {editableText("feature-5-title", "Easy Discovery")}
+              </h3>
               <p className="mt-2 text-sm text-muted-foreground">
-                Browse portfolios, reviews, and rates to find the right fit. Make data-driven
-                decisions.
+                {editableText(
+                  "feature-5-text",
+                  "Browse portfolios, reviews, and rates to find the right fit. Make data-driven decisions.",
+                )}
               </p>
             </div>
             <div className="rounded-2xl border border-border bg-card p-8 shadow-soft">
               <div className="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
                 <ArrowRight className="h-6 w-6" />
               </div>
-              <h3 className="mt-4 font-display font-semibold">Seamless Growth</h3>
+              <h3 className="mt-4 font-display font-semibold">
+                {editableText("feature-6-title", "Seamless Growth")}
+              </h3>
               <p className="mt-2 text-sm text-muted-foreground">
-                Build long-term relationships with reliable partners and scale your business
-                together.
+                {editableText(
+                  "feature-6-text",
+                  "Build long-term relationships with reliable partners and scale your business together.",
+                )}
               </p>
             </div>
           </div>
@@ -250,80 +210,35 @@ export default function Landing() {
             <div className="flex items-end justify-between">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-primary">
-                  Featured
+                  {editableText("featured-eyebrow", "Featured")}
                 </p>
                 <h2 className="mt-2 font-display text-3xl font-bold">
-                  {data?.role === "PROFESSIONAL"
-                    ? "Jobs ready for you"
-                    : "Professionals ready to help"}
+                  {editableText("featured-heading", "Professionals ready to help")}
                 </h2>
               </div>
               <Link
                 className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
-                href={
-                  data?.role === "PROFESSIONAL" ? "/professional/my-jobs?tab=find" : "/discover"
-                }
+                href="/discover"
               >
-                {data?.role === "PROFESSIONAL" ? "Browse jobs" : "Browse all"}{" "}
-                <ArrowRight className="h-4 w-4" />
+                {editableText("featured-browse", "Browse all")} <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
-            {!data && !failed && (
+            {!professionals.length && !failed && (
               <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
                 {Array.from({ length: 4 }).map((_, index) => (
                   <div key={index} className="h-64 animate-pulse rounded-2xl bg-muted" />
                 ))}
               </div>
             )}
-            {data?.role === "PROFESSIONAL" ? (
-              <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                {data.jobs.slice(0, 4).map((job) => (
-                  <Link
-                    key={job.id}
-                    href={`/job/${job.id}`}
-                    className="flex min-h-64 flex-col rounded-2xl border border-border bg-card p-5 shadow-soft transition-all hover:-translate-y-1 hover:border-primary/30 hover:shadow-elevated"
-                  >
-                    <p className="text-xs font-semibold uppercase tracking-wider text-primary">
-                      {job.category ?? "General"}
-                    </p>
-                    <h3 className="mt-2 line-clamp-2 font-display text-lg font-semibold">
-                      {job.title ?? `Job #${job.id}`}
-                    </h3>
-                    <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
-                      {job.description}
-                    </p>
-                    <p className="mt-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground">
-                      <MapPin className="h-4 w-4" /> {job.locationAddress ?? "Remote"}
-                    </p>
-                    <div className="mt-auto flex items-end justify-between border-t border-border pt-4">
-                      <div>
-                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                          Budget
-                        </p>
-                        <p className="font-display text-xl font-bold">
-                          {job.timingType === "HOURLY"
-                            ? `$${job.hourlyRate ?? 0}/hr`
-                            : `$${job.budgetMin ?? 0} – $${job.budgetMax ?? 0}`}
-                        </p>
-                      </div>
-                      <span className="text-sm font-medium text-primary">View job</span>
-                    </div>
-                  </Link>
+            {professionals.length > 0 && (
+              <div
+                data-db-section="professionals"
+                className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4"
+              >
+                {professionals.slice(0, 4).map((professional) => (
+                  <ProCard key={professional.id} pro={professional} />
                 ))}
-                {!data.jobs.length && (
-                  <p className="col-span-full rounded-2xl border border-border bg-card p-6 text-sm text-muted-foreground">
-                    No open jobs are available right now.
-                  </p>
-                )}
               </div>
-            ) : (
-              data && (
-                <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                  {data.professionals.slice(0, 4).map((professional) => (
-                    <ProCard key={professional.id} pro={professional} />
-                  ))}
-                </div>
-              )
             )}
           </div>
         </section>

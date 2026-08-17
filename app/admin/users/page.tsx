@@ -6,6 +6,7 @@ import {
   CheckCircle2,
   DollarSign,
   Power,
+  Search,
   ShieldCheck,
   UserRound,
   UsersRound,
@@ -134,15 +135,27 @@ export default function AdminUsersPage() {
   const [message, setMessage] = useState("");
   const [activeGroup, setActiveGroup] = useState<"clients" | "professionals">("professionals");
   const [detail, setDetail] = useState<Detail | null>(null);
+  const [search, setSearch] = useState("");
   useEffect(() => {
     void fetch("/api/v1/admin/data/users", { cache: "no-store" })
       .then((response) => response.json())
       .then((data) => setUsers(data.users ?? []));
   }, []);
-  const clients = useMemo(() => users.filter((user) => user.role === "CLIENT"), [users]);
+  const query = search.trim().toLowerCase();
+  const filtered = useMemo(
+    () =>
+      users.filter(
+        (user) =>
+          !query ||
+          `${user.firstName} ${user.lastName}`.toLowerCase().includes(query) ||
+          user.email.toLowerCase().includes(query),
+      ),
+    [users, query],
+  );
+  const clients = useMemo(() => filtered.filter((user) => user.role === "CLIENT"), [filtered]);
   const professionals = useMemo(
-    () => users.filter((user) => user.role === "PROFESSIONAL"),
-    [users],
+    () => filtered.filter((user) => user.role === "PROFESSIONAL"),
+    [filtered],
   );
   const openUser = (user: User) => {
     setDetail(null);
@@ -177,7 +190,16 @@ export default function AdminUsersPage() {
         Manage Clients and Professionals independently. Deactivated accounts cannot use the
         platform.
       </p>
-      <div className="mt-6 grid gap-4 sm:grid-cols-2">
+      <div className="relative mt-6 max-w-sm">
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+        <input
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          placeholder="Search by name or email…"
+          className="h-11 w-full rounded-xl border border-white/10 bg-white/[.035] pl-10 pr-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-400/50"
+        />
+      </div>
+      <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <button
           onClick={() => setActiveGroup("clients")}
           className={`rounded-2xl border p-5 text-left transition ${activeGroup === "clients" ? "border-cyan-300 bg-cyan-400/10 ring-1 ring-cyan-300/40" : "border-cyan-400/15 bg-cyan-400/[.04] hover:bg-cyan-400/[.08]"}`}

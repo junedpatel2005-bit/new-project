@@ -79,6 +79,7 @@ export type MarketplaceCategory = {
   slug: string;
   description: string;
   iconName: string;
+  segment: string;
   professionalCount: number;
 };
 

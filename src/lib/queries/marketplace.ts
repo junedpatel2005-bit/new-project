@@ -175,7 +175,14 @@ function toDetailedProfessional(professional: {
 export async function listCategories(): Promise<MarketplaceCategory[]> {
   const [categories, professionals] = await Promise.all([
     db.serviceCategory.findMany({
-      select: { id: true, name: true, slug: true, description: true, iconName: true },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        description: true,
+        iconName: true,
+        segment: true,
+      },
       orderBy: { sortOrder: "asc" },
     }),
     db.user.groupBy({

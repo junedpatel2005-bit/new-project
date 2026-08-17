@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { DollarSign, MapPin, Search, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { MarketplaceCategory, MarketplaceJob } from "@/lib/types/marketplace";
+import { sanitizeInlineHtml } from "@/lib/sanitizeInlineHtml";
 
 function budget(job: MarketplaceJob) {
   if (job.timingType === "HOURLY")
@@ -19,15 +20,69 @@ const workModeOptions: [string, string][] = [
   ["BOTH", "Flexible"],
 ];
 
+const segmentTabs: [string, string][] = [
+  ["RESIDENTIAL", "Residential"],
+  ["COMMERCIAL", "Commercial"],
+  ["INDUSTRIAL", "Industrial"],
+];
+
 export default function Services() {
   const [jobs, setJobs] = useState<MarketplaceJob[]>([]);
   const [categories, setCategories] = useState<MarketplaceCategory[]>([]);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [query, setQuery] = useState("");
+  const [segment, setSegment] = useState("");
   const [category, setCategory] = useState("");
   const [workMode, setWorkMode] = useState("");
   const [urgency, setUrgency] = useState("");
   const [role, setRole] = useState<string | null>(null);
+  const [pageText, setPageText] = useState<Record<string, string>>({});
+  const [cmsEdit, setCmsEdit] = useState(false);
+
+  const text = (key: string, fallback: string) => pageText[key] || fallback;
+  const editableText = (key: string, fallback: string) =>
+    cmsEdit ? (
+      <span
+        contentEditable
+        suppressContentEditableWarning
+        onClick={(event) => event.preventDefault()}
+        onBlur={(event) => {
+          const value = sanitizeInlineHtml(event.currentTarget.innerHTML);
+          if (!event.currentTarget.textContent?.trim()) return;
+          setPageText((current) => ({ ...current, [key]: value }));
+          window.parent.postMessage(
+            { type: "servio-cms-text", key, value },
+            window.location.origin,
+          );
+        }}
+        className="rounded outline-none ring-2 ring-indigo-400/50 focus:ring-indigo-500"
+        title="Click and type to edit"
+        dangerouslySetInnerHTML={{ __html: text(key, fallback) }}
+      />
+    ) : (
+      <span dangerouslySetInnerHTML={{ __html: text(key, fallback) }} />
+    );
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const preview = params.get("cmsPreview") === "1";
+    setCmsEdit(params.get("cmsEdit") === "1");
+    if (preview) {
+      try {
+        setPageText(
+          JSON.parse(
+            window.sessionStorage.getItem("servio-home-preview:/services") ?? "{}",
+          ) as Record<string, string>,
+        );
+      } catch {
+        setPageText({});
+      }
+      return;
+    }
+    void fetch("/api/v1/website/page-text?path=/services")
+      .then((response) => (response.ok ? response.json() : null))
+      .then((result: { text?: Record<string, string> } | null) => setPageText(result?.text ?? {}));
+  }, []);
 
   useEffect(() => {
     void Promise.all([
@@ -51,6 +106,15 @@ export default function Services() {
       .catch(() => setRole(null));
   }, []);
 
+  const visibleCategories = useMemo(
+    () => categories.filter((item) => !segment || item.segment === segment),
+    [categories, segment],
+  );
+  const segmentCategoryNames = useMemo(
+    () => new Set(visibleCategories.map((item) => item.name)),
+    [visibleCategories],
+  );
+
   const visibleJobs = useMemo(() => {
     const text = query.trim().toLowerCase();
     return jobs.filter((job) => {
@@ -61,15 +125,22 @@ export default function Services() {
           .some((value) => String(value).toLowerCase().includes(text));
       return (
         matchesText &&
+        (!segment || !job.category || segmentCategoryNames.has(job.category)) &&
         (!category || job.category === category) &&
         (!workMode || job.workMode === workMode) &&
         (!urgency || job.urgency === urgency)
       );
     });
-  }, [jobs, query, category, workMode, urgency]);
+  }, [jobs, query, segment, segmentCategoryNames, category, workMode, urgency]);
+
+  const selectSegment = (value: string) => {
+    setSegment((current) => (current === value ? "" : value));
+    setCategory("");
+  };
 
   const clearFilters = () => {
     setQuery("");
+    setSegment("");
     setCategory("");
     setWorkMode("");
     setUrgency("");
@@ -79,16 +150,19 @@ export default function Services() {
     <div className="min-h-screen bg-background">
       <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <p className="text-xs font-semibold uppercase tracking-wider text-primary">
-          Marketplace jobs
+          {editableText("eyebrow", "Marketplace jobs")}
         </p>
         <h1 className="mt-2 font-display text-3xl font-bold tracking-tight md:text-4xl">
-          Browse client jobs
+          {editableText("heading", "Browse client jobs")}
         </h1>
         <p className="mt-2 text-muted-foreground">
-          Explore open work posted by clients and find the right service category for you.
+          {editableText(
+            "description",
+            "Explore open work posted by clients and find the right service category for you.",
+          )}
         </p>
 
-        <div className="mt-8 grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
+        <div className="mt-6 grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
           <aside className="h-fit rounded-2xl border border-border bg-card p-5 shadow-soft lg:sticky lg:top-24">
             <div className="flex items-center justify-between">
               <h2 className="font-semibold">Filters</h2>
@@ -101,6 +175,28 @@ export default function Services() {
               </button>
             </div>
             <div className="mt-5 space-y-6">
+              <div
+                role="tablist"
+                aria-label="Service category"
+                className="grid grid-cols-3 gap-1 rounded-full border border-border bg-background p-1"
+              >
+                {segmentTabs.map(([value, label]) => (
+                  <button
+                    key={value}
+                    type="button"
+                    role="tab"
+                    aria-selected={segment === value}
+                    onClick={() => selectSegment(value)}
+                    className={`truncate rounded-full px-1.5 py-1.5 text-[11px] font-semibold transition sm:text-xs ${
+                      segment === value
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
               <label className="block">
                 <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   Search
@@ -130,7 +226,7 @@ export default function Services() {
                     />
                     All categories
                   </label>
-                  {categories.map((item) => (
+                  {visibleCategories.map((item) => (
                     <label key={item.id} className="flex cursor-pointer items-center gap-2 text-sm">
                       <input
                         type="radio"
@@ -219,7 +315,7 @@ export default function Services() {
               </p>
             )}
             {status === "ready" && visibleJobs.length > 0 && (
-              <div className="grid gap-4 md:grid-cols-2">
+              <div data-db-section="jobs" className="grid gap-4 md:grid-cols-2">
                 {visibleJobs.map((job) => (
                   <Link
                     key={job.id}

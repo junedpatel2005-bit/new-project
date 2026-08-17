@@ -29,6 +29,154 @@ body:has(.cms-live-editable) button {
   cursor: text;
 }
 
+/* Floating Bold/Italic/Underline toolbar shown above the current text selection. */
+.cms-format-toolbar {
+  position: absolute;
+  z-index: 9999;
+  gap: 2px;
+  padding: 4px;
+  border-radius: 8px;
+  background: #11182b;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.cms-format-btn {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 5px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  background: transparent;
+}
+
+.cms-format-btn-italic {
+  font-style: italic;
+}
+
+.cms-format-btn-underline {
+  text-decoration: underline;
+}
+
+.cms-format-btn:hover,
+.cms-format-btn.active {
+  background: color-mix(in srgb, var(--color-primary) 55%, transparent);
+}
+
+/* Admin panel light theme: overrides the fixed dark palette by matching the same
+   hardcoded Tailwind utility classes used throughout the admin pages/components. */
+[data-admin-theme="light"] [class*="text-white"] {
+  color: #0f172a;
+}
+[data-admin-theme="light"] [class*="text-slate-100"] {
+  color: #0f172a;
+}
+[data-admin-theme="light"] [class*="text-slate-200"] {
+  color: #1e293b;
+}
+[data-admin-theme="light"] [class*="text-slate-300"] {
+  color: #334155;
+}
+[data-admin-theme="light"] [class*="text-slate-400"] {
+  color: #64748b;
+}
+[data-admin-theme="light"] [class*="text-slate-500"] {
+  color: #64748b;
+}
+[data-admin-theme="light"] [class*="text-slate-600"] {
+  color: #475569;
+}
+
+[data-admin-theme="light"] [class*="bg-[#0b1020]"] {
+  background-color: #eef1f7;
+}
+[data-admin-theme="light"] [class*="bg-[#11182b]"] {
+  background-color: #ffffff;
+}
+[data-admin-theme="light"] [class*="bg-[#10182b]"] {
+  background-color: #ffffff;
+}
+[data-admin-theme="light"] [class*="bg-[#060913]"] {
+  background-color: #f8fafc;
+}
+[data-admin-theme="light"] [class*="bg-[#070b16]"] {
+  background-color: #f1f5f9;
+}
+[data-admin-theme="light"] [class*="bg-white/["] {
+  background-color: #ffffff;
+}
+[data-admin-theme="light"] [class*="bg-white/5"] {
+  background-color: #f8fafc;
+}
+[data-admin-theme="light"] [class*="bg-white/10"] {
+  background-color: #f1f5f9;
+}
+[data-admin-theme="light"] [class*="bg-white/20"] {
+  background-color: #e2e8f0;
+}
+
+[data-admin-theme="light"] [class*="border-white/1"] {
+  border-color: rgba(15, 23, 42, 0.12);
+}
+[data-admin-theme="light"] [class*="border-white/2"] {
+  border-color: rgba(15, 23, 42, 0.18);
+}
+[data-admin-theme="light"] [class*="divide-white/10"] > :not([hidden]) ~ :not([hidden]) {
+  border-color: rgba(15, 23, 42, 0.12);
+}
+
+[data-admin-theme="light"] [class*="text-indigo-"] {
+  color: #4338ca;
+}
+[data-admin-theme="light"] [class*="text-emerald-"] {
+  color: #047857;
+}
+[data-admin-theme="light"] [class*="text-amber-"] {
+  color: #b45309;
+}
+[data-admin-theme="light"] [class*="text-rose-"] {
+  color: #be123c;
+}
+[data-admin-theme="light"] [class*="text-cyan-"] {
+  color: #0e7490;
+}
+[data-admin-theme="light"] [class*="text-sky-"] {
+  color: #0369a1;
+}
+[data-admin-theme="light"] [class*="text-blue-"] {
+  color: #1d4ed8;
+}
+
+/* Database-driven sections in the CMS canvas: greyed out and non-editable. */
+.cms-db-section {
+  opacity: 0.72;
+  cursor: not-allowed;
+  user-select: none;
+}
+
+.cms-db-section-banner {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  margin-bottom: 12px;
+  border: 1px dashed color-mix(in srgb, var(--color-muted-foreground) 55%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--color-muted) 60%, transparent);
+  color: var(--color-muted-foreground);
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+
+.cms-db-section a,
+.cms-db-section button {
+  pointer-events: none;
+}
+
 .admin-job-details-scroll {
   scrollbar-color: #64748b #11182b;
   scrollbar-width: thin;

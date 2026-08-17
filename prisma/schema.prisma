@@ -88,14 +88,20 @@ model LegalPage {
 }
 
 model ServiceCategory {
-  id          Int      @id @default(autoincrement())
-  name        String   @unique
-  slug        String   @unique
-  description String   @default("")
-  iconName    String   @default("")
-  sortOrder   Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @default(now())
+  id          Int              @id @default(autoincrement())
+  name        String           @unique
+  slug        String           @unique
+  description String           @default("")
+  iconName    String           @default("")
+  segment     String           @default("RESIDENTIAL")
+  sortOrder   Int              @default(0)
+  parentId    Int?
+  parent      ServiceCategory? @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children    ServiceCategory[] @relation("CategoryHierarchy")
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @default(now())
+
+  @@index([parentId])
 }
 
 model User {

@@ -4,6 +4,7 @@ import { sessionCookie, verifySession } from "@/lib/auth";
 
 const publicPages = [
   { title: "Home", slug: "", pageKey: "home" },
+  { title: "Home (Professional)", slug: "professional-home", pageKey: "professional-home" },
   { title: "About", slug: "about", pageKey: "about" },
   { title: "How It Works", slug: "how-it-works", pageKey: "how-it-works" },
   { title: "Services", slug: "services", pageKey: "services" },

@@ -54,46 +54,21 @@ const stepsPro = [
 export default function HowItWorks() {
   return (
     <div className="min-h-screen bg-background">
-      <Hero />
-      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-        <p className="text-xs font-semibold uppercase tracking-wider text-primary">For clients</p>
-        <h2 className="font-display mt-2 text-3xl font-bold tracking-tight md:text-4xl">
-          Get great work done — in 4 steps
-        </h2>
-        <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {stepsClient.map((s, i) => (
-            <div
-              key={s.title}
-              className="relative rounded-2xl border border-border bg-card p-6 shadow-soft"
-            >
-              <span className="font-display text-5xl font-bold text-primary/15">0{i + 1}</span>
-              <div className="mt-2 grid h-11 w-11 place-items-center rounded-xl bg-primary/10 text-primary">
-                <s.icon className="h-5 w-5" />
-              </div>
-              <h3 className="font-display mt-4 text-lg font-semibold">{s.title}</h3>
-              <p className="mt-2 text-sm text-muted-foreground">{s.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-      <section className="bg-surface">
-        <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-          <p className="text-xs font-semibold uppercase tracking-wider text-cta">
-            For professionals
-          </p>
+      <main>
+        <Hero />
+        <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+          <p className="text-xs font-semibold uppercase tracking-wider text-primary">For clients</p>
           <h2 className="font-display mt-2 text-3xl font-bold tracking-tight md:text-4xl">
-            Earn more, with less hassle
+            Get great work done — in 4 steps
           </h2>
-          <div className="mt-10 grid gap-6 md:grid-cols-3">
-            {stepsPro.map((s, i) => (
+          <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {stepsClient.map((s, i) => (
               <div
                 key={s.title}
-                className="rounded-2xl border border-border bg-card p-7 shadow-soft"
+                className="relative rounded-2xl border border-border bg-card p-6 shadow-soft"
               >
-                <span className="rounded-full bg-cta/10 px-2.5 py-0.5 text-xs font-bold text-cta">
-                  Step {i + 1}
-                </span>
-                <div className="mt-3 grid h-11 w-11 place-items-center rounded-xl bg-cta/10 text-cta">
+                <span className="font-display text-5xl font-bold text-primary/15">0{i + 1}</span>
+                <div className="mt-2 grid h-11 w-11 place-items-center rounded-xl bg-primary/10 text-primary">
                   <s.icon className="h-5 w-5" />
                 </div>
                 <h3 className="font-display mt-4 text-lg font-semibold">{s.title}</h3>
@@ -101,9 +76,36 @@ export default function HowItWorks() {
               </div>
             ))}
           </div>
-        </div>
-      </section>
-      <CTABand />
+        </section>
+        <section className="bg-surface">
+          <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+            <p className="text-xs font-semibold uppercase tracking-wider text-cta">
+              For professionals
+            </p>
+            <h2 className="font-display mt-2 text-3xl font-bold tracking-tight md:text-4xl">
+              Earn more, with less hassle
+            </h2>
+            <div className="mt-10 grid gap-6 md:grid-cols-3">
+              {stepsPro.map((s, i) => (
+                <div
+                  key={s.title}
+                  className="rounded-2xl border border-border bg-card p-7 shadow-soft"
+                >
+                  <span className="rounded-full bg-cta/10 px-2.5 py-0.5 text-xs font-bold text-cta">
+                    Step {i + 1}
+                  </span>
+                  <div className="mt-3 grid h-11 w-11 place-items-center rounded-xl bg-cta/10 text-cta">
+                    <s.icon className="h-5 w-5" />
+                  </div>
+                  <h3 className="font-display mt-4 text-lg font-semibold">{s.title}</h3>
+                  <p className="mt-2 text-sm text-muted-foreground">{s.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+        <CTABand />
+      </main>
     </div>
   );
 }
@@ -114,7 +116,7 @@ function Hero() {
       <div className="mx-auto max-w-7xl px-4 py-20 text-center sm:px-6 lg:px-8">
         <p className="text-xs font-semibold uppercase tracking-wider text-primary">How it works</p>
         <h1 className="font-display mx-auto mt-3 max-w-3xl text-4xl font-bold tracking-tight md:text-6xl">
-          A simpler way to <span className="text-primary">hire & get hired</span>
+          A simpler way to hire & get hired
         </h1>
         <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
           Servio handles the busywork — discovery, vetting, payments, and tracking — so you can

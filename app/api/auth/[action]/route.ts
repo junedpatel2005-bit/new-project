@@ -145,7 +145,7 @@ export async function GET(
         user.role === "CLIENT"
           ? "/client-profile"
           : user.role === "PROFESSIONAL"
-            ? "/professional/setup"
+            ? "/professional-home"
             : "/admin";
       const response = NextResponse.redirect(new URL(redirect, request.url));
       response.cookies.set(
@@ -366,7 +366,7 @@ export async function POST(
             ? user.professionalCategory &&
               user.professionalLatitude !== null &&
               user.professionalLongitude !== null
-              ? "/professional/dashboard"
+              ? "/professional-home"
               : "/professional/setup"
             : "/dashboard";
 
@@ -389,7 +389,7 @@ export async function POST(
                   user.role === "PROFESSIONAL"
                     ? "Your profile is ready. Update your setup and start getting matched with clients."
                     : "Your account is ready. Start exploring professionals or post your first project.",
-                href: user.role === "PROFESSIONAL" ? "/professional/dashboard" : "/dashboard",
+                href: user.role === "PROFESSIONAL" ? "/professional-home" : "/dashboard",
               },
             }),
           ]
@@ -548,7 +548,7 @@ export async function POST(
       ]);
       return NextResponse.json({
         success: true,
-        redirect: session.role === "CLIENT" ? "/client-profile" : "/professional/setup",
+        redirect: session.role === "CLIENT" ? "/client-profile" : "/professional-home",
       });
     } catch {
       return safe("Unable to verify your email.", 500);

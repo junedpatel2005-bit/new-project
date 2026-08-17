@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Check, Eye, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const defaults = {
+const clientDefaults = {
   badge: "Verified marketplace professionals",
   heading: "Find trusted professionals for work that matters.",
   description: "Post work, compare qualified professionals, and manage every project in one place.",
@@ -12,15 +12,68 @@ const defaults = {
   post: "Post a job",
   eyebrow: "Live marketplace",
   services: "Featured services",
+  "why-eyebrow": "Why Choose Us",
+  "why-heading": "Everything you need to succeed",
+  "why-description":
+    "A complete platform built for seamless collaboration between professionals and clients",
+  "feature-1-title": "Verified Professionals",
+  "feature-1-text":
+    "All professionals are verified and vetted to ensure quality work and your peace of mind.",
+  "feature-2-title": "Project Management",
+  "feature-2-text":
+    "Track progress, communicate in real-time, and manage all projects in one centralized dashboard.",
+  "feature-3-title": "Expert Matching",
+  "feature-3-text":
+    "Get matched with professionals that best fit your project needs and budget requirements.",
+  "feature-4-title": "Local & Remote",
+  "feature-4-text":
+    "Work with professionals near you or globally - choose what works best for your project.",
+  "feature-5-title": "Easy Discovery",
+  "feature-5-text":
+    "Browse portfolios, reviews, and rates to find the right fit. Make data-driven decisions.",
+  "feature-6-title": "Seamless Growth",
+  "feature-6-text":
+    "Build long-term relationships with reliable partners and scale your business together.",
 };
 
-export function HomeVisualEditor() {
+const professionalDefaults = {
+  "prof-badge": "Grow your professional business",
+  "prof-heading": "Find projects that match your skills",
+  "prof-description":
+    "Browse available projects, bid on work, and build your reputation with satisfied clients worldwide.",
+  "prof-browse": "Find Projects",
+  "prof-dashboard": "My Dashboard",
+  "prof-why-eyebrow": "Why Professionals Choose Us",
+  "prof-why-heading": "Everything you need to grow",
+  "prof-why-description":
+    "Find quality projects, get paid safely, and build a reputation clients trust.",
+  "prof-featured-eyebrow": "Featured",
+  "prof-featured-heading": "Jobs ready for you",
+  "prof-browse-all": "Browse all",
+};
+
+const servicesDefaults = {
+  eyebrow: "Marketplace jobs",
+  heading: "Browse client jobs",
+  description: "Explore open work posted by clients and find the right service category for you.",
+};
+
+export function HomeVisualEditor({ path = "/" }: { path?: string }) {
+  const isProHome = path === "/professional-home";
+  const isServices = path === "/services";
+  const defaults = isProHome
+    ? professionalDefaults
+    : isServices
+      ? servicesDefaults
+      : clientDefaults;
   const [text, setText] = useState(defaults);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [previewVersion, setPreviewVersion] = useState(0);
+  const previewKey = `servio-home-preview:${path}`;
+  const liveKey = `servio-cms-live-preview:${path}`;
   useEffect(() => {
-    void fetch("/api/v1/website/page-text?path=/")
+    void fetch(`/api/v1/website/page-text?path=${encodeURIComponent(path)}`)
       .then((response) => (response.ok ? response.json() : null))
       .then((data: { text?: Record<string, string> } | null) => {
         if (!data?.text) return;
@@ -29,10 +82,10 @@ export function HomeVisualEditor() {
         );
         setText((current) => ({ ...current, ...nonEmpty }));
       });
-  }, []);
+  }, [path]);
   useEffect(() => {
-    window.sessionStorage.setItem("servio-home-preview", JSON.stringify(text));
-  }, [text]);
+    window.sessionStorage.setItem(previewKey, JSON.stringify(text));
+  }, [text, previewKey]);
   useEffect(() => {
     const receiveChange = (event: MessageEvent) => {
       if (
@@ -41,11 +94,9 @@ export function HomeVisualEditor() {
       )
         return;
       if (event.data?.type === "servio-cms-any-text") {
-        const current = JSON.parse(
-          window.sessionStorage.getItem("servio-cms-live-preview:/") ?? "{}",
-        );
+        const current = JSON.parse(window.sessionStorage.getItem(liveKey) ?? "{}");
         current[event.data.key] = event.data.value;
-        window.sessionStorage.setItem("servio-cms-live-preview:/", JSON.stringify(current));
+        window.sessionStorage.setItem(liveKey, JSON.stringify(current));
         return;
       }
       const key = event.data.key as keyof typeof defaults;
@@ -54,12 +105,12 @@ export function HomeVisualEditor() {
     };
     window.addEventListener("message", receiveChange);
     return () => window.removeEventListener("message", receiveChange);
-  }, []);
+  }, [defaults, liveKey]);
   const save = async () => {
     setSaving(true);
     setMessage("");
     try {
-      const live = JSON.parse(window.sessionStorage.getItem("servio-cms-live-preview:/") ?? "{}");
+      const live = JSON.parse(window.sessionStorage.getItem(liveKey) ?? "{}");
       const merged: Record<string, string> = { ...text, ...live };
       const cleaned = Object.fromEntries(
         Object.entries(merged).filter(
@@ -69,7 +120,7 @@ export function HomeVisualEditor() {
       const response = await fetch("/api/v1/admin/cms/visual", {
         method: "PUT",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ path: "/", text: cleaned }),
+        body: JSON.stringify({ path, text: cleaned }),
       });
       const data = await response.json().catch(() => ({}));
       setMessage(
@@ -84,16 +135,20 @@ export function HomeVisualEditor() {
     }
   };
   const preview = () => {
-    window.sessionStorage.setItem("servio-home-preview", JSON.stringify(text));
-    window.open("/?cmsPreview=1", "_blank");
+    window.sessionStorage.setItem(previewKey, JSON.stringify(text));
+    window.open(`${path}?cmsPreview=1`, "_blank");
   };
   return (
     <section className="overflow-hidden rounded-2xl border border-white/10 bg-[#11182b] shadow-2xl">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-4 py-3 text-white">
         <div>
-          <p className="text-sm font-semibold">Homepage — editing canvas</p>
+          <p className="text-sm font-semibold">
+            {isProHome ? "Professional homepage" : isServices ? "Services page" : "Homepage"} —
+            editing canvas
+          </p>
           <p className="text-xs text-slate-400">
             Links, hire buttons, and cards are disabled here. Edit text only, preview, then upload.
+            Database sections (job/pro cards) are not editable.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -132,8 +187,8 @@ export function HomeVisualEditor() {
       <iframe
         key={previewVersion}
         className="h-[calc(100vh-160px)] min-h-[760px] w-full bg-white"
-        src="/?cmsPreview=1&cmsEdit=1"
-        title="Complete editable homepage"
+        src={`${path}?cmsPreview=1&cmsEdit=1`}
+        title={`${isProHome ? "Professional homepage" : isServices ? "Services page" : "Complete editable homepage"}`}
       />
       {message && <p className="px-4 py-3 text-sm text-emerald-400">{message}</p>}
     </section>

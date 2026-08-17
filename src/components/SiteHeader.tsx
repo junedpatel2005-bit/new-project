@@ -28,7 +28,13 @@ export function SiteHeader() {
       .then((data: { user?: { role: string } } | null) => setUser(data?.user ?? null))
       .catch(() => setUser(null));
   }, []);
-  const dashboardHref = user?.role === "ADMIN" ? "/admin" : "/dashboard";
+  const homeHref = user?.role === "PROFESSIONAL" ? "/professional-home" : "/";
+  const dashboardHref =
+    user?.role === "ADMIN"
+      ? "/admin"
+      : user?.role === "PROFESSIONAL"
+        ? "/professional/dashboard"
+        : "/dashboard";
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/85 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -38,12 +44,12 @@ export function SiteHeader() {
             {links.map((l) => {
               const active =
                 l.to === "/"
-                  ? pathname === "/"
+                  ? pathname === homeHref
                   : pathname === l.to || pathname.startsWith(`${l.to}/`);
               return (
                 <Link
                   key={l.to}
-                  href={l.to}
+                  href={l.to === "/" ? homeHref : l.to}
                   aria-current={active ? "page" : undefined}
                   className={`relative px-1 py-2 text-sm transition-colors after:absolute after:inset-x-1 after:bottom-0 after:h-0.5 after:rounded-full after:transition-transform ${active ? "font-semibold text-primary after:scale-x-100 after:bg-primary" : "text-muted-foreground after:scale-x-0 hover:text-foreground hover:after:scale-x-100 hover:after:bg-primary/40"}`}
                 >
@@ -93,12 +99,12 @@ export function SiteHeader() {
             {links.map((l) => {
               const active =
                 l.to === "/"
-                  ? pathname === "/"
+                  ? pathname === homeHref
                   : pathname === l.to || pathname.startsWith(`${l.to}/`);
               return (
                 <Link
                   key={l.to}
-                  href={l.to}
+                  href={l.to === "/" ? homeHref : l.to}
                   aria-current={active ? "page" : undefined}
                   className={`rounded-md px-3 py-2 text-sm ${active ? "bg-primary/10 font-semibold text-primary" : "text-foreground hover:bg-muted"}`}
                   onClick={() => setOpen(false)}

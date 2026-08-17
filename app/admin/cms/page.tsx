@@ -65,16 +65,21 @@ export default function CmsPage() {
   }
   const url = selected ? `/${selected.slug.replace(/^\//, "")}` : "/";
   const isHome = selected?.slug === "" || selected?.slug === "/";
+  const isProHome = selected?.slug === "professional-home";
+  const isServices = selected?.slug === "services";
+  const editorLabel = isHome
+    ? "Edit the client homepage layout directly. Click text in the page to change it."
+    : isProHome
+      ? "Edit the professional homepage layout directly. Click text in the page to change it. Job cards are live database data and cannot be edited."
+      : isServices
+        ? "Edit the services page header text. Job cards are live database data and cannot be edited."
+        : "Edit content with CKEditor and preview the actual website page using its original CSS.";
 
   return (
     <div>
       <p className="text-xs font-bold uppercase tracking-[.2em] text-indigo-400">Admin module</p>
       <h1 className="mt-2 font-display text-3xl font-bold">Website CMS</h1>
-      <p className="mt-2 text-slate-400">
-        {isHome
-          ? "Edit the real homepage layout directly. Click text in the page to change it."
-          : "Edit content with CKEditor and preview the actual website page using its original CSS."}
-      </p>
+      <p className="mt-2 text-slate-400">{editorLabel}</p>
       {selected && (
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <span
@@ -116,8 +121,10 @@ export default function CmsPage() {
           ))}
         </aside>
         <div>
-          {isHome ? (
-            <HomeVisualEditor />
+          {isHome || isProHome || isServices ? (
+            <HomeVisualEditor
+              path={isProHome ? "/professional-home" : isServices ? "/services" : "/"}
+            />
           ) : (
             <VisualPageEditor path={url} title={selected?.title ?? "Website page"} />
           )}

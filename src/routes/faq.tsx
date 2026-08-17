@@ -61,47 +61,51 @@ const groups = [
 export default function FAQ() {
   return (
     <div className="min-h-screen bg-background">
-      <section className="gradient-hero">
-        <div className="mx-auto max-w-3xl px-4 py-20 text-center sm:px-6 lg:px-8">
-          <p className="text-xs font-semibold uppercase tracking-wider text-primary">Help center</p>
-          <h1 className="font-display mt-3 text-4xl font-bold tracking-tight md:text-5xl">
-            Frequently asked questions
-          </h1>
-          <p className="mt-4 text-muted-foreground">
-            Can't find what you're looking for? Our team is one click away.
-          </p>
-        </div>
-      </section>
-      <section className="mx-auto max-w-3xl px-4 pb-20 sm:px-6 lg:px-8">
-        {groups.map((g) => (
-          <div key={g.title} className="mt-10">
-            <h2 className="font-display text-xl font-semibold">{g.title}</h2>
-            <Accordion
-              type="single"
-              collapsible
-              className="mt-4 rounded-2xl border border-border bg-card shadow-soft"
-            >
-              {g.items.map((it, i) => (
-                <AccordionItem key={i} value={`${g.title}-${i}`} className="px-5">
-                  <AccordionTrigger className="text-left font-medium">{it.q}</AccordionTrigger>
-                  <AccordionContent className="text-sm text-muted-foreground">
-                    {it.a}
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
+      <main>
+        <section className="gradient-hero">
+          <div className="mx-auto max-w-3xl px-4 py-20 text-center sm:px-6 lg:px-8">
+            <p className="text-xs font-semibold uppercase tracking-wider text-primary">
+              Help center
+            </p>
+            <h1 className="font-display mt-3 text-4xl font-bold tracking-tight md:text-5xl">
+              Frequently asked questions
+            </h1>
+            <p className="mt-4 text-muted-foreground">
+              Can't find what you're looking for? Our team is one click away.
+            </p>
           </div>
-        ))}
-        <div className="mt-12 rounded-2xl border border-border bg-card p-8 text-center shadow-soft">
-          <h3 className="font-display text-2xl font-semibold">Still have questions?</h3>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Our support team replies in under an hour.
-          </p>
-          <Button asChild size="lg" className="mt-5 bg-cta text-cta-foreground hover:bg-cta/90">
-            <Link href="/">Contact support</Link>
-          </Button>
-        </div>
-      </section>
+        </section>
+        <section className="mx-auto max-w-3xl px-4 pb-20 sm:px-6 lg:px-8">
+          {groups.map((g) => (
+            <div key={g.title} className="mt-10">
+              <h2 className="font-display text-xl font-semibold">{g.title}</h2>
+              <Accordion
+                type="single"
+                collapsible
+                className="mt-4 rounded-2xl border border-border bg-card shadow-soft"
+              >
+                {g.items.map((it, i) => (
+                  <AccordionItem key={i} value={`${g.title}-${i}`} className="px-5">
+                    <AccordionTrigger className="text-left font-medium">{it.q}</AccordionTrigger>
+                    <AccordionContent className="text-sm text-muted-foreground">
+                      {it.a}
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            </div>
+          ))}
+          <div className="mt-12 rounded-2xl border border-border bg-card p-8 text-center shadow-soft">
+            <h3 className="font-display text-2xl font-semibold">Still have questions?</h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Our support team replies in under an hour.
+            </p>
+            <Button asChild size="lg" className="mt-5 bg-cta text-cta-foreground hover:bg-cta/90">
+              <Link href="/">Contact support</Link>
+            </Button>
+          </div>
+        </section>
+      </main>
     </div>
   );
 }
