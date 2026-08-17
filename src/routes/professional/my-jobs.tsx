@@ -176,14 +176,14 @@ function ProfessionalJobsContent() {
   return (
     <div>
       <div className="mb-6 flex items-end justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Find jobs</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {visibleJobs.length} jobs available
-              {jobs.length ? ` across ${jobs.length} listings` : ""}
-            </p>
-          </div>
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Find jobs</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {visibleJobs.length} jobs available
+            {jobs.length ? ` across ${jobs.length} listings` : ""}
+          </p>
         </div>
+      </div>
 
       <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
         <aside className="h-fit rounded-2xl border border-border bg-card p-5 lg:sticky lg:top-20">

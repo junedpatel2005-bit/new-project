@@ -142,116 +142,100 @@ export default function Verification() {
   return (
     <div className="space-y-7">
       <section className="relative overflow-hidden rounded-3xl bg-[linear-gradient(120deg,var(--color-ink),var(--color-primary))] px-6 py-7 text-white shadow-card sm:px-8">
-          <div className="absolute -right-8 -top-20 h-60 w-60 rounded-full bg-cta/25 blur-3xl" />
-          <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/65">
-                Professional verification
-              </p>
-              <h1 className="mt-3 font-display text-3xl font-bold">
-                Build trust before the first job.
-              </h1>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-white/75">
-                Submit your documents securely. Our team reviews your details and adds your verified
-                badge when approved.
-              </p>
-            </div>
-            <div className="rounded-2xl border border-white/15 bg-white/10 px-5 py-4 backdrop-blur">
-              <p className="text-xs font-semibold uppercase tracking-wide text-white/65">
-                Verification status
-              </p>
-              <p className="mt-1 text-lg font-bold">{status.replaceAll("_", " ")}</p>
-            </div>
+        <div className="absolute -right-8 -top-20 h-60 w-60 rounded-full bg-cta/25 blur-3xl" />
+        <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/65">
+              Professional verification
+            </p>
+            <h1 className="mt-3 font-display text-3xl font-bold">
+              Build trust before the first job.
+            </h1>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-white/75">
+              Submit your documents securely. Our team reviews your details and adds your verified
+              badge when approved.
+            </p>
           </div>
-        </section>
-        {loading ? (
-          <AppSkeleton>
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="h-52 rounded-2xl bg-muted" />
-              <div className="h-52 rounded-2xl bg-muted" />
+          <div className="rounded-2xl border border-white/15 bg-white/10 px-5 py-4 backdrop-blur">
+            <p className="text-xs font-semibold uppercase tracking-wide text-white/65">
+              Verification status
+            </p>
+            <p className="mt-1 text-lg font-bold">{status.replaceAll("_", " ")}</p>
+          </div>
+        </div>
+      </section>
+      {loading ? (
+        <AppSkeleton>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="h-52 rounded-2xl bg-muted" />
+            <div className="h-52 rounded-2xl bg-muted" />
+          </div>
+        </AppSkeleton>
+      ) : (
+        <>
+          <section className="rounded-2xl border border-border bg-card p-5 shadow-soft">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="font-display text-xl font-semibold">Verification progress</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {uploaded} of {items.length} verification items added. Government ID is required.
+                </p>
+              </div>
+              <span className="text-2xl font-bold text-primary">{completion}%</span>
             </div>
-          </AppSkeleton>
-        ) : (
-          <>
-            <section className="rounded-2xl border border-border bg-card p-5 shadow-soft">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <h2 className="font-display text-xl font-semibold">Verification progress</h2>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {uploaded} of {items.length} verification items added. Government ID is
-                    required.
-                  </p>
-                </div>
-                <span className="text-2xl font-bold text-primary">{completion}%</span>
-              </div>
-              <div className="mt-4 h-2.5 overflow-hidden rounded-full bg-muted">
-                <div
-                  className="h-full rounded-full bg-[linear-gradient(90deg,var(--color-primary),var(--color-cta))] transition-all"
-                  style={{ width: `${completion}%` }}
-                />
-              </div>
-            </section>
-            <section className="grid gap-4 md:grid-cols-2">
-              {items.map((item) => {
-                const value = values[item.field];
-                const Icon = item.icon;
-                const review = reviews.find((entry) => entry.documentKey === item.field);
-                return (
-                  <article
-                    key={item.field}
-                    className="rounded-2xl border border-border bg-card p-5 shadow-soft"
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className="grid h-11 w-11 place-items-center rounded-xl bg-primary/10 text-primary">
-                        <Icon className="h-5 w-5" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <h2 className="font-semibold">{item.title}</h2>
-                          {item.required && (
-                            <span className="rounded-full bg-cta/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-cta">
-                              Required
-                            </span>
-                          )}
-                          {review && (
-                            <span
-                              className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${review.status === "APPROVED" ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}
-                            >
-                              {review.status}
-                            </span>
-                          )}
-                        </div>
-                        <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                          {item.description}
-                        </p>
-                      </div>
+            <div className="mt-4 h-2.5 overflow-hidden rounded-full bg-muted">
+              <div
+                className="h-full rounded-full bg-[linear-gradient(90deg,var(--color-primary),var(--color-cta))] transition-all"
+                style={{ width: `${completion}%` }}
+              />
+            </div>
+          </section>
+          <section className="grid gap-4 md:grid-cols-2">
+            {items.map((item) => {
+              const value = values[item.field];
+              const Icon = item.icon;
+              const review = reviews.find((entry) => entry.documentKey === item.field);
+              return (
+                <article
+                  key={item.field}
+                  className="rounded-2xl border border-border bg-card p-5 shadow-soft"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="grid h-11 w-11 place-items-center rounded-xl bg-primary/10 text-primary">
+                      <Icon className="h-5 w-5" />
                     </div>
-                    <div
-                      className={`mt-5 rounded-xl border p-3 text-sm ${value ? "border-success/25 bg-success/5" : "border-dashed border-border bg-muted/30"}`}
-                    >
-                      {value ? (
-                        <div className="flex items-center justify-between gap-3">
-                          <span className="inline-flex min-w-0 items-center gap-2 truncate text-success">
-                            <CheckCircle2 className="h-4 w-4 shrink-0" />
-                            Document uploaded
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h2 className="font-semibold">{item.title}</h2>
+                        {item.required && (
+                          <span className="rounded-full bg-cta/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-cta">
+                            Required
                           </span>
-                          <label className="cursor-pointer text-xs font-semibold text-primary hover:underline">
-                            Replace
-                            <input
-                              className="sr-only"
-                              type="file"
-                              accept="image/*,.pdf"
-                              onChange={(event) => {
-                                const file = event.target.files?.[0];
-                                if (file) void upload(item.field, file);
-                              }}
-                            />
-                          </label>
-                        </div>
-                      ) : (
-                        <label className="flex cursor-pointer items-center justify-center gap-2 py-2 text-muted-foreground hover:text-primary">
-                          <Upload className="h-4 w-4" />
-                          Choose document
+                        )}
+                        {review && (
+                          <span
+                            className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${review.status === "APPROVED" ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}
+                          >
+                            {review.status}
+                          </span>
+                        )}
+                      </div>
+                      <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                        {item.description}
+                      </p>
+                    </div>
+                  </div>
+                  <div
+                    className={`mt-5 rounded-xl border p-3 text-sm ${value ? "border-success/25 bg-success/5" : "border-dashed border-border bg-muted/30"}`}
+                  >
+                    {value ? (
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="inline-flex min-w-0 items-center gap-2 truncate text-success">
+                          <CheckCircle2 className="h-4 w-4 shrink-0" />
+                          Document uploaded
+                        </span>
+                        <label className="cursor-pointer text-xs font-semibold text-primary hover:underline">
+                          Replace
                           <input
                             className="sr-only"
                             type="file"
@@ -262,46 +246,61 @@ export default function Verification() {
                             }}
                           />
                         </label>
-                      )}
-                    </div>
-                  </article>
-                );
-              })}
-            </section>
-            <section className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-5 shadow-soft sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                {message ? (
-                  <p
-                    className={
-                      message.includes("submitted")
-                        ? "text-sm text-success"
-                        : "text-sm text-destructive"
-                    }
-                  >
-                    {message}
-                  </p>
-                ) : (
-                  <p className="text-sm text-muted-foreground">
-                    You can add or replace documents before submitting for review.
-                  </p>
-                )}
-              </div>
-              <Button disabled={saving || !values.governmentIdUrl} onClick={() => void save()}>
-                {saving ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Submitting
-                  </>
-                ) : (
-                  <>
-                    <BadgeCheck className="mr-2 h-4 w-4" />
-                    Submit for review
-                  </>
-                )}
-              </Button>
-            </section>
-          </>
-        )}
+                      </div>
+                    ) : (
+                      <label className="flex cursor-pointer items-center justify-center gap-2 py-2 text-muted-foreground hover:text-primary">
+                        <Upload className="h-4 w-4" />
+                        Choose document
+                        <input
+                          className="sr-only"
+                          type="file"
+                          accept="image/*,.pdf"
+                          onChange={(event) => {
+                            const file = event.target.files?.[0];
+                            if (file) void upload(item.field, file);
+                          }}
+                        />
+                      </label>
+                    )}
+                  </div>
+                </article>
+              );
+            })}
+          </section>
+          <section className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-5 shadow-soft sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              {message ? (
+                <p
+                  className={
+                    message.includes("submitted")
+                      ? "text-sm text-success"
+                      : "text-sm text-destructive"
+                  }
+                >
+                  {message}
+                </p>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  You can add or replace documents before submitting for review.
+                </p>
+              )}
+            </div>
+            <Button disabled={saving || !values.governmentIdUrl} onClick={() => void save()}>
+              {saving ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Submitting
+                </>
+              ) : (
+                <>
+                  <BadgeCheck className="mr-2 h-4 w-4" />
+                  Submit for review
+                </>
+              )}
+            </Button>
+          </section>
+        </>
+      )}
     </div>
   );
 }

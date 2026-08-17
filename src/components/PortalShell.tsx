@@ -78,7 +78,9 @@ const PortalTitleContext = createContext<{
 export function PortalTitleProvider({ children }: { children: React.ReactNode }) {
   const [title, setTitle] = useState<string | undefined>(undefined);
   return (
-    <PortalTitleContext.Provider value={{ title, setTitle }}>{children}</PortalTitleContext.Provider>
+    <PortalTitleContext.Provider value={{ title, setTitle }}>
+      {children}
+    </PortalTitleContext.Provider>
   );
 }
 

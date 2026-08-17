@@ -27,7 +27,7 @@ export function AppSidebar({ items, pathname }: { items: NavigationItem[]; pathn
             </Link>
           );
         })}
-      </nav>  
+      </nav>
     </aside>
   );
 }
