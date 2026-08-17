@@ -12,7 +12,7 @@ const querySchema = z.object({
   distanceKm: z.coerce.number().positive().max(500).optional(),
   originLat: z.coerce.number().optional(),
   originLng: z.coerce.number().optional(),
-  sort: z.enum(["recommended", "rating", "distance", "most-reviewed"]).optional(),
+  sort: z.enum(["recommended", "rating", "distance", "most-reviewed", "price"]).optional(),
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(50).default(20),
 });

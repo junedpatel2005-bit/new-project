@@ -13,7 +13,7 @@ export type ProfessionalDiscoveryFilter = {
   distanceKm?: number;
   originLat?: number;
   originLng?: number;
-  sort?: "recommended" | "rating" | "distance" | "most-reviewed";
+  sort?: "recommended" | "rating" | "distance" | "most-reviewed" | "price";
   page?: number;
   limit?: number;
 };
@@ -70,6 +70,9 @@ function buildOrderBy(
   }
   if (filter.sort === "most-reviewed") {
     return [{ reviewCount: "desc" }, { averageRating: "desc" }, { updatedAt: "desc" }];
+  }
+  if (filter.sort === "price") {
+    return [{ hourlyRate: "asc" }, { averageRating: "desc" }];
   }
   return [{ isVerified: "desc" }, { averageRating: "desc" }, { reviewCount: "desc" }];
 }

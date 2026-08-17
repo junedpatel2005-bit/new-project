@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { MapPin } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -60,7 +61,14 @@ type Data = {
     startedAt: string | null;
     completedAt: string | null;
   };
-  job: { title: string | null; deadline: string | null; budgetMax: number | null } | null;
+  job: {
+    title: string | null;
+    deadline: string | null;
+    budgetMax: number | null;
+    locationAddress: string | null;
+    locationLat: number | null;
+    locationLng: number | null;
+  } | null;
   professional: Person;
   client: Person;
   viewerRole: "CLIENT" | "PROFESSIONAL";
@@ -352,6 +360,33 @@ export default function SharedProjectTrackingPage() {
             <Info label="Current milestone" value={current?.title ?? "No active milestone"} />
             <Info label="Last activity" value={date(lastActivity)} />
           </div>
+          {(data.job?.locationAddress ||
+            (data.job?.locationLat !== null && data.job?.locationLng !== null)) && (
+            <div className="mt-5 border-t border-border pt-5">
+              <div className="flex items-center gap-2">
+                <MapPin className="h-5 w-5 text-primary" />
+                <div>
+                  <h2 className="text-base font-semibold">Project location</h2>
+                  <p className="text-sm text-muted-foreground">
+                    {isClient
+                      ? "Where you asked the professional to work"
+                      : "Exact address — visible now that you're hired"}
+                  </p>
+                </div>
+              </div>
+              {data.job?.locationAddress && (
+                <p className="mt-2 text-sm font-medium">{data.job.locationAddress}</p>
+              )}
+              {data.job?.locationLat != null && data.job?.locationLng != null && (
+                <iframe
+                  title="Project location"
+                  className="mt-3 h-[220px] w-full rounded-2xl border border-border"
+                  loading="lazy"
+                  src={`https://www.openstreetmap.org/export/embed.html?bbox=${data.job.locationLng - 0.01}%2C${data.job.locationLat - 0.01}%2C${data.job.locationLng + 0.01}%2C${data.job.locationLat + 0.01}&layer=mapnik&marker=${data.job.locationLat}%2C${data.job.locationLng}`}
+                />
+              )}
+            </div>
+          )}
         </section>
         <section className="rounded-2xl border border-primary/20 bg-primary/5 p-5">
           <p className="text-xs font-semibold uppercase tracking-wide text-primary">

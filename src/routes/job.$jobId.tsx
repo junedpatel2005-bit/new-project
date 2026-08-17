@@ -2,6 +2,7 @@
 
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import {
   Briefcase,
@@ -30,6 +31,10 @@ import type {
   ProfessionalDiscoveryResponse,
   ProfessionalDiscoveryResult,
 } from "@/lib/types/professional-discovery";
+
+const ProfessionalsPreviewMap = dynamic(() => import("@/components/ProfessionalsPreviewMap"), {
+  ssr: false,
+});
 
 type OwnerJob = {
   id: number;
@@ -243,6 +248,25 @@ export default function JobDetails() {
 
     void loadJob();
   }, [jobId]);
+
+  useEffect(() => {
+    if (!job || job.client || job.status !== "OPEN" || job.projectId) return;
+    let cancelled = false;
+    setFinderStatus("loading");
+    fetch("/api/v1/professionals?limit=50")
+      .then((response) => (response.ok ? response.json() : Promise.reject()))
+      .then((data: ProfessionalDiscoveryResponse) => {
+        if (cancelled) return;
+        setProfessionals(data.professionals);
+        setFinderStatus("idle");
+      })
+      .catch(() => {
+        if (!cancelled) setFinderStatus("error");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [job]);
 
   async function searchProfessionals(query = finderQuery) {
     setFinderStatus("loading");
@@ -695,6 +719,31 @@ export default function JobDetails() {
               </div>
             )}
           </section>
+        )}
+        {!job.client && job.status === "OPEN" && !job.projectId && professionals.length > 0 && (
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={openFinder}
+            onKeyDown={(event) => {
+              if (event.key !== "Enter" && event.key !== " ") return;
+              event.preventDefault();
+              event.currentTarget.click();
+            }}
+            className="mt-8 w-full cursor-pointer overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-primary/10 via-card to-accent/10 p-5 shadow-soft transition-all hover:border-primary/50 hover:shadow-elevated sm:p-6"
+          >
+            <div className="flex h-32 items-center justify-between gap-6">
+              <div className="text-left">
+                <p className="text-sm font-semibold">Professionals near you</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {professionals.length} available • Click to view on map
+                </p>
+              </div>
+              <div className="h-full w-1/2">
+                <ProfessionalsPreviewMap professionals={professionals} />
+              </div>
+            </div>
+          </div>
         )}
         {/* Actions - Footer Section */}
         <div className="mt-8 border-t border-border pt-6">

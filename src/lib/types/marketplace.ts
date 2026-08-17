@@ -11,6 +11,7 @@ export type MarketplaceProfessional = {
   verified: boolean;
   skills: string[];
   bio: string | null;
+  approximateDistanceKm?: number | null;
 };
 
 export type DetailedProfessional = MarketplaceProfessional & {

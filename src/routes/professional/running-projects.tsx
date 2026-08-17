@@ -7,9 +7,9 @@ import {
   ArrowRight,
   BriefcaseBusiness,
   CalendarDays,
-  CheckCircle2,
   CircleDollarSign,
   Clock3,
+  Heart,
   MapPin,
   Search,
   Sparkles,
@@ -47,6 +47,7 @@ function money(project: RunningProject) {
 export default function RunningProjectsPage() {
   const router = useRouter();
   const [projects, setProjects] = useState<RunningProject[]>([]);
+  const [savedJobsCount, setSavedJobsCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
@@ -55,8 +56,10 @@ export default function RunningProjectsPage() {
     let active = true;
     void fetch("/api/v1/portal/professional-jobs", { cache: "no-store" })
       .then((response) => (response.ok ? response.json() : Promise.reject()))
-      .then((data: { activeProjects?: RunningProject[] }) => {
-        if (active) setProjects(data.activeProjects ?? []);
+      .then((data: { activeProjects?: RunningProject[]; savedJobs?: { id: number }[] }) => {
+        if (!active) return;
+        setProjects(data.activeProjects ?? []);
+        setSavedJobsCount(data.savedJobs?.length ?? 0);
       })
       .catch(() => {
         if (active) setError("Your active projects could not be loaded.");
@@ -136,10 +139,11 @@ export default function RunningProjectsPage() {
           tint="bg-emerald-500/10 text-emerald-600"
         />
         <Metric
-          icon={CheckCircle2}
-          label="Average progress"
-          value={`${averageProgress}%`}
-          tint="bg-blue-500/10 text-blue-600"
+          icon={Heart}
+          label="Saved jobs"
+          value={savedJobsCount}
+          tint="bg-rose-500/10 text-rose-600"
+          href="/professional/my-jobs?view=saved"
         />
       </section>
 
@@ -270,14 +274,16 @@ function Metric({
   label,
   value,
   tint,
+  href,
 }: {
   icon: typeof BriefcaseBusiness;
   label: string;
   value: string | number;
   tint: string;
+  href?: string;
 }) {
-  return (
-    <div className="rounded-2xl border border-border bg-card p-4 shadow-soft">
+  const content = (
+    <>
       <div className="flex items-center justify-between">
         <div className={`grid h-10 w-10 place-items-center rounded-xl ${tint}`}>
           <Icon className="h-5 w-5" />
@@ -285,6 +291,16 @@ function Metric({
         <p className="text-2xl font-bold tracking-tight">{value}</p>
       </div>
       <p className="mt-3 text-sm font-medium text-muted-foreground">{label}</p>
-    </div>
+    </>
   );
+  if (href)
+    return (
+      <Link
+        href={href}
+        className="block rounded-2xl border border-border bg-card p-4 shadow-soft transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-card"
+      >
+        {content}
+      </Link>
+    );
+  return <div className="rounded-2xl border border-border bg-card p-4 shadow-soft">{content}</div>;
 }

@@ -77,6 +77,16 @@ export function ProCard({
         <span className="inline-flex items-center gap-1">
           <MapPin className="h-3 w-3" /> {pro.location ?? "Remote"}
         </span>
+        {pro.approximateDistanceKm != null && (
+          <>
+            <span className="h-1 w-1 rounded-full bg-border" />
+            <span className="font-semibold text-primary">
+              {pro.approximateDistanceKm < 1
+                ? "< 1 km away"
+                : `${pro.approximateDistanceKm.toFixed(1)} km away`}
+            </span>
+          </>
+        )}
       </div>
       <div className="mt-4 flex flex-wrap gap-1.5">
         {pro.skills.slice(0, 3).map((skill) => (

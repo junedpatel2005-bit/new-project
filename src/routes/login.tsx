@@ -2,13 +2,18 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { AuthLayout } from "@/components/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+
+const DEMO_ACCOUNTS = {
+  client: { email: "seed.client@servio.example", password: "ServioSeed#2026" },
+  professional: { email: "surat.pro@servio.example", password: "ServioSeed#2026" },
+} as const;
 
 export default function Login() {
   const router = useRouter();
@@ -17,6 +22,18 @@ export default function Login() {
   const [pending, setPending] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({ email: "", password: "" });
   const [buttonScale, setButtonScale] = useState(1);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
+
+  function quickFill(role: "" | keyof typeof DEMO_ACCOUNTS) {
+    if (!role) return;
+    const account = DEMO_ACCOUNTS[role];
+    if (emailRef.current) emailRef.current.value = account.email;
+    if (passwordRef.current) passwordRef.current.value = account.password;
+    setFieldErrors({ email: "", password: "" });
+    setError(null);
+    passwordRef.current?.focus();
+  }
 
   useEffect(() => {
     setOauthError(new URLSearchParams(window.location.search).get("oauthError"));
@@ -105,6 +122,27 @@ export default function Login() {
           <span className="relative z-10 bg-background px-3">or</span>
           <div className="absolute inset-x-0 top-1/2 h-px bg-border" />
         </div>
+        <div className="space-y-1.5 rounded-lg border border-dashed border-amber-400/60 bg-amber-400/10 p-3">
+          <Label htmlFor="quickFill" className="text-amber-700">
+            Quick fill — temporary, for testing only
+          </Label>
+          <select
+            id="quickFill"
+            defaultValue=""
+            onChange={(event) => {
+              quickFill(event.target.value as "" | keyof typeof DEMO_ACCOUNTS);
+              event.target.value = "";
+            }}
+            className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
+          >
+            <option value="">Select a demo account…</option>
+            <option value="client">Client</option>
+            <option value="professional">Professional</option>
+          </select>
+          <p className="text-xs text-amber-700">
+            Fills the email and password below — just press Enter to log in.
+          </p>
+        </div>
         <div className="space-y-1.5">
           <Label htmlFor="email">Email</Label>
           <Input
@@ -112,6 +150,7 @@ export default function Login() {
             name="email"
             type="email"
             required
+            ref={emailRef}
             placeholder="you@example.com"
             aria-invalid={Boolean(fieldErrors.email)}
             className={fieldErrors.email ? "border-destructive" : ""}
@@ -132,6 +171,7 @@ export default function Login() {
             name="password"
             type="password"
             required
+            ref={passwordRef}
             placeholder="••••••••"
             aria-invalid={Boolean(fieldErrors.password)}
             className={fieldErrors.password ? "border-destructive" : ""}

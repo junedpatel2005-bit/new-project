@@ -1,10 +1,13 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Map, MapPin, SlidersHorizontal, Star, ShieldCheck } from "lucide-react";
+import { Search, Map, MapPin, SlidersHorizontal, Star, ShieldCheck, Heart } from "lucide-react";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import type { MarketplaceCategory } from "@/lib/types/marketplace";
 
 const ProfessionalJobsMap = dynamic(() => import("@/components/ProfessionalJobsMap"), {
   ssr: false,
@@ -12,6 +15,11 @@ const ProfessionalJobsMap = dynamic(() => import("@/components/ProfessionalJobsM
 });
 
 const PAGE_SIZE = 20;
+const segmentOptions: [string, string][] = [
+  ["RESIDENTIAL", "Residential"],
+  ["COMMERCIAL", "Commercial"],
+  ["INDUSTRIAL", "Industrial"],
+];
 
 type JobListItem = {
   id: number;
@@ -25,6 +33,7 @@ type JobListItem = {
   locationAddress: string | null;
   locationLat: number | null;
   locationLng: number | null;
+  distanceKm: number | null;
   description: string | null;
   clientName: string | null;
   clientRating: number;
@@ -34,6 +43,7 @@ type JobListItem = {
 };
 
 type JobsResponse = {
+  professional?: { professionalLatitude: number | null; professionalLongitude: number | null };
   openJobs: JobListItem[];
   savedJobs: JobListItem[];
   proposals: unknown[];
@@ -61,8 +71,16 @@ function formatBudgetRange(
 }
 
 function ProfessionalJobsContent() {
-  const [jobs, setJobs] = useState<JobListItem[]>([]);
+  const router = useRouter();
+  const [openJobs, setOpenJobs] = useState<JobListItem[]>([]);
+  const [hasServiceLocation, setHasServiceLocation] = useState(true);
+  const [savedJobs, setSavedJobs] = useState<JobListItem[]>([]);
+  const [view, setView] = useState<"all" | "saved">("all");
+  const jobs = view === "saved" ? savedJobs : openJobs;
+  const savedIds = useMemo(() => new Set(savedJobs.map((job) => job.id)), [savedJobs]);
+  const [categories, setCategories] = useState<MarketplaceCategory[]>([]);
   const [query, setQuery] = useState("");
+  const [segment, setSegment] = useState("");
   const [category, setCategory] = useState("");
   const [city, setCity] = useState("");
   const [minRating, setMinRating] = useState<number | "">("");
@@ -93,7 +111,12 @@ function ProfessionalJobsContent() {
         if (!response.ok) throw new Error("Unable to load jobs");
         const payload = (await response.json()) as JobsResponse;
         if (!active) return;
-        setJobs(payload.openJobs ?? []);
+        setOpenJobs(payload.openJobs ?? []);
+        setSavedJobs(payload.savedJobs ?? []);
+        setHasServiceLocation(
+          payload.professional?.professionalLatitude != null &&
+            payload.professional?.professionalLongitude != null,
+        );
       } catch (loadError) {
         if (!active) return;
         console.error(loadError);
@@ -109,10 +132,74 @@ function ProfessionalJobsContent() {
     };
   }, []);
 
-  const categories = useMemo(
-    () => Array.from(new Set(jobs.map((job) => job.category).filter(Boolean))) as string[],
-    [jobs],
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("view") === "saved") setView("saved");
+  }, []);
+
+  useEffect(() => {
+    void fetch("/api/v1/marketplace/categories")
+      .then((response) => (response.ok ? response.json() : []))
+      .then(setCategories)
+      .catch(() => setCategories([]));
+  }, []);
+
+  function bumpProposalCount(list: JobListItem[], jobId: number, delta: number) {
+    return list.map((item) =>
+      item.id === jobId
+        ? { ...item, proposalCount: Math.max(0, item.proposalCount + delta) }
+        : item,
+    );
+  }
+
+  function applySaveChange(saved: boolean, job: JobListItem, delta: number) {
+    setOpenJobs((current) => bumpProposalCount(current, job.id, delta));
+    setSavedJobs((current) => {
+      const bumped = bumpProposalCount(current, job.id, delta);
+      if (saved) return bumped.filter((item) => item.id !== job.id);
+      if (bumped.some((item) => item.id === job.id)) return bumped;
+      return [...bumped, { ...job, proposalCount: Math.max(0, job.proposalCount + delta) }];
+    });
+  }
+
+  async function toggleSave(job: JobListItem, saved: boolean) {
+    const delta = saved ? -1 : 1;
+    applySaveChange(saved, job, delta);
+    try {
+      const response = await fetch(`/api/v1/professional/favorite-jobs/${job.id}`, {
+        method: saved ? "DELETE" : "POST",
+      });
+      if (!response.ok) throw new Error();
+    } catch {
+      applySaveChange(!saved, job, -delta);
+      setError("Unable to update saved jobs. Please try again.");
+    }
+  }
+
+  const topCategories = useMemo(
+    () => (segment ? categories.filter((c) => c.parentId === null && c.segment === segment) : []),
+    [categories, segment],
   );
+  const selectedCategory = useMemo(
+    () => categories.find((c) => c.name === category) ?? null,
+    [categories, category],
+  );
+  const activeTopCategory = useMemo(() => {
+    if (!selectedCategory) return null;
+    if (selectedCategory.parentId === null) return selectedCategory;
+    return categories.find((c) => c.id === selectedCategory.parentId) ?? null;
+  }, [categories, selectedCategory]);
+  const subCategories = useMemo(
+    () => (activeTopCategory ? categories.filter((c) => c.parentId === activeTopCategory.id) : []),
+    [categories, activeTopCategory],
+  );
+  const jobCountByCategory = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const job of jobs) {
+      if (!job.category) continue;
+      counts[job.category] = (counts[job.category] ?? 0) + 1;
+    }
+    return counts;
+  }, [jobs]);
 
   const filteredJobs = useMemo(() => {
     const value = query.trim().toLowerCase();
@@ -175,18 +262,37 @@ function ProfessionalJobsContent() {
 
   return (
     <div>
-      <div className="mb-6 flex items-end justify-between gap-4">
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Find jobs</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            {view === "saved" ? "Saved jobs" : "Find jobs"}
+          </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {visibleJobs.length} jobs available
             {jobs.length ? ` across ${jobs.length} listings` : ""}
           </p>
         </div>
+        <div className="flex gap-1 rounded-xl border border-border bg-muted/50 p-1">
+          <button
+            type="button"
+            onClick={() => setView("all")}
+            className={`rounded-lg px-3 py-2 text-sm font-semibold transition-all ${view === "all" ? "bg-card text-primary shadow-soft" : "text-muted-foreground hover:text-foreground"}`}
+          >
+            All jobs
+          </button>
+          <button
+            type="button"
+            onClick={() => setView("saved")}
+            className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition-all ${view === "saved" ? "bg-card text-primary shadow-soft" : "text-muted-foreground hover:text-foreground"}`}
+          >
+            <Heart className="h-3.5 w-3.5" />
+            Saved ({savedJobs.length})
+          </button>
+        </div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
-        <aside className="h-fit rounded-2xl border border-border bg-card p-5 lg:sticky lg:top-20">
+        <aside className="h-fit rounded-2xl border border-border bg-card p-5 lg:sticky lg:top-20 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="font-semibold">Filters</h2>
             <button
@@ -194,6 +300,7 @@ function ProfessionalJobsContent() {
               className="text-xs text-primary hover:underline"
               onClick={() => {
                 setQuery("");
+                setSegment("");
                 setCategory("");
                 setCity("");
                 setMinRating("");
@@ -209,30 +316,94 @@ function ProfessionalJobsContent() {
               <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
                 Category
               </p>
-              <div className="space-y-2">
-                <label className="flex items-center gap-2 text-sm">
-                  <input
-                    type="radio"
-                    name="category"
-                    checked={category === ""}
-                    onChange={() => setCategory("")}
-                    className="h-4 w-4 accent-primary"
-                  />
-                  <span>All categories</span>
-                </label>
-                {categories.map((item) => (
-                  <label key={item} className="flex items-center gap-2 text-sm">
+              <div className="mb-3 grid grid-cols-3 gap-1 rounded-full border border-border bg-background p-1">
+                {segmentOptions.map(([value, label]) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => {
+                      setSegment((current) => (current === value ? "" : value));
+                      setCategory("");
+                    }}
+                    className={`truncate rounded-full px-1.5 py-1.5 text-[11px] font-semibold transition ${
+                      segment === value
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              {segment ? (
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 text-sm">
                     <input
                       type="radio"
                       name="category"
-                      checked={category === item}
-                      onChange={() => setCategory(item)}
+                      checked={category === ""}
+                      onChange={() => setCategory("")}
                       className="h-4 w-4 accent-primary"
                     />
-                    <span>{item}</span>
+                    <span>All categories</span>
                   </label>
-                ))}
-              </div>
+                  {topCategories.map((item) => (
+                    <label key={item.id} className="flex items-center gap-2 text-sm">
+                      <input
+                        type="radio"
+                        name="category"
+                        checked={category === item.name}
+                        onChange={() => setCategory(item.name)}
+                        className="h-4 w-4 accent-primary"
+                      />
+                      <span className="flex-1">{item.name}</span>
+                      {jobCountByCategory[item.name] ? (
+                        <span className="text-xs text-muted-foreground">
+                          {jobCountByCategory[item.name]}
+                        </span>
+                      ) : null}
+                    </label>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  Select Residential, Commercial, or Industrial to see categories.
+                </p>
+              )}
+              {subCategories.length > 0 && (
+                <div className="mt-3 space-y-2 border-t border-border pt-3">
+                  <p className="text-xs font-medium text-muted-foreground">
+                    Sub-category of {activeTopCategory?.name}
+                  </p>
+                  <label className="flex items-center gap-2 text-sm">
+                    <input
+                      type="radio"
+                      name="subcategory"
+                      checked={category === activeTopCategory?.name}
+                      onChange={() => setCategory(activeTopCategory?.name ?? "")}
+                      className="h-4 w-4 accent-primary"
+                    />
+                    <span>General {activeTopCategory?.name}</span>
+                  </label>
+                  {subCategories.map((item) => (
+                    <label key={item.id} className="flex items-center gap-2 text-sm">
+                      <input
+                        type="radio"
+                        name="subcategory"
+                        checked={category === item.name}
+                        onChange={() => setCategory(item.name)}
+                        className="h-4 w-4 accent-primary"
+                      />
+                      <span className="flex-1">{item.name}</span>
+                      {jobCountByCategory[item.name] ? (
+                        <span className="text-xs text-muted-foreground">
+                          {jobCountByCategory[item.name]}
+                        </span>
+                      ) : null}
+                    </label>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div>
@@ -330,6 +501,16 @@ function ProfessionalJobsContent() {
               <span className="text-sm text-muted-foreground">{visibleJobs.length} results</span>
             </div>
 
+            {!loading && !hasServiceLocation && (
+              <p className="mb-4 rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-primary">
+                Set your location and service radius in{" "}
+                <Link href="/professional/setup" className="font-semibold underline">
+                  your profile
+                </Link>{" "}
+                to see distances and jobs sorted by how close they are to you.
+              </p>
+            )}
+
             {showMap && (
               <div
                 ref={mapSectionRef}
@@ -364,83 +545,122 @@ function ProfessionalJobsContent() {
               </div>
             ) : visibleJobs.length > 0 ? (
               <div className="grid gap-4 lg:grid-cols-2">
-                {visibleJobs.map((job) => (
-                  <article
-                    key={job.id}
-                    className={`rounded-2xl border bg-background p-4 transition ${
-                      selectedJobId === job.id ? "border-primary shadow-soft" : "border-border"
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="text-[10px] font-medium uppercase tracking-[0.24em] text-muted-foreground">
-                          {job.category ?? "General"}
-                        </p>
-                        <h3 className="mt-2 text-[17px] font-semibold leading-tight text-foreground">
-                          {job.title}
-                        </h3>
-                        <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-                          <span>{job.locationAddress ?? "Remote"}</span>
-                          {job.clientName ? <span>{job.clientName}</span> : null}
-                          <span className="inline-flex items-center gap-1">
-                            <Star className="h-3.5 w-3.5 fill-current text-amber-500" />
-                            {job.clientRating.toFixed(1)}
-                          </span>
-                          {job.clientVerified && (
-                            <span className="inline-flex items-center gap-1 text-primary">
-                              <ShieldCheck className="h-3.5 w-3.5" />
-                              Verified
+                {visibleJobs.map((job) => {
+                  const saved = savedIds.has(job.id);
+                  return (
+                    <article
+                      key={job.id}
+                      onClick={() => router.push(`/job/${job.id}`)}
+                      className={`cursor-pointer rounded-2xl border bg-background p-4 transition hover:border-primary/40 ${
+                        selectedJobId === job.id ? "border-primary shadow-soft" : "border-border"
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="text-[10px] font-medium uppercase tracking-[0.24em] text-muted-foreground">
+                            {job.category ?? "General"}
+                          </p>
+                          <h3 className="mt-2 text-[17px] font-semibold leading-tight text-foreground">
+                            {job.title}
+                          </h3>
+                          <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+                            <span>{job.locationAddress ?? "Remote"}</span>
+                            {job.distanceKm !== null && (
+                              <span className="inline-flex items-center gap-1 font-medium text-primary">
+                                <MapPin className="h-3.5 w-3.5" />
+                                {job.distanceKm < 1
+                                  ? "Less than 1 km away"
+                                  : `${job.distanceKm.toFixed(1)} km away`}
+                              </span>
+                            )}
+                            {job.clientName ? <span>{job.clientName}</span> : null}
+                            <span className="inline-flex items-center gap-1">
+                              <Star className="h-3.5 w-3.5 fill-current text-amber-500" />
+                              {job.clientRating.toFixed(1)}
                             </span>
-                          )}
+                            {job.clientVerified && (
+                              <span className="inline-flex items-center gap-1 text-primary">
+                                <ShieldCheck className="h-3.5 w-3.5" />
+                                Verified
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex shrink-0 items-center gap-2">
+                          <span className="rounded-full bg-muted px-2 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                            {job.status}
+                          </span>
+                          <button
+                            type="button"
+                            aria-label={saved ? "Remove from saved jobs" : "Save this job"}
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              void toggleSave(job, saved);
+                            }}
+                            className={`grid h-8 w-8 shrink-0 place-items-center rounded-full transition ${
+                              saved
+                                ? "bg-cta/10 text-cta"
+                                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                            }`}
+                          >
+                            <Heart className={`h-4 w-4 ${saved ? "fill-current" : ""}`} />
+                          </button>
                         </div>
                       </div>
-                      <span className="rounded-full bg-muted px-2 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                        {job.status}
-                      </span>
-                    </div>
 
-                    {job.description ? (
-                      <p className="mt-3 line-clamp-3 text-sm leading-6 text-muted-foreground">
-                        {job.description}
-                      </p>
-                    ) : null}
+                      {job.description ? (
+                        <p className="mt-3 line-clamp-3 text-sm leading-6 text-muted-foreground">
+                          {job.description}
+                        </p>
+                      ) : null}
 
-                    <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                      <span className="font-medium text-foreground">
-                        {formatBudgetRange(job.budgetMin, job.budgetMax, job.timingType)}
-                      </span>
-                      <span>•</span>
-                      <span>{formatBudgetAmount(job.hourlyRate, job.timingType)}</span>
-                    </div>
-
-                    <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
-                      <div className="flex items-center gap-2">
-                        <Button asChild size="sm">
-                          <a href={`/job/${job.id}`}>View details</a>
-                        </Button>
-                        {job.locationLat !== null && job.locationLng !== null && (
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            className="gap-1.5"
-                            onClick={() => showJobLocation(job.id)}
-                          >
-                            <MapPin className="h-3.5 w-3.5" />
-                            Show location
-                          </Button>
-                        )}
+                      <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                        <span className="font-medium text-foreground">
+                          {formatBudgetRange(job.budgetMin, job.budgetMax, job.timingType)}
+                        </span>
+                        <span>•</span>
+                        <span>{formatBudgetAmount(job.hourlyRate, job.timingType)}</span>
                       </div>
-                      <span className="text-xs text-muted-foreground">
-                        {job.proposalCount} saved
-                      </span>
-                    </div>
-                  </article>
-                ))}
+
+                      <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                          <Button asChild size="sm">
+                            <Link
+                              href={`/job/${job.id}`}
+                              onClick={(event) => event.stopPropagation()}
+                            >
+                              View details
+                            </Link>
+                          </Button>
+                          {job.locationLat !== null && job.locationLng !== null && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="gap-1.5"
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                showJobLocation(job.id);
+                              }}
+                            >
+                              <MapPin className="h-3.5 w-3.5" />
+                              Show location
+                            </Button>
+                          )}
+                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          {job.proposalCount} pros saved
+                        </span>
+                      </div>
+                    </article>
+                  );
+                })}
               </div>
             ) : (
               <div className="rounded-2xl border border-dashed border-border bg-background px-6 py-10 text-center text-sm text-muted-foreground">
-                No jobs match your current filters.
+                {view === "saved" && !savedJobs.length
+                  ? "You haven't saved any jobs yet. Tap the heart on a job to save it here."
+                  : "No jobs match your current filters."}
               </div>
             )}
           </div>

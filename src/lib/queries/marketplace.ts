@@ -1,5 +1,6 @@
 import "server-only";
 import { db } from "@/lib/db";
+import { approximateAddress, createDisplayPoint } from "@/lib/geo";
 import type {
   MarketplaceCategory,
   MarketplaceJob,
@@ -277,33 +278,39 @@ export async function listOpenJobs(): Promise<MarketplaceJob[]> {
     .filter((job): job is typeof job & { title: string; description: string; category: string } =>
       Boolean(job.title && job.description && job.category),
     )
-    .map((job) => ({
-      id: job.id,
-      title: job.title,
-      description: job.description,
-      category: job.category,
-      budgetMin: job.budgetMin,
-      budgetMax: job.budgetMax,
-      urgency: job.urgency,
-      workMode: job.workMode,
-      location: job.locationLabel,
-      locationAddress: job.locationAddress,
-      locationLat: job.locationLat,
-      locationLng: job.locationLng,
-      jobDate: job.jobDate?.toISOString() ?? null,
-      deadline: job.deadline?.toISOString() ?? null,
-      timingType: job.timingType as "FIXED" | "HOURLY",
-      hourlyRate: job.hourlyRate,
-      createdAt: job.createdAt.toISOString(),
-      status: "OPEN",
-      proposalCount: job._count.favoriteJobs,
-      client: {
-        name: `${job.user.firstName} ${job.user.lastName}`.trim(),
-        avatar: job.user.avatarUrl,
-        rating: job.user.averageRating,
-      },
-      attachments: job.attachments,
-    }));
+    .map((job) => {
+      const displayPoint =
+        job.locationLat !== null && job.locationLng !== null
+          ? createDisplayPoint(job.id, job.locationLat, job.locationLng)
+          : null;
+      return {
+        id: job.id,
+        title: job.title,
+        description: job.description,
+        category: job.category,
+        budgetMin: job.budgetMin,
+        budgetMax: job.budgetMax,
+        urgency: job.urgency,
+        workMode: job.workMode,
+        location: job.locationLabel,
+        locationAddress: approximateAddress(job.locationAddress),
+        locationLat: displayPoint?.lat ?? null,
+        locationLng: displayPoint?.lng ?? null,
+        jobDate: job.jobDate?.toISOString() ?? null,
+        deadline: job.deadline?.toISOString() ?? null,
+        timingType: job.timingType as "FIXED" | "HOURLY",
+        hourlyRate: job.hourlyRate,
+        createdAt: job.createdAt.toISOString(),
+        status: "OPEN" as const,
+        proposalCount: job._count.favoriteJobs,
+        client: {
+          name: `${job.user.firstName} ${job.user.lastName}`.trim(),
+          avatar: job.user.avatarUrl,
+          rating: job.user.averageRating,
+        },
+        attachments: job.attachments,
+      };
+    });
 }
 
 export async function getProfessional(id: number): Promise<MarketplaceProfessional | null> {
@@ -453,6 +460,10 @@ export async function getOpenJob(id: number): Promise<MarketplaceJob | null> {
     },
   });
   if (!job || !job.title || !job.description || !job.category) return null;
+  const displayPoint =
+    job.locationLat !== null && job.locationLng !== null
+      ? createDisplayPoint(job.id, job.locationLat, job.locationLng)
+      : null;
   return {
     id: job.id,
     title: job.title,
@@ -463,9 +474,9 @@ export async function getOpenJob(id: number): Promise<MarketplaceJob | null> {
     urgency: job.urgency,
     workMode: job.workMode,
     location: job.locationLabel,
-    locationAddress: job.locationAddress,
-    locationLat: job.locationLat,
-    locationLng: job.locationLng,
+    locationAddress: approximateAddress(job.locationAddress),
+    locationLat: displayPoint?.lat ?? null,
+    locationLng: displayPoint?.lng ?? null,
     jobDate: job.jobDate?.toISOString() ?? null,
     deadline: job.deadline?.toISOString() ?? null,
     timingType: job.timingType as "FIXED" | "HOURLY",

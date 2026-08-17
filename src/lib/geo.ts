@@ -22,6 +22,21 @@ export function getDistanceBoundingBox(lat: number, distanceKm: number) {
   return { latDelta, lngDelta };
 }
 
+/**
+ * Reduces a full geocoded address (most-specific segment first, per Nominatim's
+ * display_name convention) down to its coarsest 1-2 segments, so street-level
+ * detail isn't exposed before a professional is authorized to see it.
+ */
+export function approximateAddress(address: string | null): string | null {
+  if (!address) return null;
+  const parts = address
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean);
+  if (parts.length <= 2) return parts[parts.length - 1] ?? null;
+  return parts.slice(-2).join(", ");
+}
+
 export function createDisplayPoint(id: number, lat: number, lng: number): LatLng | null {
   const salt = process.env.GEO_OBFUSCATION_SALT;
   if (!salt || Number.isNaN(lat) || Number.isNaN(lng)) return null;

@@ -36,6 +36,7 @@ function toMarketplaceProfessional(
     verified: professional.verified,
     skills: professional.skills,
     bio: professional.bio,
+    approximateDistanceKm: professional.approximateDistanceKm,
   };
 }
 
@@ -57,9 +58,9 @@ function DiscoverContent() {
   const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [showMap, setShowMap] = useState(false);
   const [selectedPoint, setSelectedPoint] = useState<{ lat: number; lng: number } | null>(null);
-  const [sort, setSort] = useState<"recommended" | "rating" | "distance" | "most-reviewed">(
-    "recommended",
-  );
+  const [sort, setSort] = useState<
+    "recommended" | "rating" | "distance" | "most-reviewed" | "price"
+  >("recommended");
   const [page, setPage] = useState(1);
   const mapSectionRef = useRef<HTMLDivElement | null>(null);
   const userLocationRef = useRef<{ lat: number; lng: number } | null>(null);
@@ -68,6 +69,25 @@ function DiscoverContent() {
     () => (results ? results.professionals.map(toMarketplaceProfessional) : []),
     [results],
   );
+
+  function requestMyLocation() {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setOriginLat(position.coords.latitude);
+        setOriginLng(position.coords.longitude);
+        setDistanceKm((current) => (current === "" ? 25 : current));
+        setPage(1);
+        userLocationRef.current = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        };
+      },
+      () => {
+        alert("Unable to retrieve your location. Please enable location access or enter a city.");
+      },
+    );
+  }
 
   useEffect(() => {
     const controller = new AbortController();
@@ -106,6 +126,7 @@ function DiscoverContent() {
       params.set("originLng", String(originLng));
     }
     if (verifiedOnly) params.set("verified", "true");
+    params.set("sort", sort);
     params.set("page", String(page));
     params.set("limit", String(PAGE_SIZE));
 
@@ -137,6 +158,7 @@ function DiscoverContent() {
     originLat,
     originLng,
     verifiedOnly,
+    sort,
     page,
   ]);
 
@@ -170,7 +192,7 @@ function DiscoverContent() {
       )}
 
       <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
-        <aside className="rounded-2xl border border-border bg-card p-5 shadow-soft h-fit lg:sticky lg:top-20">
+        <aside className="rounded-2xl border border-border bg-card p-5 shadow-soft h-fit lg:sticky lg:top-20 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="font-semibold">Filters</h2>
             <button
@@ -251,23 +273,7 @@ function DiscoverContent() {
                   checked={distanceKm !== "" && originLat !== null && originLng !== null}
                   onChange={(event) => {
                     if (event.target.checked) {
-                      if (navigator.geolocation) {
-                        navigator.geolocation.getCurrentPosition(
-                          (position) => {
-                            setOriginLat(position.coords.latitude);
-                            setOriginLng(position.coords.longitude);
-                            userLocationRef.current = {
-                              lat: position.coords.latitude,
-                              lng: position.coords.longitude,
-                            };
-                          },
-                          () => {
-                            alert(
-                              "Unable to retrieve your location. Please enable location access or enter a city.",
-                            );
-                          },
-                        );
-                      }
+                      requestMyLocation();
                     } else {
                       setDistanceKm("");
                       setOriginLat(null);
@@ -406,11 +412,22 @@ function DiscoverContent() {
                 placeholder="Try 'plumber', 'react developer', 'wedding photographer'"
               />
             </div>
-            <select className="h-9 rounded-lg border border-input bg-background px-3 text-sm">
-              <option>Sort: Best match</option>
-              <option>Top rated</option>
-              <option>Lowest price</option>
-              <option>Closest</option>
+            <select
+              value={sort}
+              onChange={(event) => {
+                const value = event.target.value as typeof sort;
+                setSort(value);
+                setPage(1);
+                if (value === "distance" && (originLat === null || originLng === null)) {
+                  requestMyLocation();
+                }
+              }}
+              className="h-9 rounded-lg border border-input bg-background px-3 text-sm"
+            >
+              <option value="recommended">Sort: Best match</option>
+              <option value="rating">Top rated</option>
+              <option value="price">Lowest price</option>
+              <option value="distance">Closest</option>
             </select>
             <Button
               variant="outline"

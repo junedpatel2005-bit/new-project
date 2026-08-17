@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { sessionCookie, verifySession } from "@/lib/auth";
 import { db } from "@/lib/db";
+import {
+  approximateAddress,
+  createDisplayPoint,
+  getDistanceBoundingBox,
+  getDistanceKm,
+} from "@/lib/geo";
 
 async function sessionFromRequest(request: NextRequest) {
   const token = request.cookies.get(sessionCookie)?.value;
@@ -68,8 +74,21 @@ export async function GET(
           isVerified: true,
           availabilityStatus: true,
           experienceYears: true,
+          professionalLatitude: true,
+          professionalLongitude: true,
+          serviceRadiusKm: true,
         },
       });
+      const hasServiceArea =
+        professional?.professionalLatitude != null &&
+        professional?.professionalLongitude != null &&
+        professional?.serviceRadiusKm != null;
+      const bbox = hasServiceArea
+        ? getDistanceBoundingBox(
+            professional!.professionalLatitude!,
+            professional!.serviceRadiusKm!,
+          )
+        : null;
 
       const blockedJobs = await db.$transaction(async (tx) => {
         const [trackingJobs, acceptedRequests] = await Promise.all([
@@ -94,9 +113,26 @@ export async function GET(
             where: {
               status: "OPEN",
               id: { notIn: [...blockedJobs] },
+              ...(bbox
+                ? {
+                    OR: [
+                      { locationLat: null },
+                      {
+                        locationLat: {
+                          gte: professional!.professionalLatitude! - bbox.latDelta,
+                          lte: professional!.professionalLatitude! + bbox.latDelta,
+                        },
+                        locationLng: {
+                          gte: professional!.professionalLongitude! - bbox.lngDelta,
+                          lte: professional!.professionalLongitude! + bbox.lngDelta,
+                        },
+                      },
+                    ],
+                  }
+                : {}),
             },
             orderBy: { createdAt: "desc" },
-            take: 20,
+            take: bbox ? 100 : 20,
             include: {
               user: {
                 select: {
@@ -149,8 +185,46 @@ export async function GET(
         ]);
 
       const hiddenJobIds = blockedJobs;
-      const visibleOpenJobs = openJobs.filter((job) => !hiddenJobIds.has(job.id));
-      const visibleSavedJobs = savedJobs.filter((favorite) => !hiddenJobIds.has(favorite.job.id));
+
+      function distanceKmFor(locationLat: number | null, locationLng: number | null) {
+        if (
+          !hasServiceArea ||
+          locationLat === null ||
+          locationLng === null ||
+          professional?.professionalLatitude == null ||
+          professional?.professionalLongitude == null
+        )
+          return null;
+        return (
+          Math.round(
+            getDistanceKm(
+              professional.professionalLatitude,
+              professional.professionalLongitude,
+              locationLat,
+              locationLng,
+            ) * 10,
+          ) / 10
+        );
+      }
+
+      const visibleOpenJobs = openJobs
+        .filter((job) => !hiddenJobIds.has(job.id))
+        .map((job) => ({ ...job, distanceKm: distanceKmFor(job.locationLat, job.locationLng) }))
+        .filter(
+          (job) =>
+            job.distanceKm === null ||
+            job.distanceKm <= (professional?.serviceRadiusKm ?? Infinity),
+        )
+        .sort((a, b) =>
+          hasServiceArea ? (a.distanceKm ?? Infinity) - (b.distanceKm ?? Infinity) : 0,
+        )
+        .slice(0, 20);
+      const visibleSavedJobs = savedJobs
+        .filter((favorite) => !hiddenJobIds.has(favorite.job.id))
+        .map((favorite) => ({
+          ...favorite,
+          distanceKm: distanceKmFor(favorite.job.locationLat, favorite.job.locationLng),
+        }));
 
       const clientIds = [
         ...new Set([
@@ -198,50 +272,86 @@ export async function GET(
       const visibleProposals = proposals.filter((request) => !activeJobIds.has(request.jobId));
       const visibleOffers = offers.filter((request) => !activeJobIds.has(request.jobId));
 
+      const favoriteCounts = await db.favoriteJob.groupBy({
+        by: ["jobId"],
+        where: {
+          jobId: {
+            in: [
+              ...new Set([
+                ...visibleOpenJobs.map((job) => job.id),
+                ...visibleSavedJobs.map((favorite) => favorite.job.id),
+              ]),
+            ],
+          },
+        },
+        _count: { _all: true },
+      });
+      const favoriteCountMap = new Map(
+        favoriteCounts.map((entry) => [entry.jobId, entry._count._all]),
+      );
+
       return NextResponse.json({
         professional,
         openJobs: visibleOpenJobs
           .filter((job) => !activeJobIds.has(job.id))
-          .map((job) => ({
-            id: job.id,
-            title: job.title,
-            category: job.category,
-            status: job.status,
-            budgetMin: job.budgetMin,
-            budgetMax: job.budgetMax,
-            hourlyRate: job.hourlyRate,
-            timingType: job.timingType,
-            locationAddress: job.locationAddress,
-            locationLat: job.locationLat,
-            locationLng: job.locationLng,
-            description: job.description,
-            clientName: clientMap.get(job.userId) ?? "Client",
-            clientRating: job.user.averageRating ?? 0,
-            clientVerified: job.user.isVerified ?? false,
-            createdAt: job.createdAt.toISOString(),
-            proposalCount: 0,
-          })),
+          .map((job) => {
+            const displayPoint =
+              job.locationLat !== null && job.locationLng !== null
+                ? createDisplayPoint(job.id, job.locationLat, job.locationLng)
+                : null;
+            return {
+              id: job.id,
+              title: job.title,
+              category: job.category,
+              status: job.status,
+              budgetMin: job.budgetMin,
+              budgetMax: job.budgetMax,
+              hourlyRate: job.hourlyRate,
+              timingType: job.timingType,
+              locationAddress: approximateAddress(job.locationAddress),
+              locationLat: displayPoint?.lat ?? null,
+              locationLng: displayPoint?.lng ?? null,
+              distanceKm: job.distanceKm,
+              description: job.description,
+              clientName: clientMap.get(job.userId) ?? "Client",
+              clientRating: job.user.averageRating ?? 0,
+              clientVerified: job.user.isVerified ?? false,
+              createdAt: job.createdAt.toISOString(),
+              proposalCount: favoriteCountMap.get(job.id) ?? 0,
+            };
+          }),
         savedJobs: visibleSavedJobs
           .filter((favorite) => !activeJobIds.has(favorite.job.id))
-          .map((favorite) => ({
-            id: favorite.job.id,
-            title: favorite.job.title,
-            category: favorite.job.category,
-            status: favorite.job.status,
-            budgetMin: favorite.job.budgetMin,
-            budgetMax: favorite.job.budgetMax,
-            hourlyRate: favorite.job.hourlyRate,
-            timingType: favorite.job.timingType,
-            locationAddress: favorite.job.locationAddress,
-            locationLat: favorite.job.locationLat,
-            locationLng: favorite.job.locationLng,
-            description: favorite.job.description,
-            clientName: clientMap.get(favorite.job.userId) ?? "Client",
-            clientRating: favorite.job.user.averageRating ?? 0,
-            clientVerified: favorite.job.user.isVerified ?? false,
-            createdAt: favorite.job.createdAt.toISOString(),
-            proposalCount: 0,
-          })),
+          .map((favorite) => {
+            const displayPoint =
+              favorite.job.locationLat !== null && favorite.job.locationLng !== null
+                ? createDisplayPoint(
+                    favorite.job.id,
+                    favorite.job.locationLat,
+                    favorite.job.locationLng,
+                  )
+                : null;
+            return {
+              id: favorite.job.id,
+              title: favorite.job.title,
+              category: favorite.job.category,
+              status: favorite.job.status,
+              budgetMin: favorite.job.budgetMin,
+              budgetMax: favorite.job.budgetMax,
+              hourlyRate: favorite.job.hourlyRate,
+              timingType: favorite.job.timingType,
+              locationAddress: approximateAddress(favorite.job.locationAddress),
+              locationLat: displayPoint?.lat ?? null,
+              locationLng: displayPoint?.lng ?? null,
+              distanceKm: favorite.distanceKm,
+              description: favorite.job.description,
+              clientName: clientMap.get(favorite.job.userId) ?? "Client",
+              clientRating: favorite.job.user.averageRating ?? 0,
+              clientVerified: favorite.job.user.isVerified ?? false,
+              createdAt: favorite.job.createdAt.toISOString(),
+              proposalCount: favoriteCountMap.get(favorite.job.id) ?? 0,
+            };
+          }),
         proposals: visibleProposals.map((request) => {
           const job = jobMap.get(request.jobId);
           return {

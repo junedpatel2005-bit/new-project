@@ -1,7 +1,8 @@
 "use client";
 
 import L from "leaflet";
-import { MapContainer, Marker, TileLayer } from "react-leaflet";
+import { useEffect } from "react";
+import { MapContainer, Marker, TileLayer, useMap } from "react-leaflet";
 import type { ProfessionalDiscoveryResult } from "@/lib/types/professional-discovery";
 
 const markerIcon = L.divIcon({
@@ -11,24 +12,39 @@ const markerIcon = L.divIcon({
   iconAnchor: [10, 20],
 });
 
+const fallbackCenter: [number, number] = [37.7749, -122.4194];
+
+function FollowPoints({ points }: { points: [number, number][] }) {
+  const map = useMap();
+  useEffect(() => {
+    if (points.length === 0) map.setView(fallbackCenter, 9, { animate: false });
+    else if (points.length === 1) map.setView(points[0] ?? fallbackCenter, 10, { animate: false });
+    else map.fitBounds(points, { padding: [20, 20], animate: false });
+  }, [points, map]);
+  return null;
+}
+
 export default function ProfessionalsPreviewMap({
   professionals,
 }: {
   professionals: ProfessionalDiscoveryResult[];
 }) {
-  const points = professionals
-    .map((professional) => professional.displayPoint)
-    .filter((point): point is { lat: number; lng: number } => Boolean(point));
-  const center = points[0] ?? { lat: 37.7749, lng: -122.4194 };
-  const bounds = points.map((point) => [point.lat, point.lng] as [number, number]);
+  const pinned = professionals
+    .map((professional) => ({ id: professional.id, point: professional.displayPoint }))
+    .filter(
+      (entry): entry is { id: string; point: { lat: number; lng: number } } =>
+        entry.point !== undefined,
+    );
+  const points = pinned.map((entry) => [entry.point.lat, entry.point.lng] as [number, number]);
 
   return (
     <div className="pointer-events-none h-full w-full overflow-hidden rounded-xl">
       <MapContainer
-        center={[center.lat, center.lng]}
-        zoom={points.length > 1 ? 5 : 9}
-        bounds={bounds.length > 1 ? bounds : undefined}
-        boundsOptions={{ padding: [20, 20] }}
+        center={points[0] ?? fallbackCenter}
+        zoom={9}
+        zoomAnimation={false}
+        markerZoomAnimation={false}
+        fadeAnimation={false}
         zoomControl={false}
         dragging={false}
         scrollWheelZoom={false}
@@ -40,8 +56,9 @@ export default function ProfessionalsPreviewMap({
         className="h-full w-full"
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-        {points.map((point, index) => (
-          <Marker key={index} position={[point.lat, point.lng]} icon={markerIcon} />
+        <FollowPoints points={points} />
+        {pinned.map((entry) => (
+          <Marker key={entry.id} position={[entry.point.lat, entry.point.lng]} icon={markerIcon} />
         ))}
       </MapContainer>
     </div>

@@ -47,7 +47,7 @@ export type ProfessionalDiscoveryFilters = {
   distanceKm?: number;
   originLat?: number;
   originLng?: number;
-  sort?: "recommended" | "rating" | "distance" | "most-reviewed";
+  sort?: "recommended" | "rating" | "distance" | "most-reviewed" | "price";
   page?: number;
   limit?: number;
 };
