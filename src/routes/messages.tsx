@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import { AppShell } from "@/components/AppShell";
 type Conversation = {
   id: string;
   jobTitle: string | null;
@@ -19,7 +18,7 @@ export default function Messages() {
       .catch(() => setError(true));
   }, []);
   return (
-    <AppShell>
+    <>
       <h1 className="text-2xl font-semibold">Messages</h1>
       {!items && !error && <div className="mt-6 h-48 animate-pulse rounded-2xl bg-muted" />}
       {error && (
@@ -49,6 +48,6 @@ export default function Messages() {
             No conversations yet.
           </p>
         ))}
-    </AppShell>
+    </>
   );
 }

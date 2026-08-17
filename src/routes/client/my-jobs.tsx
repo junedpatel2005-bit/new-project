@@ -14,10 +14,9 @@ import {
   Plus,
   Trash2,
 } from "lucide-react";
-import { AppShell } from "@/components/AppShell";
+import { CardListSkeleton } from "@/components/LoadingSkeleton";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { CardListSkeleton } from "@/components/LoadingSkeleton";
 import { ExportMenu } from "@/components/reports/ExportMenu";
 import { useRowSelection } from "@/hooks/use-row-selection";
 
@@ -140,7 +139,7 @@ export default function MyJobs() {
   }
 
   return (
-    <AppShell>
+    <>
       <section className="relative overflow-hidden rounded-3xl border border-primary/10 bg-[linear-gradient(115deg,var(--color-ink),var(--color-primary))] px-6 py-7 text-white shadow-card sm:px-8 sm:py-9">
         <div className="absolute -right-16 -top-24 h-64 w-64 rounded-full bg-cta/20 blur-3xl" />
         <div className="absolute -bottom-28 left-1/3 h-48 w-48 rounded-full bg-white/10 blur-3xl" />
@@ -391,6 +390,6 @@ export default function MyJobs() {
           ) : null}
         </div>
       </section>
-    </AppShell>
+    </>
   );
 }

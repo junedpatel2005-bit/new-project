@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AppShell } from "@/components/AppShell";
 import { AddressMapPicker } from "@/components/AddressMapPicker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -205,288 +204,286 @@ export default function PostJob() {
     [primary, saved],
   );
   return (
-    <AppShell>
-      <div className="max-w-3xl">
-        <h1 className="text-3xl font-bold">Create a job</h1>
-        <p className="mt-1 text-muted-foreground">Tell qualified professionals what you need.</p>
-        <ol className="mt-7 grid grid-cols-5 gap-1" aria-label="Job posting steps">
-          {steps.map((label, index) => (
-            <li key={label} className="min-w-0">
-              <div className={`h-1 rounded ${index <= step ? "bg-primary" : "bg-muted"}`} />
-              <span
-                className={`mt-2 block text-center text-xs sm:text-sm ${index === step ? "font-semibold text-primary" : "text-muted-foreground"}`}
+    <div className="max-w-3xl">
+      <h1 className="text-3xl font-bold">Create a job</h1>
+      <p className="mt-1 text-muted-foreground">Tell qualified professionals what you need.</p>
+      <ol className="mt-7 grid grid-cols-5 gap-1" aria-label="Job posting steps">
+        {steps.map((label, index) => (
+          <li key={label} className="min-w-0">
+            <div className={`h-1 rounded ${index <= step ? "bg-primary" : "bg-muted"}`} />
+            <span
+              className={`mt-2 block text-center text-xs sm:text-sm ${index === step ? "font-semibold text-primary" : "text-muted-foreground"}`}
+            >
+              {index + 1}. <span className="hidden sm:inline">{label}</span>
+            </span>
+          </li>
+        ))}
+      </ol>
+      <section className="mt-7 rounded-2xl border bg-card p-5 shadow-sm sm:p-7">
+        {step === 0 && (
+          <div className="space-y-5">
+            <h2 className="text-xl font-semibold">Tell us about the job</h2>
+            <Field label="Job title" error={errors.title}>
+              <Input
+                value={form.title}
+                onChange={(e) => update("title", e.target.value)}
+                maxLength={160}
+                placeholder="What do you need done?"
+              />
+            </Field>
+            <Field label="Category" error={errors.category}>
+              <select
+                value={form.category}
+                onChange={(e) => update("category", e.target.value)}
+                className="h-10 w-full rounded-md border border-input bg-background px-3"
               >
-                {index + 1}. <span className="hidden sm:inline">{label}</span>
-              </span>
-            </li>
-          ))}
-        </ol>
-        <section className="mt-7 rounded-2xl border bg-card p-5 shadow-sm sm:p-7">
-          {step === 0 && (
-            <div className="space-y-5">
-              <h2 className="text-xl font-semibold">Tell us about the job</h2>
-              <Field label="Job title" error={errors.title}>
-                <Input
-                  value={form.title}
-                  onChange={(e) => update("title", e.target.value)}
-                  maxLength={160}
-                  placeholder="What do you need done?"
-                />
-              </Field>
-              <Field label="Category" error={errors.category}>
-                <select
-                  value={form.category}
-                  onChange={(e) => update("category", e.target.value)}
-                  className="h-10 w-full rounded-md border border-input bg-background px-3"
-                >
-                  <option value="">Select a category</option>
-                  {categories.map((c) => (
-                    <option key={c.id} value={c.name}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-              </Field>
-              <Field label="Description" error={errors.description}>
-                <textarea
-                  value={form.description}
-                  onChange={(e) => update("description", e.target.value)}
-                  maxLength={5000}
-                  className="min-h-36 w-full rounded-md border border-input bg-background p-3"
-                  placeholder="Tell professionals what needs to be done..."
-                />
-              </Field>
+                <option value="">Select a category</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.name}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <Field label="Description" error={errors.description}>
+              <textarea
+                value={form.description}
+                onChange={(e) => update("description", e.target.value)}
+                maxLength={5000}
+                className="min-h-36 w-full rounded-md border border-input bg-background p-3"
+                placeholder="Tell professionals what needs to be done..."
+              />
+            </Field>
+          </div>
+        )}
+        {step === 1 && (
+          <div className="space-y-5">
+            <h2 className="text-xl font-semibold">Budget & schedule</h2>
+            <div className="flex gap-4">
+              <Choice
+                checked={form.timingType === "FIXED"}
+                onClick={() => update("timingType", "FIXED")}
+                label="Budget range"
+              />
+              <Choice
+                checked={form.timingType === "HOURLY"}
+                onClick={() => update("timingType", "HOURLY")}
+                label="Hourly rate"
+              />
             </div>
-          )}
-          {step === 1 && (
-            <div className="space-y-5">
-              <h2 className="text-xl font-semibold">Budget & schedule</h2>
-              <div className="flex gap-4">
-                <Choice
-                  checked={form.timingType === "FIXED"}
-                  onClick={() => update("timingType", "FIXED")}
-                  label="Budget range"
-                />
-                <Choice
-                  checked={form.timingType === "HOURLY"}
-                  onClick={() => update("timingType", "HOURLY")}
-                  label="Hourly rate"
-                />
-              </div>
-              {form.timingType === "FIXED" ? (
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <Field label="Minimum budget (USD)" error={errors.budgetMin}>
-                    <Input
-                      type="number"
-                      min="0"
-                      value={form.budgetMin}
-                      onChange={(e) => update("budgetMin", e.target.value)}
-                      placeholder="$ 0"
-                    />
-                  </Field>
-                  <Field label="Maximum budget (USD)" error={errors.budgetMax}>
-                    <Input
-                      type="number"
-                      min="0"
-                      value={form.budgetMax}
-                      onChange={(e) => update("budgetMax", e.target.value)}
-                      placeholder="$ 0"
-                    />
-                  </Field>
-                </div>
-              ) : (
-                <Field label="Hourly rate (USD)" error={errors.hourlyRate}>
+            {form.timingType === "FIXED" ? (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field label="Minimum budget (USD)" error={errors.budgetMin}>
                   <Input
                     type="number"
                     min="0"
-                    value={form.hourlyRate}
-                    onChange={(e) => update("hourlyRate", e.target.value)}
-                    placeholder="$ 0 / hour"
+                    value={form.budgetMin}
+                    onChange={(e) => update("budgetMin", e.target.value)}
+                    placeholder="$ 0"
                   />
                 </Field>
-              )}
-              <Field label="How urgent is this job?">
-                <select
-                  value={form.urgency}
-                  onChange={(e) => update("urgency", e.target.value as Form["urgency"])}
-                  className="h-10 w-full rounded-md border border-input bg-background px-3"
-                >
-                  <option value="HIGH">Urgent — as soon as possible</option>
-                  <option value="MEDIUM">Soon — within a few days</option>
-                  <option value="LOW">Flexible — timing is flexible</option>
-                </select>
-              </Field>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Preferred job date">
+                <Field label="Maximum budget (USD)" error={errors.budgetMax}>
                   <Input
-                    type="date"
-                    min={new Date().toISOString().slice(0, 10)}
-                    value={form.jobDate}
-                    onChange={(e) => update("jobDate", e.target.value)}
-                  />
-                </Field>
-                <Field label="Deadline" error={errors.deadline}>
-                  <Input
-                    type="date"
-                    min={form.jobDate || new Date().toISOString().slice(0, 10)}
-                    value={form.deadline}
-                    onChange={(e) => update("deadline", e.target.value)}
+                    type="number"
+                    min="0"
+                    value={form.budgetMax}
+                    onChange={(e) => update("budgetMax", e.target.value)}
+                    placeholder="$ 0"
                   />
                 </Field>
               </div>
-            </div>
-          )}
-          {step === 2 && (
-            <div className="space-y-5">
-              <h2 className="text-xl font-semibold">What type of job is this?</h2>
-              <div className="grid gap-3 sm:grid-cols-3">
-                <Mode
-                  checked={form.workMode === "ON_SITE"}
-                  onClick={() => update("workMode", "ON_SITE")}
-                  title="On-site"
-                  text="A professional comes to the job location."
-                />
-                <Mode
-                  checked={form.workMode === "REMOTE"}
-                  onClick={() => update("workMode", "REMOTE")}
-                  title="Remote"
-                  text="The work can be completed remotely."
-                />
-                <Mode
-                  checked={form.workMode === "BOTH"}
-                  onClick={() => update("workMode", "BOTH")}
-                  title="Hybrid"
-                  text="A mix of remote and on-site work."
-                />
-              </div>
-            </div>
-          )}
-          {step === 3 && (
-            <div className="space-y-5">
-              <h2 className="text-xl font-semibold">Where will the job take place?</h2>
-              {form.workMode === "REMOTE" ? (
-                <p className="rounded-lg bg-muted p-4 text-sm">
-                  Remote jobs do not need a physical location. You may still add one if it helps
-                  professionals.
-                </p>
-              ) : null}
-              {locationOptions.length > 0 && (
-                <div className="space-y-2">
-                  {locationOptions.map((option) => (
-                    <button
-                      key={`${option.label}-${option.address}`}
-                      type="button"
-                      className="w-full rounded-lg border p-3 text-left hover:border-primary"
-                      onClick={() => {
-                        update("locationLabel", option.label);
-                        update("locationAddress", option.address);
-                        update("locationLat", option.lat ?? null);
-                        update("locationLng", option.lng ?? null);
-                      }}
-                    >
-                      <span className="block font-medium">Use {option.label}</span>
-                      <span className="text-sm text-muted-foreground">{option.address}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-              <Field label="Location label">
+            ) : (
+              <Field label="Hourly rate (USD)" error={errors.hourlyRate}>
                 <Input
-                  value={form.locationLabel}
-                  onChange={(e) => update("locationLabel", e.target.value)}
-                  placeholder="e.g. Home or job site"
+                  type="number"
+                  min="0"
+                  value={form.hourlyRate}
+                  onChange={(e) => update("hourlyRate", e.target.value)}
+                  placeholder="$ 0 / hour"
                 />
               </Field>
-              <div
-                className={errors.locationAddress ? "rounded-lg border border-destructive p-2" : ""}
+            )}
+            <Field label="How urgent is this job?">
+              <select
+                value={form.urgency}
+                onChange={(e) => update("urgency", e.target.value as Form["urgency"])}
+                className="h-10 w-full rounded-md border border-input bg-background px-3"
               >
-                <AddressMapPicker
-                  id="job-location"
-                  value={form.locationAddress}
-                  onChange={(value) => update("locationAddress", value)}
-                  onCoordinatesChange={(lat, lng) => {
-                    update("locationLat", lat);
-                    update("locationLng", lng);
-                  }}
+                <option value="HIGH">Urgent — as soon as possible</option>
+                <option value="MEDIUM">Soon — within a few days</option>
+                <option value="LOW">Flexible — timing is flexible</option>
+              </select>
+            </Field>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Preferred job date">
+                <Input
+                  type="date"
+                  min={new Date().toISOString().slice(0, 10)}
+                  value={form.jobDate}
+                  onChange={(e) => update("jobDate", e.target.value)}
                 />
-                {errors.locationAddress && (
-                  <p className="mt-2 text-sm text-destructive">{errors.locationAddress}</p>
-                )}
+              </Field>
+              <Field label="Deadline" error={errors.deadline}>
+                <Input
+                  type="date"
+                  min={form.jobDate || new Date().toISOString().slice(0, 10)}
+                  value={form.deadline}
+                  onChange={(e) => update("deadline", e.target.value)}
+                />
+              </Field>
+            </div>
+          </div>
+        )}
+        {step === 2 && (
+          <div className="space-y-5">
+            <h2 className="text-xl font-semibold">What type of job is this?</h2>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <Mode
+                checked={form.workMode === "ON_SITE"}
+                onClick={() => update("workMode", "ON_SITE")}
+                title="On-site"
+                text="A professional comes to the job location."
+              />
+              <Mode
+                checked={form.workMode === "REMOTE"}
+                onClick={() => update("workMode", "REMOTE")}
+                title="Remote"
+                text="The work can be completed remotely."
+              />
+              <Mode
+                checked={form.workMode === "BOTH"}
+                onClick={() => update("workMode", "BOTH")}
+                title="Hybrid"
+                text="A mix of remote and on-site work."
+              />
+            </div>
+          </div>
+        )}
+        {step === 3 && (
+          <div className="space-y-5">
+            <h2 className="text-xl font-semibold">Where will the job take place?</h2>
+            {form.workMode === "REMOTE" ? (
+              <p className="rounded-lg bg-muted p-4 text-sm">
+                Remote jobs do not need a physical location. You may still add one if it helps
+                professionals.
+              </p>
+            ) : null}
+            {locationOptions.length > 0 && (
+              <div className="space-y-2">
+                {locationOptions.map((option) => (
+                  <button
+                    key={`${option.label}-${option.address}`}
+                    type="button"
+                    className="w-full rounded-lg border p-3 text-left hover:border-primary"
+                    onClick={() => {
+                      update("locationLabel", option.label);
+                      update("locationAddress", option.address);
+                      update("locationLat", option.lat ?? null);
+                      update("locationLng", option.lng ?? null);
+                    }}
+                  >
+                    <span className="block font-medium">Use {option.label}</span>
+                    <span className="text-sm text-muted-foreground">{option.address}</span>
+                  </button>
+                ))}
               </div>
-            </div>
-          )}
-          {step === 4 && (
-            <div className="space-y-5">
-              <h2 className="text-xl font-semibold">Review your job</h2>
-              <Review label="Title" value={form.title || "Not set"} />
-              <Review label="Category" value={form.category || "Not set"} />
-              <Review label="Description" value={form.description || "Not set"} />
-              <Review
-                label="Budget"
-                value={
-                  form.timingType === "HOURLY"
-                    ? `${money(Number(form.hourlyRate) || null)} / hour`
-                    : `${money(Number(form.budgetMin) || null)} – ${money(Number(form.budgetMax) || null)}`
-                }
+            )}
+            <Field label="Location label">
+              <Input
+                value={form.locationLabel}
+                onChange={(e) => update("locationLabel", e.target.value)}
+                placeholder="e.g. Home or job site"
               />
-              <Review
-                label="Urgency"
-                value={{ HIGH: "Urgent", MEDIUM: "Soon", LOW: "Flexible" }[form.urgency]}
-              />
-              <Review label="Deadline" value={form.deadline || "Not set"} />
-              <Review
-                label="Job type"
-                value={{ ON_SITE: "On-site", REMOTE: "Remote", BOTH: "Hybrid" }[form.workMode]}
-              />
-              {form.workMode !== "REMOTE" && (
-                <Review label="Location" value={form.locationAddress || "Not set"} />
-              )}
-            </div>
-          )}
-          {message && (
-            <p
-              role="status"
-              className={`mt-5 text-sm ${message.includes("saved") ? "text-green-700" : "text-destructive"}`}
+            </Field>
+            <div
+              className={errors.locationAddress ? "rounded-lg border border-destructive p-2" : ""}
             >
-              {message}
-            </p>
-          )}
-          <div className="mt-7 flex flex-wrap justify-between gap-3 border-t pt-5">
-            <div>
-              {step > 0 && (
-                <Button type="button" variant="outline" onClick={() => setStep(step - 1)}>
-                  Back
-                </Button>
-              )}
-            </div>
-            <div className="flex gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                disabled={saving}
-                onClick={() => void save("draft")}
-              >
-                {saving ? "Saving..." : "Save draft"}
-              </Button>
-              {step < 4 ? (
-                <Button
-                  type="button"
-                  onClick={() => {
-                    if (clientCheck()) setStep(step + 1);
-                  }}
-                >
-                  Continue
-                </Button>
-              ) : (
-                <Button type="button" disabled={saving} onClick={() => void save("publish")}>
-                  {saving ? "Posting..." : "Post job"}
-                </Button>
+              <AddressMapPicker
+                id="job-location"
+                value={form.locationAddress}
+                onChange={(value) => update("locationAddress", value)}
+                onCoordinatesChange={(lat, lng) => {
+                  update("locationLat", lat);
+                  update("locationLng", lng);
+                }}
+              />
+              {errors.locationAddress && (
+                <p className="mt-2 text-sm text-destructive">{errors.locationAddress}</p>
               )}
             </div>
           </div>
-        </section>
-      </div>
-    </AppShell>
+        )}
+        {step === 4 && (
+          <div className="space-y-5">
+            <h2 className="text-xl font-semibold">Review your job</h2>
+            <Review label="Title" value={form.title || "Not set"} />
+            <Review label="Category" value={form.category || "Not set"} />
+            <Review label="Description" value={form.description || "Not set"} />
+            <Review
+              label="Budget"
+              value={
+                form.timingType === "HOURLY"
+                  ? `${money(Number(form.hourlyRate) || null)} / hour`
+                  : `${money(Number(form.budgetMin) || null)} – ${money(Number(form.budgetMax) || null)}`
+              }
+            />
+            <Review
+              label="Urgency"
+              value={{ HIGH: "Urgent", MEDIUM: "Soon", LOW: "Flexible" }[form.urgency]}
+            />
+            <Review label="Deadline" value={form.deadline || "Not set"} />
+            <Review
+              label="Job type"
+              value={{ ON_SITE: "On-site", REMOTE: "Remote", BOTH: "Hybrid" }[form.workMode]}
+            />
+            {form.workMode !== "REMOTE" && (
+              <Review label="Location" value={form.locationAddress || "Not set"} />
+            )}
+          </div>
+        )}
+        {message && (
+          <p
+            role="status"
+            className={`mt-5 text-sm ${message.includes("saved") ? "text-green-700" : "text-destructive"}`}
+          >
+            {message}
+          </p>
+        )}
+        <div className="mt-7 flex flex-wrap justify-between gap-3 border-t pt-5">
+          <div>
+            {step > 0 && (
+              <Button type="button" variant="outline" onClick={() => setStep(step - 1)}>
+                Back
+              </Button>
+            )}
+          </div>
+          <div className="flex gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={saving}
+              onClick={() => void save("draft")}
+            >
+              {saving ? "Saving..." : "Save draft"}
+            </Button>
+            {step < 4 ? (
+              <Button
+                type="button"
+                onClick={() => {
+                  if (clientCheck()) setStep(step + 1);
+                }}
+              >
+                Continue
+              </Button>
+            ) : (
+              <Button type="button" disabled={saving} onClick={() => void save("publish")}>
+                {saving ? "Posting..." : "Post job"}
+              </Button>
+            )}
+          </div>
+        </div>
+      </section>
+    </div>
   );
 }
 function Field({

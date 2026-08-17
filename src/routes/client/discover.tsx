@@ -3,7 +3,6 @@
 import { Suspense } from "react";
 import dynamic from "next/dynamic";
 import { useRouter, useSearchParams } from "next/navigation";
-import { AppShell } from "@/components/AppShell";
 const ProfessionalDiscoveryMap = dynamic(() => import("@/components/ProfessionalDiscoveryMap"), {
   ssr: false,
 });
@@ -141,7 +140,7 @@ function DiscoverContent() {
   const totalProfessionals = results?.total ?? 0;
 
   return (
-    <AppShell>
+    <>
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Find professionals</h1>
@@ -553,7 +552,7 @@ function DiscoverContent() {
           )}
         </div>
       </div>
-    </AppShell>
+    </>
   );
 }
 

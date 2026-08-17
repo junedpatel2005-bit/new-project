@@ -12,7 +12,6 @@ import {
   Star,
   UsersRound,
 } from "lucide-react";
-import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { DashboardSkeleton } from "@/components/LoadingSkeleton";
 
@@ -64,7 +63,7 @@ export default function Dashboard() {
       .catch(() => setError("Sign in as a client to view your dashboard."));
   }, []);
   return (
-    <AppShell>
+    <>
       {error ? (
         <div className="rounded-2xl border border-destructive/20 bg-destructive/5 p-6 text-sm text-destructive">
           {error}
@@ -309,7 +308,7 @@ export default function Dashboard() {
           </section>
         </div>
       )}
-    </AppShell>
+    </>
   );
 }
 
