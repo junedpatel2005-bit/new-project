@@ -57,6 +57,12 @@ export async function POST(request: NextRequest) {
       { error: "Complete the required professional details." },
       { status: 400 },
     );
+  const validCategory = await db.serviceCategory.findFirst({
+    where: { name: parsed.data.category },
+    select: { id: true },
+  });
+  if (!validCategory)
+    return NextResponse.json({ error: "Choose a valid service category." }, { status: 400 });
   const profile = await db.user.update({
     where: { id: userId },
     data: {

@@ -148,8 +148,12 @@ export default function PostJob() {
       if (!form.description.trim()) e.description = "Describe the work needed.";
     }
     if (step === 1) {
+      if (form.timingType === "HOURLY" && !form.hourlyRate) e.hourlyRate = "Enter an hourly rate.";
+      if (form.timingType === "FIXED" && (!form.budgetMin || !form.budgetMax))
+        e.budgetMin = "Enter a budget range.";
       if (form.budgetMin && form.budgetMax && Number(form.budgetMin) > Number(form.budgetMax))
         e.budgetMax = "Maximum budget must be at least the minimum.";
+      if (!form.deadline) e.deadline = "Choose a deadline.";
       if (form.jobDate && form.deadline && form.deadline < form.jobDate)
         e.deadline = "Deadline cannot be before the preferred job date.";
     }
@@ -423,8 +427,8 @@ export default function PostJob() {
               label="Budget"
               value={
                 form.timingType === "HOURLY"
-                  ? `${money(Number(form.hourlyRate) || null)} / hour`
-                  : `${money(Number(form.budgetMin) || null)} – ${money(Number(form.budgetMax) || null)}`
+                  ? `${money(form.hourlyRate === "" ? null : Number(form.hourlyRate))} / hour`
+                  : `${money(form.budgetMin === "" ? null : Number(form.budgetMin))} – ${money(form.budgetMax === "" ? null : Number(form.budgetMax))}`
               }
             />
             <Review

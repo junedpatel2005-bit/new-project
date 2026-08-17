@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import type { MarketplaceCategory } from "@/lib/types/marketplace";
 
 const LeafletMap = dynamic(() => import("@/components/LeafletAddressMap"), {
   ssr: false,
@@ -34,6 +35,15 @@ export function ProfessionalProfileSetup() {
   const [skills, setSkills] = useState("");
   const [location, setLocation] = useState<[number, number]>([20.5937, 78.9629]);
   const [serviceRadiusKm, setServiceRadiusKm] = useState<string>("25");
+  const [categories, setCategories] = useState<MarketplaceCategory[]>([]);
+  const [category, setCategory] = useState("");
+
+  useEffect(() => {
+    void fetch("/api/v1/marketplace/categories")
+      .then((response) => (response.ok ? response.json() : []))
+      .then(setCategories)
+      .catch(() => setCategories([]));
+  }, []);
 
   useEffect(() => {
     void fetch("/api/v1/professional/profile")
@@ -41,6 +51,7 @@ export function ProfessionalProfileSetup() {
       .then((data: { profile?: Profile | null } | null) => {
         if (!data?.profile) return;
         setProfile(data.profile);
+        setCategory(data.profile.professionalCategory ?? "");
         if (
           data.profile.professionalLatitude !== null &&
           data.profile.professionalLongitude !== null
@@ -62,6 +73,10 @@ export function ProfessionalProfileSetup() {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!category) {
+      setError("Choose a service category.");
+      return;
+    }
     setError(null);
     setPending(true);
     const form = new FormData(event.currentTarget);
@@ -69,7 +84,7 @@ export function ProfessionalProfileSetup() {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
-        category: form.get("category"),
+        category,
         experienceYears: form.get("experienceYears") ? Number(form.get("experienceYears")) : null,
         hourlyRate: form.get("hourlyRate") ? Number(form.get("hourlyRate")) : null,
         serviceRadiusKm: serviceRadiusKm ? Number(serviceRadiusKm) : null,
@@ -98,13 +113,27 @@ export function ProfessionalProfileSetup() {
       subtitle="Add the essentials clients need before they can hire you."
     >
       <form onSubmit={submit} className="space-y-4">
-        <Field
-          name="category"
-          label="Service category"
-          required
-          defaultValue={profile?.professionalCategory}
-          placeholder="Designer, electrician..."
-        />
+        <div className="space-y-1.5">
+          <Label htmlFor="category">Service category</Label>
+          <select
+            id="category"
+            name="category"
+            required
+            value={category}
+            onChange={(event) => setCategory(event.target.value)}
+            className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+          >
+            <option value="">Select a category</option>
+            {category && !categories.some((item) => item.name === category) && (
+              <option value={category}>{category} (no longer listed — please reselect)</option>
+            )}
+            {categories.map((item) => (
+              <option key={item.id} value={item.name}>
+                {item.name}
+              </option>
+            ))}
+          </select>
+        </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field
             name="experienceYears"
