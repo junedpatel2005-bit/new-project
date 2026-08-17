@@ -80,6 +80,7 @@ export type MarketplaceCategory = {
   description: string;
   iconName: string;
   segment: string;
+  parentId: number | null;
   professionalCount: number;
 };
 

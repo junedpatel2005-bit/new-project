@@ -6,6 +6,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 const ProfessionalDiscoveryMap = dynamic(() => import("@/components/ProfessionalDiscoveryMap"), {
   ssr: false,
 });
+const ProfessionalsPreviewMap = dynamic(() => import("@/components/ProfessionalsPreviewMap"), {
+  ssr: false,
+});
 import { ProCard } from "@/components/ProCard";
 import Skeleton from "react-loading-skeleton";
 import type { MarketplaceCategory, MarketplaceProfessional } from "@/lib/types/marketplace";
@@ -429,7 +432,9 @@ function DiscoverContent() {
             </Button>
           </div>
 
-          <button
+          <div
+            role="button"
+            tabIndex={0}
             onClick={() => {
               setShowMap(true);
               if (mapSectionRef.current) {
@@ -438,9 +443,14 @@ function DiscoverContent() {
                 });
               }
             }}
-            className="mb-4 hidden h-40 w-full overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-primary/10 via-card to-accent/10 p-6 shadow-soft transition-all hover:border-primary/50 hover:shadow-elevated md:block"
+            onKeyDown={(event) => {
+              if (event.key !== "Enter" && event.key !== " ") return;
+              event.preventDefault();
+              event.currentTarget.click();
+            }}
+            className="mb-4 hidden h-40 w-full cursor-pointer overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-primary/10 via-card to-accent/10 p-6 shadow-soft transition-all hover:border-primary/50 hover:shadow-elevated md:block"
           >
-            <div className="flex h-full items-center justify-between">
+            <div className="flex h-full items-center justify-between gap-6">
               <div className="text-left">
                 <p className="text-sm font-semibold">Professionals near you</p>
                 <p className="text-xs text-muted-foreground mt-1">
@@ -448,23 +458,11 @@ function DiscoverContent() {
                   view on map
                 </p>
               </div>
-              <div className="relative h-full w-1/2">
-                <div className="absolute inset-0 grid grid-cols-6 grid-rows-3 gap-1 opacity-40">
-                  {Array.from({ length: 18 }).map((_, i) => (
-                    <div key={i} className="rounded bg-primary/20" />
-                  ))}
-                </div>
-                <div className="grid h-full grid-cols-2 gap-3 p-6">
-                  {professionals.slice(0, 4).map((professional) => (
-                    <span
-                      key={professional.id}
-                      className="h-3 w-3 animate-pulse rounded-full bg-primary ring-4 ring-primary/20"
-                    />
-                  ))}
-                </div>
+              <div className="h-full w-1/2">
+                <ProfessionalsPreviewMap professionals={results?.professionals ?? []} />
               </div>
             </div>
-          </button>
+          </div>
 
           {status === "loading" && (
             <div className="grid gap-4 sm:grid-cols-2">

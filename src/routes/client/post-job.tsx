@@ -42,6 +42,11 @@ const empty: Form = {
   locationLng: null,
 };
 const steps = ["Details", "Budget & schedule", "Job type", "Location", "Review"];
+const segmentOptions: [string, string][] = [
+  ["RESIDENTIAL", "Residential"],
+  ["COMMERCIAL", "Commercial"],
+  ["INDUSTRIAL", "Industrial"],
+];
 const asDate = (value: string | Date | null) =>
   value ? new Date(value).toISOString().slice(0, 10) : "";
 const money = (value: number | null | undefined) =>
@@ -65,7 +70,8 @@ export default function PostJob() {
     [primary, setPrimary] = useState<string>(""),
     [errors, setErrors] = useState<Record<string, string>>({}),
     [message, setMessage] = useState(""),
-    [saving, setSaving] = useState(false);
+    [saving, setSaving] = useState(false),
+    [segment, setSegment] = useState("");
   const update = <K extends keyof Form>(key: K, value: Form[K]) => {
     setForm((old) => ({ ...old, [key]: value }));
     setErrors((old) => {
@@ -192,6 +198,26 @@ export default function PostJob() {
       setSaving(false);
     }
   }
+  const topCategories = useMemo(
+    () => categories.filter((c) => c.parentId === null && (!segment || c.segment === segment)),
+    [categories, segment],
+  );
+  const selectedCategory = useMemo(
+    () => categories.find((c) => c.name === form.category) ?? null,
+    [categories, form.category],
+  );
+  const activeTopCategory = useMemo(() => {
+    if (!selectedCategory) return null;
+    if (selectedCategory.parentId === null) return selectedCategory;
+    return categories.find((c) => c.id === selectedCategory.parentId) ?? null;
+  }, [categories, selectedCategory]);
+  const subCategories = useMemo(
+    () => (activeTopCategory ? categories.filter((c) => c.parentId === activeTopCategory.id) : []),
+    [categories, activeTopCategory],
+  );
+  useEffect(() => {
+    if (!segment && activeTopCategory) setSegment(activeTopCategory.segment);
+  }, [segment, activeTopCategory]);
   const locationOptions = useMemo<
     Array<{ label: string; address: string; lat: number | null; lng: number | null }>
   >(
@@ -236,19 +262,57 @@ export default function PostJob() {
               />
             </Field>
             <Field label="Category" error={errors.category}>
-              <select
-                value={form.category}
-                onChange={(e) => update("category", e.target.value)}
-                className="h-10 w-full rounded-md border border-input bg-background px-3"
-              >
-                <option value="">Select a category</option>
-                {categories.map((c) => (
-                  <option key={c.id} value={c.name}>
-                    {c.name}
-                  </option>
+              <div className="flex flex-wrap gap-2">
+                {segmentOptions.map(([value, label]) => (
+                  <Choice
+                    key={value}
+                    checked={segment === value}
+                    onClick={() => {
+                      setSegment(value);
+                      update("category", "");
+                    }}
+                    label={label}
+                  />
                 ))}
-              </select>
+              </div>
             </Field>
+            {segment && (
+              <Field label="Which category?" error={errors.category}>
+                <select
+                  value={activeTopCategory?.id ?? ""}
+                  onChange={(e) => {
+                    const top = topCategories.find((c) => c.id === Number(e.target.value));
+                    update("category", top?.name ?? "");
+                  }}
+                  className="h-10 w-full rounded-md border border-input bg-background px-3"
+                >
+                  <option value="">Select a category</option>
+                  {topCategories.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+            )}
+            {subCategories.length > 0 && (
+              <Field label="Sub-category">
+                <select
+                  value={selectedCategory?.parentId != null ? selectedCategory.name : ""}
+                  onChange={(e) =>
+                    update("category", e.target.value || (activeTopCategory?.name ?? ""))
+                  }
+                  className="h-10 w-full rounded-md border border-input bg-background px-3"
+                >
+                  <option value="">General {activeTopCategory?.name}</option>
+                  {subCategories.map((c) => (
+                    <option key={c.id} value={c.name}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+            )}
             <Field label="Description" error={errors.description}>
               <textarea
                 value={form.description}

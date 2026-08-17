@@ -182,6 +182,7 @@ export async function listCategories(): Promise<MarketplaceCategory[]> {
         description: true,
         iconName: true,
         segment: true,
+        parentId: true,
       },
       orderBy: { sortOrder: "asc" },
     }),

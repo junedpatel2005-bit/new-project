@@ -16,9 +16,6 @@ import {
 } from "lucide-react";
 import { CardListSkeleton } from "@/components/LoadingSkeleton";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { ExportMenu } from "@/components/reports/ExportMenu";
-import { useRowSelection } from "@/hooks/use-row-selection";
 
 type Job = {
   id: number;
@@ -131,13 +128,6 @@ export default function MyJobs() {
       return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
     });
   }, [jobs, status]);
-
-  const {
-    selectedIds,
-    toggle: toggleSelected,
-    allVisibleSelected,
-    toggleAllVisible: toggleSelectAllVisible,
-  } = useRowSelection(visible);
 
   async function remove(id: number) {
     if (!confirm("Delete this draft permanently?")) return;
@@ -253,22 +243,6 @@ export default function MyJobs() {
           </div>
         </div>
 
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-          <label className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Checkbox
-              checked={allVisibleSelected}
-              onCheckedChange={toggleSelectAllVisible}
-              disabled={!visible.length}
-            />
-            {selectedIds.size > 0 ? `${selectedIds.size} selected` : "Select all shown"}
-          </label>
-          <ExportMenu
-            endpoint="/api/client/jobs/export"
-            selectedIds={[...selectedIds]}
-            fileBaseName="my-jobs"
-          />
-        </div>
-
         {message ? (
           <p className="mt-5 rounded-xl border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive">
             {message}
@@ -299,13 +273,6 @@ export default function MyJobs() {
                 >
                   <div className="flex flex-col gap-5 lg:flex-row lg:items-center">
                     <div className="flex min-w-0 flex-1 gap-4">
-                      <Checkbox
-                        className="mt-1 shrink-0"
-                        checked={selectedIds.has(job.id)}
-                        onCheckedChange={() => toggleSelected(job.id)}
-                        onClick={(event) => event.stopPropagation()}
-                        aria-label={`Select ${job.title ?? "job"}`}
-                      />
                       <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
                         <BriefcaseBusiness className="h-5 w-5" />
                       </div>
