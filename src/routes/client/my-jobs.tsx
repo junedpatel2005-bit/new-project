@@ -54,11 +54,11 @@ function jobBudget(job: Job) {
   if (job.timingType === "HOURLY") {
     return job.hourlyRate == null
       ? "Rate not set"
-      : `$${job.hourlyRate.toLocaleString("en-US")}/hr`;
+      : `₹${job.hourlyRate.toLocaleString("en-US")}/hr`;
   }
   if (job.budgetMin == null && job.budgetMax == null) return "Budget not set";
-  if (job.budgetMin === job.budgetMax) return `$${job.budgetMin?.toLocaleString("en-US")}`;
-  return `$${job.budgetMin?.toLocaleString("en-US") ?? "—"} – $${job.budgetMax?.toLocaleString("en-US") ?? "—"}`;
+  if (job.budgetMin === job.budgetMax) return `₹${job.budgetMin?.toLocaleString("en-US")}`;
+  return `₹${job.budgetMin?.toLocaleString("en-US") ?? "—"} – ₹${job.budgetMax?.toLocaleString("en-US") ?? "—"}`;
 }
 
 function statusStyle(status: Job["status"]) {

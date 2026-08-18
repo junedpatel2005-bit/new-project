@@ -151,11 +151,11 @@ function fromOwner(job: OwnerJob): ViewJob {
 
 function formatBudget(job: ViewJob) {
   if (job.timingType === "HOURLY" && job.hourlyRate !== null) {
-    return `$${job.hourlyRate.toLocaleString()}/hr`;
+    return `₹${job.hourlyRate.toLocaleString()}/hr`;
   }
   return job.budgetMin === null && job.budgetMax === null
     ? "Budget on request"
-    : `$${job.budgetMin?.toLocaleString() ?? "—"} – $${job.budgetMax?.toLocaleString() ?? "—"}`;
+    : `₹${job.budgetMin?.toLocaleString() ?? "—"} – ₹${job.budgetMax?.toLocaleString() ?? "—"}`;
 }
 
 function formatDate(dateString: string | null) {
@@ -738,6 +738,9 @@ export default function JobDetails() {
                 <p className="mt-1 text-xs text-muted-foreground">
                   {professionals.length} available • Click to view on map
                 </p>
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  Approximate location — shown for privacy
+                </p>
               </div>
               <div className="h-full w-1/2">
                 <ProfessionalsPreviewMap professionals={professionals} />
@@ -875,7 +878,7 @@ export default function JobDetails() {
             <DialogTitle>Confirm hire</DialogTitle>
             <DialogDescription>
               {pendingAcceptProposal
-                ? `Hire ${pendingAcceptProposal.professional?.firstName ?? "this professional"} for $${pendingAcceptProposal.bidAmount.toLocaleString()}?`
+                ? `Hire ${pendingAcceptProposal.professional?.firstName ?? "this professional"} for ₹${pendingAcceptProposal.bidAmount.toLocaleString()}?`
                 : "Hire this professional?"}
             </DialogDescription>
           </DialogHeader>
@@ -981,7 +984,7 @@ export default function JobDetails() {
                     <p className="text-xs text-muted-foreground">
                       {professional.hourlyRate == null
                         ? "Contact for pricing"
-                        : `$${professional.hourlyRate}/hr`}{" "}
+                        : `₹${professional.hourlyRate}/hr`}{" "}
                       · {professional.location ?? "Remote"}
                     </p>
                     <Button asChild size="sm">

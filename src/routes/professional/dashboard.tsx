@@ -274,7 +274,7 @@ export default function ProfessionalDashboard() {
                     {proposal.clientName ?? "Client"} · {proposal.duration}
                   </p>
                 </div>
-                <p className="font-semibold">${proposal.bidAmount.toLocaleString()}</p>
+                <p className="font-semibold">₹{proposal.bidAmount.toLocaleString()}</p>
                 <Button asChild size="sm">
                   <Link href="/professional/my-jobs?tab=proposals">Review</Link>
                 </Button>

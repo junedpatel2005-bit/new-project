@@ -267,7 +267,7 @@ export default function AdminUsersPage() {
                 ["Proposals", detail.stats.proposals, UserRound],
                 ["Projects", detail.stats.projects, CheckCircle2],
                 ["Payments", detail.stats.completedPayments, DollarSign],
-                ["Money", `$${detail.stats.money.toLocaleString()}`, DollarSign],
+                ["Money", `₹${detail.stats.money.toLocaleString()}`, DollarSign],
                 ["Services", detail.stats.services, ShieldCheck],
               ].map(([label, value, Icon]) => {
                 const MetricIcon = Icon as typeof DollarSign;

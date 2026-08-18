@@ -37,8 +37,8 @@ function displayStatus(status: string) {
 function money(project: RunningProject) {
   if (project.budget == null) return "Amount pending";
   return project.timingType === "HOURLY"
-    ? `$${project.budget.toLocaleString()}/hr`
-    : `$${project.budget.toLocaleString()}`;
+    ? `₹${project.budget.toLocaleString()}/hr`
+    : `₹${project.budget.toLocaleString()}`;
 }
 
 function ProjectsReport() {
@@ -177,7 +177,7 @@ function EarningsReport() {
               key: "amount",
               header: "Amount",
               align: "right",
-              render: (item) => `$${item.amount.toLocaleString()} ${item.currency}`,
+              render: (item) => `₹${item.amount.toLocaleString()} ${item.currency}`,
             },
             { key: "status", header: "Status", render: (item) => item.status },
             {

@@ -26,9 +26,9 @@ import type { DetailedProfessional } from "@/lib/types/marketplace";
 
 function formatCurrency(amount: number | null): string {
   if (amount === null || amount === undefined) return "Not specified";
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat("en-IN", {
     style: "currency",
-    currency: "USD",
+    currency: "INR",
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(amount);
@@ -200,7 +200,7 @@ export default async function ProfessionalProfilePage() {
             </div>
             <div className="flex flex-wrap gap-3">
               <Button asChild>
-                <Link href="/profile-setup">Edit profile</Link>
+                <Link href="/professional/setup">Edit profile</Link>
               </Button>
               <Button variant="outline" asChild>
                 <Link href="/dashboard">Dashboard</Link>

@@ -781,7 +781,7 @@ export default function SharedProjectTrackingPage() {
                   <div>
                     <p className="font-semibold">{m.title}</p>
                     <p className="mt-1 text-sm text-muted-foreground">
-                      {m.description || "No description"} · ${m.amount.toLocaleString()}
+                      {m.description || "No description"} · ₹{m.amount.toLocaleString()}
                     </p>
                   </div>
                   <Badge variant="outline">{label(m.status)}</Badge>

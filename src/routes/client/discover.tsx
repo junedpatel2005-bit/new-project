@@ -449,37 +449,42 @@ function DiscoverContent() {
             </Button>
           </div>
 
-          <div
-            role="button"
-            tabIndex={0}
-            onClick={() => {
-              setShowMap(true);
-              if (mapSectionRef.current) {
-                window.requestAnimationFrame(() => {
-                  mapSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-                });
-              }
-            }}
-            onKeyDown={(event) => {
-              if (event.key !== "Enter" && event.key !== " ") return;
-              event.preventDefault();
-              event.currentTarget.click();
-            }}
-            className="mb-4 hidden h-40 w-full cursor-pointer overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-primary/10 via-card to-accent/10 p-6 shadow-soft transition-all hover:border-primary/50 hover:shadow-elevated md:block"
-          >
-            <div className="flex h-full items-center justify-between gap-6">
-              <div className="text-left">
-                <p className="text-sm font-semibold">Professionals near you</p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {professionals.filter((p) => p.location !== null).length} available • Click to
-                  view on map
-                </p>
-              </div>
-              <div className="h-full w-1/2">
-                <ProfessionalsPreviewMap professionals={results?.professionals ?? []} />
+          {!showMap && (
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={() => {
+                setShowMap(true);
+                if (mapSectionRef.current) {
+                  window.requestAnimationFrame(() => {
+                    mapSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  });
+                }
+              }}
+              onKeyDown={(event) => {
+                if (event.key !== "Enter" && event.key !== " ") return;
+                event.preventDefault();
+                event.currentTarget.click();
+              }}
+              className="mb-4 hidden h-40 w-full cursor-pointer overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-primary/10 via-card to-accent/10 p-6 shadow-soft transition-all hover:border-primary/50 hover:shadow-elevated md:block"
+            >
+              <div className="flex h-full items-center justify-between gap-6">
+                <div className="text-left">
+                  <p className="text-sm font-semibold">Professionals near you</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {(results?.professionals ?? []).filter((p) => p.displayPoint).length} available
+                    • Click to view on map
+                  </p>
+                  <p className="mt-1 text-[11px] text-muted-foreground">
+                    Approximate location — shown for privacy
+                  </p>
+                </div>
+                <div className="h-full w-1/2">
+                  <ProfessionalsPreviewMap professionals={results?.professionals ?? []} />
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {status === "loading" && (
             <div className="grid gap-4 sm:grid-cols-2">
@@ -513,6 +518,9 @@ function DiscoverContent() {
                       selectedPoint={selectedPoint ?? undefined}
                     />
                   </Suspense>
+                  <p className="mt-1.5 text-[11px] text-muted-foreground">
+                    Approximate location — shown for privacy
+                  </p>
                 </div>
               )}
               <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-2">

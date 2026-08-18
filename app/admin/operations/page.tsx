@@ -409,7 +409,7 @@ function Tab({
 function JobRow({ job, onOpen }: { job: Job; onOpen: (id: number) => void }) {
   const budget =
     job.budgetMin || job.budgetMax
-      ? `$${(job.budgetMin ?? 0).toLocaleString()} – $${(job.budgetMax ?? job.budgetMin ?? 0).toLocaleString()}`
+      ? `₹${(job.budgetMin ?? 0).toLocaleString()} – ₹${(job.budgetMax ?? job.budgetMin ?? 0).toLocaleString()}`
       : "Budget not set";
   return (
     <div
@@ -566,8 +566,8 @@ function JobDetailsPanel({
                     job.timingType === "HOURLY"
                       ? job.hourlyRate == null
                         ? "Not set"
-                        : `$${job.hourlyRate.toLocaleString()}/hr`
-                      : `$${job.budgetMin?.toLocaleString() ?? "—"} – $${job.budgetMax?.toLocaleString() ?? "—"}`,
+                        : `₹${job.hourlyRate.toLocaleString()}/hr`
+                      : `₹${job.budgetMin?.toLocaleString() ?? "—"} – ₹${job.budgetMax?.toLocaleString() ?? "—"}`,
                   ],
                   ["Location", job.locationAddress ?? job.locationLabel ?? "Not set"],
                   ["Job date", job.jobDate ? date(job.jobDate) : "Not set"],
@@ -606,7 +606,7 @@ function JobDetailsPanel({
                         <div className="text-right">
                           <Badge value={proposal.status} />
                           <p className="mt-1 text-sm font-semibold text-white">
-                            ${proposal.bidAmount.toLocaleString()}
+                            ₹{proposal.bidAmount.toLocaleString()}
                           </p>
                         </div>
                       </div>
@@ -682,13 +682,13 @@ function JobDetailsPanel({
                     <div className="rounded-lg bg-white/5 p-2">
                       <dt className="text-[10px] uppercase text-slate-500">Paid</dt>
                       <dd className="mt-1 text-sm font-semibold text-white">
-                        ${job.project.financial.paidAmount.toLocaleString()}
+                        ₹{job.project.financial.paidAmount.toLocaleString()}
                       </dd>
                     </div>
                     <div className="rounded-lg bg-white/5 p-2">
                       <dt className="text-[10px] uppercase text-slate-500">Remaining</dt>
                       <dd className="mt-1 text-sm font-semibold text-white">
-                        ${job.project.financial.remainingAmount.toLocaleString()}
+                        ₹{job.project.financial.remainingAmount.toLocaleString()}
                       </dd>
                     </div>
                   </dl>
@@ -704,7 +704,7 @@ function JobDetailsPanel({
                             <Badge value={milestone.status} />
                           </div>
                           <p className="mt-1 text-xs text-slate-400">
-                            ${milestone.amount.toLocaleString()}
+                            ₹{milestone.amount.toLocaleString()}
                             {milestone.dueDate ? ` · Due ${date(milestone.dueDate)}` : ""}
                           </p>
                         </div>

@@ -85,7 +85,7 @@ const financeColumns: ReportColumn<FinanceRow>[] = [
     header: "Amount",
     width: 1.3,
     align: "right",
-    format: (row) => `$${row.amount.toLocaleString("en-US")} ${row.currency}`,
+    format: (row) => `₹${row.amount.toLocaleString("en-US")} ${row.currency}`,
   },
   { key: "status", header: "Status", width: 1.2, format: (row) => row.status },
   { key: "party", header: "Parties", width: 2.2, format: (row) => row.party },

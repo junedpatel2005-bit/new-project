@@ -39,10 +39,10 @@ function readableStatus(status: string) {
 
 function jobBudget(job: Job) {
   if (job.timingType === "HOURLY") {
-    return job.hourlyRate == null ? "Rate not set" : `$${job.hourlyRate.toLocaleString()}/hr`;
+    return job.hourlyRate == null ? "Rate not set" : `₹${job.hourlyRate.toLocaleString()}/hr`;
   }
   if (job.budgetMin == null && job.budgetMax == null) return "Budget not set";
-  return `$${job.budgetMin?.toLocaleString() ?? "—"} – $${job.budgetMax?.toLocaleString() ?? "—"}`;
+  return `₹${job.budgetMin?.toLocaleString() ?? "—"} – ₹${job.budgetMax?.toLocaleString() ?? "—"}`;
 }
 
 function ProjectsReport() {
@@ -176,7 +176,7 @@ function PaymentsReport() {
               key: "amount",
               header: "Amount",
               align: "right",
-              render: (payment) => `$${payment.amount.toLocaleString()} ${payment.currency}`,
+              render: (payment) => `₹${payment.amount.toLocaleString()} ${payment.currency}`,
             },
             { key: "status", header: "Status", render: (payment) => payment.status },
             {

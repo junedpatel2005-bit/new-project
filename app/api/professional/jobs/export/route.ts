@@ -39,8 +39,8 @@ type ProjectRow = {
 function money(value: number | null, timingType: string) {
   if (value == null) return "Amount pending";
   return timingType === "HOURLY"
-    ? `$${value.toLocaleString("en-US")}/hr`
-    : `$${value.toLocaleString("en-US")}`;
+    ? `₹${value.toLocaleString("en-US")}/hr`
+    : `₹${value.toLocaleString("en-US")}`;
 }
 
 const columns: ReportColumn<ProjectRow>[] = [

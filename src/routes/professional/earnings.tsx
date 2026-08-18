@@ -89,19 +89,19 @@ export default function Earnings() {
             <Stat
               icon={WalletCards}
               label="Available balance"
-              value={`$${wallet.available.toLocaleString()}`}
+              value={`₹${wallet.available.toLocaleString()}`}
               tone="primary"
             />
             <Stat
               icon={CircleDollarSign}
               label="Total earned"
-              value={`$${wallet.total.toLocaleString()}`}
+              value={`₹${wallet.total.toLocaleString()}`}
             />
-            <Stat icon={Clock3} label="This month" value={`$${thisMonth.toLocaleString()}`} />
+            <Stat icon={Clock3} label="This month" value={`₹${thisMonth.toLocaleString()}`} />
             <Stat
               icon={Landmark}
               label="In payout review"
-              value={`$${wallet.reserved.toLocaleString()}`}
+              value={`₹${wallet.reserved.toLocaleString()}`}
             />
           </div>
           <div className="grid gap-6 xl:grid-cols-[1.25fr_.75fr]">

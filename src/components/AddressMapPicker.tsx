@@ -22,20 +22,40 @@ export function AddressMapPicker({
 }) {
   const [results, setResults] = useState<Result[]>([]);
   const [point, setPoint] = useState<[number, number]>([20.5937, 78.9629]);
-  const [status, setStatus] = useState("");
+  const [searchStatus, setSearchStatus] = useState("");
+  const [pinStatus, setPinStatus] = useState("");
+  const [searching, setSearching] = useState(false);
+  const [searched, setSearched] = useState(false);
   useEffect(() => {
     if (value.trim().length < 3) {
       setResults([]);
+      setSearching(false);
+      setSearched(false);
+      setSearchStatus("");
       return;
     }
+    setSearching(true);
     const t = setTimeout(async () => {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10000);
       try {
-        const r = await fetch(`/api/geocode?q=${encodeURIComponent(value)}`);
+        const r = await fetch(`/api/geocode?q=${encodeURIComponent(value)}`, {
+          signal: controller.signal,
+        });
         const d = (await r.json()) as { results?: Result[]; error?: string };
         setResults(d.results ?? []);
-        if (d.error) setStatus(d.error);
-      } catch {
-        setStatus("Address search is unavailable. You can still enter an address manually.");
+        setSearchStatus(d.error ?? "");
+      } catch (error) {
+        setResults([]);
+        setSearchStatus(
+          error instanceof Error && error.name === "AbortError"
+            ? "Address search timed out. You can still enter an address manually."
+            : "Address search is unavailable. You can still enter an address manually.",
+        );
+      } finally {
+        clearTimeout(timeout);
+        setSearching(false);
+        setSearched(true);
       }
     }, 650);
     return () => clearTimeout(t);
@@ -43,14 +63,16 @@ export function AddressMapPicker({
   async function resolve(lat: number, lon: number) {
     setPoint([lat, lon]);
     onCoordinatesChange?.(lat, lon);
-    setStatus("Finding address…");
+    setPinStatus("Finding address…");
     try {
       const r = await fetch(`/api/geocode?lat=${lat}&lon=${lon}`);
       const d = (await r.json()) as { results?: Result[]; error?: string };
-      if (d.results?.[0]) onChange(d.results[0].address);
-      else setStatus(d.error ?? "Address not found.");
-    } finally {
-      setStatus("");
+      if (d.results?.[0]) {
+        onChange(d.results[0].address);
+        setPinStatus("");
+      } else setPinStatus(d.error ?? "Address not found for that point.");
+    } catch {
+      setPinStatus("Could not look up that location. You can still enter an address manually.");
     }
   }
   return (
@@ -65,7 +87,8 @@ export function AddressMapPicker({
           maxLength={300}
         />
       </div>
-      {results.length > 0 && (
+      {searching && <p className="text-sm text-muted-foreground">Searching…</p>}
+      {!searching && results.length > 0 && (
         <ul className="rounded-lg border bg-card">
           {results.map((item) => (
             <li key={`${item.lat}-${item.lon}`}>
@@ -77,6 +100,8 @@ export function AddressMapPicker({
                   setPoint([item.lat, item.lon]);
                   onCoordinatesChange?.(item.lat, item.lon);
                   setResults([]);
+                  setSearched(false);
+                  setSearchStatus("");
                 }}
               >
                 {item.address}
@@ -85,6 +110,15 @@ export function AddressMapPicker({
           ))}
         </ul>
       )}
+      {!searching && searched && results.length === 0 && (
+        <p className="text-sm text-muted-foreground">
+          {searchStatus ||
+            "No matches found. You can drop a pin on the map or enter the address manually."}
+        </p>
+      )}
+      <p className="text-sm text-muted-foreground">
+        Click or drag the pin on the map to set the exact job location.
+      </p>
       <LeafletMap point={point} onPointChange={resolve} />
       <div className="flex flex-wrap items-center gap-3">
         <Button
@@ -93,13 +127,13 @@ export function AddressMapPicker({
           onClick={() =>
             navigator.geolocation?.getCurrentPosition(
               (p) => void resolve(p.coords.latitude, p.coords.longitude),
-              () => setStatus("Location permission was not granted."),
+              () => setPinStatus("Location permission was not granted."),
             )
           }
         >
           Use my current location
         </Button>
-        {status && <span className="text-sm text-muted-foreground">{status}</span>}
+        {pinStatus && <span className="text-sm text-muted-foreground">{pinStatus}</span>}
       </div>
       <p className="text-xs text-muted-foreground">© OpenStreetMap contributors</p>
     </div>

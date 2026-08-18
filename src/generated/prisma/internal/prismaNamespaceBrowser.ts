@@ -100,6 +100,7 @@ export const ModelName = {
   StoredFile: 'StoredFile',
   AuditLog: 'AuditLog',
   ApiToken: 'ApiToken',
+  OtpCode: 'OtpCode',
   BrowserSubscription: 'BrowserSubscription',
   Faq: 'Faq',
   ContactRequest: 'ContactRequest',
@@ -899,6 +900,20 @@ export const ApiTokenScalarFieldEnum = {
 } as const
 
 export type ApiTokenScalarFieldEnum = (typeof ApiTokenScalarFieldEnum)[keyof typeof ApiTokenScalarFieldEnum]
+
+
+export const OtpCodeScalarFieldEnum = {
+  id: 'id',
+  phone: 'phone',
+  codeHash: 'codeHash',
+  role: 'role',
+  attempts: 'attempts',
+  expiresAt: 'expiresAt',
+  consumedAt: 'consumedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type OtpCodeScalarFieldEnum = (typeof OtpCodeScalarFieldEnum)[keyof typeof OtpCodeScalarFieldEnum]
 
 
 export const BrowserSubscriptionScalarFieldEnum = {

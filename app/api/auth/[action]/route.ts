@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
-import { createHash, randomBytes, randomInt } from "crypto";
+import { createHash, randomBytes } from "crypto";
 import { db } from "@/lib/db";
 import { createSession, sessionCookie, sessionOptions, verifySession } from "@/lib/auth";
 import {
@@ -12,7 +12,7 @@ import {
 } from "@/lib/dev-phone-otp";
 import { requestPhoneOtp, verifyPhoneOtp } from "@/lib/phone-otp-provider";
 import { clearRateLimit, rateLimit } from "@/lib/rate-limit";
-import { sendAuthEmail, sendVerificationCodeEmail } from "@/lib/email";
+import { sendAuthEmail } from "@/lib/email";
 import { enqueueBackgroundJob } from "@/lib/background-jobs";
 import {
   notifyAdminsOfNewAccount,
@@ -39,7 +39,32 @@ const tokenHash = (value: string) => createHash("sha256").update(value).digest("
 const clientKey = (request: NextRequest) =>
   request.headers.get("x-forwarded-for")?.split(",")[0] ?? "local";
 const safe = (message: string, status = 400) => NextResponse.json({ error: message }, { status });
-const verificationCode = () => String(randomInt(100000, 1000000));
+async function createEmailVerificationToken(userId: number) {
+  const raw = randomBytes(32).toString("hex");
+  await db.apiToken.create({
+    data: {
+      userId,
+      tokenHash: tokenHash(raw),
+      kind: "EMAIL_VERIFICATION",
+      expiresAt: new Date(Date.now() + 24 * 3600 * 1000),
+    },
+  });
+  return raw;
+}
+function sendEmailVerificationLink(userId: number, email: string, raw: string) {
+  enqueueBackgroundJob(
+    "email.verification",
+    () =>
+      sendAuthEmail(
+        email,
+        "Verify your Servio email",
+        "Verify your email",
+        `${process.env.APP_URL}/verify-email?token=${raw}`,
+        "Verify email",
+      ),
+    { userId },
+  );
+}
 
 export async function GET(
   request: NextRequest,
@@ -204,8 +229,13 @@ export async function POST(
     : `${action}:${clientKey(request)}`;
   if (!rateLimit(rateLimitKey)) return safe("Too many attempts. Please try again shortly.", 429);
   if (action === "send-phone-otp") {
-    const parsed = z.object({ phone: z.string().min(7).max(25) }).safeParse(body);
-    if (!parsed.success) return safe("Enter a valid phone number.");
+    const parsed = z
+      .object({
+        phone: z.string().min(7).max(25),
+        role: z.enum(["CLIENT", "PROFESSIONAL"]),
+      })
+      .safeParse(body);
+    if (!parsed.success) return safe("Enter a valid phone number and account type.");
     const existingUser = await db.user.findFirst({ where: { phone: parsed.data.phone } });
     if (existingUser)
       return NextResponse.json(
@@ -219,28 +249,30 @@ export async function POST(
       !rateLimit(`send-phone-otp:${clientKey(request)}:${parsed.data.phone.trim()}`, 3, 10 * 60_000)
     )
       return safe("Too many code requests. Please try again later.", 429);
-    const result = await requestPhoneOtp(parsed.data.phone);
+    const result = await requestPhoneOtp(parsed.data.phone, parsed.data.role);
     if (!result.ok) return safe(result.error, result.status);
-    // The development code is configured only on the server. A real SMS sender
-    // can replace this isolated action without changing signup or registration.
     return NextResponse.json({ success: true });
   }
   if (action === "verify-phone") {
     const parsed = z
-      .object({ phone: z.string().min(7).max(25), code: z.string().min(1).max(20) })
+      .object({
+        phone: z.string().min(7).max(25),
+        code: z.string().min(1).max(20),
+        role: z.enum(["CLIENT", "PROFESSIONAL"]),
+      })
       .safeParse(body);
-    if (!parsed.success) return safe("Enter a valid phone number and verification code.");
+    if (!parsed.success) return safe("Enter a valid phone number, account type, and code.");
     if (
       !rateLimit(`verify-phone:${clientKey(request)}:${parsed.data.phone.trim()}`, 5, 10 * 60_000)
     )
       return safe("Too many verification attempts. Please try again later.", 429);
-    const result = await verifyPhoneOtp(parsed.data.phone, parsed.data.code);
+    const result = await verifyPhoneOtp(parsed.data.phone, parsed.data.code, parsed.data.role);
     if (!result.ok) return safe(result.error, result.status);
 
     const response = NextResponse.json({ success: true });
     response.cookies.set(
       phoneProofCookie,
-      await createPhoneVerificationProof(parsed.data.phone),
+      await createPhoneVerificationProof(parsed.data.phone, parsed.data.role),
       phoneProofCookieOptions,
     );
     return response;
@@ -283,6 +315,7 @@ export async function POST(
       !(await hasValidPhoneVerificationProof(
         request.cookies.get(phoneProofCookie)?.value,
         data.phone!,
+        data.role,
       ))
     ) {
       return safe("Verify this phone number before creating an account.", 403);
@@ -318,18 +351,8 @@ export async function POST(
       notifyAdminsOfNewAccount(user),
       ...(user.role === "PROFESSIONAL" ? [notifyClientsOfNewProfessional(user)] : []),
     ]);
-    const code = verificationCode();
-    await db.apiToken.create({
-      data: {
-        userId: user.id,
-        tokenHash: tokenHash(code),
-        kind: "EMAIL_VERIFICATION",
-        expiresAt: new Date(Date.now() + 15 * 60 * 1000),
-      },
-    });
-    enqueueBackgroundJob("email.verification", () => sendVerificationCodeEmail(user.email, code), {
-      userId: user.id,
-    });
+    const raw = await createEmailVerificationToken(user.id);
+    sendEmailVerificationLink(user.id, user.email, raw);
     const response = NextResponse.json(
       {
         success: true,
@@ -431,7 +454,7 @@ export async function POST(
           { status: 409 },
         );
       }
-      const code = verificationCode();
+      const raw = randomBytes(32).toString("hex");
       await db.$transaction([
         db.apiToken.updateMany({
           where: {
@@ -448,20 +471,16 @@ export async function POST(
         db.apiToken.create({
           data: {
             userId: user.id,
-            tokenHash: tokenHash(code),
+            tokenHash: tokenHash(raw),
             kind: "EMAIL_VERIFICATION",
-            expiresAt: new Date(Date.now() + 15 * 60 * 1000),
+            expiresAt: new Date(Date.now() + 24 * 3600 * 1000),
           },
         }),
       ]);
-      enqueueBackgroundJob(
-        "email.verification",
-        () => sendVerificationCodeEmail(parsed.data.email, code),
-        { userId: user.id },
-      );
+      sendEmailVerificationLink(user.id, parsed.data.email, raw);
       return NextResponse.json({
         success: true,
-        message: "Email updated. A new code has been sent.",
+        message: "Email updated. A new confirmation link has been sent.",
         email: parsed.data.email,
       });
     } catch {
@@ -476,22 +495,8 @@ export async function POST(
       const session = await verifySession(token);
       const user = await db.user.findUniqueOrThrow({ where: { id: session.userId } });
       if (user.emailVerifiedAt) return NextResponse.json({ success: true });
-      const code = verificationCode();
-      await db.apiToken.create({
-        data: {
-          userId: user.id,
-          tokenHash: tokenHash(code),
-          kind: "EMAIL_VERIFICATION",
-          expiresAt: new Date(Date.now() + 15 * 60 * 1000),
-        },
-      });
-      enqueueBackgroundJob(
-        "email.verification",
-        () => sendVerificationCodeEmail(user.email, code),
-        {
-          userId: user.id,
-        },
-      );
+      const raw = await createEmailVerificationToken(user.id);
+      sendEmailVerificationLink(user.id, user.email, raw);
       return NextResponse.json({ success: true });
     } catch {
       return safe("Unable to send a new verification code.", 500);
@@ -526,33 +531,69 @@ export async function POST(
     }
     return NextResponse.json({ success: true });
   }
-  if (action === "verify-email") {
-    const parsed = z.object({ code: z.string().regex(/^\d{6}$/) }).safeParse(body);
-    const token = request.cookies.get(sessionCookie)?.value;
-    if (!parsed.success || !token) return safe("Enter the 6-digit verification code.");
-    try {
-      const session = await verifySession(token);
-      const verification = await db.apiToken.findFirst({
-        where: {
-          userId: session.userId,
-          tokenHash: tokenHash(parsed.data.code),
-          kind: "EMAIL_VERIFICATION",
-          usedAt: null,
-          expiresAt: { gt: new Date() },
-        },
-      });
-      if (!verification) return safe("That verification code is invalid or has expired.");
-      await db.$transaction([
-        db.apiToken.update({ where: { id: verification.id }, data: { usedAt: new Date() } }),
-        db.user.update({ where: { id: session.userId }, data: { emailVerifiedAt: new Date() } }),
-      ]);
-      return NextResponse.json({
-        success: true,
-        redirect: session.role === "CLIENT" ? "/client-profile" : "/professional-home",
-      });
-    } catch {
-      return safe("Unable to verify your email.", 500);
+  if (action === "forgot-password-phone") {
+    const parsed = z.object({ phone: z.string().min(7).max(25) }).safeParse(body);
+    if (!parsed.success) return NextResponse.json({ success: true });
+    const phone = parsed.data.phone.trim();
+    if (!rateLimit(`forgot-password-phone:${clientKey(request)}:${phone}`, 3, 10 * 60_000))
+      return safe("Too many code requests. Please try again later.", 429);
+    const user = await db.user.findFirst({ where: { phone, isActive: true } });
+    if (user && (user.role === "CLIENT" || user.role === "PROFESSIONAL")) {
+      const result = await requestPhoneOtp(phone, user.role);
+      if (!result.ok) return safe(result.error, result.status);
     }
+    return NextResponse.json({ success: true });
+  }
+  if (action === "verify-forgot-password-phone") {
+    const parsed = z
+      .object({ phone: z.string().min(7).max(25), code: z.string().min(1).max(20) })
+      .safeParse(body);
+    if (!parsed.success) return safe("Enter a valid phone number and code.");
+    const phone = parsed.data.phone.trim();
+    if (!rateLimit(`verify-forgot-password-phone:${clientKey(request)}:${phone}`, 5, 10 * 60_000))
+      return safe("Too many verification attempts. Please try again later.", 429);
+    const user = await db.user.findFirst({ where: { phone, isActive: true } });
+    if (!user || (user.role !== "CLIENT" && user.role !== "PROFESSIONAL"))
+      return safe("That verification code is invalid or has expired.");
+    const result = await verifyPhoneOtp(phone, parsed.data.code, user.role);
+    if (!result.ok) return safe(result.error, result.status);
+    const raw = randomBytes(32).toString("hex");
+    await db.apiToken.create({
+      data: {
+        userId: user.id,
+        tokenHash: tokenHash(raw),
+        kind: "PASSWORD_RESET",
+        expiresAt: new Date(Date.now() + 30 * 60 * 1000),
+      },
+    });
+    return NextResponse.json({ success: true, token: raw });
+  }
+  if (action === "verify-email") {
+    const parsed = z.object({ token: z.string().min(32) }).safeParse(body);
+    if (!parsed.success) return safe("This verification link is invalid or has expired.");
+    const verification = await db.apiToken.findFirst({
+      where: {
+        tokenHash: tokenHash(parsed.data.token),
+        kind: "EMAIL_VERIFICATION",
+        usedAt: null,
+        expiresAt: { gt: new Date() },
+      },
+    });
+    if (!verification) return safe("This verification link is invalid or has expired.");
+    const [, user] = await db.$transaction([
+      db.apiToken.update({ where: { id: verification.id }, data: { usedAt: new Date() } }),
+      db.user.update({ where: { id: verification.userId }, data: { emailVerifiedAt: new Date() } }),
+    ]);
+    const response = NextResponse.json({
+      success: true,
+      redirect: user.role === "CLIENT" ? "/client-profile" : "/professional-home",
+    });
+    response.cookies.set(
+      sessionCookie,
+      await createSession({ userId: user.id, role: user.role }),
+      sessionOptions,
+    );
+    return response;
   }
   if (action === "reset-password") {
     const parsed = z

@@ -103,7 +103,7 @@ export function ProCard({
           <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Starting at</p>
           <p>
             <span className="font-display text-2xl font-bold text-foreground">
-              {pro.hourlyRate === null ? "Contact" : `$${pro.hourlyRate}`}
+              {pro.hourlyRate === null ? "Contact" : `₹${pro.hourlyRate}`}
             </span>
             {pro.hourlyRate !== null && <span className="text-sm text-muted-foreground">/hr</span>}
           </p>

@@ -51,9 +51,9 @@ function formatDate(dateString: string | null): string {
 
 function formatCurrency(amount: number | null): string {
   if (amount === null || amount === undefined) return "Not specified";
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat("en-IN", {
     style: "currency",
-    currency: "USD",
+    currency: "INR",
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(amount);

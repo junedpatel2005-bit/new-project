@@ -1,6 +1,7 @@
 import "server-only";
 import { randomBytes } from "crypto";
 import { jwtVerify, SignJWT } from "jose";
+import type { AccountRole } from "@/lib/phone-otp-provider";
 
 const phoneVerificationCookie = "servio_phone_verification";
 const proofLifetimeSeconds = 10 * 60;
@@ -10,8 +11,12 @@ function normalisePhone(phone: string) {
   return phone.trim();
 }
 
-export async function createPhoneVerificationProof(phone: string) {
-  return new SignJWT({ phone: normalisePhone(phone), purpose: "client-signup-phone" })
+export async function createPhoneVerificationProof(phone: string, role: AccountRole) {
+  return new SignJWT({
+    phone: normalisePhone(phone),
+    role,
+    purpose: "signup-phone",
+  })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setJti(randomBytes(16).toString("hex"))
@@ -19,13 +24,18 @@ export async function createPhoneVerificationProof(phone: string) {
     .sign(secret);
 }
 
-export async function hasValidPhoneVerificationProof(token: string | undefined, phone: string) {
+export async function hasValidPhoneVerificationProof(
+  token: string | undefined,
+  phone: string,
+  role: AccountRole,
+) {
   if (!token) return false;
   try {
     const { payload } = await jwtVerify(token, secret);
     return (
-      payload.purpose === "client-signup-phone" &&
+      payload.purpose === "signup-phone" &&
       payload.phone === normalisePhone(phone) &&
+      payload.role === role &&
       typeof payload.exp === "number" &&
       payload.exp * 1000 > Date.now()
     );

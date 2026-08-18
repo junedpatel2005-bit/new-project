@@ -31,10 +31,10 @@ const markerIcon = L.divIcon({
 
 function budgetLabel(job: MapJob) {
   if (job.timingType === "HOURLY") {
-    return job.hourlyRate == null ? "Rate not set" : `$${job.hourlyRate.toLocaleString()}/hr`;
+    return job.hourlyRate == null ? "Rate not set" : `₹${job.hourlyRate.toLocaleString()}/hr`;
   }
   if (job.budgetMin == null && job.budgetMax == null) return "Budget on request";
-  return `$${job.budgetMin?.toLocaleString() ?? "—"} – $${job.budgetMax?.toLocaleString() ?? "—"}`;
+  return `₹${job.budgetMin?.toLocaleString() ?? "—"} – ₹${job.budgetMax?.toLocaleString() ?? "—"}`;
 }
 
 function MapCenterController({ center }: { center: [number, number] }) {

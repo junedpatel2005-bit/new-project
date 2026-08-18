@@ -34,7 +34,7 @@ export default function ForPros() {
               </div>
               <div className="mt-8 grid grid-cols-3 gap-6">
                 {[
-                  { v: "$3.2k", l: "Avg. monthly earnings" },
+                  { v: "₹3.2k", l: "Avg. monthly earnings" },
                   { v: "<2h", l: "First lead" },
                   { v: "120K+", l: "Active pros" },
                 ].map((s) => (

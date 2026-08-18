@@ -29,9 +29,9 @@ export type JobCardProps = {
 };
 
 function formatBudget(value: number | null | undefined, timingType?: string | null) {
-  if (timingType === "HOURLY" && value != null) return `$${value.toLocaleString()}/hr`;
+  if (timingType === "HOURLY" && value != null) return `₹${value.toLocaleString()}/hr`;
   if (value == null) return "Budget on request";
-  return `$${value.toLocaleString()}`;
+  return `₹${value.toLocaleString()}`;
 }
 
 function formatBudgetRange(
@@ -40,10 +40,10 @@ function formatBudgetRange(
   timingType?: string | null,
 ) {
   if (timingType === "HOURLY") {
-    return min == null ? "Hourly rate not set" : `$${min.toLocaleString()}/hr`;
+    return min == null ? "Hourly rate not set" : `₹${min.toLocaleString()}/hr`;
   }
   if (min == null && max == null) return "Budget on request";
-  return `$${min?.toLocaleString() ?? "—"} – $${max?.toLocaleString() ?? "—"}`;
+  return `₹${min?.toLocaleString() ?? "—"} – ₹${max?.toLocaleString() ?? "—"}`;
 }
 
 export function JobCard({

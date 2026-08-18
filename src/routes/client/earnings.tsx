@@ -55,10 +55,10 @@ export default function ClientEarnings() {
       ) : (
         <>
           <div className="grid gap-4 sm:grid-cols-3">
-            <Stat icon={CircleDollarSign} value={`$${total.toLocaleString()}`} label="Total paid" />
+            <Stat icon={CircleDollarSign} value={`₹${total.toLocaleString()}`} label="Total paid" />
             <Stat
               icon={CalendarDays}
-              value={`$${thisMonth.toLocaleString()}`}
+              value={`₹${thisMonth.toLocaleString()}`}
               label="Paid this month"
             />
             <Stat icon={ReceiptText} value={String(completed.length)} label="Approved milestones" />
@@ -91,7 +91,7 @@ export default function ClientEarnings() {
                   </div>
                   <div className="text-right">
                     <p className="font-bold">
-                      ${payment.amount.toLocaleString()} {payment.currency}
+                      ₹{payment.amount.toLocaleString()} {payment.currency}
                     </p>
                     <p className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-success">
                       <CheckCircle2 className="h-3.5 w-3.5" />

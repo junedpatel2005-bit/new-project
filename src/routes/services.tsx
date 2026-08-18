@@ -9,9 +9,25 @@ import { sanitizeInlineHtml } from "@/lib/sanitizeInlineHtml";
 
 function budget(job: MarketplaceJob) {
   if (job.timingType === "HOURLY")
-    return job.hourlyRate == null ? "Rate not set" : `$${job.hourlyRate.toLocaleString()}/hr`;
+    return job.hourlyRate == null ? "Rate not set" : `₹${job.hourlyRate.toLocaleString()}/hr`;
   if (job.budgetMin == null && job.budgetMax == null) return "Budget on request";
-  return `$${job.budgetMin?.toLocaleString() ?? "—"} – $${job.budgetMax?.toLocaleString() ?? "—"}`;
+  return `₹${job.budgetMin?.toLocaleString() ?? "—"} – ₹${job.budgetMax?.toLocaleString() ?? "—"}`;
+}
+
+const DEFAULT_NEAR_ME_RADIUS_KM = 25;
+const MIN_NEAR_ME_RADIUS_KM = 1;
+const MAX_NEAR_ME_RADIUS_KM = 100;
+
+function distanceKm(lat1: number, lon1: number, lat2: number, lon2: number) {
+  const toRadians = (degrees: number) => (degrees * Math.PI) / 180;
+  const earthRadiusKm = 6371;
+  const φ1 = toRadians(lat1);
+  const φ2 = toRadians(lat2);
+  const Δφ = toRadians(lat2 - lat1);
+  const Δλ = toRadians(lon2 - lon1);
+  const a = Math.sin(Δφ / 2) ** 2 + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return earthRadiusKm * c;
 }
 
 const workModeOptions: [string, string][] = [
@@ -35,6 +51,11 @@ export default function Services() {
   const [category, setCategory] = useState("");
   const [workMode, setWorkMode] = useState("");
   const [urgency, setUrgency] = useState("");
+  const [nearMe, setNearMe] = useState(false);
+  const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
+  const [locating, setLocating] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
+  const [radiusKm, setRadiusKm] = useState(DEFAULT_NEAR_ME_RADIUS_KM);
   const [role, setRole] = useState<string | null>(null);
   const [pageText, setPageText] = useState<Record<string, string>>({});
   const [cmsEdit, setCmsEdit] = useState(false);
@@ -115,28 +136,79 @@ export default function Services() {
     [visibleCategories],
   );
 
+  const jobsWithDistance = useMemo(() => {
+    if (!userLocation) return jobs.map((job) => ({ job, distanceKm: null as number | null }));
+    const [lat, lng] = userLocation;
+    return jobs.map((job) => ({
+      job,
+      distanceKm:
+        job.locationLat != null && job.locationLng != null
+          ? distanceKm(lat, lng, job.locationLat, job.locationLng)
+          : null,
+    }));
+  }, [jobs, userLocation]);
+
   const visibleJobs = useMemo(() => {
     const text = query.trim().toLowerCase();
-    return jobs.filter((job) => {
-      const matchesText =
-        !text ||
-        [job.title, job.description, job.category, job.client.name, job.location]
-          .filter(Boolean)
-          .some((value) => String(value).toLowerCase().includes(text));
-      return (
-        matchesText &&
-        (!segment || !job.category || segmentCategoryNames.has(job.category)) &&
-        (!category || job.category === category) &&
-        (!workMode || job.workMode === workMode) &&
-        (!urgency || job.urgency === urgency)
-      );
-    });
-  }, [jobs, query, segment, segmentCategoryNames, category, workMode, urgency]);
+    return jobsWithDistance
+      .filter(({ job }) => {
+        const matchesText =
+          !text ||
+          [job.title, job.description, job.category, job.client.name, job.location]
+            .filter(Boolean)
+            .some((value) => String(value).toLowerCase().includes(text));
+        return (
+          matchesText &&
+          (!segment || !job.category || segmentCategoryNames.has(job.category)) &&
+          (!category || job.category === category) &&
+          (!workMode || job.workMode === workMode) &&
+          (!urgency || job.urgency === urgency)
+        );
+      })
+      .filter(({ distanceKm: value }) => !nearMe || (value !== null && value <= radiusKm))
+      .sort((a, b) => {
+        if (!nearMe) return 0;
+        return (a.distanceKm ?? Infinity) - (b.distanceKm ?? Infinity);
+      });
+  }, [
+    jobsWithDistance,
+    query,
+    segment,
+    segmentCategoryNames,
+    category,
+    workMode,
+    urgency,
+    nearMe,
+    radiusKm,
+  ]);
 
   const selectSegment = (value: string) => {
     setSegment((current) => (current === value ? "" : value));
     setCategory("");
   };
+
+  function toggleNearMe(checked: boolean) {
+    setNearMe(checked);
+    setLocationError(null);
+    if (!checked || userLocation) return;
+    if (!navigator.geolocation) {
+      setLocationError("Location isn't available in this browser.");
+      setNearMe(false);
+      return;
+    }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserLocation([position.coords.latitude, position.coords.longitude]);
+        setLocating(false);
+      },
+      () => {
+        setLocationError("Location permission was not granted.");
+        setLocating(false);
+        setNearMe(false);
+      },
+    );
+  }
 
   const clearFilters = () => {
     setQuery("");
@@ -144,6 +216,9 @@ export default function Services() {
     setCategory("");
     setWorkMode("");
     setUrgency("");
+    setNearMe(false);
+    setLocationError(null);
+    setRadiusKm(DEFAULT_NEAR_ME_RADIUS_KM);
   };
 
   return (
@@ -175,11 +250,7 @@ export default function Services() {
               </button>
             </div>
             <div className="mt-5 space-y-6">
-              <div
-                role="tablist"
-                aria-label="Service category"
-                className="grid grid-cols-3 gap-1 rounded-full border border-border bg-background p-1"
-              >
+              <div role="tablist" aria-label="Service category" className="flex flex-wrap gap-2">
                 {segmentTabs.map(([value, label]) => (
                   <button
                     key={value}
@@ -187,10 +258,10 @@ export default function Services() {
                     role="tab"
                     aria-selected={segment === value}
                     onClick={() => selectSegment(value)}
-                    className={`truncate rounded-full px-1.5 py-1.5 text-[11px] font-semibold transition sm:text-xs ${
+                    className={`whitespace-nowrap rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors duration-200 ${
                       segment === value
-                        ? "bg-primary text-primary-foreground"
-                        : "text-muted-foreground hover:text-foreground"
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"
                     }`}
                   >
                     {label}
@@ -211,6 +282,43 @@ export default function Services() {
                   />
                 </div>
               </label>
+              <fieldset>
+                <legend className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Location
+                </legend>
+                <label className="flex cursor-pointer items-center justify-between gap-2 text-sm">
+                  <span className="inline-flex items-center gap-1.5">
+                    <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
+                    Jobs near me
+                  </span>
+                  <input
+                    type="checkbox"
+                    checked={nearMe}
+                    onChange={(event) => toggleNearMe(event.target.checked)}
+                    className="h-4 w-4 accent-primary"
+                  />
+                </label>
+                {locating && <p className="mt-1.5 text-xs text-muted-foreground">Locating…</p>}
+                {locationError && (
+                  <p className="mt-1.5 text-xs text-destructive">{locationError}</p>
+                )}
+                {nearMe && (
+                  <div className="mt-3">
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <span>Radius</span>
+                      <span className="font-semibold text-foreground">{radiusKm} km</span>
+                    </div>
+                    <input
+                      type="range"
+                      min={MIN_NEAR_ME_RADIUS_KM}
+                      max={MAX_NEAR_ME_RADIUS_KM}
+                      value={radiusKm}
+                      onChange={(event) => setRadiusKm(Number(event.target.value))}
+                      className="mt-1.5 h-1.5 w-full cursor-pointer accent-primary"
+                    />
+                  </div>
+                )}
+              </fieldset>
               <fieldset>
                 <legend className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   Service category
@@ -316,7 +424,7 @@ export default function Services() {
             )}
             {status === "ready" && visibleJobs.length > 0 && (
               <div data-db-section="jobs" className="grid gap-4 md:grid-cols-2">
-                {visibleJobs.map((job) => (
+                {visibleJobs.map(({ job, distanceKm: jobDistanceKm }) => (
                   <Link
                     key={job.id}
                     href={`/job/${job.id}`}
@@ -344,6 +452,14 @@ export default function Services() {
                       <span className="inline-flex items-center gap-1">
                         <MapPin className="h-4 w-4" />
                         {job.location ?? "Remote"}
+                        {jobDistanceKm !== null && (
+                          <span className="font-medium text-primary">
+                            ·{" "}
+                            {jobDistanceKm < 1
+                              ? "Less than 1 km away"
+                              : `${jobDistanceKm.toFixed(1)} km away`}
+                          </span>
+                        )}
                       </span>
                       <span className="inline-flex items-center gap-1">
                         <DollarSign className="h-4 w-4" />

@@ -12,12 +12,15 @@ export async function GET(request: NextRequest) {
   const lon = request.nextUrl.searchParams.get("lon");
   if (!query && (!lat || !lon)) return NextResponse.json({ results: [] });
   const url = query
-    ? `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&q=${encodeURIComponent(query)}`
-    : `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(lat!)}&lon=${encodeURIComponent(lon!)}`;
+    ? `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&q=${encodeURIComponent(query)}&email=support@servio.app`
+    : `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(lat!)}&lon=${encodeURIComponent(lon!)}&email=support@servio.app`;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8000);
   try {
     const response = await fetch(url, {
-      headers: { "User-Agent": "Servio/1.0 (address picker)" },
+      headers: { "User-Agent": "Servio/1.0 (address picker; support@servio.app)" },
       next: { revalidate: 0 },
+      signal: controller.signal,
     });
     if (!response.ok) throw new Error("Geocoding service unavailable");
     const data = (await response.json()) as
@@ -31,10 +34,17 @@ export async function GET(request: NextRequest) {
         lon: Number(item.lon),
       })),
     });
-  } catch {
+  } catch (error) {
+    const timedOut = error instanceof Error && error.name === "AbortError";
     return NextResponse.json(
-      { error: "Address search is unavailable. You can still enter an address manually." },
+      {
+        error: timedOut
+          ? "Address search timed out. Please try again or enter the address manually."
+          : "Address search is unavailable. You can still enter an address manually.",
+      },
       { status: 503 },
     );
+  } finally {
+    clearTimeout(timeout);
   }
 }

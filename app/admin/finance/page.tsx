@@ -34,7 +34,7 @@ type Finance = {
   withdrawals: Withdrawal[];
   names: Record<string, string>;
 };
-const money = (value: number) => `$${value.toLocaleString()}`;
+const money = (value: number) => `₹${value.toLocaleString()}`;
 export default function FinancePage() {
   const [data, setData] = useState<Finance | null>(null);
   const [tab, setTab] = useState<"payments" | "payouts">("payments");

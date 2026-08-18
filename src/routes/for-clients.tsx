@@ -59,7 +59,7 @@ export default function ForClients() {
               <ol className="mt-4 space-y-4">
                 {[
                   { t: "0 min", e: "You post a kitchen plumbing job" },
-                  { t: "8 min", e: "First proposal received from Priya, $180" },
+                  { t: "8 min", e: "First proposal received from Priya, ₹180" },
                   { t: "32 min", e: "3 more vetted plumbers have applied" },
                   { t: "1h", e: "You hire Priya. She's on her way." },
                   { t: "Same day", e: "Job done. Payment released." },

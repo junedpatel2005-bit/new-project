@@ -287,6 +287,11 @@ export type AuditLog = Prisma.AuditLogModel
  */
 export type ApiToken = Prisma.ApiTokenModel
 /**
+ * Model OtpCode
+ * 
+ */
+export type OtpCode = Prisma.OtpCodeModel
+/**
  * Model BrowserSubscription
  * 
  */

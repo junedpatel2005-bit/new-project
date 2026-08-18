@@ -187,8 +187,8 @@ export default function ProfessionalHome() {
                         </p>
                         <p className="font-display text-xl font-bold">
                           {job.timingType === "HOURLY"
-                            ? `$${job.hourlyRate ?? 0}/hr`
-                            : `$${job.budgetMin ?? 0} – $${job.budgetMax ?? 0}`}
+                            ? `₹${job.hourlyRate ?? 0}/hr`
+                            : `₹${job.budgetMin ?? 0} – ₹${job.budgetMax ?? 0}`}
                         </p>
                       </div>
                       <span className="text-sm font-medium text-primary">View job</span>

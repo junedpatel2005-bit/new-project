@@ -13,8 +13,27 @@ const ProfessionalJobsMap = dynamic(() => import("@/components/ProfessionalJobsM
   ssr: false,
   loading: () => <div className="h-full w-full animate-pulse bg-muted" />,
 });
+const JobsPreviewMap = dynamic(() => import("@/components/JobsPreviewMap"), {
+  ssr: false,
+  loading: () => <div className="h-full w-full animate-pulse bg-muted" />,
+});
 
 const PAGE_SIZE = 20;
+const DEFAULT_NEAR_ME_RADIUS_KM = 25;
+const MIN_NEAR_ME_RADIUS_KM = 1;
+const MAX_NEAR_ME_RADIUS_KM = 100;
+
+function distanceKm(lat1: number, lon1: number, lat2: number, lon2: number) {
+  const toRadians = (degrees: number) => (degrees * Math.PI) / 180;
+  const earthRadiusKm = 6371;
+  const φ1 = toRadians(lat1);
+  const φ2 = toRadians(lat2);
+  const Δφ = toRadians(lat2 - lat1);
+  const Δλ = toRadians(lon2 - lon1);
+  const a = Math.sin(Δφ / 2) ** 2 + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return earthRadiusKm * c;
+}
 const segmentOptions: [string, string][] = [
   ["RESIDENTIAL", "Residential"],
   ["COMMERCIAL", "Commercial"],
@@ -53,9 +72,9 @@ type JobsResponse = {
 };
 
 function formatBudgetAmount(value: number | null | undefined, timingType?: string | null) {
-  if (timingType === "HOURLY" && value != null) return `$${value.toLocaleString()}/hr`;
+  if (timingType === "HOURLY" && value != null) return `₹${value.toLocaleString()}/hr`;
   if (value == null) return "Budget on request";
-  return `$${value.toLocaleString()}`;
+  return `₹${value.toLocaleString()}`;
 }
 
 function formatBudgetRange(
@@ -64,10 +83,10 @@ function formatBudgetRange(
   timingType?: string | null,
 ) {
   if (timingType === "HOURLY") {
-    return min == null ? "Hourly rate not set" : `$${min.toLocaleString()}/hr`;
+    return min == null ? "Hourly rate not set" : `₹${min.toLocaleString()}/hr`;
   }
   if (min == null && max == null) return "Budget on request";
-  return `$${min?.toLocaleString() ?? "—"} – $${max?.toLocaleString() ?? "—"}`;
+  return `₹${min?.toLocaleString() ?? "—"} – ₹${max?.toLocaleString() ?? "—"}`;
 }
 
 function ProfessionalJobsContent() {
@@ -85,6 +104,11 @@ function ProfessionalJobsContent() {
   const [city, setCity] = useState("");
   const [minRating, setMinRating] = useState<number | "">("");
   const [verifiedOnly, setVerifiedOnly] = useState(false);
+  const [nearMe, setNearMe] = useState(false);
+  const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
+  const [locating, setLocating] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
+  const [radiusKm, setRadiusKm] = useState(DEFAULT_NEAR_ME_RADIUS_KM);
   const [sort, setSort] = useState("Best match");
   const [showMap, setShowMap] = useState(false);
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
@@ -98,6 +122,29 @@ function ProfessionalJobsContent() {
     window.requestAnimationFrame(() => {
       mapSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
+  }
+
+  function toggleNearMe(checked: boolean) {
+    setNearMe(checked);
+    setLocationError(null);
+    if (!checked || userLocation) return;
+    if (!navigator.geolocation) {
+      setLocationError("Location isn't available in this browser.");
+      setNearMe(false);
+      return;
+    }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserLocation([position.coords.latitude, position.coords.longitude]);
+        setLocating(false);
+      },
+      () => {
+        setLocationError("Location permission was not granted.");
+        setLocating(false);
+        setNearMe(false);
+      },
+    );
   }
 
   useEffect(() => {
@@ -203,7 +250,13 @@ function ProfessionalJobsContent() {
 
   const filteredJobs = useMemo(() => {
     const value = query.trim().toLowerCase();
-    return jobs.filter((job) => {
+    const withLiveDistance = jobs.map((job) => {
+      if (!nearMe || !userLocation || job.locationLat === null || job.locationLng === null)
+        return job;
+      const [lat, lng] = userLocation;
+      return { ...job, distanceKm: distanceKm(lat, lng, job.locationLat, job.locationLng) };
+    });
+    return withLiveDistance.filter((job) => {
       const matchesQuery =
         !value ||
         [job.title, job.category, job.locationAddress, job.clientName]
@@ -214,20 +267,29 @@ function ProfessionalJobsContent() {
         !city || (job.locationAddress ?? "").toLowerCase().includes(city.toLowerCase());
       const matchesRating = minRating === "" || (job.clientRating ?? 0) >= Number(minRating);
       const matchesVerified = !verifiedOnly || job.clientVerified;
-      return matchesQuery && matchesCategory && matchesCity && matchesRating && matchesVerified;
+      const matchesNearMe = !nearMe || (job.distanceKm !== null && job.distanceKm <= radiusKm);
+      return (
+        matchesQuery &&
+        matchesCategory &&
+        matchesCity &&
+        matchesRating &&
+        matchesVerified &&
+        matchesNearMe
+      );
     });
-  }, [jobs, query, category, city, minRating, verifiedOnly]);
+  }, [jobs, query, category, city, minRating, verifiedOnly, nearMe, userLocation, radiusKm]);
 
   const visibleJobs = useMemo(() => {
     const sorted = [...filteredJobs];
-    if (sort === "Highest rated") {
+    if (nearMe) {
+      sorted.sort((a, b) => (a.distanceKm ?? Infinity) - (b.distanceKm ?? Infinity));
+    } else if (sort === "Highest rated") {
       sorted.sort((a, b) => (b.clientRating ?? 0) - (a.clientRating ?? 0));
-    }
-    if (sort === "Newest") {
+    } else if (sort === "Newest") {
       sorted.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     }
     return sorted.slice(0, PAGE_SIZE);
-  }, [filteredJobs, sort]);
+  }, [filteredJobs, sort, nearMe]);
 
   useEffect(() => {
     if (visibleJobs.length === 0) {
@@ -259,6 +321,10 @@ function ProfessionalJobsContent() {
   const mapCenter: [number, number] = selectedJob
     ? [selectedJob.locationLat, selectedJob.locationLng]
     : [20, 0];
+  const previewPoints: [number, number][] = mapJobs.map((job) => [
+    job.locationLat,
+    job.locationLng,
+  ]);
 
   return (
     <div>
@@ -305,6 +371,9 @@ function ProfessionalJobsContent() {
                 setCity("");
                 setMinRating("");
                 setVerifiedOnly(false);
+                setNearMe(false);
+                setLocationError(null);
+                setRadiusKm(DEFAULT_NEAR_ME_RADIUS_KM);
               }}
             >
               Clear all
@@ -316,7 +385,7 @@ function ProfessionalJobsContent() {
               <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
                 Category
               </p>
-              <div className="mb-3 grid grid-cols-3 gap-1 rounded-full border border-border bg-background p-1">
+              <div className="mb-3 flex flex-wrap gap-2">
                 {segmentOptions.map(([value, label]) => (
                   <button
                     key={value}
@@ -325,10 +394,10 @@ function ProfessionalJobsContent() {
                       setSegment((current) => (current === value ? "" : value));
                       setCategory("");
                     }}
-                    className={`truncate rounded-full px-1.5 py-1.5 text-[11px] font-semibold transition ${
+                    className={`whitespace-nowrap rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors duration-200 ${
                       segment === value
-                        ? "bg-primary text-primary-foreground"
-                        : "text-muted-foreground hover:text-foreground"
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"
                     }`}
                   >
                     {label}
@@ -402,6 +471,42 @@ function ProfessionalJobsContent() {
                       ) : null}
                     </label>
                   ))}
+                </div>
+              )}
+            </div>
+
+            <div>
+              <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                Location
+              </p>
+              <label className="flex items-center justify-between text-sm">
+                <span className="inline-flex items-center gap-1.5">
+                  <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
+                  Jobs near me
+                </span>
+                <input
+                  type="checkbox"
+                  checked={nearMe}
+                  onChange={(event) => toggleNearMe(event.target.checked)}
+                  className="h-4 w-4 accent-primary"
+                />
+              </label>
+              {locating && <p className="mt-1.5 text-xs text-muted-foreground">Locating…</p>}
+              {locationError && <p className="mt-1.5 text-xs text-destructive">{locationError}</p>}
+              {nearMe && (
+                <div className="mt-3">
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <span>Radius</span>
+                    <span className="font-semibold text-foreground">{radiusKm} km</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={MIN_NEAR_ME_RADIUS_KM}
+                    max={MAX_NEAR_ME_RADIUS_KM}
+                    value={radiusKm}
+                    onChange={(event) => setRadiusKm(Number(event.target.value))}
+                    className="mt-1.5 h-1.5 w-full cursor-pointer accent-primary"
+                  />
                 </div>
               )}
             </div>
@@ -486,6 +591,40 @@ function ProfessionalJobsContent() {
             </div>
           </div>
 
+          {!loading && !showMap && mapJobs.length > 0 && (
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={() => {
+                setShowMap(true);
+                window.requestAnimationFrame(() => {
+                  mapSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                });
+              }}
+              onKeyDown={(event) => {
+                if (event.key !== "Enter" && event.key !== " ") return;
+                event.preventDefault();
+                event.currentTarget.click();
+              }}
+              className="w-full cursor-pointer overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-primary/10 via-card to-accent/10 p-5 shadow-soft transition-all hover:border-primary/50 hover:shadow-elevated sm:p-6"
+            >
+              <div className="flex h-32 items-center justify-between gap-6">
+                <div className="text-left">
+                  <p className="text-sm font-semibold">Jobs near you</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {mapJobs.length} available • Click to view on map
+                  </p>
+                  <p className="mt-1 text-[11px] text-muted-foreground">
+                    Approximate location — shown for privacy
+                  </p>
+                </div>
+                <div className="h-full w-1/2">
+                  <JobsPreviewMap points={previewPoints} />
+                </div>
+              </div>
+            </div>
+          )}
+
           {error ? (
             <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-6 text-sm text-destructive">
               {error}
@@ -512,27 +651,27 @@ function ProfessionalJobsContent() {
             )}
 
             {showMap && (
-              <div
-                ref={mapSectionRef}
-                className="relative mb-4 h-[320px] overflow-hidden rounded-2xl border border-border"
-              >
-                {mapJobs.length > 0 ? (
-                  <>
+              <div className="mb-4">
+                <div
+                  ref={mapSectionRef}
+                  className="relative h-[320px] overflow-hidden rounded-2xl border border-border"
+                >
+                  {mapJobs.length > 0 ? (
                     <ProfessionalJobsMap
                       center={mapCenter}
                       jobs={mapJobs}
                       onSelectJob={setSelectedJobId}
                     />
-                    {selectedJob ? (
-                      <div className="pointer-events-none absolute left-1/2 top-4 z-10 -translate-x-1/2 rounded-full border-2 border-white bg-[#ff4d7d] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-white shadow-lg">
-                        {selectedJob.title}
-                      </div>
-                    ) : null}
-                  </>
-                ) : (
-                  <div className="flex h-full items-center justify-center bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.35),transparent_10%),linear-gradient(180deg,#bfe8ef_0%,#b1d7df_100%)] text-sm text-muted-foreground">
-                    None of your matching jobs have a pinned location yet.
-                  </div>
+                  ) : (
+                    <div className="flex h-full items-center justify-center bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.35),transparent_10%),linear-gradient(180deg,#bfe8ef_0%,#b1d7df_100%)] text-sm text-muted-foreground">
+                      None of your matching jobs have a pinned location yet.
+                    </div>
+                  )}
+                </div>
+                {mapJobs.length > 0 && (
+                  <p className="mt-1.5 text-[11px] text-muted-foreground">
+                    Approximate location — shown for privacy
+                  </p>
                 )}
               </div>
             )}

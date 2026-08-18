@@ -64,8 +64,12 @@ async function errors(d: z.infer<typeof bodySchema>) {
   if (!d.category?.trim()) fields.category = "Choose a category.";
   if (!d.description?.trim()) fields.description = "Describe the work needed.";
   if (!d.deadline) fields.deadline = "Choose a deadline.";
-  if (d.workMode !== "REMOTE" && !d.locationAddress?.trim())
-    fields.locationAddress = "Choose a job location.";
+  if (d.workMode !== "REMOTE") {
+    if (!d.locationAddress?.trim()) fields.locationAddress = "Choose a job location.";
+    else if (d.locationLat == null || d.locationLng == null)
+      fields.locationAddress =
+        "Select the address from the search results or drop a pin on the map so professionals can find you nearby.";
+  }
   if (d.timingType === "HOURLY" && !d.hourlyRate) fields.hourlyRate = "Enter an hourly rate.";
   if (d.timingType !== "HOURLY" && (d.budgetMin == null || d.budgetMax == null))
     fields.budgetMin = "Enter a budget range.";

@@ -48,7 +48,7 @@ type DashboardData = {
 
 function formatBudget(job: DashboardData["jobs"][number]) {
   if (job.budgetMin == null && job.budgetMax == null) return "Budget pending";
-  return `$${job.budgetMin?.toLocaleString() ?? "—"} – $${job.budgetMax?.toLocaleString() ?? "—"}`;
+  return `₹${job.budgetMin?.toLocaleString() ?? "—"} – ₹${job.budgetMax?.toLocaleString() ?? "—"}`;
 }
 
 export default function Dashboard() {
@@ -265,7 +265,7 @@ export default function Dashboard() {
                           </div>
                         </div>
                         <p className="text-lg font-bold text-primary">
-                          ${proposal.bidAmount.toLocaleString()}
+                          ₹{proposal.bidAmount.toLocaleString()}
                         </p>
                       </div>
                       <p className="mt-3 line-clamp-2 text-sm leading-6 text-muted-foreground">

@@ -9,6 +9,21 @@ type Overrides = Record<string, string>;
 // Database-driven sections (marked [data-db-section]) are excluded entirely — the CMS
 // must never rewrite live data rendered from the database.
 const dbSectionExclude = ":not([data-db-section] *)";
+
+// `app/loading.tsx` wraps every route in a Suspense boundary, so route content (e.g. a
+// below-the-fold footer) can stream in and hydrate on its own schedule, independent of
+// CmsLiveEditor's own hydration in the root layout. A macrotask (setTimeout(fn, 0)) only
+// waits for the *root* commit, not for that streamed-in content to finish hydrating, so it
+// isn't a safe signal to start mutating the DOM. requestIdleCallback waits until the browser
+// has no pending work — including any in-flight hydration — which is what we actually need.
+const scheduleIdle: (callback: () => void) => number =
+  typeof window !== "undefined" && "requestIdleCallback" in window
+    ? (callback) => window.requestIdleCallback(callback, { timeout: 500 })
+    : (callback) => window.setTimeout(callback, 50);
+const cancelIdle: (handle: number | undefined) => void =
+  typeof window !== "undefined" && "cancelIdleCallback" in window
+    ? (handle) => handle !== undefined && window.cancelIdleCallback(handle)
+    : (handle) => window.clearTimeout(handle);
 const selector = [
   "main h1",
   "main h2",
@@ -137,17 +152,18 @@ export function CmsLiveEditor() {
     };
     document.addEventListener("click", blockActions, true);
     const observer = new MutationObserver(() => {
-      window.clearTimeout(timer);
-      timer = window.setTimeout(sync, 80);
+      cancelIdle(timer);
+      timer = scheduleIdle(sync);
     });
-    // Defer the first DOM mutation past the current macrotask so React finishes hydrating
-    // the whole page first — mutating SSR'd nodes any earlier can race React 19's streaming/
-    // selective hydration (e.g. a below-the-fold footer still hydrating) and trigger a
-    // hydration-mismatch error.
-    const startTimer = window.setTimeout(() => {
+    // Wait for browser idle time — not just the next macrotask — before touching the DOM.
+    // React finishing its *own* hydration commit doesn't mean route content has hydrated too:
+    // `app/loading.tsx` streams the route tree in via its own Suspense boundary, so a
+    // below-the-fold footer can still be mid-hydration well after this component's effect
+    // fires. Mutating it earlier races that and trips a hydration-mismatch error.
+    const startTimer = scheduleIdle(() => {
       void load();
       observer.observe(document.body, { childList: true, subtree: true });
-    }, 0);
+    });
 
     let removeToolbarListeners: (() => void) | undefined;
     if (editing) {
@@ -177,10 +193,10 @@ export function CmsLiveEditor() {
     }
 
     return () => {
-      window.clearTimeout(startTimer);
+      cancelIdle(startTimer);
       observer.disconnect();
       document.removeEventListener("click", blockActions, true);
-      if (timer) window.clearTimeout(timer);
+      cancelIdle(timer);
       removeToolbarListeners?.();
     };
   }, []);

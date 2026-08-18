@@ -268,7 +268,7 @@ model ProjectTransaction {
   clientId       Int
   professionalId Int
   amount         Int
-  currency       String   @default("USD")
+  currency       String   @default("INR")
   type           String
   status         String   @default("COMPLETED")
   description    String
@@ -614,7 +614,7 @@ model Payment {
   jobId             Int?
   amount            Int
   commissionAmount  Int      @default(0)
-  currency          String   @default("USD")
+  currency          String   @default("INR")
   provider          String
   providerReference String?
   status            String   @default("PENDING")
@@ -629,7 +629,7 @@ model Payment {
 model Wallet {
   id             Int                 @id @default(autoincrement())
   userId         Int                 @unique
-  currency       String              @default("USD")
+  currency       String              @default("INR")
   balance        Int                 @default(0)
   pendingBalance Int                 @default(0)
   updatedAt      DateTime            @updatedAt
@@ -655,7 +655,7 @@ model ProjectWithdrawal {
   id               Int      @id @default(autoincrement())
   professionalId   Int
   amount           Int
-  currency         String   @default("USD")
+  currency         String   @default("INR")
   destinationType  String
   destinationLabel String?
   status           String   @default("PENDING")
@@ -791,6 +791,20 @@ model ApiToken {
   createdAt DateTime  @default(now())
 
   @@index([userId, kind])
+}
+
+model OtpCode {
+  id         Int       @id @default(autoincrement())
+  phone      String
+  codeHash   String
+  role       String
+  attempts   Int       @default(0)
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([phone, role, expiresAt])
+  @@index([phone, role, consumedAt])
 }
 
 model BrowserSubscription {

@@ -50,11 +50,12 @@ const segmentOptions: [string, string][] = [
 const asDate = (value: string | Date | null) =>
   value ? new Date(value).toISOString().slice(0, 10) : "";
 const money = (value: number | null | undefined) =>
-  value == null ? "Not set" : `$${value.toLocaleString("en-US")}`;
+  value == null ? "Not set" : `₹${value.toLocaleString("en-US")}`;
 
 export default function PostJob() {
   const router = useRouter();
   const [step, setStep] = useState(0),
+    [maxStep, setMaxStep] = useState(0),
     [form, setForm] = useState<Form>(empty),
     [id, setId] = useState<number | null>(null),
     [categories, setCategories] = useState<MarketplaceCategory[]>([]),
@@ -114,6 +115,7 @@ export default function PostJob() {
         .then((r) => (r.ok ? r.json() : Promise.reject()))
         .then(({ job }) => {
           setId(job.id);
+          setMaxStep(4);
           setForm({
             title: job.title ?? "",
             category: job.category ?? "",
@@ -163,8 +165,12 @@ export default function PostJob() {
       if (form.jobDate && form.deadline && form.deadline < form.jobDate)
         e.deadline = "Deadline cannot be before the preferred job date.";
     }
-    if (step === 3 && form.workMode !== "REMOTE" && !form.locationAddress.trim())
-      e.locationAddress = "Choose a job location.";
+    if (step === 3 && form.workMode !== "REMOTE") {
+      if (!form.locationAddress.trim()) e.locationAddress = "Choose a job location.";
+      else if (form.locationLat === null || form.locationLng === null)
+        e.locationAddress =
+          "Select the address from the search results or drop a pin on the map so professionals can find you nearby.";
+    }
     setErrors(e);
     return !Object.keys(e).length;
   };
@@ -183,10 +189,18 @@ export default function PostJob() {
         setErrors(data.fields ?? {});
         setMessage(data.error ?? "Could not save the job.");
         const focus = Object.keys(data.fields ?? {})[0];
-        if (focus && ["title", "category", "description"].includes(focus)) setStep(0);
-        else if (focus && ["budgetMin", "budgetMax", "hourlyRate", "deadline"].includes(focus))
-          setStep(1);
-        else if (focus === "locationAddress") setStep(3);
+        const focusStep =
+          focus && ["title", "category", "description"].includes(focus)
+            ? 0
+            : focus && ["budgetMin", "budgetMax", "hourlyRate", "deadline"].includes(focus)
+              ? 1
+              : focus === "locationAddress"
+                ? 3
+                : null;
+        if (focusStep !== null) {
+          setStep(focusStep);
+          setMaxStep((prev) => Math.max(prev, focusStep));
+        }
         return;
       }
       setId(data.job.id);
@@ -238,16 +252,32 @@ export default function PostJob() {
       <h1 className="text-3xl font-bold">Create a job</h1>
       <p className="mt-1 text-muted-foreground">Tell qualified professionals what you need.</p>
       <ol className="mt-7 grid grid-cols-5 gap-1" aria-label="Job posting steps">
-        {steps.map((label, index) => (
-          <li key={label} className="min-w-0">
-            <div className={`h-1 rounded ${index <= step ? "bg-primary" : "bg-muted"}`} />
-            <span
-              className={`mt-2 block text-center text-xs sm:text-sm ${index === step ? "font-semibold text-primary" : "text-muted-foreground"}`}
-            >
+        {steps.map((label, index) => {
+          const reachable = index <= maxStep;
+          const stepLabel = (
+            <>
               {index + 1}. <span className="hidden sm:inline">{label}</span>
-            </span>
-          </li>
-        ))}
+            </>
+          );
+          return (
+            <li key={label} className="min-w-0">
+              <div className={`h-1 rounded ${index <= step ? "bg-primary" : "bg-muted"}`} />
+              {reachable ? (
+                <button
+                  type="button"
+                  onClick={() => setStep(index)}
+                  className={`mt-2 block w-full text-center text-xs sm:text-sm ${index === step ? "font-semibold text-primary" : "text-muted-foreground hover:text-foreground"}`}
+                >
+                  {stepLabel}
+                </button>
+              ) : (
+                <span className="mt-2 block text-center text-xs text-muted-foreground sm:text-sm">
+                  {stepLabel}
+                </span>
+              )}
+            </li>
+          );
+        })}
       </ol>
       <section className="mt-7 rounded-2xl border bg-card p-5 shadow-sm sm:p-7">
         {step === 0 && (
@@ -341,33 +371,33 @@ export default function PostJob() {
             </div>
             {form.timingType === "FIXED" ? (
               <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Minimum budget (USD)" error={errors.budgetMin}>
+                <Field label="Minimum budget (INR)" error={errors.budgetMin}>
                   <Input
                     type="number"
                     min="0"
                     value={form.budgetMin}
                     onChange={(e) => update("budgetMin", e.target.value)}
-                    placeholder="$ 0"
+                    placeholder="₹ 0"
                   />
                 </Field>
-                <Field label="Maximum budget (USD)" error={errors.budgetMax}>
+                <Field label="Maximum budget (INR)" error={errors.budgetMax}>
                   <Input
                     type="number"
                     min="0"
                     value={form.budgetMax}
                     onChange={(e) => update("budgetMax", e.target.value)}
-                    placeholder="$ 0"
+                    placeholder="₹ 0"
                   />
                 </Field>
               </div>
             ) : (
-              <Field label="Hourly rate (USD)" error={errors.hourlyRate}>
+              <Field label="Hourly rate (INR)" error={errors.hourlyRate}>
                 <Input
                   type="number"
                   min="0"
                   value={form.hourlyRate}
                   onChange={(e) => update("hourlyRate", e.target.value)}
-                  placeholder="$ 0 / hour"
+                  placeholder="₹ 0 / hour"
                 />
               </Field>
             )}
@@ -484,9 +514,17 @@ export default function PostJob() {
         {step === 4 && (
           <div className="space-y-5">
             <h2 className="text-xl font-semibold">Review your job</h2>
-            <Review label="Title" value={form.title || "Not set"} />
-            <Review label="Category" value={form.category || "Not set"} />
-            <Review label="Description" value={form.description || "Not set"} />
+            <Review label="Title" value={form.title || "Not set"} onEdit={() => setStep(0)} />
+            <Review
+              label="Category"
+              value={form.category || "Not set"}
+              onEdit={() => setStep(0)}
+            />
+            <Review
+              label="Description"
+              value={form.description || "Not set"}
+              onEdit={() => setStep(0)}
+            />
             <Review
               label="Budget"
               value={
@@ -494,18 +532,25 @@ export default function PostJob() {
                   ? `${money(form.hourlyRate === "" ? null : Number(form.hourlyRate))} / hour`
                   : `${money(form.budgetMin === "" ? null : Number(form.budgetMin))} – ${money(form.budgetMax === "" ? null : Number(form.budgetMax))}`
               }
+              onEdit={() => setStep(1)}
             />
             <Review
               label="Urgency"
               value={{ HIGH: "Urgent", MEDIUM: "Soon", LOW: "Flexible" }[form.urgency]}
+              onEdit={() => setStep(1)}
             />
-            <Review label="Deadline" value={form.deadline || "Not set"} />
+            <Review label="Deadline" value={form.deadline || "Not set"} onEdit={() => setStep(1)} />
             <Review
               label="Job type"
               value={{ ON_SITE: "On-site", REMOTE: "Remote", BOTH: "Hybrid" }[form.workMode]}
+              onEdit={() => setStep(2)}
             />
             {form.workMode !== "REMOTE" && (
-              <Review label="Location" value={form.locationAddress || "Not set"} />
+              <Review
+                label="Location"
+                value={form.locationAddress || "Not set"}
+                onEdit={() => setStep(3)}
+              />
             )}
           </div>
         )}
@@ -538,7 +583,10 @@ export default function PostJob() {
               <Button
                 type="button"
                 onClick={() => {
-                  if (clientCheck()) setStep(step + 1);
+                  if (clientCheck()) {
+                    setStep(step + 1);
+                    setMaxStep((prev) => Math.max(prev, step + 1));
+                  }
                 }}
               >
                 Continue
@@ -614,11 +662,30 @@ function Mode({
     </button>
   );
 }
-function Review({ label, value }: { label: string; value: string }) {
+function Review({
+  label,
+  value,
+  onEdit,
+}: {
+  label: string;
+  value: string;
+  onEdit?: () => void;
+}) {
   return (
-    <div className="border-b pb-3">
-      <dt className="text-sm text-muted-foreground">{label}</dt>
-      <dd className="mt-1 whitespace-pre-wrap font-medium">{value}</dd>
+    <div className="flex items-start justify-between gap-3 border-b pb-3">
+      <div>
+        <dt className="text-sm text-muted-foreground">{label}</dt>
+        <dd className="mt-1 whitespace-pre-wrap font-medium">{value}</dd>
+      </div>
+      {onEdit && (
+        <button
+          type="button"
+          onClick={onEdit}
+          className="shrink-0 text-sm font-medium text-primary hover:underline"
+        >
+          Edit
+        </button>
+      )}
     </div>
   );
 }

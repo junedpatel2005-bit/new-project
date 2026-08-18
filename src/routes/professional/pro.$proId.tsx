@@ -39,7 +39,7 @@ type ClientJob = {
 };
 
 const formatCurrency = (value: number | null) =>
-  value == null ? "Not set" : `$${value.toLocaleString("en-US")}`;
+  value == null ? "Not set" : `₹${value.toLocaleString("en-US")}`;
 
 const jobLabel = (job: ClientJob) =>
   `${job.title ?? `Job #${job.id}`} · ${job.timingType === "HOURLY" ? `${formatCurrency(job.hourlyRate)}/hr` : `${formatCurrency(job.budgetMin)} – ${formatCurrency(job.budgetMax)}`} ${job.status !== "OPEN" ? `(${job.status.toLowerCase()})` : ""}`;
@@ -112,7 +112,7 @@ function ProProfileContent() {
     const parsedBid = Number(bidAmount);
     if (!Number.isFinite(parsedBid) || parsedBid <= 0 || parsedBid > MAX_HIRE_REQUEST_BUDGET) {
       setRequestMessage(
-        `Enter a bid amount between $1 and $${MAX_HIRE_REQUEST_BUDGET.toLocaleString()}.`,
+        `Enter a bid amount between ₹1 and ₹${MAX_HIRE_REQUEST_BUDGET.toLocaleString()}.`,
       );
       setRequestStatus("error");
       return;
@@ -456,13 +456,13 @@ function ProProfileContent() {
               <p className="mt-1 text-2xl font-semibold">
                 {professional.hourlyRate === null
                   ? "Contact for pricing"
-                  : `$${professional.hourlyRate}/hr`}
+                  : `₹${professional.hourlyRate}/hr`}
               </p>
             </div>
             <div className="rounded-2xl border border-border p-5">
               <p className="text-sm text-muted-foreground">Fixed rate</p>
               <p className="mt-1 text-2xl font-semibold">
-                {professional.fixedRate === null ? "Not set" : `$${professional.fixedRate}`}
+                {professional.fixedRate === null ? "Not set" : `₹${professional.fixedRate}`}
               </p>
             </div>
           </section>

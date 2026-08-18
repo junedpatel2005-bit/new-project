@@ -257,7 +257,7 @@ function FinanceReport() {
               key: "amount",
               header: "Amount",
               align: "right",
-              render: (row) => `$${row.amount.toLocaleString()} ${row.currency}`,
+              render: (row) => `₹${row.amount.toLocaleString()} ${row.currency}`,
             },
             { key: "status", header: "Status", render: (row) => row.status },
             { key: "party", header: "Parties", render: (row) => row.party },

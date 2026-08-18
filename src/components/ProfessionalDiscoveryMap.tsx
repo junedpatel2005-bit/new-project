@@ -92,7 +92,7 @@ export default function ProfessionalDiscoveryMap({
                   <p className="text-sm font-semibold text-foreground">
                     {professional.hourlyRate === null
                       ? "Contact for rate"
-                      : `$${professional.hourlyRate}/hr`}
+                      : `₹${professional.hourlyRate}/hr`}
                   </p>
                 </div>
               </Tooltip>

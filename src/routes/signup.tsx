@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
+import { countryCodes } from "@/lib/country-codes";
 
 const emptyOtp = ["", "", "", ""];
 
@@ -24,7 +25,9 @@ function SignupContent() {
   const searchParams = useSearchParams();
   const otpRefs = useRef<Array<HTMLInputElement | null>>([]);
   const [role, setRole] = useState<"client" | "pro">("client");
+  const [countryCode, setCountryCode] = useState("+91");
   const [phone, setPhone] = useState("");
+  const fullPhone = `${countryCode}${phone.trim().replace(/\D/g, "")}`;
   const [otp, setOtp] = useState(emptyOtp);
   const [otpOpen, setOtpOpen] = useState(false);
   const [phoneVerified, setPhoneVerified] = useState(false);
@@ -74,19 +77,27 @@ function SignupContent() {
       return;
     }
     setSendingCode(true);
-    const response = await fetch("/api/v1/auth/send-phone-otp", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ phone }),
-    });
-    const result = (await response.json()) as { error?: string };
-    setSendingCode(false);
-    if (!response.ok) {
-      setPhoneError(result.error ?? "Unable to start phone verification.");
-      return;
+    try {
+      const response = await fetch("/api/v1/auth/send-phone-otp", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          phone: fullPhone,
+          role: role === "pro" ? "PROFESSIONAL" : "CLIENT",
+        }),
+      });
+      const result = (await response.json()) as { error?: string };
+      if (!response.ok) {
+        setPhoneError(result.error ?? "Unable to start phone verification.");
+        return;
+      }
+      setOtpOpen(true);
+      requestAnimationFrame(() => otpRefs.current[0]?.focus());
+    } catch {
+      setPhoneError("Network error. Check your connection and try again.");
+    } finally {
+      setSendingCode(false);
     }
-    setOtpOpen(true);
-    requestAnimationFrame(() => otpRefs.current[0]?.focus());
   }
 
   function updateOtp(index: number, value: string) {
@@ -117,19 +128,28 @@ function SignupContent() {
     }
     setPhoneError(null);
     setVerifyingPhone(true);
-    const response = await fetch("/api/v1/auth/verify-phone", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ phone, code }),
-    });
-    const result = (await response.json()) as { error?: string };
-    setVerifyingPhone(false);
-    if (!response.ok) {
-      setPhoneError(result.error ?? "Unable to verify this phone number.");
-      return;
+    try {
+      const response = await fetch("/api/v1/auth/verify-phone", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          phone: fullPhone,
+          code,
+          role: role === "pro" ? "PROFESSIONAL" : "CLIENT",
+        }),
+      });
+      const result = (await response.json()) as { error?: string };
+      if (!response.ok) {
+        setPhoneError(result.error ?? "Unable to verify this phone number.");
+        return;
+      }
+      setPhoneVerified(true);
+      setOtpOpen(false);
+    } catch {
+      setPhoneError("Network error. Check your connection and try again.");
+    } finally {
+      setVerifyingPhone(false);
     }
-    setPhoneVerified(true);
-    setOtpOpen(false);
   }
 
   async function checkAvailability(field: "email" | "phone", value: string) {
@@ -191,29 +211,34 @@ function SignupContent() {
       return;
     }
     setPending(true);
-    const response = await fetch("/api/v1/auth/register", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        firstName,
-        lastName,
-        email,
-        phone,
-        password,
-        role: role === "pro" ? "PROFESSIONAL" : "CLIENT",
-        terms: draft.terms,
-      }),
-    });
-    const result = (await response.json()) as {
-      error?: string;
-      redirect?: string;
-      fields?: Record<string, string>;
-    };
-    setPending(false);
-    if (!response.ok) {
-      setFieldErrors(result.fields ?? {});
-      setError(result.error ?? "Unable to create your account.");
-    } else router.push(result.redirect ?? "/client-profile");
+    try {
+      const response = await fetch("/api/v1/auth/register", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          email,
+          phone: fullPhone,
+          password,
+          role: role === "pro" ? "PROFESSIONAL" : "CLIENT",
+          terms: draft.terms,
+        }),
+      });
+      const result = (await response.json()) as {
+        error?: string;
+        redirect?: string;
+        fields?: Record<string, string>;
+      };
+      if (!response.ok) {
+        setFieldErrors(result.fields ?? {});
+        setError(result.error ?? "Unable to create your account.");
+      } else router.push(result.redirect ?? "/client-profile");
+    } catch {
+      setError("Network error. Check your connection and try again.");
+    } finally {
+      setPending(false);
+    }
   }
 
   return (
@@ -302,11 +327,27 @@ function SignupContent() {
         <div className="space-y-2">
           <Label htmlFor="phone">Phone number</Label>
           <div className="flex gap-2">
+            <select
+              aria-label="Country code"
+              value={countryCode}
+              onChange={(event) => {
+                setCountryCode(event.target.value);
+                resetPhoneVerification();
+              }}
+              disabled={phoneVerified}
+              className="h-10 w-[104px] shrink-0 rounded-md border border-input bg-background px-2 text-sm disabled:opacity-50"
+            >
+              {countryCodes.map((country) => (
+                <option key={country.code} value={country.code}>
+                  {country.flag} {country.code}
+                </option>
+              ))}
+            </select>
             <Input
               id="phone"
               value={phone}
               onChange={(event) => {
-                setPhone(event.target.value);
+                setPhone(event.target.value.replace(/[^\d\s-]/g, ""));
                 resetPhoneVerification();
                 setFieldErrors((current) => {
                   const next = { ...current };
@@ -315,12 +356,12 @@ function SignupContent() {
                 });
               }}
               onBlur={() => {
-                if (phone.trim().length >= 7) checkAvailability("phone", phone);
+                if (phone.trim().length >= 7) checkAvailability("phone", fullPhone);
               }}
               type="tel"
               required
               disabled={phoneVerified}
-              placeholder="+1 555 123 4567"
+              placeholder="98765 43210"
               className={
                 fieldErrors.phone
                   ? "border-destructive placeholder:text-destructive focus-visible:ring-destructive"

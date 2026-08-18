@@ -102,7 +102,7 @@ export default function Pricing() {
                 <h3 className="font-display mt-2 text-2xl font-bold">{t.name}</h3>
                 <div className="mt-4 flex items-end gap-1">
                   <span className="font-display text-5xl font-bold">
-                    ${yearly ? t.price.yearly : t.price.monthly}
+                    ₹{yearly ? t.price.yearly : t.price.monthly}
                   </span>
                   <span className="mb-1.5 text-sm text-muted-foreground">/mo</span>
                 </div>

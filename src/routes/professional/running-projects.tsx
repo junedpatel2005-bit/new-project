@@ -40,8 +40,8 @@ function displayStatus(status: string) {
 function money(project: RunningProject) {
   if (project.budget == null) return "Amount pending";
   return project.timingType === "HOURLY"
-    ? `$${project.budget.toLocaleString()}/hr`
-    : `$${project.budget.toLocaleString()}`;
+    ? `₹${project.budget.toLocaleString()}/hr`
+    : `₹${project.budget.toLocaleString()}`;
 }
 
 export default function RunningProjectsPage() {
@@ -135,7 +135,7 @@ export default function RunningProjectsPage() {
         <Metric
           icon={CircleDollarSign}
           label="Active value"
-          value={`$${totalValue.toLocaleString()}`}
+          value={`₹${totalValue.toLocaleString()}`}
           tint="bg-emerald-500/10 text-emerald-600"
         />
         <Metric

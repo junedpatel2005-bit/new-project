@@ -37,6 +37,7 @@ export function ProfessionalProfileSetup() {
   const [serviceRadiusKm, setServiceRadiusKm] = useState<string>("25");
   const [categories, setCategories] = useState<MarketplaceCategory[]>([]);
   const [category, setCategory] = useState("");
+  const isEdit = Boolean(profile?.professionalCategory);
 
   useEffect(() => {
     void fetch("/api/v1/marketplace/categories")
@@ -104,13 +105,17 @@ export function ProfessionalProfileSetup() {
       setError(result?.error ?? "Unable to save your professional profile.");
       return;
     }
-    router.push("/professional/dashboard");
+    router.push(isEdit ? "/professional-profile" : "/professional/dashboard");
   }
 
   return (
     <AuthLayout
-      title="Set up your professional profile"
-      subtitle="Add the essentials clients need before they can hire you."
+      title={isEdit ? "Edit your professional profile" : "Set up your professional profile"}
+      subtitle={
+        isEdit
+          ? "Update your service details, location, and service radius."
+          : "Add the essentials clients need before they can hire you."
+      }
     >
       <form onSubmit={submit} className="space-y-4">
         <div className="space-y-1.5">
@@ -221,7 +226,7 @@ export function ProfessionalProfileSetup() {
         </div>
         {error && <p className="text-sm text-destructive">{error}</p>}
         <Button type="submit" className="w-full" disabled={pending}>
-          {pending ? "Saving..." : "Save profile and open dashboard"}
+          {pending ? "Saving..." : isEdit ? "Save changes" : "Save profile and open dashboard"}
         </Button>
       </form>
     </AuthLayout>

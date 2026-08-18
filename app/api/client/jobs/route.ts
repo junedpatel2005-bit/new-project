@@ -65,8 +65,12 @@ async function publishErrors(data: z.infer<typeof jobInput>) {
   if (!data.category?.trim()) fields.category = "Choose a category.";
   if (!data.description?.trim()) fields.description = "Describe the work needed.";
   if (!data.deadline) fields.deadline = "Choose a deadline.";
-  if (!data.locationAddress?.trim() && data.workMode !== "REMOTE")
-    fields.locationAddress = "Choose a job location.";
+  if (data.workMode !== "REMOTE") {
+    if (!data.locationAddress?.trim()) fields.locationAddress = "Choose a job location.";
+    else if (data.locationLat == null || data.locationLng == null)
+      fields.locationAddress =
+        "Select the address from the search results or drop a pin on the map so professionals can find you nearby.";
+  }
   if (data.timingType === "HOURLY" && !data.hourlyRate) fields.hourlyRate = "Enter an hourly rate.";
   if (data.timingType !== "HOURLY" && (data.budgetMin == null || data.budgetMax == null))
     fields.budgetMin = "Enter a budget range.";

@@ -34,7 +34,7 @@ type JobRow = {
 };
 
 function money(value: number | null) {
-  return value == null ? "—" : `$${value.toLocaleString("en-US")}`;
+  return value == null ? "—" : `₹${value.toLocaleString("en-US")}`;
 }
 
 const columns: ReportColumn<JobRow>[] = [
