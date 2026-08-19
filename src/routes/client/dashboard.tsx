@@ -6,7 +6,6 @@ import {
   ArrowRight,
   BellRing,
   BriefcaseBusiness,
-  CircleDollarSign,
   FileText,
   Plus,
   Star,
@@ -31,11 +30,22 @@ type DashboardData = {
   }[];
   proposals: {
     id: number;
+    jobId: number;
     professionalId: number;
     professionalName: string;
     bidAmount: number;
     duration: string;
     coverLetter: string;
+  }[];
+  hireRequests: {
+    id: number;
+    jobId: number;
+    professionalId: number;
+    professionalName: string;
+    bidAmount: number;
+    duration: string;
+    coverLetter: string;
+    status: string;
   }[];
   notifications: {
     id: number;
@@ -54,6 +64,7 @@ function formatBudget(job: DashboardData["jobs"][number]) {
 export default function Dashboard() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"proposals" | "hireRequests">("proposals");
   useEffect(() => {
     void fetch("/api/v1/dashboard", { cache: "no-store" })
       .then((response) =>
@@ -94,37 +105,6 @@ export default function Dashboard() {
                 </Link>
               </Button>
             </div>
-          </section>
-
-          <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <Metric
-              href="/my-jobs"
-              icon={BriefcaseBusiness}
-              label="Total projects"
-              value={data.projectSummary.total}
-              tint="bg-primary/10 text-primary"
-            />
-            <Metric
-              href="/my-jobs"
-              icon={FileText}
-              label="Open for proposals"
-              value={data.projectSummary.open}
-              tint="bg-emerald-500/10 text-emerald-600"
-            />
-            <Metric
-              href="/my-jobs"
-              icon={CircleDollarSign}
-              label="Currently active"
-              value={data.projectSummary.running}
-              tint="bg-blue-500/10 text-blue-600"
-            />
-            <Metric
-              href="/my-jobs"
-              icon={BellRing}
-              label="Saved drafts"
-              value={data.projectSummary.drafts}
-              tint="bg-amber-500/10 text-amber-600"
-            />
           </section>
 
           <section className="grid gap-6 xl:grid-cols-[minmax(0,1.65fr)_minmax(300px,0.8fr)]">
@@ -231,52 +211,134 @@ export default function Dashboard() {
             <div className="rounded-3xl border border-border bg-card p-5 shadow-soft sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="font-display text-xl font-semibold">Recent proposals</h2>
+                  <h2 className="font-display text-xl font-semibold">
+                    {activeTab === "proposals" ? "Recent proposals" : "Sent hire requests"}
+                  </h2>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    Compare offers and choose the right professional.
+                    {activeTab === "proposals"
+                      ? "Compare offers and choose the right professional."
+                      : "Professionals you've directly invited to your jobs."}
                   </p>
                 </div>
                 <FileText className="h-5 w-5 text-primary" />
               </div>
+              <div className="mt-4 flex gap-1 rounded-xl border border-border bg-muted/50 p-1">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("proposals")}
+                  className={`flex-1 rounded-lg px-3 py-2 text-xs font-semibold transition-all sm:text-sm ${activeTab === "proposals" ? "bg-card text-primary shadow-soft" : "text-muted-foreground hover:text-foreground"}`}
+                >
+                  Proposals
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("hireRequests")}
+                  className={`flex-1 rounded-lg px-3 py-2 text-xs font-semibold transition-all sm:text-sm ${activeTab === "hireRequests" ? "bg-card text-primary shadow-soft" : "text-muted-foreground hover:text-foreground"}`}
+                >
+                  Sent hire requests
+                </button>
+              </div>
               <div className="mt-5 space-y-3">
-                {data.proposals.slice(0, 3).map((proposal) => {
-                  const name =
-                    proposal.professionalName?.trim() || `Professional #${proposal.professionalId}`;
-                  return (
-                    <div
-                      key={proposal.id}
-                      className="rounded-2xl border border-border bg-background p-4"
-                    >
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex items-center gap-3">
-                          <div className="grid h-9 w-9 place-items-center rounded-full bg-primary/10 text-xs font-bold text-primary">
-                            {name
-                              .split(" ")
-                              .map((part) => part[0])
-                              .join("")
-                              .slice(0, 2)
-                              .toUpperCase()}
-                          </div>
-                          <div>
-                            <p className="font-semibold">{name}</p>
-                            <p className="mt-0.5 text-xs text-muted-foreground">
-                              Delivery estimate: {proposal.duration}
+                {activeTab === "proposals"
+                  ? data.proposals.slice(0, 3).map((proposal) => {
+                      const name =
+                        proposal.professionalName?.trim() ||
+                        `Professional #${proposal.professionalId}`;
+                      return (
+                        <Link
+                          key={proposal.id}
+                          href={`/job/${proposal.jobId}`}
+                          className="block rounded-2xl border border-border bg-background p-4 transition-colors hover:border-primary/25"
+                        >
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex items-center gap-3">
+                              <div className="grid h-9 w-9 place-items-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                                {name
+                                  .split(" ")
+                                  .map((part) => part[0])
+                                  .join("")
+                                  .slice(0, 2)
+                                  .toUpperCase()}
+                              </div>
+                              <div>
+                                <p className="font-semibold">{name}</p>
+                                <p className="mt-0.5 text-xs text-muted-foreground">
+                                  Delivery estimate: {proposal.duration}
+                                </p>
+                              </div>
+                            </div>
+                            <p className="text-lg font-bold text-primary">
+                              ₹{proposal.bidAmount.toLocaleString()}
                             </p>
                           </div>
-                        </div>
-                        <p className="text-lg font-bold text-primary">
-                          ₹{proposal.bidAmount.toLocaleString()}
-                        </p>
-                      </div>
-                      <p className="mt-3 line-clamp-2 text-sm leading-6 text-muted-foreground">
-                        {proposal.coverLetter}
-                      </p>
-                    </div>
-                  );
-                })}
-                {!data.proposals.length ? (
+                          <p className="mt-3 line-clamp-2 text-sm leading-6 text-muted-foreground">
+                            {proposal.coverLetter}
+                          </p>
+                        </Link>
+                      );
+                    })
+                  : data.hireRequests.slice(0, 3).map((hireRequest) => {
+                      const name =
+                        hireRequest.professionalName?.trim() ||
+                        `Professional #${hireRequest.professionalId}`;
+                      return (
+                        <Link
+                          key={hireRequest.id}
+                          href={`/job/${hireRequest.jobId}`}
+                          className="block rounded-2xl border border-border bg-background p-4 transition-colors hover:border-primary/25"
+                        >
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex items-center gap-3">
+                              <div className="grid h-9 w-9 place-items-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                                {name
+                                  .split(" ")
+                                  .map((part) => part[0])
+                                  .join("")
+                                  .slice(0, 2)
+                                  .toUpperCase()}
+                              </div>
+                              <div>
+                                <p className="font-semibold">{name}</p>
+                                <p className="mt-0.5 text-xs text-muted-foreground">
+                                  Timeline: {hireRequest.duration}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-lg font-bold text-primary">
+                                ₹{hireRequest.bidAmount.toLocaleString()}
+                              </p>
+                              <span
+                                className={`text-xs font-semibold ${
+                                  hireRequest.status === "PENDING"
+                                    ? "text-yellow"
+                                    : hireRequest.status === "ACCEPTED"
+                                      ? "text-green"
+                                      : "text-red"
+                                }`}
+                              >
+                                {hireRequest.status === "PENDING"
+                                  ? "Awaiting professional"
+                                  : hireRequest.status}
+                              </span>
+                            </div>
+                          </div>
+                          <p className="mt-3 line-clamp-2 text-sm leading-6 text-muted-foreground">
+                            {hireRequest.coverLetter}
+                          </p>
+                        </Link>
+                      );
+                    })}
+                {activeTab === "proposals" && !data.proposals.length ? (
                   <Empty
                     text="New proposals will show up here as professionals respond."
+                    href="/discover"
+                    label="Find professionals"
+                  />
+                ) : null}
+                {activeTab === "hireRequests" && !data.hireRequests.length ? (
+                  <Empty
+                    text="Hire requests you send to professionals will show up here."
                     href="/discover"
                     label="Find professionals"
                   />
@@ -312,34 +374,6 @@ export default function Dashboard() {
   );
 }
 
-function Metric({
-  icon: Icon,
-  label,
-  value,
-  tint,
-  href,
-}: {
-  icon: typeof BriefcaseBusiness;
-  label: string;
-  value: string | number;
-  tint: string;
-  href: string;
-}) {
-  return (
-    <Link
-      href={href}
-      className="rounded-2xl border border-border bg-card p-4 shadow-soft transition-all hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-card"
-    >
-      <div className="flex items-center justify-between">
-        <div className={`grid h-10 w-10 place-items-center rounded-xl ${tint}`}>
-          <Icon className="h-5 w-5" />
-        </div>
-        <p className="text-2xl font-bold tracking-tight">{value}</p>
-      </div>
-      <p className="mt-3 text-sm font-medium text-muted-foreground">{label}</p>
-    </Link>
-  );
-}
 function Empty({ text, href, label }: { text: string; href: string; label: string }) {
   return (
     <div className="rounded-2xl border border-dashed border-primary/20 bg-primary/[0.025] px-5 py-8 text-center">

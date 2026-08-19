@@ -153,6 +153,14 @@ function toDetailedProfessional(professional: {
     serviceRadiusKm: professional.serviceRadiusKm,
     professionalLatitude: professional.professionalLatitude,
     professionalLongitude: professional.professionalLongitude,
+    displayPoint:
+      professional.professionalLatitude !== null && professional.professionalLongitude !== null
+        ? (createDisplayPoint(
+            professional.id,
+            professional.professionalLatitude,
+            professional.professionalLongitude,
+          ) ?? undefined)
+        : undefined,
     isActive: professional.isActive,
     lastLoginAt: professional.lastLoginAt?.toISOString() ?? null,
     createdAt: professional.createdAt.toISOString(),

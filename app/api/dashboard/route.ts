@@ -15,42 +15,51 @@ export async function GET(request: NextRequest) {
   try {
     if (role !== "CLIENT")
       return NextResponse.json({ error: "Client access required" }, { status: 403 });
-    const [user, jobs, proposals, notifications, spent, runningProjects] = await Promise.all([
-      db.user.findUniqueOrThrow({
-        where: { id: userId },
-        select: { firstName: true, averageRating: true },
-      }),
-      db.clientJob.findMany({
-        where: { userId },
-        orderBy: { createdAt: "desc" },
-        include: { _count: { select: { favoriteJobs: true } } },
-      }),
-      db.projectRequest.findMany({
-        where: { clientId: userId },
-        orderBy: { createdAt: "desc" },
-        take: 4,
-      }),
-      db.userNotification.findMany({
-        where: { userId, clearedAt: null },
-        orderBy: { createdAt: "desc" },
-        take: 4,
-      }),
-      db.projectTransaction.aggregate({
-        where: {
-          clientId: userId,
-          status: "COMPLETED",
-          createdAt: { gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1) },
-        },
-        _sum: { amount: true },
-      }),
-      db.projectTracking.findMany({
-        where: { clientId: userId, status: { not: "COMPLETED" } },
-        select: { jobId: true },
-      }),
-    ]);
+    const [user, jobs, proposals, hireRequests, notifications, spent, runningProjects] =
+      await Promise.all([
+        db.user.findUniqueOrThrow({
+          where: { id: userId },
+          select: { firstName: true, averageRating: true },
+        }),
+        db.clientJob.findMany({
+          where: { userId },
+          orderBy: { createdAt: "desc" },
+          include: { _count: { select: { favoriteJobs: true } } },
+        }),
+        db.projectRequest.findMany({
+          where: { clientId: userId, origin: "PROFESSIONAL_PROPOSAL" },
+          orderBy: { createdAt: "desc" },
+          take: 4,
+        }),
+        db.projectRequest.findMany({
+          where: { clientId: userId, origin: "CLIENT_HIRE" },
+          orderBy: { createdAt: "desc" },
+          take: 4,
+        }),
+        db.userNotification.findMany({
+          where: { userId, clearedAt: null },
+          orderBy: { createdAt: "desc" },
+          take: 4,
+        }),
+        db.projectTransaction.aggregate({
+          where: {
+            clientId: userId,
+            status: "COMPLETED",
+            createdAt: { gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1) },
+          },
+          _sum: { amount: true },
+        }),
+        db.projectTracking.findMany({
+          where: { clientId: userId, status: { not: "COMPLETED" } },
+          select: { jobId: true },
+        }),
+      ]);
     const runningJobIds = new Set(runningProjects.map((project) => project.jobId));
+    const professionalIds = [
+      ...new Set([...proposals, ...hireRequests].map((item) => item.professionalId)),
+    ];
     const professionals = await db.user.findMany({
-      where: { id: { in: [...new Set(proposals.map((proposal) => proposal.professionalId))] } },
+      where: { id: { in: professionalIds } },
       select: { id: true, firstName: true, lastName: true },
     });
     const professionalNames = new Map(
@@ -75,6 +84,10 @@ export async function GET(request: NextRequest) {
       proposals: proposals.map((proposal) => ({
         ...proposal,
         professionalName: professionalNames.get(proposal.professionalId) ?? "Professional",
+      })),
+      hireRequests: hireRequests.map((hireRequest) => ({
+        ...hireRequest,
+        professionalName: professionalNames.get(hireRequest.professionalId) ?? "Professional",
       })),
       notifications,
       spent: spent._sum.amount ?? 0,

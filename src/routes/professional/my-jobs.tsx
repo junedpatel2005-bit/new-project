@@ -5,8 +5,15 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Search, Map, MapPin, SlidersHorizontal, Star, ShieldCheck, Heart } from "lucide-react";
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { MarketplaceCategory } from "@/lib/types/marketplace";
 
 const ProfessionalJobsMap = dynamic(() => import("@/components/ProfessionalJobsMap"), {
@@ -61,15 +68,34 @@ type JobListItem = {
   proposalCount: number;
 };
 
+type RequestItem = {
+  id: number;
+  jobId: number;
+  jobTitle: string;
+  clientName: string;
+  bidAmount: number;
+  duration: string;
+  coverLetter: string;
+  status: string;
+  lastActorRole: "CLIENT" | "PROFESSIONAL";
+  createdAt: string;
+};
+
 type JobsResponse = {
   professional?: { professionalLatitude: number | null; professionalLongitude: number | null };
   openJobs: JobListItem[];
   savedJobs: JobListItem[];
-  proposals: unknown[];
-  offers: unknown[];
+  proposals: RequestItem[];
+  offers: RequestItem[];
   activeProjects: unknown[];
   completedProjects: unknown[];
 };
+
+function requestStatusStyle(status: string) {
+  if (status === "PENDING") return "bg-yellow/10 text-yellow";
+  if (status === "ACCEPTED") return "bg-green/10 text-green";
+  return "bg-red/10 text-red";
+}
 
 function formatBudgetAmount(value: number | null | undefined, timingType?: string | null) {
   if (timingType === "HOURLY" && value != null) return `₹${value.toLocaleString()}/hr`;
@@ -94,7 +120,9 @@ function ProfessionalJobsContent() {
   const [openJobs, setOpenJobs] = useState<JobListItem[]>([]);
   const [hasServiceLocation, setHasServiceLocation] = useState(true);
   const [savedJobs, setSavedJobs] = useState<JobListItem[]>([]);
-  const [view, setView] = useState<"all" | "saved">("all");
+  const [proposals, setProposals] = useState<RequestItem[]>([]);
+  const [offers, setOffers] = useState<RequestItem[]>([]);
+  const [view, setView] = useState<"all" | "saved" | "proposals" | "offers">("all");
   const jobs = view === "saved" ? savedJobs : openJobs;
   const savedIds = useMemo(() => new Set(savedJobs.map((job) => job.id)), [savedJobs]);
   const [categories, setCategories] = useState<MarketplaceCategory[]>([]);
@@ -114,7 +142,84 @@ function ProfessionalJobsContent() {
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [offerBusyId, setOfferBusyId] = useState<number | null>(null);
   const mapSectionRef = useRef<HTMLDivElement | null>(null);
+
+  async function respondToOffer(offer: RequestItem, action: "accept" | "reject") {
+    setOfferBusyId(offer.id);
+    try {
+      const response = await fetch(`/api/v1/professional/project-requests/${offer.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action }),
+      });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) {
+        alert(payload?.error || "Unable to update this request.");
+        return;
+      }
+      if (action === "accept" && payload.project?.id) {
+        router.push(`/project/${payload.project.id}/tracking`);
+        return;
+      }
+      await loadJobs();
+    } finally {
+      setOfferBusyId(null);
+    }
+  }
+
+  const [negotiateTarget, setNegotiateTarget] = useState<RequestItem | null>(null);
+  const [negotiatePrice, setNegotiatePrice] = useState("");
+  const [negotiateDuration, setNegotiateDuration] = useState("");
+  const [negotiateMessage, setNegotiateMessage] = useState("");
+  const [negotiateBusy, setNegotiateBusy] = useState(false);
+  const [negotiateError, setNegotiateError] = useState<string | null>(null);
+
+  function openNegotiate(item: RequestItem) {
+    setNegotiateTarget(item);
+    setNegotiatePrice(String(item.bidAmount));
+    setNegotiateDuration(item.duration);
+    setNegotiateMessage("");
+    setNegotiateError(null);
+  }
+
+  async function submitNegotiation() {
+    if (!negotiateTarget) return;
+    const bidAmount = Number(negotiatePrice);
+    if (
+      !Number.isSafeInteger(bidAmount) ||
+      bidAmount < 1 ||
+      !negotiateDuration.trim() ||
+      !negotiateMessage.trim()
+    ) {
+      setNegotiateError("Enter a valid price, timeline, and message.");
+      return;
+    }
+    setNegotiateBusy(true);
+    setNegotiateError(null);
+    try {
+      const response = await fetch(`/api/v1/professional/project-requests/${negotiateTarget.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "counter",
+          bidAmount,
+          duration: negotiateDuration,
+          message: negotiateMessage,
+        }),
+      });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(payload?.error || "Unable to send your counter-offer.");
+      setNegotiateTarget(null);
+      await loadJobs();
+    } catch (error) {
+      setNegotiateError(
+        error instanceof Error ? error.message : "Unable to send your counter-offer.",
+      );
+    } finally {
+      setNegotiateBusy(false);
+    }
+  }
 
   function showJobLocation(jobId: number) {
     setSelectedJobId(jobId);
@@ -147,37 +252,32 @@ function ProfessionalJobsContent() {
     );
   }
 
-  useEffect(() => {
-    let active = true;
-
-    async function loadJobs() {
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await fetch("/api/v1/portal/professional-jobs", { cache: "no-store" });
-        if (!response.ok) throw new Error("Unable to load jobs");
-        const payload = (await response.json()) as JobsResponse;
-        if (!active) return;
-        setOpenJobs(payload.openJobs ?? []);
-        setSavedJobs(payload.savedJobs ?? []);
-        setHasServiceLocation(
-          payload.professional?.professionalLatitude != null &&
-            payload.professional?.professionalLongitude != null,
-        );
-      } catch (loadError) {
-        if (!active) return;
-        console.error(loadError);
-        setError("Unable to load jobs. Please refresh and try again.");
-      } finally {
-        if (active) setLoading(false);
-      }
+  const loadJobs = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await fetch("/api/v1/portal/professional-jobs", { cache: "no-store" });
+      if (!response.ok) throw new Error("Unable to load jobs");
+      const payload = (await response.json()) as JobsResponse;
+      setOpenJobs(payload.openJobs ?? []);
+      setSavedJobs(payload.savedJobs ?? []);
+      setProposals(payload.proposals ?? []);
+      setOffers(payload.offers ?? []);
+      setHasServiceLocation(
+        payload.professional?.professionalLatitude != null &&
+          payload.professional?.professionalLongitude != null,
+      );
+    } catch (loadError) {
+      console.error(loadError);
+      setError("Unable to load jobs. Please refresh and try again.");
+    } finally {
+      setLoading(false);
     }
-
-    void loadJobs();
-    return () => {
-      active = false;
-    };
   }, []);
+
+  useEffect(() => {
+    void loadJobs();
+  }, [loadJobs]);
 
   useEffect(() => {
     if (new URLSearchParams(window.location.search).get("view") === "saved") setView("saved");
@@ -327,485 +427,636 @@ function ProfessionalJobsContent() {
   ]);
 
   return (
-    <div>
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            {view === "saved" ? "Saved jobs" : "Find jobs"}
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {visibleJobs.length} jobs available
-            {jobs.length ? ` across ${jobs.length} listings` : ""}
-          </p>
-        </div>
-        <div className="flex gap-1 rounded-xl border border-border bg-muted/50 p-1">
-          <button
-            type="button"
-            onClick={() => setView("all")}
-            className={`rounded-lg px-3 py-2 text-sm font-semibold transition-all ${view === "all" ? "bg-card text-primary shadow-soft" : "text-muted-foreground hover:text-foreground"}`}
-          >
-            All jobs
-          </button>
-          <button
-            type="button"
-            onClick={() => setView("saved")}
-            className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition-all ${view === "saved" ? "bg-card text-primary shadow-soft" : "text-muted-foreground hover:text-foreground"}`}
-          >
-            <Heart className="h-3.5 w-3.5" />
-            Saved ({savedJobs.length})
-          </button>
-        </div>
-      </div>
-
-      <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
-        <aside className="h-fit rounded-2xl border border-border bg-card p-5 lg:sticky lg:top-20 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="font-semibold">Filters</h2>
+    <>
+      <div>
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">
+              {view === "saved"
+                ? "Saved jobs"
+                : view === "proposals"
+                  ? "My proposals"
+                  : view === "offers"
+                    ? "Hire requests"
+                    : "Find jobs"}
+            </h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {view === "proposals"
+                ? `${proposals.length} proposal${proposals.length === 1 ? "" : "s"} sent`
+                : view === "offers"
+                  ? `${offers.length} hire request${offers.length === 1 ? "" : "s"} received`
+                  : `${visibleJobs.length} jobs available${jobs.length ? ` across ${jobs.length} listings` : ""}`}
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-1 rounded-xl border border-border bg-muted/50 p-1">
             <button
               type="button"
-              className="text-xs text-primary hover:underline"
-              onClick={() => {
-                setQuery("");
-                setSegment("");
-                setCategory("");
-                setCity("");
-                setMinRating("");
-                setVerifiedOnly(false);
-                setNearMe(false);
-                setLocationError(null);
-                setRadiusKm(DEFAULT_NEAR_ME_RADIUS_KM);
-              }}
+              onClick={() => setView("all")}
+              className={`rounded-lg px-3 py-2 text-sm font-semibold transition-all ${view === "all" ? "bg-card text-primary shadow-soft" : "text-muted-foreground hover:text-foreground"}`}
             >
-              Clear all
+              All jobs
+            </button>
+            <button
+              type="button"
+              onClick={() => setView("saved")}
+              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition-all ${view === "saved" ? "bg-card text-primary shadow-soft" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              <Heart className="h-3.5 w-3.5" />
+              Saved ({savedJobs.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setView("proposals")}
+              className={`rounded-lg px-3 py-2 text-sm font-semibold transition-all ${view === "proposals" ? "bg-card text-primary shadow-soft" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              My Proposals ({proposals.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setView("offers")}
+              className={`rounded-lg px-3 py-2 text-sm font-semibold transition-all ${view === "offers" ? "bg-card text-primary shadow-soft" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              Hire Requests ({offers.length})
             </button>
           </div>
+        </div>
 
-          <div className="space-y-6">
-            <div>
-              <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
-                Category
-              </p>
-              <div className="mb-3 flex flex-wrap gap-2">
-                {segmentOptions.map(([value, label]) => (
-                  <button
-                    key={value}
-                    type="button"
-                    onClick={() => {
-                      setSegment((current) => (current === value ? "" : value));
-                      setCategory("");
-                    }}
-                    className={`whitespace-nowrap rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors duration-200 ${
-                      segment === value
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"
-                    }`}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-              {segment ? (
-                <div className="space-y-2">
-                  <label className="flex items-center gap-2 text-sm">
-                    <input
-                      type="radio"
-                      name="category"
-                      checked={category === ""}
-                      onChange={() => setCategory("")}
-                      className="h-4 w-4 accent-primary"
-                    />
-                    <span>All categories</span>
-                  </label>
-                  {topCategories.map((item) => (
-                    <label key={item.id} className="flex items-center gap-2 text-sm">
-                      <input
-                        type="radio"
-                        name="category"
-                        checked={category === item.name}
-                        onChange={() => setCategory(item.name)}
-                        className="h-4 w-4 accent-primary"
-                      />
-                      <span className="flex-1">{item.name}</span>
-                      {jobCountByCategory[item.name] ? (
-                        <span className="text-xs text-muted-foreground">
-                          {jobCountByCategory[item.name]}
-                        </span>
-                      ) : null}
-                    </label>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-xs text-muted-foreground">
-                  Select Residential, Commercial, or Industrial to see categories.
-                </p>
-              )}
-              {subCategories.length > 0 && (
-                <div className="mt-3 space-y-2 border-t border-border pt-3">
-                  <p className="text-xs font-medium text-muted-foreground">
-                    Sub-category of {activeTopCategory?.name}
-                  </p>
-                  <label className="flex items-center gap-2 text-sm">
-                    <input
-                      type="radio"
-                      name="subcategory"
-                      checked={category === activeTopCategory?.name}
-                      onChange={() => setCategory(activeTopCategory?.name ?? "")}
-                      className="h-4 w-4 accent-primary"
-                    />
-                    <span>General {activeTopCategory?.name}</span>
-                  </label>
-                  {subCategories.map((item) => (
-                    <label key={item.id} className="flex items-center gap-2 text-sm">
-                      <input
-                        type="radio"
-                        name="subcategory"
-                        checked={category === item.name}
-                        onChange={() => setCategory(item.name)}
-                        className="h-4 w-4 accent-primary"
-                      />
-                      <span className="flex-1">{item.name}</span>
-                      {jobCountByCategory[item.name] ? (
-                        <span className="text-xs text-muted-foreground">
-                          {jobCountByCategory[item.name]}
-                        </span>
-                      ) : null}
-                    </label>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div>
-              <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
-                Location
-              </p>
-              <label className="flex items-center justify-between text-sm">
-                <span className="inline-flex items-center gap-1.5">
-                  <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
-                  Jobs near me
-                </span>
-                <input
-                  type="checkbox"
-                  checked={nearMe}
-                  onChange={(event) => toggleNearMe(event.target.checked)}
-                  className="h-4 w-4 accent-primary"
-                />
-              </label>
-              {locating && <p className="mt-1.5 text-xs text-muted-foreground">Locating…</p>}
-              {locationError && <p className="mt-1.5 text-xs text-destructive">{locationError}</p>}
-              {nearMe && (
-                <div className="mt-3">
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>Radius</span>
-                    <span className="font-semibold text-foreground">{radiusKm} km</span>
+        {view === "proposals" || view === "offers" ? (
+          <div className="space-y-3">
+            {(view === "proposals" ? proposals : offers).map((item) => (
+              <article
+                key={item.id}
+                className="rounded-2xl border border-border bg-card p-4 shadow-soft"
+              >
+                <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="truncate text-base font-semibold">{item.jobTitle}</h3>
+                      <span
+                        className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ${requestStatusStyle(item.status)}`}
+                      >
+                        {item.status === "PENDING"
+                          ? item.lastActorRole === "CLIENT"
+                            ? "Your turn to respond"
+                            : "Awaiting client"
+                          : item.status}
+                      </span>
+                    </div>
+                    <p className="mt-1 truncate text-sm text-muted-foreground">
+                      {view === "proposals"
+                        ? `To ${item.clientName}`
+                        : `Invited by ${item.clientName}`}{" "}
+                      · ₹{item.bidAmount.toLocaleString()} · {item.duration}
+                      {item.coverLetter ? ` · "${item.coverLetter}"` : ""}
+                    </p>
                   </div>
-                  <input
-                    type="range"
-                    min={MIN_NEAR_ME_RADIUS_KM}
-                    max={MAX_NEAR_ME_RADIUS_KM}
-                    value={radiusKm}
-                    onChange={(event) => setRadiusKm(Number(event.target.value))}
-                    className="mt-1.5 h-1.5 w-full cursor-pointer accent-primary"
-                  />
+                  <div className="flex shrink-0 items-center gap-2">
+                    <Button asChild variant="outline" size="sm">
+                      <Link href={`/job/${item.jobId}`}>View Job</Link>
+                    </Button>
+                    {item.status === "PENDING" && item.lastActorRole === "CLIENT" && (
+                      <>
+                        <Button
+                          size="sm"
+                          disabled={offerBusyId === item.id}
+                          onClick={() => void respondToOffer(item, "accept")}
+                        >
+                          {offerBusyId === item.id ? "Working…" : "Accept"}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={offerBusyId === item.id}
+                          onClick={() => openNegotiate(item)}
+                        >
+                          Negotiate
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-destructive hover:text-destructive"
+                          disabled={offerBusyId === item.id}
+                          onClick={() => void respondToOffer(item, "reject")}
+                        >
+                          Decline
+                        </Button>
+                      </>
+                    )}
+                  </div>
                 </div>
-              )}
-            </div>
-
-            <div>
-              <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
-                Verified only
-              </p>
-              <label className="flex items-center justify-between text-sm">
-                <span>Verified pros</span>
-                <input
-                  type="checkbox"
-                  checked={verifiedOnly}
-                  onChange={(event) => setVerifiedOnly(event.target.checked)}
-                  className="h-4 w-4 accent-primary"
-                />
-              </label>
-            </div>
-
-            <div>
-              <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
-                City
-              </p>
-              <Input
-                value={city}
-                onChange={(event) => setCity(event.target.value)}
-                placeholder="e.g. Toronto, Vancouver"
-              />
-            </div>
-
-            <div>
-              <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
-                Minimum rating
-              </p>
-              <select
-                value={minRating}
-                onChange={(event) =>
-                  setMinRating(event.target.value === "" ? "" : Number(event.target.value))
-                }
-                className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-              >
-                <option value="">Any rating</option>
-                <option value={4}>4.0+ stars</option>
-                <option value={4.5}>4.5+ stars</option>
-                <option value={4.8}>4.8+ stars</option>
-              </select>
-            </div>
-          </div>
-        </aside>
-
-        <section className="space-y-4">
-          <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-3 md:flex-row md:items-center md:justify-between">
-            <div className="relative flex-1">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="Try 'plumber', 'react developer', 'wedding photographer'"
-                className="pl-9"
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="relative">
-                <select
-                  value={sort}
-                  onChange={(event) => setSort(event.target.value)}
-                  className="h-10 appearance-none rounded-md border border-input bg-background px-3 pr-9 text-sm"
-                >
-                  <option>Best match</option>
-                  <option>Highest rated</option>
-                  <option>Newest</option>
-                </select>
+              </article>
+            ))}
+            {(view === "proposals" ? proposals : offers).length === 0 && (
+              <div className="rounded-2xl border border-dashed border-border bg-background px-6 py-10 text-center text-sm text-muted-foreground">
+                {view === "proposals"
+                  ? "You haven't sent any proposals yet. Browse open jobs to get started."
+                  : "No clients have invited you to a job yet."}
               </div>
-              <Button
-                variant="outline"
-                onClick={() => setShowMap((current) => !current)}
-                className="gap-2"
-              >
-                <Map className="h-4 w-4" />
-                {showMap ? "Hide map" : "Show map"}
-              </Button>
-            </div>
-          </div>
-
-          {!loading && !showMap && mapJobs.length > 0 && (
-            <div
-              role="button"
-              tabIndex={0}
-              onClick={() => {
-                setShowMap(true);
-                window.requestAnimationFrame(() => {
-                  mapSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-                });
-              }}
-              onKeyDown={(event) => {
-                if (event.key !== "Enter" && event.key !== " ") return;
-                event.preventDefault();
-                event.currentTarget.click();
-              }}
-              className="w-full cursor-pointer overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-primary/10 via-card to-accent/10 p-5 shadow-soft transition-all hover:border-primary/50 hover:shadow-elevated sm:p-6"
-            >
-              <div className="flex h-32 items-center justify-between gap-6">
-                <div className="text-left">
-                  <p className="text-sm font-semibold">Jobs near you</p>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {mapJobs.length} available • Click to view on map
-                  </p>
-                  <p className="mt-1 text-[11px] text-muted-foreground">
-                    Approximate location — shown for privacy
-                  </p>
-                </div>
-                <div className="h-full w-1/2">
-                  <JobsPreviewMap points={previewPoints} />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {error ? (
-            <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-6 text-sm text-destructive">
-              {error}
-            </div>
-          ) : null}
-
-          <div className="rounded-2xl border border-border bg-card p-4">
-            <div className="mb-4 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">Jobs near you</span>
-              </div>
-              <span className="text-sm text-muted-foreground">{visibleJobs.length} results</span>
-            </div>
-
-            {!loading && !hasServiceLocation && (
-              <p className="mb-4 rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-primary">
-                Set your location and service radius in{" "}
-                <Link href="/professional/setup" className="font-semibold underline">
-                  your profile
-                </Link>{" "}
-                to see distances and jobs sorted by how close they are to you.
-              </p>
             )}
-
-            {showMap && (
-              <div className="mb-4">
-                <div
-                  ref={mapSectionRef}
-                  className="relative h-[320px] overflow-hidden rounded-2xl border border-border"
+          </div>
+        ) : (
+          <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
+            <aside className="h-fit rounded-2xl border border-border bg-card p-5 lg:sticky lg:top-20 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="font-semibold">Filters</h2>
+                <button
+                  type="button"
+                  className="text-xs text-primary hover:underline"
+                  onClick={() => {
+                    setQuery("");
+                    setSegment("");
+                    setCategory("");
+                    setCity("");
+                    setMinRating("");
+                    setVerifiedOnly(false);
+                    setNearMe(false);
+                    setLocationError(null);
+                    setRadiusKm(DEFAULT_NEAR_ME_RADIUS_KM);
+                  }}
                 >
-                  {mapJobs.length > 0 ? (
-                    <ProfessionalJobsMap
-                      center={mapCenter}
-                      jobs={mapJobs}
-                      onSelectJob={setSelectedJobId}
-                    />
+                  Clear all
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                <div>
+                  <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                    Category
+                  </p>
+                  <div className="mb-3 flex flex-wrap gap-2">
+                    {segmentOptions.map(([value, label]) => (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => {
+                          setSegment((current) => (current === value ? "" : value));
+                          setCategory("");
+                        }}
+                        className={`whitespace-nowrap rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors duration-200 ${
+                          segment === value
+                            ? "border-primary bg-primary text-primary-foreground"
+                            : "border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                  {segment ? (
+                    <div className="space-y-2">
+                      <label className="flex items-center gap-2 text-sm">
+                        <input
+                          type="radio"
+                          name="category"
+                          checked={category === ""}
+                          onChange={() => setCategory("")}
+                          className="h-4 w-4 accent-primary"
+                        />
+                        <span>All categories</span>
+                      </label>
+                      {topCategories.map((item) => (
+                        <label key={item.id} className="flex items-center gap-2 text-sm">
+                          <input
+                            type="radio"
+                            name="category"
+                            checked={category === item.name}
+                            onChange={() => setCategory(item.name)}
+                            className="h-4 w-4 accent-primary"
+                          />
+                          <span className="flex-1">{item.name}</span>
+                          {jobCountByCategory[item.name] ? (
+                            <span className="text-xs text-muted-foreground">
+                              {jobCountByCategory[item.name]}
+                            </span>
+                          ) : null}
+                        </label>
+                      ))}
+                    </div>
                   ) : (
-                    <div className="flex h-full items-center justify-center bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.35),transparent_10%),linear-gradient(180deg,#bfe8ef_0%,#b1d7df_100%)] text-sm text-muted-foreground">
-                      None of your matching jobs have a pinned location yet.
+                    <p className="text-xs text-muted-foreground">
+                      Select Residential, Commercial, or Industrial to see categories.
+                    </p>
+                  )}
+                  {subCategories.length > 0 && (
+                    <div className="mt-3 space-y-2 border-t border-border pt-3">
+                      <p className="text-xs font-medium text-muted-foreground">
+                        Sub-category of {activeTopCategory?.name}
+                      </p>
+                      <label className="flex items-center gap-2 text-sm">
+                        <input
+                          type="radio"
+                          name="subcategory"
+                          checked={category === activeTopCategory?.name}
+                          onChange={() => setCategory(activeTopCategory?.name ?? "")}
+                          className="h-4 w-4 accent-primary"
+                        />
+                        <span>General {activeTopCategory?.name}</span>
+                      </label>
+                      {subCategories.map((item) => (
+                        <label key={item.id} className="flex items-center gap-2 text-sm">
+                          <input
+                            type="radio"
+                            name="subcategory"
+                            checked={category === item.name}
+                            onChange={() => setCategory(item.name)}
+                            className="h-4 w-4 accent-primary"
+                          />
+                          <span className="flex-1">{item.name}</span>
+                          {jobCountByCategory[item.name] ? (
+                            <span className="text-xs text-muted-foreground">
+                              {jobCountByCategory[item.name]}
+                            </span>
+                          ) : null}
+                        </label>
+                      ))}
                     </div>
                   )}
                 </div>
-                {mapJobs.length > 0 && (
-                  <p className="mt-1.5 text-[11px] text-muted-foreground">
-                    Approximate location — shown for privacy
+
+                <div>
+                  <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                    Location
+                  </p>
+                  <label className="flex items-center justify-between text-sm">
+                    <span className="inline-flex items-center gap-1.5">
+                      <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
+                      Jobs near me
+                    </span>
+                    <input
+                      type="checkbox"
+                      checked={nearMe}
+                      onChange={(event) => toggleNearMe(event.target.checked)}
+                      className="h-4 w-4 accent-primary"
+                    />
+                  </label>
+                  {locating && <p className="mt-1.5 text-xs text-muted-foreground">Locating…</p>}
+                  {locationError && (
+                    <p className="mt-1.5 text-xs text-destructive">{locationError}</p>
+                  )}
+                  {nearMe && (
+                    <div className="mt-3">
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span>Radius</span>
+                        <span className="font-semibold text-foreground">{radiusKm} km</span>
+                      </div>
+                      <input
+                        type="range"
+                        min={MIN_NEAR_ME_RADIUS_KM}
+                        max={MAX_NEAR_ME_RADIUS_KM}
+                        value={radiusKm}
+                        onChange={(event) => setRadiusKm(Number(event.target.value))}
+                        className="mt-1.5 h-1.5 w-full cursor-pointer accent-primary"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                    Verified only
+                  </p>
+                  <label className="flex items-center justify-between text-sm">
+                    <span>Verified pros</span>
+                    <input
+                      type="checkbox"
+                      checked={verifiedOnly}
+                      onChange={(event) => setVerifiedOnly(event.target.checked)}
+                      className="h-4 w-4 accent-primary"
+                    />
+                  </label>
+                </div>
+
+                <div>
+                  <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                    City
+                  </p>
+                  <Input
+                    value={city}
+                    onChange={(event) => setCity(event.target.value)}
+                    placeholder="e.g. Toronto, Vancouver"
+                  />
+                </div>
+
+                <div>
+                  <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                    Minimum rating
+                  </p>
+                  <select
+                    value={minRating}
+                    onChange={(event) =>
+                      setMinRating(event.target.value === "" ? "" : Number(event.target.value))
+                    }
+                    className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                  >
+                    <option value="">Any rating</option>
+                    <option value={4}>4.0+ stars</option>
+                    <option value={4.5}>4.5+ stars</option>
+                    <option value={4.8}>4.8+ stars</option>
+                  </select>
+                </div>
+              </div>
+            </aside>
+
+            <section className="space-y-4">
+              <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-3 md:flex-row md:items-center md:justify-between">
+                <div className="relative flex-1">
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    value={query}
+                    onChange={(event) => setQuery(event.target.value)}
+                    placeholder="Try 'plumber', 'react developer', 'wedding photographer'"
+                    className="pl-9"
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="relative">
+                    <select
+                      value={sort}
+                      onChange={(event) => setSort(event.target.value)}
+                      className="h-10 appearance-none rounded-md border border-input bg-background px-3 pr-9 text-sm"
+                    >
+                      <option>Best match</option>
+                      <option>Highest rated</option>
+                      <option>Newest</option>
+                    </select>
+                  </div>
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowMap((current) => !current)}
+                    className="gap-2"
+                  >
+                    <Map className="h-4 w-4" />
+                    {showMap ? "Hide map" : "Show map"}
+                  </Button>
+                </div>
+              </div>
+
+              {!loading && !showMap && mapJobs.length > 0 && (
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => {
+                    setShowMap(true);
+                    window.requestAnimationFrame(() => {
+                      mapSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                    });
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key !== "Enter" && event.key !== " ") return;
+                    event.preventDefault();
+                    event.currentTarget.click();
+                  }}
+                  className="w-full cursor-pointer overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-primary/10 via-card to-accent/10 p-5 shadow-soft transition-all hover:border-primary/50 hover:shadow-elevated sm:p-6"
+                >
+                  <div className="flex h-32 items-center justify-between gap-6">
+                    <div className="text-left">
+                      <p className="text-sm font-semibold">Jobs near you</p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {mapJobs.length} available • Click to view on map
+                      </p>
+                      <p className="mt-1 text-[11px] text-muted-foreground">
+                        Approximate location — shown for privacy
+                      </p>
+                    </div>
+                    <div className="h-full w-1/2">
+                      <JobsPreviewMap points={previewPoints} />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {error ? (
+                <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-6 text-sm text-destructive">
+                  {error}
+                </div>
+              ) : null}
+
+              <div className="rounded-2xl border border-border bg-card p-4">
+                <div className="mb-4 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm font-medium">Jobs near you</span>
+                  </div>
+                  <span className="text-sm text-muted-foreground">
+                    {visibleJobs.length} results
+                  </span>
+                </div>
+
+                {!loading && !hasServiceLocation && (
+                  <p className="mb-4 rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-primary">
+                    Set your location and service radius in{" "}
+                    <Link href="/professional/setup" className="font-semibold underline">
+                      your profile
+                    </Link>{" "}
+                    to see distances and jobs sorted by how close they are to you.
                   </p>
                 )}
-              </div>
-            )}
 
-            {loading ? (
-              <div className="space-y-3">
-                <div className="h-28 animate-pulse rounded-2xl bg-muted" />
-                <div className="h-28 animate-pulse rounded-2xl bg-muted" />
-                <div className="h-28 animate-pulse rounded-2xl bg-muted" />
-              </div>
-            ) : visibleJobs.length > 0 ? (
-              <div className="grid gap-4 lg:grid-cols-2">
-                {visibleJobs.map((job) => {
-                  const saved = savedIds.has(job.id);
-                  return (
-                    <article
-                      key={job.id}
-                      onClick={() => router.push(`/job/${job.id}`)}
-                      className={`cursor-pointer rounded-2xl border bg-background p-4 transition hover:border-primary/40 ${
-                        selectedJobId === job.id ? "border-primary shadow-soft" : "border-border"
-                      }`}
+                {showMap && (
+                  <div className="mb-4">
+                    <div
+                      ref={mapSectionRef}
+                      className="relative h-[320px] overflow-hidden rounded-2xl border border-border"
                     >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <p className="text-[10px] font-medium uppercase tracking-[0.24em] text-muted-foreground">
-                            {job.category ?? "General"}
-                          </p>
-                          <h3 className="mt-2 text-[17px] font-semibold leading-tight text-foreground">
-                            {job.title}
-                          </h3>
-                          <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-                            <span>{job.locationAddress ?? "Remote"}</span>
-                            {job.distanceKm !== null && (
-                              <span className="inline-flex items-center gap-1 font-medium text-primary">
-                                <MapPin className="h-3.5 w-3.5" />
-                                {job.distanceKm < 1
-                                  ? "Less than 1 km away"
-                                  : `${job.distanceKm.toFixed(1)} km away`}
+                      {mapJobs.length > 0 ? (
+                        <ProfessionalJobsMap
+                          center={mapCenter}
+                          jobs={mapJobs}
+                          onSelectJob={setSelectedJobId}
+                        />
+                      ) : (
+                        <div className="flex h-full items-center justify-center bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.35),transparent_10%),linear-gradient(180deg,#bfe8ef_0%,#b1d7df_100%)] text-sm text-muted-foreground">
+                          None of your matching jobs have a pinned location yet.
+                        </div>
+                      )}
+                    </div>
+                    {mapJobs.length > 0 && (
+                      <p className="mt-1.5 text-[11px] text-muted-foreground">
+                        Approximate location — shown for privacy
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {loading ? (
+                  <div className="space-y-3">
+                    <div className="h-28 animate-pulse rounded-2xl bg-muted" />
+                    <div className="h-28 animate-pulse rounded-2xl bg-muted" />
+                    <div className="h-28 animate-pulse rounded-2xl bg-muted" />
+                  </div>
+                ) : visibleJobs.length > 0 ? (
+                  <div className="grid gap-4 lg:grid-cols-2">
+                    {visibleJobs.map((job) => {
+                      const saved = savedIds.has(job.id);
+                      return (
+                        <article
+                          key={job.id}
+                          onClick={() => router.push(`/job/${job.id}`)}
+                          className={`cursor-pointer rounded-2xl border bg-background p-4 transition hover:border-primary/40 ${
+                            selectedJobId === job.id
+                              ? "border-primary shadow-soft"
+                              : "border-border"
+                          }`}
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <p className="text-[10px] font-medium uppercase tracking-[0.24em] text-muted-foreground">
+                                {job.category ?? "General"}
+                              </p>
+                              <h3 className="mt-2 text-[17px] font-semibold leading-tight text-foreground">
+                                {job.title}
+                              </h3>
+                              <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+                                <span>{job.locationAddress ?? "Remote"}</span>
+                                {job.distanceKm !== null && (
+                                  <span className="inline-flex items-center gap-1 font-medium text-primary">
+                                    <MapPin className="h-3.5 w-3.5" />
+                                    {job.distanceKm < 1
+                                      ? "Less than 1 km away"
+                                      : `${job.distanceKm.toFixed(1)} km away`}
+                                  </span>
+                                )}
+                                {job.clientName ? <span>{job.clientName}</span> : null}
+                                <span className="inline-flex items-center gap-1">
+                                  <Star className="h-3.5 w-3.5 fill-current text-amber-500" />
+                                  {job.clientRating.toFixed(1)}
+                                </span>
+                                {job.clientVerified && (
+                                  <span className="inline-flex items-center gap-1 text-primary">
+                                    <ShieldCheck className="h-3.5 w-3.5" />
+                                    Verified
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex shrink-0 items-center gap-2">
+                              <span className="rounded-full bg-muted px-2 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                                {job.status}
                               </span>
-                            )}
-                            {job.clientName ? <span>{job.clientName}</span> : null}
-                            <span className="inline-flex items-center gap-1">
-                              <Star className="h-3.5 w-3.5 fill-current text-amber-500" />
-                              {job.clientRating.toFixed(1)}
-                            </span>
-                            {job.clientVerified && (
-                              <span className="inline-flex items-center gap-1 text-primary">
-                                <ShieldCheck className="h-3.5 w-3.5" />
-                                Verified
-                              </span>
-                            )}
+                              <button
+                                type="button"
+                                aria-label={saved ? "Remove from saved jobs" : "Save this job"}
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  void toggleSave(job, saved);
+                                }}
+                                className={`grid h-8 w-8 shrink-0 place-items-center rounded-full transition ${
+                                  saved
+                                    ? "bg-cta/10 text-cta"
+                                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                                }`}
+                              >
+                                <Heart className={`h-4 w-4 ${saved ? "fill-current" : ""}`} />
+                              </button>
+                            </div>
                           </div>
-                        </div>
-                        <div className="flex shrink-0 items-center gap-2">
-                          <span className="rounded-full bg-muted px-2 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                            {job.status}
-                          </span>
-                          <button
-                            type="button"
-                            aria-label={saved ? "Remove from saved jobs" : "Save this job"}
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              void toggleSave(job, saved);
-                            }}
-                            className={`grid h-8 w-8 shrink-0 place-items-center rounded-full transition ${
-                              saved
-                                ? "bg-cta/10 text-cta"
-                                : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                            }`}
-                          >
-                            <Heart className={`h-4 w-4 ${saved ? "fill-current" : ""}`} />
-                          </button>
-                        </div>
-                      </div>
 
-                      {job.description ? (
-                        <p className="mt-3 line-clamp-3 text-sm leading-6 text-muted-foreground">
-                          {job.description}
-                        </p>
-                      ) : null}
+                          {job.description ? (
+                            <p className="mt-3 line-clamp-3 text-sm leading-6 text-muted-foreground">
+                              {job.description}
+                            </p>
+                          ) : null}
 
-                      <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                        <span className="font-medium text-foreground">
-                          {formatBudgetRange(job.budgetMin, job.budgetMax, job.timingType)}
-                        </span>
-                        <span>•</span>
-                        <span>{formatBudgetAmount(job.hourlyRate, job.timingType)}</span>
-                      </div>
+                          <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                            <span className="font-medium text-foreground">
+                              {formatBudgetRange(job.budgetMin, job.budgetMax, job.timingType)}
+                            </span>
+                            <span>•</span>
+                            <span>{formatBudgetAmount(job.hourlyRate, job.timingType)}</span>
+                          </div>
 
-                      <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
-                        <div className="flex items-center gap-2">
-                          <Button asChild size="sm">
-                            <Link
-                              href={`/job/${job.id}`}
-                              onClick={(event) => event.stopPropagation()}
-                            >
-                              View details
-                            </Link>
-                          </Button>
-                          {job.locationLat !== null && job.locationLng !== null && (
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              className="gap-1.5"
-                              onClick={(event) => {
-                                event.stopPropagation();
-                                showJobLocation(job.id);
-                              }}
-                            >
-                              <MapPin className="h-3.5 w-3.5" />
-                              Show location
-                            </Button>
-                          )}
-                        </div>
-                        <span className="text-xs text-muted-foreground">
-                          {job.proposalCount} pros saved
-                        </span>
-                      </div>
-                    </article>
-                  );
-                })}
+                          <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
+                            <div className="flex items-center gap-2">
+                              <Button asChild size="sm">
+                                <Link
+                                  href={`/job/${job.id}`}
+                                  onClick={(event) => event.stopPropagation()}
+                                >
+                                  View details
+                                </Link>
+                              </Button>
+                              {job.locationLat !== null && job.locationLng !== null && (
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  className="gap-1.5"
+                                  onClick={(event) => {
+                                    event.stopPropagation();
+                                    showJobLocation(job.id);
+                                  }}
+                                >
+                                  <MapPin className="h-3.5 w-3.5" />
+                                  Show location
+                                </Button>
+                              )}
+                            </div>
+                            <span className="text-xs text-muted-foreground">
+                              {job.proposalCount} pros saved
+                            </span>
+                          </div>
+                        </article>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="rounded-2xl border border-dashed border-border bg-background px-6 py-10 text-center text-sm text-muted-foreground">
+                    {view === "saved" && !savedJobs.length
+                      ? "You haven't saved any jobs yet. Tap the heart on a job to save it here."
+                      : "No jobs match your current filters."}
+                  </div>
+                )}
               </div>
-            ) : (
-              <div className="rounded-2xl border border-dashed border-border bg-background px-6 py-10 text-center text-sm text-muted-foreground">
-                {view === "saved" && !savedJobs.length
-                  ? "You haven't saved any jobs yet. Tap the heart on a job to save it here."
-                  : "No jobs match your current filters."}
-              </div>
-            )}
+            </section>
           </div>
-        </section>
+        )}
       </div>
-    </div>
+      <Dialog
+        open={negotiateTarget !== null}
+        onOpenChange={(open) => {
+          if (!open) setNegotiateTarget(null);
+        }}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Send a counter-offer</DialogTitle>
+            <DialogDescription>
+              Propose a different price, timeline, or terms for {negotiateTarget?.jobTitle}. The
+              client can accept, decline, or counter back.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-2 grid gap-3 [&_input]:rounded-md [&_input]:border [&_input]:bg-background [&_input]:px-3 [&_input]:py-2 [&_textarea]:rounded-md [&_textarea]:border [&_textarea]:bg-background [&_textarea]:px-3 [&_textarea]:py-2">
+            <input
+              type="number"
+              min="1"
+              value={negotiatePrice}
+              onChange={(event) => setNegotiatePrice(event.target.value)}
+              placeholder="Your counter price"
+            />
+            <input
+              value={negotiateDuration}
+              onChange={(event) => setNegotiateDuration(event.target.value)}
+              placeholder="Timeline (for example, 10 days)"
+            />
+            <textarea
+              value={negotiateMessage}
+              onChange={(event) => setNegotiateMessage(event.target.value)}
+              placeholder="Explain your counter-offer"
+              rows={4}
+            />
+          </div>
+          {negotiateError && <p className="mt-3 text-sm text-destructive">{negotiateError}</p>}
+          <div className="mt-4 flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setNegotiateTarget(null)}>
+              Cancel
+            </Button>
+            <Button disabled={negotiateBusy} onClick={() => void submitNegotiation()}>
+              {negotiateBusy ? "Sending…" : "Send Counter-Offer"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 

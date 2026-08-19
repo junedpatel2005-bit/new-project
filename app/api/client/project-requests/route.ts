@@ -7,7 +7,7 @@ import { MAX_HIRE_REQUEST_BUDGET } from "@/lib/constants/hiring";
 const bodySchema = z.object({
   jobId: z.coerce.number().int().positive(),
   professionalId: z.coerce.number().int().positive(),
-  bidAmount: z.coerce.number().int().positive().max(MAX_HIRE_REQUEST_BUDGET),
+  bidAmount: z.coerce.number().int().positive(),
   duration: z.string().trim().max(100),
   coverLetter: z.string().trim().max(5000).optional().or(z.literal("")),
 });
@@ -50,6 +50,19 @@ export async function POST(request: NextRequest) {
       { error: "Only open jobs can be used to request a hire." },
       { status: 409 },
     );
+  }
+
+  if (job.timingType !== "HOURLY" && job.budgetMin !== null && job.budgetMax !== null) {
+    if (bidAmount < job.budgetMin || bidAmount > job.budgetMax) {
+      return NextResponse.json(
+        {
+          error: `Bid amount must be between ₹${job.budgetMin.toLocaleString()} and ₹${job.budgetMax.toLocaleString()} for this job.`,
+        },
+        { status: 400 },
+      );
+    }
+  } else if (bidAmount > MAX_HIRE_REQUEST_BUDGET) {
+    return NextResponse.json({ error: "Bid amount is too high." }, { status: 400 });
   }
 
   const professional = await db.user.findUnique({

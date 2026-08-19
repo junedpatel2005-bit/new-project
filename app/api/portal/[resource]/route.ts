@@ -8,6 +8,7 @@ import {
   getDistanceBoundingBox,
   getDistanceKm,
 } from "@/lib/geo";
+import { attachLastActorRole } from "@/lib/project-request-actions";
 
 async function sessionFromRequest(request: NextRequest) {
   const token = request.cookies.get(sessionCookie)?.value;
@@ -269,8 +270,10 @@ export async function GET(
       });
       const jobMap = new Map(jobs.map((job) => [job.id, job]));
       const activeJobIds = new Set(activeProjects.map((project) => project.jobId));
-      const visibleProposals = proposals.filter((request) => !activeJobIds.has(request.jobId));
-      const visibleOffers = offers.filter((request) => !activeJobIds.has(request.jobId));
+      const [visibleProposals, visibleOffers] = await Promise.all([
+        attachLastActorRole(proposals.filter((request) => !activeJobIds.has(request.jobId))),
+        attachLastActorRole(offers.filter((request) => !activeJobIds.has(request.jobId))),
+      ]);
 
       const favoriteCounts = await db.favoriteJob.groupBy({
         by: ["jobId"],
@@ -363,6 +366,7 @@ export async function GET(
             duration: request.duration,
             coverLetter: request.coverLetter,
             status: request.status,
+            lastActorRole: request.lastActorRole,
             createdAt: request.createdAt.toISOString(),
           };
         }),
@@ -377,6 +381,7 @@ export async function GET(
             duration: request.duration,
             coverLetter: request.coverLetter,
             status: request.status,
+            lastActorRole: request.lastActorRole,
             createdAt: request.createdAt.toISOString(),
           };
         }),

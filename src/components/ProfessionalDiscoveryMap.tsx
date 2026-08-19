@@ -2,6 +2,7 @@
 
 import L from "leaflet";
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { MapContainer, Marker, Tooltip, TileLayer, ZoomControl, useMap } from "react-leaflet";
 import { BadgeCheck, MapPin, Star } from "lucide-react";
 import type { ProfessionalDiscoveryResult } from "@/lib/types/professional-discovery";
@@ -36,6 +37,7 @@ export default function ProfessionalDiscoveryMap({
   professionals: ProfessionalDiscoveryResult[];
   selectedPoint?: { lat: number; lng: number };
 }) {
+  const router = useRouter();
   const points = professionals
     .map((professional) => professional.displayPoint)
     .filter((point): point is { lat: number; lng: number } => Boolean(point));
@@ -64,10 +66,27 @@ export default function ProfessionalDiscoveryMap({
         {professionals.map((professional) => {
           const point = professional.displayPoint;
           if (!point) return null;
+          const goToProfile = () => router.push(`/pro/${professional.id}`);
           return (
-            <Marker key={professional.id} position={[point.lat, point.lng]} icon={markerIcon}>
-              <Tooltip direction="right" offset={[12, -14]} opacity={1}>
-                <div className="w-56 space-y-1.5 whitespace-normal break-words p-0.5">
+            <Marker
+              key={professional.id}
+              position={[point.lat, point.lng]}
+              icon={markerIcon}
+              eventHandlers={{ click: goToProfile }}
+            >
+              <Tooltip direction="right" offset={[12, -14]} opacity={1} interactive>
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={goToProfile}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      goToProfile();
+                    }
+                  }}
+                  className="w-56 cursor-pointer space-y-1.5 whitespace-normal break-words p-0.5"
+                >
                   <div className="flex items-center gap-1.5">
                     <span className="font-semibold text-foreground">{professional.name}</span>
                     {professional.verified && (

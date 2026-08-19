@@ -3,6 +3,7 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { sessionCookie, verifySession } from "@/lib/auth";
 import { notifyAdminsOfNewProposal } from "@/lib/marketplace-notifications";
+import { attachLastActorRole } from "@/lib/project-request-actions";
 
 const proposalSchema = z.object({
   jobId: z.number().int().positive(),
@@ -30,7 +31,8 @@ export async function GET(request: NextRequest) {
       where: { jobId: jobId.data, professionalId: session.userId, origin: "PROFESSIONAL_PROPOSAL" },
       orderBy: { createdAt: "desc" },
     });
-    return NextResponse.json({ proposal });
+    const [proposalWithActor] = proposal ? await attachLastActorRole([proposal]) : [null];
+    return NextResponse.json({ proposal: proposalWithActor ?? null });
   } catch {
     return NextResponse.json({ error: "Unable to load your proposal." }, { status: 500 });
   }
@@ -70,11 +72,28 @@ export async function POST(request: NextRequest) {
       },
       select: { id: true },
     });
-    if (existing)
-      return NextResponse.json(
-        { error: "You already have a pending proposal for this job." },
-        { status: 409 },
-      );
+
+    if (existing) {
+      const updated = await db.projectRequest.update({
+        where: { id: existing.id },
+        data: {
+          bidAmount: parsed.data.bidAmount,
+          duration: parsed.data.duration,
+          coverLetter: parsed.data.coverLetter,
+        },
+      });
+      await db.userNotification.create({
+        data: {
+          userId: job.userId,
+          type: "PROPOSAL_UPDATED",
+          title: "Proposal Updated",
+          description: `A professional updated their proposal for ${job.title ?? "your job"}.`,
+          href: `/job/${job.id}`,
+        },
+      });
+      return NextResponse.json({ proposal: updated });
+    }
+
     const proposal = await db.projectRequest.create({
       data: {
         jobId: job.id,

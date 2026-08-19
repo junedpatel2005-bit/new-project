@@ -12,6 +12,8 @@ export type MarketplaceProfessional = {
   skills: string[];
   bio: string | null;
   approximateDistanceKm?: number | null;
+  /** Fuzzed to a nearby point for privacy — never the professional's exact location. */
+  displayPoint?: { lat: number; lng: number };
 };
 
 export type DetailedProfessional = MarketplaceProfessional & {

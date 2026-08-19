@@ -191,6 +191,16 @@ export async function POST(request: NextRequest) {
           { error: "A project can have a maximum of 5 milestones." },
           { status: 409 },
         );
+      // A new milestone should start IN_PROGRESS whenever nothing else is currently active —
+      // not just when it's the very first milestone ever created. Otherwise a milestone added
+      // after all prior ones are already approved gets stuck at UPCOMING with no way for the
+      // professional to work on it (no future approval event will ever activate it).
+      const activeCount = await db.projectMilestone.count({
+        where: {
+          trackingId: project.id,
+          status: { in: ["IN_PROGRESS", "REVISION_REQUESTED", "AWAITING_CLIENT_REVIEW"] },
+        },
+      });
       const milestone = await db.projectMilestone.create({
         data: {
           trackingId: project.id,
@@ -200,7 +210,7 @@ export async function POST(request: NextRequest) {
           amount: input.amount,
           description: input.description ?? null,
           dueDate: input.deadline ? new Date(input.deadline) : null,
-          status: count === 0 ? "IN_PROGRESS" : "UPCOMING",
+          status: activeCount === 0 ? "IN_PROGRESS" : "UPCOMING",
         },
       });
       await event("MILESTONE_CREATED", "Milestone created", input.title, {

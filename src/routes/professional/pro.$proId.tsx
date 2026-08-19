@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams, useSearchParams } from "next/navigation";
+import dynamic from "next/dynamic";
 import { Suspense, useEffect, useState } from "react";
 import { BadgeCheck, MapPin, Star } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
@@ -37,6 +38,10 @@ type ClientJob = {
   hourlyRate: number | null;
   timingType: string;
 };
+
+const ProfessionalLocationMap = dynamic(() => import("@/components/ProfessionalLocationMap"), {
+  ssr: false,
+});
 
 const formatCurrency = (value: number | null) =>
   value == null ? "Not set" : `₹${value.toLocaleString("en-US")}`;
@@ -95,12 +100,29 @@ function ProProfileContent() {
   }, [requestedJobId]);
 
   const selectedJob = jobs.find((job) => job.id === selectedJobId) ?? null;
+  const isHourlyJob = selectedJob?.timingType === "HOURLY";
+  const jobBudgetMin = selectedJob && !isHourlyJob ? selectedJob.budgetMin : null;
+  const jobBudgetMax = selectedJob && !isHourlyJob ? selectedJob.budgetMax : null;
+  // Fixed-price jobs default to the midpoint of the posted range; hourly jobs use the posted rate.
+  const defaultBid = isHourlyJob
+    ? (selectedJob?.hourlyRate ?? null)
+    : jobBudgetMin !== null && jobBudgetMax !== null
+      ? Math.round((jobBudgetMin + jobBudgetMax) / 2)
+      : null;
+  const bidMin = !isHourlyJob && jobBudgetMin !== null ? jobBudgetMin : 1;
+  const bidMax = !isHourlyJob && jobBudgetMax !== null ? jobBudgetMax : MAX_HIRE_REQUEST_BUDGET;
+
+  useEffect(() => {
+    setBidAmount(defaultBid !== null ? String(defaultBid) : "");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedJobId]);
+
   const canSubmitRequest =
     selectedJob !== null &&
     selectedJob.status === "OPEN" &&
     Number.isFinite(Number(bidAmount)) &&
-    Number(bidAmount) > 0 &&
-    Number(bidAmount) <= MAX_HIRE_REQUEST_BUDGET &&
+    Number(bidAmount) >= bidMin &&
+    Number(bidAmount) <= bidMax &&
     requestStatus !== "loading";
 
   async function submitRequest() {
@@ -110,9 +132,9 @@ function ProProfileContent() {
       return;
     }
     const parsedBid = Number(bidAmount);
-    if (!Number.isFinite(parsedBid) || parsedBid <= 0 || parsedBid > MAX_HIRE_REQUEST_BUDGET) {
+    if (!Number.isFinite(parsedBid) || parsedBid < bidMin || parsedBid > bidMax) {
       setRequestMessage(
-        `Enter a bid amount between ₹1 and ₹${MAX_HIRE_REQUEST_BUDGET.toLocaleString()}.`,
+        `Enter a bid amount between ₹${bidMin.toLocaleString()} and ₹${bidMax.toLocaleString()}.`,
       );
       setRequestStatus("error");
       return;
@@ -139,6 +161,16 @@ function ProProfileContent() {
       }
       setRequestStatus("success");
       setRequestMessage("Your hire request was sent successfully.");
+      setTimeout(() => {
+        setDialogOpen(false);
+        setHireStep(1);
+        setSelectedJobId(null);
+        setBidAmount("");
+        setDuration("1 week");
+        setCoverLetter("");
+        setRequestStatus("idle");
+        setRequestMessage(null);
+      }, 1500);
     } catch {
       setRequestStatus("error");
       setRequestMessage("Unable to send the hire request right now.");
@@ -270,21 +302,30 @@ function ProProfileContent() {
                       )}
                       {hireStep === 2 && (
                         <div>
-                          <Label htmlFor="bidAmount">Your budget</Label>
+                          <Label htmlFor="bidAmount">
+                            {isHourlyJob ? "Your hourly rate" : "Your budget"}
+                          </Label>
                           <Input
                             id="bidAmount"
                             type="number"
-                            min="1"
-                            max={MAX_HIRE_REQUEST_BUDGET}
+                            min={bidMin}
+                            max={bidMax}
                             step="1"
                             value={bidAmount}
                             onChange={(event) => setBidAmount(event.target.value)}
-                            placeholder="Enter your proposed bid"
+                            placeholder={
+                              isHourlyJob
+                                ? "Enter your proposed hourly rate"
+                                : "Enter your proposed bid"
+                            }
                             className="mt-2"
                           />
                           <p className="mt-2 text-xs text-muted-foreground">
-                            Maximum hire-request budget: ${MAX_HIRE_REQUEST_BUDGET.toLocaleString()}
-                            .
+                            {isHourlyJob && selectedJob?.hourlyRate !== null
+                              ? `This job's rate: ₹${selectedJob?.hourlyRate?.toLocaleString()}/hr. We've pre-filled it for you.`
+                              : jobBudgetMin !== null && jobBudgetMax !== null
+                                ? `This job's budget: ₹${jobBudgetMin.toLocaleString()} – ₹${jobBudgetMax.toLocaleString()}. We've pre-filled the average.`
+                                : `Enter a bid amount up to ₹${bidMax.toLocaleString()}.`}
                           </p>
                         </div>
                       )}
@@ -332,8 +373,11 @@ function ProProfileContent() {
                             {professional.name}
                           </p>
                           <p>
-                            <span className="text-muted-foreground">Budget:</span> $
-                            {Number(bidAmount || 0).toLocaleString()}
+                            <span className="text-muted-foreground">
+                              {isHourlyJob ? "Hourly rate:" : "Budget:"}
+                            </span>{" "}
+                            ₹{Number(bidAmount || 0).toLocaleString()}
+                            {isHourlyJob ? "/hr" : ""}
                           </p>
                           <p>
                             <span className="text-muted-foreground">Timeline:</span> {duration}
@@ -372,8 +416,8 @@ function ProProfileContent() {
                         hireStep === 1
                           ? !selectedJob || selectedJob.status !== "OPEN"
                           : !bidAmount.trim() ||
-                            Number(bidAmount) <= 0 ||
-                            Number(bidAmount) > MAX_HIRE_REQUEST_BUDGET
+                            Number(bidAmount) < bidMin ||
+                            Number(bidAmount) > bidMax
                       }
                       className="w-full sm:w-auto"
                     >
@@ -436,6 +480,17 @@ function ProProfileContent() {
               </div>
             </div>
           </section>
+          {professional.displayPoint && (
+            <section className="mt-8">
+              <h2 className="text-lg font-semibold">Location</h2>
+              <div className="mt-3">
+                <ProfessionalLocationMap point={professional.displayPoint} />
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Approximate location — shown for privacy
+                </p>
+              </div>
+            </section>
+          )}
           <section className="mt-8">
             <h2 className="text-lg font-semibold">Skills</h2>
             <div className="mt-3 flex flex-wrap gap-2">

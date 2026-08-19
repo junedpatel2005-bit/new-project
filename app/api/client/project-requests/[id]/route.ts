@@ -14,11 +14,10 @@ const bodySchema = z.object({
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const token = request.cookies.get(sessionCookie)?.value;
-    if (!token)
-      return NextResponse.json({ error: "Professional sign-in is required." }, { status: 401 });
+    if (!token) return NextResponse.json({ error: "Client sign-in is required." }, { status: 401 });
     const session = await verifySession(token);
-    if (session.role !== "PROFESSIONAL")
-      return NextResponse.json({ error: "Professional access required." }, { status: 403 });
+    if (session.role !== "CLIENT")
+      return NextResponse.json({ error: "Client access required." }, { status: 403 });
 
     const requestId = Number((await params).id);
     const input = bodySchema.safeParse(await request.json().catch(() => null));
@@ -38,7 +37,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
     const result = await respondToProjectRequest(
       requestId,
-      { userId: session.userId, role: "PROFESSIONAL" },
+      { userId: session.userId, role: "CLIENT" },
       input.data.action,
       input.data.action === "counter"
         ? {
@@ -52,7 +51,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       return NextResponse.json({ error: result.error }, { status: result.status });
     return NextResponse.json(result);
   } catch (error) {
-    logServerError("professional.project-request.action.failed", error, {
+    logServerError("client.project-request.action.failed", error, {
       requestId: request.headers.get("x-request-id"),
     });
     return NextResponse.json({ error: "Unable to update this request." }, { status: 500 });

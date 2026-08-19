@@ -37,6 +37,23 @@ function displayStatus(status: string) {
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
+type StatusFilter =
+  | "ALL"
+  | "READY_TO_START"
+  | "IN_PROGRESS"
+  | "AWAITING_CLIENT_REVIEW"
+  | "REVISION_REQUESTED"
+  | "FINAL_WORK_SUBMITTED";
+
+const statusFilters: { value: StatusFilter; label: string }[] = [
+  { value: "ALL", label: "All projects" },
+  { value: "READY_TO_START", label: "Ready to Start" },
+  { value: "IN_PROGRESS", label: "In Progress" },
+  { value: "AWAITING_CLIENT_REVIEW", label: "Awaiting Review" },
+  { value: "REVISION_REQUESTED", label: "Needs Revision" },
+  { value: "FINAL_WORK_SUBMITTED", label: "Final Submitted" },
+];
+
 function money(project: RunningProject) {
   if (project.budget == null) return "Amount pending";
   return project.timingType === "HOURLY"
@@ -51,6 +68,7 @@ export default function RunningProjectsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
 
   useEffect(() => {
     let active = true;
@@ -74,14 +92,16 @@ export default function RunningProjectsPage() {
 
   const visibleProjects = useMemo(() => {
     const term = search.trim().toLowerCase();
-    return !term
-      ? projects
-      : projects.filter((project) =>
+    return projects
+      .filter((project) => statusFilter === "ALL" || project.status === statusFilter)
+      .filter(
+        (project) =>
+          !term ||
           [project.jobTitle, project.clientName, project.status].some((value) =>
             value?.toLowerCase().includes(term),
           ),
-        );
-  }, [projects, search]);
+      );
+  }, [projects, search, statusFilter]);
 
   const inProgress = projects.filter((project) => project.status === "IN_PROGRESS").length;
   const totalValue = projects.reduce(
@@ -166,6 +186,18 @@ export default function RunningProjectsPage() {
             />
           </div>
         </div>
+        <div className="mt-4 flex max-w-full gap-1 overflow-x-auto rounded-xl border border-border bg-muted/50 p-1">
+          {statusFilters.map((filter) => (
+            <button
+              key={filter.value}
+              type="button"
+              onClick={() => setStatusFilter(filter.value)}
+              className={`whitespace-nowrap rounded-lg px-3 py-2 text-xs font-semibold transition-all sm:text-sm ${statusFilter === filter.value ? "bg-card text-primary shadow-soft" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              {filter.label}
+            </button>
+          ))}
+        </div>
         {error ? (
           <p className="mt-5 rounded-xl border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive">
             {error}
@@ -178,7 +210,7 @@ export default function RunningProjectsPage() {
             visibleProjects.map((project) => (
               <article
                 key={project.id}
-                onClick={() => router.push(`/project/${project.id}`)}
+                onClick={() => router.push(`/project/${project.id}/tracking`)}
                 className="group cursor-pointer overflow-hidden rounded-2xl border border-border bg-card shadow-soft transition-all hover:border-primary/25 hover:shadow-card"
               >
                 <div className="p-5 sm:p-6">
@@ -222,7 +254,7 @@ export default function RunningProjectsPage() {
                       </div>
                       <Button asChild>
                         <Link
-                          href={`/project/${project.id}`}
+                          href={`/project/${project.id}/tracking`}
                           onClick={(event) => event.stopPropagation()}
                         >
                           <span className="hidden sm:inline">View workspace</span>
@@ -254,13 +286,22 @@ export default function RunningProjectsPage() {
                 <BriefcaseBusiness className="h-6 w-6" />
               </div>
               <h3 className="mt-4 text-lg font-semibold">
-                {search ? "No matching projects" : "No active projects yet"}
+                {search || statusFilter !== "ALL"
+                  ? "No matching projects"
+                  : "No active projects yet"}
               </h3>
               <p className="mt-2 text-sm text-muted-foreground">
                 {search
                   ? "Try another project or client name."
-                  : "Accepted client work will appear here when it starts."}
+                  : statusFilter !== "ALL"
+                    ? "No projects have this status right now."
+                    : "Accepted client work will appear here when it starts."}
               </p>
+              {!search && statusFilter === "ALL" && (
+                <Button asChild className="mt-6">
+                  <Link href="/professional/my-jobs">Browse open jobs</Link>
+                </Button>
+              )}
             </div>
           ) : null}
         </div>

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { sessionCookie, verifySession } from "@/lib/auth";
+import { attachLastActorRole } from "@/lib/project-request-actions";
 import { z } from "zod";
 
 const bodySchema = z.object({
@@ -105,21 +106,32 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     where: { jobId: id, clientId: userId },
     select: { id: true },
   });
-  const proposals = await db.projectRequest.findMany({
-    where: { jobId: id, clientId: userId, origin: "PROFESSIONAL_PROPOSAL" },
-    orderBy: { createdAt: "desc" },
-    select: {
-      id: true,
-      professionalId: true,
-      bidAmount: true,
-      duration: true,
-      coverLetter: true,
-      status: true,
-      createdAt: true,
-    },
-  });
+  const proposalSelect = {
+    id: true,
+    professionalId: true,
+    bidAmount: true,
+    duration: true,
+    coverLetter: true,
+    status: true,
+    origin: true,
+    createdAt: true,
+  } as const;
+  const [proposals, hireRequests] = await Promise.all([
+    db.projectRequest.findMany({
+      where: { jobId: id, clientId: userId, origin: "PROFESSIONAL_PROPOSAL" },
+      orderBy: { createdAt: "desc" },
+      select: proposalSelect,
+    }),
+    db.projectRequest.findMany({
+      where: { jobId: id, clientId: userId, origin: "CLIENT_HIRE" },
+      orderBy: { createdAt: "desc" },
+      select: proposalSelect,
+    }),
+  ]);
   const professionals = await db.user.findMany({
-    where: { id: { in: proposals.map((proposal) => proposal.professionalId) } },
+    where: {
+      id: { in: [...proposals, ...hireRequests].map((item) => item.professionalId) },
+    },
     select: {
       id: true,
       firstName: true,
@@ -134,11 +146,19 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   const professionalById = new Map(
     professionals.map((professional) => [professional.id, professional]),
   );
+  const [proposalsWithActor, hireRequestsWithActor] = await Promise.all([
+    attachLastActorRole(proposals),
+    attachLastActorRole(hireRequests),
+  ]);
   return NextResponse.json({
     job: { ...job, projectId: project?.id ?? null },
-    proposals: proposals.map((proposal) => ({
+    proposals: proposalsWithActor.map((proposal) => ({
       ...proposal,
       professional: professionalById.get(proposal.professionalId) ?? null,
+    })),
+    hireRequests: hireRequestsWithActor.map((hireRequest) => ({
+      ...hireRequest,
+      professional: professionalById.get(hireRequest.professionalId) ?? null,
     })),
   });
 }
