@@ -347,10 +347,7 @@ export async function POST(
         phoneVerifiedAt: new Date(),
       },
     });
-    await Promise.all([
-      notifyAdminsOfNewAccount(user),
-      ...(user.role === "PROFESSIONAL" ? [notifyClientsOfNewProfessional(user)] : []),
-    ]);
+    if (user.role === "PROFESSIONAL") await notifyClientsOfNewProfessional(user);
     const raw = await createEmailVerificationToken(user.id);
     sendEmailVerificationLink(user.id, user.email, raw);
     const response = NextResponse.json(
