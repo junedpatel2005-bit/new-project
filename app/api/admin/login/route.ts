@@ -17,15 +17,19 @@ function clientKey(request: NextRequest) {
 async function createBootstrapAdmin() {
   const username = process.env.ADMIN_BOOTSTRAP_USERNAME?.trim().toLowerCase();
   const password = process.env.ADMIN_BOOTSTRAP_PASSWORD;
-  if (!username || !password || password.length < 12) return null;
+  const email = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+  if (!username || !email || !password || password.length < 12) return null;
+  const validEmail = z.string().email().safeParse(email);
+  if (!validEmail.success) return null;
 
   const existing = await db.user.findUnique({ where: { username } });
   if (existing) return existing.role === "ADMIN" ? existing : null;
+  const emailOwner = await db.user.findUnique({ where: { email } });
 
   return db.user.create({
     data: {
       username,
-      email: `${username}@admin.local`,
+      email: emailOwner ? `${username}@admin.local` : email,
       firstName: "Platform",
       lastName: "Administrator",
       role: "ADMIN",

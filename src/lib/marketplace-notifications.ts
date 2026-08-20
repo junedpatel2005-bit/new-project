@@ -30,10 +30,19 @@ async function notifyRole(
       recipients.map((recipient) => recipient.id),
       notification,
     );
+    const configuredAdminEmail =
+      role === "ADMIN" && process.env.ADMIN_EMAIL?.includes("@")
+        ? process.env.ADMIN_EMAIL.trim().toLowerCase()
+        : null;
     await Promise.allSettled(
       recipients
         .filter((recipient) => recipient.emailNotificationsEnabled)
-        .map((recipient) => sendNotificationEmail({ to: recipient.email, ...notification })),
+        .map((recipient) => {
+          const isLocalAddress = recipient.email.endsWith(".local");
+          const to =
+            isLocalAddress && configuredAdminEmail ? configuredAdminEmail : recipient.email;
+          return sendNotificationEmail({ to, ...notification });
+        }),
     );
   } catch (error) {
     // A failed notification must never block account creation or job publishing.
