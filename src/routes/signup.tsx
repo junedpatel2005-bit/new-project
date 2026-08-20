@@ -200,14 +200,19 @@ function SignupContent() {
     else if (password !== draft.confirmPassword) {
       nextErrors.confirmPassword = "Passwords do not match.";
     }
-    if (!phone.trim()) nextErrors.phone = "Phone number is required.";
+    const phoneDigits = phone.replace(/\D/g, "");
+    if (!phoneDigits) nextErrors.phone = "Phone number is required.";
+    else if (phoneDigits.length < 7) nextErrors.phone = "Enter a valid phone number.";
     if (!draft.terms) nextErrors.terms = "Please accept the Terms and Privacy Policy.";
     setFieldErrors(nextErrors);
     if (Object.keys(nextErrors).length) {
       return;
     }
     if (!phoneVerified) {
-      setError("Verify your phone number before creating your account.");
+      setFieldErrors((current) => ({
+        ...current,
+        phone: "Verify your phone number before creating your account.",
+      }));
       return;
     }
     setPending(true);
@@ -476,7 +481,7 @@ function SignupContent() {
         </label>
         {fieldErrors.terms && <p className="text-sm text-destructive">{fieldErrors.terms}</p>}
         {error && <p className="text-sm text-destructive">{error}</p>}
-        <Button type="submit" className="w-full" disabled={pending || !phoneVerified}>
+        <Button type="submit" className="w-full" disabled={pending}>
           {pending ? (
             <span className="flex items-center justify-center gap-2">
               <Loader2 className="h-4 w-4 animate-spin" />
