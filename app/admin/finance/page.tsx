@@ -25,6 +25,7 @@ type Withdrawal = {
   professionalId: number;
   amount: number;
   currency: string;
+  destinationType?: string;
   destinationLabel: string | null;
   status: string;
   createdAt: string;
@@ -60,6 +61,7 @@ export default function FinancePage() {
   const [tab, setTab] = useState<"earnings" | "commission" | "payouts">("earnings");
   const [payoutPayment, setPayoutPayment] = useState<Record<number, string>>({});
   const [processing, setProcessing] = useState<number | null>(null);
+  const [selectedWithdrawal, setSelectedWithdrawal] = useState<Withdrawal | null>(null);
   useEffect(() => {
     void fetch("/api/v1/admin/data/finance", { cache: "no-store" })
       .then((response) => response.json())
@@ -277,7 +279,12 @@ export default function FinancePage() {
             ) : (
               <div className="divide-y divide-white/10">
                 {data.withdrawals.map((item) => (
-                  <div key={item.id} className="flex flex-wrap items-center gap-4 px-5 py-4">
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => setSelectedWithdrawal(item)}
+                    className="flex w-full flex-wrap items-center gap-4 px-5 py-4 text-left transition hover:bg-white/[.04]"
+                  >
                     <span className="grid h-10 w-10 place-items-center rounded-xl bg-amber-400/10 text-amber-300">
                       <Landmark className="h-5 w-5" />
                     </span>
@@ -301,7 +308,7 @@ export default function FinancePage() {
                       {money(item.amount)}{" "}
                       <span className="text-xs text-slate-400">{item.currency}</span>
                     </p>
-                  </div>
+                  </button>
                 ))}
                 {!data.withdrawals.length && (
                   <Empty text="No professional withdrawal requests yet." />
@@ -309,6 +316,90 @@ export default function FinancePage() {
               </div>
             )}
           </section>
+          {selectedWithdrawal ? (
+            <div
+              className="fixed inset-0 z-50 grid place-items-center bg-slate-950/70 p-4 backdrop-blur-sm"
+              role="presentation"
+              onClick={() => setSelectedWithdrawal(null)}
+            >
+              <section
+                className="w-full max-w-lg rounded-2xl border border-white/10 bg-[#121827] p-6 text-white shadow-2xl"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="withdrawal-details-title"
+                onClick={(event) => event.stopPropagation()}
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-[.18em] text-indigo-300">
+                      Withdrawal request #{selectedWithdrawal.id}
+                    </p>
+                    <h2 id="withdrawal-details-title" className="mt-2 text-2xl font-bold">
+                      {data.names[selectedWithdrawal.professionalId] ??
+                        `Professional #${selectedWithdrawal.professionalId}`}
+                    </h2>
+                  </div>
+                  <button
+                    type="button"
+                    className="rounded-lg px-3 py-1 text-2xl text-slate-400 hover:bg-white/10 hover:text-white"
+                    onClick={() => setSelectedWithdrawal(null)}
+                    aria-label="Close withdrawal details"
+                  >
+                    ×
+                  </button>
+                </div>
+                <div className="mt-6 grid gap-3 rounded-xl bg-white/[.04] p-4 text-sm">
+                  <Detail label="Amount" value={`${money(selectedWithdrawal.amount)} ${selectedWithdrawal.currency}`} />
+                  <Detail label="Status" value={selectedWithdrawal.status} />
+                  <Detail label="Destination type" value={selectedWithdrawal.destinationType ?? "BANK"} />
+                  <Detail label="Destination" value={selectedWithdrawal.destinationLabel ?? "Not provided"} />
+                  <Detail label="Requested" value={new Date(selectedWithdrawal.createdAt).toLocaleString()} />
+                  {selectedWithdrawal.failureReason ? (
+                    <Detail label="Failure reason" value={selectedWithdrawal.failureReason} />
+                  ) : null}
+                </div>
+                {selectedWithdrawal.status === "PENDING" ? (
+                  <div className="mt-5">
+                    <label className="text-sm font-semibold text-slate-300">
+                      Captured payment to use for this payout
+                      <select
+                        className="mt-2 w-full rounded-lg border border-white/10 bg-[#0b1020] px-3 py-2 text-sm text-slate-300"
+                        value={payoutPayment[selectedWithdrawal.id] ?? ""}
+                        onChange={(event) =>
+                          setPayoutPayment((current) => ({
+                            ...current,
+                            [selectedWithdrawal.id]: event.target.value,
+                          }))
+                        }
+                      >
+                        <option value="">Select captured payment</option>
+                        {data.payments
+                          .filter(
+                            (payment) =>
+                              payment.status === "COMPLETED" &&
+                              payment.professionalId === selectedWithdrawal.professionalId &&
+                              Boolean(payment.razorpayPaymentId),
+                          )
+                          .map((payment) => (
+                            <option key={payment.id} value={payment.id}>
+                              Payment #{payment.id} · {money(payment.amount)}
+                            </option>
+                          ))}
+                      </select>
+                    </label>
+                    <button
+                      type="button"
+                      className="mt-4 w-full rounded-lg bg-indigo-500 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+                      disabled={!payoutPayment[selectedWithdrawal.id] || processing === selectedWithdrawal.id}
+                      onClick={() => void processPayout(selectedWithdrawal.id)}
+                    >
+                      {processing === selectedWithdrawal.id ? "Processing…" : "Send with Razorpay"}
+                    </button>
+                  </div>
+                ) : null}
+              </section>
+            </div>
+          ) : null}
         </>
       )}
     </div>
@@ -343,4 +434,12 @@ function Metric({
 }
 function Empty({ text }: { text: string }) {
   return <p className="p-10 text-center text-sm text-slate-400">{text}</p>;
+}
+function Detail({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex flex-wrap justify-between gap-3 border-b border-white/10 pb-3 last:border-0 last:pb-0">
+      <span className="text-slate-400">{label}</span>
+      <span className="text-right font-medium">{value}</span>
+    </div>
+  );
 }

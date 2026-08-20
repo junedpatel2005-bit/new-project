@@ -222,7 +222,7 @@ export default function Earnings() {
               <section className="rounded-2xl border border-border bg-card p-5 shadow-soft">
                 <h2 className="font-display text-xl font-semibold">Request withdrawal</h2>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Available: ${wallet.available.toLocaleString()}
+                  Available: ₹{wallet.available.toLocaleString("en-IN")}
                 </p>
                 <label className="mt-5 block text-sm font-medium">
                   Amount
@@ -260,7 +260,7 @@ export default function Earnings() {
                   {wallet.withdrawals.map((w) => (
                     <div key={w.id} className="py-3">
                       <div className="flex justify-between gap-3">
-                        <p className="font-medium">${w.amount.toLocaleString()}</p>
+                        <p className="font-medium">₹{w.amount.toLocaleString("en-IN")}</p>
                         <span
                           className={`text-xs font-semibold ${w.status === "COMPLETED" ? "text-success" : "text-amber-600"}`}
                         >

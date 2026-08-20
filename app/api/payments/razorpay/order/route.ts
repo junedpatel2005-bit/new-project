@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { sessionCookie, verifySession } from "@/lib/auth";
-import { createRazorpayOrder, isRazorpayConfigured } from "@/lib/razorpay";
+import { createRazorpayOrder, isRazorpayConfigured, razorpayConfig } from "@/lib/razorpay";
 
 const schema = z.object({
   projectId: z.number().int().positive(),
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
   if (existing?.razorpayOrderId && existing.status !== "COMPLETED")
     return NextResponse.json({
       enabled: true,
-      keyId: process.env.RAZORPAY_KEY_ID,
+      keyId: razorpayConfig().keyId,
       orderId: existing.razorpayOrderId,
       amount: existing.amount * 100,
       currency: "INR",
