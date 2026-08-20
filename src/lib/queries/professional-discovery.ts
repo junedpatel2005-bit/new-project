@@ -5,6 +5,7 @@ import type { ProfessionalDiscoveryResult } from "@/lib/types/professional-disco
 
 export type ProfessionalDiscoveryFilter = {
   query?: string;
+  segment?: string;
   category?: string;
   city?: string;
   minRating?: number;
@@ -21,7 +22,7 @@ export type ProfessionalDiscoveryFilter = {
 const MAX_RESULTS_PER_PAGE = 50;
 const DEFAULT_RESULTS_PER_PAGE = 20;
 
-function buildSearchWhere(filter: ProfessionalDiscoveryFilter) {
+async function buildSearchWhere(filter: ProfessionalDiscoveryFilter) {
   const where: Prisma.UserWhereInput = {
     role: "PROFESSIONAL",
     isActive: true,
@@ -33,6 +34,16 @@ function buildSearchWhere(filter: ProfessionalDiscoveryFilter) {
 
   if (filter.category) {
     where.professionalCategory = filter.category;
+  }
+
+  if (filter.segment) {
+    const segmentCategories = await db.serviceCategory.findMany({
+      where: { segment: filter.segment },
+      select: { name: true },
+    });
+    where.professionalCategory = filter.category
+      ? filter.category
+      : { in: segmentCategories.map((category) => category.name) };
   }
 
   if (filter.city) {
@@ -199,7 +210,7 @@ export async function searchProfessionals(filter: ProfessionalDiscoveryFilter) {
     typeof filter.originLat === "number" &&
     typeof filter.originLng === "number";
 
-  const baseWhere = buildSearchWhere(filter);
+  const baseWhere = await buildSearchWhere(filter);
   if (useExactDistanceFiltering) {
     const originLat = filter.originLat!;
     const originLng = filter.originLng!;

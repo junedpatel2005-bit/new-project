@@ -224,10 +224,14 @@ function ProfessionalJobsContent() {
   function showJobLocation(jobId: number) {
     setSelectedJobId(jobId);
     setShowMap(true);
+  }
+
+  useEffect(() => {
+    if (!showMap) return;
     window.requestAnimationFrame(() => {
       mapSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
-  }
+  }, [showMap, selectedJobId]);
 
   function toggleNearMe(checked: boolean) {
     setNearMe(checked);
@@ -339,6 +343,13 @@ function ProfessionalJobsContent() {
     () => (activeTopCategory ? categories.filter((c) => c.parentId === activeTopCategory.id) : []),
     [categories, activeTopCategory],
   );
+  const segmentCategoryNames = useMemo(
+    () =>
+      new Set(
+        categories.filter((item) => !segment || item.segment === segment).map((item) => item.name),
+      ),
+    [categories, segment],
+  );
   const jobCountByCategory = useMemo(() => {
     const counts: Record<string, number> = {};
     for (const job of jobs) {
@@ -362,6 +373,7 @@ function ProfessionalJobsContent() {
         [job.title, job.category, job.locationAddress, job.clientName]
           .filter(Boolean)
           .some((field) => String(field).toLowerCase().includes(value));
+      const matchesSegment = !segment || segmentCategoryNames.has(job.category ?? "");
       const matchesCategory = !category || job.category === category;
       const matchesCity =
         !city || (job.locationAddress ?? "").toLowerCase().includes(city.toLowerCase());
@@ -370,6 +382,7 @@ function ProfessionalJobsContent() {
       const matchesNearMe = !nearMe || (job.distanceKm !== null && job.distanceKm <= radiusKm);
       return (
         matchesQuery &&
+        matchesSegment &&
         matchesCategory &&
         matchesCity &&
         matchesRating &&
@@ -377,7 +390,19 @@ function ProfessionalJobsContent() {
         matchesNearMe
       );
     });
-  }, [jobs, query, category, city, minRating, verifiedOnly, nearMe, userLocation, radiusKm]);
+  }, [
+    jobs,
+    query,
+    segment,
+    segmentCategoryNames,
+    category,
+    city,
+    minRating,
+    verifiedOnly,
+    nearMe,
+    userLocation,
+    radiusKm,
+  ]);
 
   const visibleJobs = useMemo(() => {
     const sorted = [...filteredJobs];

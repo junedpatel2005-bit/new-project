@@ -83,10 +83,20 @@ export function ClientMyInfoPage({ data }: { data: ClientAccountSummaryResponse 
               </Avatar>
             </div>
             <div className="space-y-4">
-              <div>
-                <p className="text-sm text-muted-foreground">Account overview</p>
-                <h2 className="mt-1 text-2xl font-semibold tracking-tight">{profileName}</h2>
-                <p className="text-sm text-muted-foreground">Client</p>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p className="text-sm text-muted-foreground">Account overview</p>
+                  <h2 className="mt-1 text-2xl font-semibold tracking-tight">{profileName}</h2>
+                  <p className="text-sm text-muted-foreground">Client</p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <Button asChild variant="outline" size="sm">
+                    <Link href="/client-profile">Edit profile</Link>
+                  </Button>
+                  <Button asChild size="sm">
+                    <Link href="/dashboard">Go to dashboard</Link>
+                  </Button>
+                </div>
               </div>
               <div className="space-y-3">
                 <div className="rounded-2xl border border-border bg-muted p-4">
@@ -173,11 +183,7 @@ export function ClientMyInfoPage({ data }: { data: ClientAccountSummaryResponse 
                   label="Phone"
                   value={data.account.phone ?? "Not added"}
                   state={data.account.phoneVerifiedAt ? "verified" : "unverified"}
-                  action={
-                    <Button asChild variant="outline" size="sm">
-                      <Link href="/client-profile">Update phone</Link>
-                    </Button>
-                  }
+                  action={null}
                 />
               </CardContent>
             </Card>
@@ -194,11 +200,6 @@ export function ClientMyInfoPage({ data }: { data: ClientAccountSummaryResponse 
                   <p className="text-sm text-muted-foreground">No primary address added.</p>
                 )}
               </CardContent>
-              <CardFooter>
-                <Button asChild variant="outline" size="sm">
-                  <Link href="/client-profile">{address ? "Edit address" : "Add address"}</Link>
-                </Button>
-              </CardFooter>
             </Card>
           </div>
 
@@ -220,14 +221,6 @@ export function ClientMyInfoPage({ data }: { data: ClientAccountSummaryResponse 
                   <p className="text-sm text-muted-foreground">No saved locations yet.</p>
                 )}
               </CardContent>
-              <CardFooter className="justify-between gap-2">
-                <Button asChild variant="outline" size="sm">
-                  <Link href="/client-profile">View all</Link>
-                </Button>
-                <Button asChild size="sm">
-                  <Link href="/client-profile">Add location</Link>
-                </Button>
-              </CardFooter>
             </Card>
 
             <Card>

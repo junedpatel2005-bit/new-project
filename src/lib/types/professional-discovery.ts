@@ -39,6 +39,7 @@ export type ProfessionalDiscoveryResponse = {
 
 export type ProfessionalDiscoveryFilters = {
   query?: string;
+  segment?: string;
   category?: string;
   city?: string;
   minRating?: number;

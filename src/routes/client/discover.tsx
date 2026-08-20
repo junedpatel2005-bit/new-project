@@ -19,6 +19,11 @@ import { Input } from "@/components/ui/input";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 const PAGE_SIZE = 20;
+const segmentOptions: [string, string][] = [
+  ["RESIDENTIAL", "Residential"],
+  ["COMMERCIAL", "Commercial"],
+  ["INDUSTRIAL", "Industrial"],
+];
 
 function toMarketplaceProfessional(
   professional: ProfessionalDiscoveryResponse["professionals"][number],
@@ -48,6 +53,7 @@ function DiscoverContent() {
   const [categories, setCategories] = useState<MarketplaceCategory[]>([]);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [query, setQuery] = useState("");
+  const [segment, setSegment] = useState("");
   const [category, setCategory] = useState("");
   const [city, setCity] = useState("");
   const [minRating, setMinRating] = useState<number | "">("");
@@ -116,6 +122,7 @@ function DiscoverContent() {
 
     const params = new URLSearchParams();
     if (query.trim()) params.set("query", query.trim());
+    if (segment) params.set("segment", segment);
     if (category) params.set("category", category);
     if (city) params.set("city", city);
     if (minRating !== "") params.set("minRating", String(minRating));
@@ -150,6 +157,7 @@ function DiscoverContent() {
     return () => controller.abort();
   }, [
     query,
+    segment,
     category,
     city,
     minRating,
@@ -163,6 +171,27 @@ function DiscoverContent() {
   ]);
 
   const totalProfessionals = results?.total ?? 0;
+  const topCategories = useMemo(
+    () =>
+      segment
+        ? categories.filter((item) => item.parentId === null && item.segment === segment)
+        : [],
+    [categories, segment],
+  );
+  const selectedCategory = useMemo(
+    () => categories.find((item) => item.name === category) ?? null,
+    [categories, category],
+  );
+  const activeTopCategory = useMemo(() => {
+    if (!selectedCategory) return null;
+    if (selectedCategory.parentId === null) return selectedCategory;
+    return categories.find((item) => item.id === selectedCategory.parentId) ?? null;
+  }, [categories, selectedCategory]);
+  const subCategories = useMemo(
+    () =>
+      activeTopCategory ? categories.filter((item) => item.parentId === activeTopCategory.id) : [],
+    [categories, activeTopCategory],
+  );
 
   return (
     <>
@@ -200,6 +229,7 @@ function DiscoverContent() {
               className="text-xs text-primary hover:underline"
               onClick={() => {
                 setQuery("");
+                setSegment("");
                 setCategory("");
                 setCity("");
                 setMinRating("");
@@ -216,26 +246,99 @@ function DiscoverContent() {
           </div>
 
           <FilterSection title="Category">
-            <div className="space-y-2">
-              {categories.slice(0, 6).map((c) => (
-                <label key={c.id} className="flex items-center gap-2 text-sm">
+            <div className="mb-3 flex flex-wrap gap-2">
+              {segmentOptions.map(([value, label]) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => {
+                    setSegment((current) => (current === value ? "" : value));
+                    setCategory("");
+                    setPage(1);
+                  }}
+                  className={`whitespace-nowrap rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors duration-200 ${
+                    segment === value
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            {segment ? (
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-sm">
                   <input
                     type="radio"
                     name="category"
-                    checked={category === c.name}
+                    checked={category === ""}
                     onChange={() => {
-                      setCategory(c.name);
+                      setCategory("");
                       setPage(1);
                     }}
-                    className="h-4 w-4 rounded border-border accent-primary"
+                    className="h-4 w-4 accent-primary"
                   />
-                  <span>{c.name}</span>
-                  <span className="ml-auto text-xs text-muted-foreground">
-                    {c.professionalCount}
-                  </span>
+                  <span>All categories</span>
                 </label>
-              ))}
-            </div>
+                {topCategories.map((item) => (
+                  <label key={item.id} className="flex items-center gap-2 text-sm">
+                    <input
+                      type="radio"
+                      name="category"
+                      checked={category === item.name}
+                      onChange={() => {
+                        setCategory(item.name);
+                        setPage(1);
+                      }}
+                      className="h-4 w-4 accent-primary"
+                    />
+                    <span className="flex-1">{item.name}</span>
+                    <span className="text-xs text-muted-foreground">{item.professionalCount}</span>
+                  </label>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                Select Residential, Commercial, or Industrial to see categories.
+              </p>
+            )}
+            {subCategories.length > 0 && (
+              <div className="mt-3 space-y-2 border-t border-border pt-3">
+                <p className="text-xs font-medium text-muted-foreground">
+                  Sub-category of {activeTopCategory?.name}
+                </p>
+                <label className="flex items-center gap-2 text-sm">
+                  <input
+                    type="radio"
+                    name="subcategory"
+                    checked={category === activeTopCategory?.name}
+                    onChange={() => {
+                      setCategory(activeTopCategory?.name ?? "");
+                      setPage(1);
+                    }}
+                    className="h-4 w-4 accent-primary"
+                  />
+                  <span>General {activeTopCategory?.name}</span>
+                </label>
+                {subCategories.map((item) => (
+                  <label key={item.id} className="flex items-center gap-2 text-sm">
+                    <input
+                      type="radio"
+                      name="subcategory"
+                      checked={category === item.name}
+                      onChange={() => {
+                        setCategory(item.name);
+                        setPage(1);
+                      }}
+                      className="h-4 w-4 accent-primary"
+                    />
+                    <span className="flex-1">{item.name}</span>
+                    <span className="text-xs text-muted-foreground">{item.professionalCount}</span>
+                  </label>
+                ))}
+              </div>
+            )}
           </FilterSection>
 
           <FilterSection title="Verified only">

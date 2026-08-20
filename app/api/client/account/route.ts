@@ -27,6 +27,7 @@ export async function GET(request: NextRequest) {
       email: true,
       avatarUrl: true,
       phone: true,
+      address: true,
       phoneVerifiedAt: true,
       emailVerifiedAt: true,
       isActive: true,

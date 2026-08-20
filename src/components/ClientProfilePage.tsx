@@ -36,6 +36,7 @@ type Data = {
     phone: string | null;
     phoneVerifiedAt: string | null;
     avatarUrl: string | null;
+    address: string | null;
   };
   profile: {
     companyName: string | null;
@@ -78,7 +79,7 @@ export function ClientProfilePage() {
         firstName: result.account.firstName,
         lastName: result.account.lastName,
         companyName: result.profile?.companyName ?? "",
-        address: result.profile?.address ?? "",
+        address: result.profile?.address ?? result.account.address ?? "",
         profilePhotoUrl: result.profile?.profilePhotoUrl ?? result.account.avatarUrl ?? "",
       });
     } catch (error) {
@@ -255,6 +256,9 @@ export function ClientProfilePage() {
           </Button>
           <Button type="button" variant="ghost" asChild>
             <Link href="/">Go to Home</Link>
+          </Button>
+          <Button type="button" variant="ghost" asChild>
+            <Link href="/dashboard">Go to dashboard</Link>
           </Button>
         </div>
       </form>

@@ -59,6 +59,7 @@ export async function GET(request: NextRequest) {
       phone: user.phone,
       phoneVerifiedAt: user.phoneVerifiedAt,
       avatarUrl: user.avatarUrl,
+      address: user.address,
     },
     profile,
   });
@@ -90,11 +91,6 @@ export async function POST(request: NextRequest) {
     address: data.address,
     profilePhotoUrl,
   };
-  if (!user.phone)
-    return NextResponse.json(
-      { error: "Add and verify a phone number during signup before completing your profile." },
-      { status: 400 },
-    );
   const existing = await db.clientProfile.findFirst({ where: { userId: user.id } });
   const primaryLocation = await db.$transaction(async (tx) => {
     const profile = existing
