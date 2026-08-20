@@ -349,11 +349,23 @@ export default function FinancePage() {
                   </button>
                 </div>
                 <div className="mt-6 grid gap-3 rounded-xl bg-white/[.04] p-4 text-sm">
-                  <Detail label="Amount" value={`${money(selectedWithdrawal.amount)} ${selectedWithdrawal.currency}`} />
+                  <Detail
+                    label="Amount"
+                    value={`${money(selectedWithdrawal.amount)} ${selectedWithdrawal.currency}`}
+                  />
                   <Detail label="Status" value={selectedWithdrawal.status} />
-                  <Detail label="Destination type" value={selectedWithdrawal.destinationType ?? "BANK"} />
-                  <Detail label="Destination" value={selectedWithdrawal.destinationLabel ?? "Not provided"} />
-                  <Detail label="Requested" value={new Date(selectedWithdrawal.createdAt).toLocaleString()} />
+                  <Detail
+                    label="Destination type"
+                    value={selectedWithdrawal.destinationType ?? "BANK"}
+                  />
+                  <Detail
+                    label="Destination"
+                    value={selectedWithdrawal.destinationLabel ?? "Not provided"}
+                  />
+                  <Detail
+                    label="Requested"
+                    value={new Date(selectedWithdrawal.createdAt).toLocaleString()}
+                  />
                   {selectedWithdrawal.failureReason ? (
                     <Detail label="Failure reason" value={selectedWithdrawal.failureReason} />
                   ) : null}
@@ -390,7 +402,10 @@ export default function FinancePage() {
                     <button
                       type="button"
                       className="mt-4 w-full rounded-lg bg-indigo-500 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
-                      disabled={!payoutPayment[selectedWithdrawal.id] || processing === selectedWithdrawal.id}
+                      disabled={
+                        !payoutPayment[selectedWithdrawal.id] ||
+                        processing === selectedWithdrawal.id
+                      }
                       onClick={() => void processPayout(selectedWithdrawal.id)}
                     >
                       {processing === selectedWithdrawal.id ? "Processing…" : "Send with Razorpay"}

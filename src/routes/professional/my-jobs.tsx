@@ -284,7 +284,10 @@ function ProfessionalJobsContent() {
   }, [loadJobs]);
 
   useEffect(() => {
-    if (new URLSearchParams(window.location.search).get("view") === "saved") setView("saved");
+    const params = new URLSearchParams(window.location.search);
+    const requested = params.get("view") ?? params.get("tab");
+    if (requested === "saved" || requested === "proposals" || requested === "offers")
+      setView(requested);
   }, []);
 
   useEffect(() => {

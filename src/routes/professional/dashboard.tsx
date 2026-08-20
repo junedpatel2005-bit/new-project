@@ -161,13 +161,13 @@ export default function ProfessionalDashboard() {
           label="Completed jobs"
           value={stats.completed}
           icon={CheckCircle2}
-          href="/professional/my-jobs?tab=completed"
+          href="/professional/reports"
         />
         <StatCard
           label="Active projects"
           value={stats.active}
           icon={BriefcaseBusiness}
-          href="/professional/my-jobs?tab=active"
+          href="/professional/running-projects"
         />
         <StatCard
           label="Client requests"
@@ -189,7 +189,7 @@ export default function ProfessionalDashboard() {
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold">Active work</h2>
             <Link
-              href="/professional/my-jobs?tab=active"
+              href="/professional/running-projects"
               className="text-sm text-primary hover:underline"
             >
               View all

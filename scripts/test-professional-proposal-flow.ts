@@ -5,8 +5,8 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
 
 const base = process.env.TEST_BASE_URL ?? process.env.APP_URL ?? "http://localhost:3000";
-const clientId = 43;
-const professionalId = 76;
+let clientId: number;
+let professionalId: number;
 const db = new PrismaClient({
   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
 });
@@ -76,7 +76,7 @@ async function postProposal(jobId: number, price = 1500) {
 }
 
 async function clientProposalAction(proposalId: number, action: "accept" | "reject") {
-  const response = await fetch(`${base}/api/v1/client/proposals/${proposalId}`, {
+  const response = await fetch(`${base}/api/v1/client/project-requests/${proposalId}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -90,6 +90,21 @@ async function clientProposalAction(proposalId: number, action: "accept" | "reje
 
 try {
   await ensureServer();
+  const [client, professional] = await Promise.all([
+    db.user.findUnique({
+      where: { email: process.env.TEST_CLIENT_EMAIL ?? "seed.client@servio.example" },
+      select: { id: true, role: true },
+    }),
+    db.user.findUnique({
+      where: { email: process.env.TEST_PROFESSIONAL_EMAIL ?? "surat.pro@servio.example" },
+      select: { id: true, role: true },
+    }),
+  ]);
+  if (!client || client.role !== "CLIENT") throw new Error("Test client fixture was not found.");
+  if (!professional || professional.role !== "PROFESSIONAL")
+    throw new Error("Test professional fixture was not found.");
+  clientId = client.id;
+  professionalId = professional.id;
   const unauthorizedProposal = await fetch(`${base}/api/v1/professional/proposals`, {
     method: "POST",
     headers: {
@@ -130,8 +145,8 @@ try {
   if (sent.status !== 201) throw new Error(`proposal send failed: ${JSON.stringify(sent)}`);
   requestIds.push(sent.body.proposal.id);
   const duplicate = await postProposal(first.id);
-  if (duplicate.status !== 409)
-    throw new Error(`duplicate proposal was not rejected: ${JSON.stringify(duplicate)}`);
+  if (duplicate.status !== 200 || duplicate.body.proposal?.id !== sent.body.proposal.id)
+    throw new Error(`duplicate proposal was not updated safely: ${JSON.stringify(duplicate)}`);
   const professionalView = await fetch(`${base}/api/v1/professional/proposals?jobId=${first.id}`, {
     headers: { Cookie: await cookie(professionalId, "PROFESSIONAL") },
   });
@@ -190,7 +205,7 @@ try {
     },
     select: { type: true },
   });
-  for (const type of ["NEW_PROPOSAL", "PROPOSAL_DECLINED", "PROPOSAL_ACCEPTED"])
+  for (const type of ["NEW_PROPOSAL", "REQUEST_DECLINED", "REQUEST_ACCEPTED"])
     if (!notifications.some((notification) => notification.type === type))
       throw new Error(`${type} notification was not persisted`);
   console.log(

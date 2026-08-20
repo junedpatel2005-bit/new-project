@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { sessionCookie, verifySession } from "@/lib/auth";
 
 function isTrustedStateChangingRequest(request: NextRequest) {
   if (!["POST", "PUT", "PATCH", "DELETE"].includes(request.method)) return true;
@@ -16,9 +17,29 @@ function isTrustedStateChangingRequest(request: NextRequest) {
  * Adds a correlation id that API handlers can include in structured server logs
  * and clients can provide when reporting a failed request.
  */
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith("/api/") && !isTrustedStateChangingRequest(request)) {
     return NextResponse.json({ error: "Request origin is not allowed." }, { status: 403 });
+  }
+
+  // Every /admin/* page (besides the login screen itself) requires an ADMIN session.
+  // Individual admin pages render as client components with no server-side guard of
+  // their own, so this is the only place that stops a signed-out visitor from loading
+  // the admin shell directly.
+  if (
+    request.nextUrl.pathname.startsWith("/admin") &&
+    request.nextUrl.pathname !== "/admin/login"
+  ) {
+    const token = request.cookies.get(sessionCookie)?.value;
+    let authorized = false;
+    if (token) {
+      try {
+        authorized = (await verifySession(token)).role === "ADMIN";
+      } catch {
+        authorized = false;
+      }
+    }
+    if (!authorized) return NextResponse.redirect(new URL("/admin/login", request.url));
   }
 
   const requestId = request.headers.get("x-request-id") ?? crypto.randomUUID();

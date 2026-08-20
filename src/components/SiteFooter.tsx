@@ -24,16 +24,40 @@ export function SiteFooter() {
               experts, track work — all in one platform.
             </p>
             <div className="mt-6 flex gap-2 text-white/70">
-              <a href="#" className="rounded-md p-2 hover:bg-white/10 hover:text-white">
+              <a
+                href="https://www.facebook.com"
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-md p-2 hover:bg-white/10 hover:text-white"
+                aria-label="Facebook"
+              >
                 <Facebook className="h-4 w-4" />
               </a>
-              <a href="#" className="rounded-md p-2 hover:bg-white/10 hover:text-white">
+              <a
+                href="https://www.instagram.com"
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-md p-2 hover:bg-white/10 hover:text-white"
+                aria-label="Instagram"
+              >
                 <Instagram className="h-4 w-4" />
               </a>
-              <a href="#" className="rounded-md p-2 hover:bg-white/10 hover:text-white">
+              <a
+                href="https://www.linkedin.com"
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-md p-2 hover:bg-white/10 hover:text-white"
+                aria-label="LinkedIn"
+              >
                 <Linkedin className="h-4 w-4" />
               </a>
-              <a href="#" className="rounded-md p-2 hover:bg-white/10 hover:text-white">
+              <a
+                href="https://www.twitter.com"
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-md p-2 hover:bg-white/10 hover:text-white"
+                aria-label="Twitter"
+              >
                 <Twitter className="h-4 w-4" />
               </a>
             </div>
@@ -51,7 +75,7 @@ export function SiteFooter() {
             links={[
               { l: "FAQ", to: "/faq" },
               { l: "Contact", to: "/contact" },
-              { l: "Help Center", to: "/" },
+              { l: "Help Center", to: "/faq" },
             ]}
           />
           <FooterCol

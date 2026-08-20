@@ -104,7 +104,7 @@ export default async function FAQ() {
               Our support team replies in under an hour.
             </p>
             <Button asChild size="lg" className="mt-5 bg-cta text-cta-foreground hover:bg-cta/90">
-              <Link href="/">Contact support</Link>
+              <Link href="/contact">Contact support</Link>
             </Button>
           </div>
         </section>

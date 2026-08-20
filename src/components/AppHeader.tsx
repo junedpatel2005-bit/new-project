@@ -46,6 +46,21 @@ export function AppHeader({ role }: { role?: string }) {
 
   const unreadNotifications = notifications.filter((notification) => !notification.readAt).length;
 
+  function markRead(id: number) {
+    setNotifications((current) =>
+      current.map((notification) =>
+        notification.id === id
+          ? { ...notification, readAt: new Date().toISOString() }
+          : notification,
+      ),
+    );
+    void fetch("/api/v1/portal/notifications", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+  }
+
   return (
     <header className="sticky top-0 z-20 flex h-16 items-center gap-4 border-b border-border bg-background/85 px-4 backdrop-blur-md sm:px-6">
       <div className="flex flex-1 items-center gap-2">
@@ -98,7 +113,10 @@ export function AppHeader({ role }: { role?: string }) {
                   <Link
                     key={notification.id}
                     href={notification.href ?? "/notifications"}
-                    onClick={() => setNotificationsOpen(false)}
+                    onClick={() => {
+                      setNotificationsOpen(false);
+                      markRead(notification.id);
+                    }}
                     className="block rounded-xl border border-border bg-background p-3 transition-colors hover:bg-muted/60"
                   >
                     <div className="flex items-start justify-between gap-2">

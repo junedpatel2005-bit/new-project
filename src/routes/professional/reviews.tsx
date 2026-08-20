@@ -40,7 +40,7 @@ export default function ProfessionalReviews() {
           <p className="mt-1 text-muted-foreground">See what clients are saying about your work.</p>
         </div>
         <Button asChild>
-          <a href="/professional/my-jobs?tab=completed">Completed projects</a>
+          <a href="/professional/reports">Completed projects</a>
         </Button>
       </div>
 

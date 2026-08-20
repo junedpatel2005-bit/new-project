@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useDatabaseStatus } from "@/hooks/use-database-status";
 import {
   BarChart3,
   Bell,
@@ -31,6 +32,7 @@ const links = [
 
 export function AdminSidebar() {
   const pathname = usePathname();
+  const dbStatus = useDatabaseStatus();
   return (
     <aside className="fixed inset-y-0 hidden w-64 border-r border-white/10 bg-[#11182b] p-5 lg:block">
       <div className="flex items-center gap-3 px-2">
@@ -61,7 +63,16 @@ export function AdminSidebar() {
       <div className="absolute inset-x-5 bottom-5 rounded-2xl border border-white/10 bg-white/5 p-4 text-xs text-slate-400">
         Private admin environment
         <br />
-        <span className="mt-1 block text-emerald-400">● Database connected</span>
+        <span
+          className={`mt-1 block ${dbStatus === "connected" ? "text-emerald-400" : dbStatus === "disconnected" ? "text-rose-400" : "text-slate-500"}`}
+        >
+          ●{" "}
+          {dbStatus === "connected"
+            ? "Database connected"
+            : dbStatus === "disconnected"
+              ? "Database disconnected"
+              : "Checking database…"}
+        </span>
       </div>
     </aside>
   );

@@ -50,6 +50,7 @@ const tiers = [
       "API access",
     ],
     cta: "Talk to sales",
+    ctaHref: "/contact",
   },
 ];
 
@@ -122,7 +123,7 @@ export default function Pricing() {
                   size="lg"
                   className={`mt-7 ${t.highlight ? "bg-cta text-cta-foreground hover:bg-cta/90" : "bg-primary"}`}
                 >
-                  <Link href="/signup">{t.cta}</Link>
+                  <Link href={t.ctaHref ?? "/signup"}>{t.cta}</Link>
                 </Button>
               </div>
             ))}
@@ -130,7 +131,7 @@ export default function Pricing() {
 
           <p className="mt-10 text-center text-sm text-muted-foreground">
             Need something custom?{" "}
-            <Link href="/" className="font-medium text-primary hover:underline">
+            <Link href="/contact" className="font-medium text-primary hover:underline">
               Contact us
             </Link>
             .

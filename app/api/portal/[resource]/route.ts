@@ -78,6 +78,30 @@ export async function GET(
           include: { messages: { orderBy: { createdAt: "desc" }, take: 1 } },
         }),
       );
+    if (resource === "reviews") {
+      if (session.role !== "PROFESSIONAL")
+        return NextResponse.json({ error: "Professional access required." }, { status: 403 });
+      const reviews = await db.projectReview.findMany({
+        where: { professionalId: session.userId },
+        orderBy: { createdAt: "desc" },
+      });
+      const clients = await db.user.findMany({
+        where: { id: { in: [...new Set(reviews.map((review) => review.clientId))] } },
+        select: { id: true, firstName: true, lastName: true },
+      });
+      const clientMap = new Map(
+        clients.map((client) => [client.id, `${client.firstName} ${client.lastName}`.trim()]),
+      );
+      return NextResponse.json(
+        reviews.map((review) => ({
+          id: review.id,
+          rating: review.rating,
+          comment: review.comment,
+          clientName: clientMap.get(review.clientId) ?? null,
+          createdAt: review.createdAt.toISOString(),
+        })),
+      );
+    }
     if (resource === "professional-jobs") {
       if (session.role !== "PROFESSIONAL")
         return NextResponse.json({ error: "Professional access required." }, { status: 403 });
@@ -554,4 +578,34 @@ export async function GET(
     console.error("portal.request.failed", { resource, userId: session.userId, error });
     return NextResponse.json({ error: "Unable to load portal data." }, { status: 500 });
   }
+}
+
+const markReadSchema = z
+  .object({ id: z.number().int().positive() })
+  .or(z.object({ all: z.literal(true) }));
+
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ resource: string }> },
+) {
+  const session = await sessionFromRequest(request);
+  if (!session) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+  const { resource } = await params;
+  if (resource !== "notifications")
+    return NextResponse.json({ error: "Not found." }, { status: 404 });
+  const parsed = markReadSchema.safeParse(await request.json().catch(() => null));
+  if (!parsed.success)
+    return NextResponse.json({ error: "A notification id is required." }, { status: 400 });
+  if ("all" in parsed.data) {
+    await db.userNotification.updateMany({
+      where: { userId: session.userId, readAt: null },
+      data: { readAt: new Date() },
+    });
+  } else {
+    await db.userNotification.updateMany({
+      where: { id: parsed.data.id, userId: session.userId, readAt: null },
+      data: { readAt: new Date() },
+    });
+  }
+  return NextResponse.json({ success: true });
 }

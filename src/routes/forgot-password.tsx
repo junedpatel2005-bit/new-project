@@ -16,13 +16,19 @@ function EmailTab() {
   const [pending, setPending] = useState(false);
   async function submit(formData: FormData) {
     setPending(true);
-    await fetch("/api/v1/auth/forgot-password", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ email: formData.get("email") }),
-    });
-    setPending(false);
-    setMessage("If an account exists for that email, we sent a reset link.");
+    setMessage(null);
+    try {
+      await fetch("/api/v1/auth/forgot-password", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email: formData.get("email") }),
+      });
+      setMessage("If an account exists for that email, we sent a reset link.");
+    } catch {
+      setMessage("Unable to send the reset link. Please check your connection and try again.");
+    } finally {
+      setPending(false);
+    }
   }
   return (
     <form action={submit} className="space-y-4">

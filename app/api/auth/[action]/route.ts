@@ -20,13 +20,14 @@ import {
   notifyClientsOfNewProfessional,
 } from "@/lib/marketplace-notifications";
 
+const passwordSchema = z.string().min(8).regex(/[A-Z]/).regex(/[a-z]/).regex(/\d/);
 const registerSchema = z
   .object({
     firstName: z.string().min(1).max(80),
     lastName: z.string().min(1).max(80),
     email: z.string().email(),
     phone: z.string().min(7).max(25),
-    password: z.string().min(8).regex(/[A-Z]/).regex(/[a-z]/).regex(/\d/),
+    password: passwordSchema,
     role: z.enum(["CLIENT", "PROFESSIONAL"]),
     terms: z.literal(true),
   })
@@ -102,8 +103,7 @@ export async function GET(
   if (action === "google") {
     const clientId = process.env.GOOGLE_CLIENT_ID;
     const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-    const appUrl = process.env.APP_URL ?? new URL(request.url).origin;
-    const callbackUrl = `${appUrl}/api/v1/auth/google`;
+    const callbackUrl = `${publicAppOrigin(request)}/api/v1/auth/google`;
 
     if (!clientId || !clientSecret) {
       return NextResponse.redirect(new URL("/login?oauthError=google-not-configured", request.url));
@@ -216,29 +216,10 @@ export async function GET(
       return response;
     }
   }
-  if (action !== "me") return safe("Not found", 404);
-  const token = request.cookies.get(sessionCookie)?.value;
-  // This endpoint also powers the public app shell. A signed-out visitor is
-  // a normal state, not an error, so return an empty session without a 401.
-  if (!token) return NextResponse.json({ user: null });
-  try {
-    const session = await verifySession(token);
-    const user = await db.user.findUnique({
-      where: { id: session.userId },
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        email: true,
-        role: true,
-        avatarUrl: true,
-        isActive: true,
-      },
-    });
-    return user?.isActive ? NextResponse.json({ user }) : NextResponse.json({ user: null });
-  } catch {
-    return NextResponse.json({ user: null });
-  }
+  // Note: `GET /api/auth/me` is served by the sibling static route at
+  // app/api/auth/me/route.ts, which Next.js matches before this dynamic
+  // [action] segment — there is intentionally no "me" case here.
+  return safe("Not found", 404);
 }
 
 export async function POST(
@@ -630,12 +611,16 @@ export async function POST(
   }
   if (action === "reset-password") {
     const parsed = z
-      .object({
-        token: z.string().min(32),
-        password: action === "reset-password" ? z.string().min(8) : z.undefined().optional(),
-      })
+      .object({ token: z.string().min(32), password: passwordSchema })
       .safeParse(body);
-    if (!parsed.success) return safe("Invalid or expired link.");
+    if (!parsed.success) {
+      const tokenValid = z.string().min(32).safeParse(body?.token).success;
+      return safe(
+        tokenValid
+          ? "Password must be at least 8 characters and include an uppercase letter, a lowercase letter, and a number."
+          : "Invalid or expired link.",
+      );
+    }
     const token = await db.apiToken.findFirst({
       where: {
         tokenHash: tokenHash(parsed.data.token),
@@ -649,7 +634,7 @@ export async function POST(
       db.apiToken.update({ where: { id: token.id }, data: { usedAt: new Date() } }),
       db.user.update({
         where: { id: token.userId },
-        data: { passwordHash: await bcrypt.hash(parsed.data.password!, 12) },
+        data: { passwordHash: await bcrypt.hash(parsed.data.password, 12) },
       }),
     ]);
     return NextResponse.json({ success: true });

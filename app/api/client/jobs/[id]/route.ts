@@ -168,12 +168,25 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   if (!userId || !id) return NextResponse.json({ error: "Not found." }, { status: 404 });
   const current = await db.clientJob.findFirst({ where: { id, userId } });
   if (!current) return NextResponse.json({ error: "Not found." }, { status: 404 });
-  if (current.status === "CLOSED")
-    return NextResponse.json({ error: "Closed jobs cannot be changed." }, { status: 409 });
   const parsed = bodySchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success)
     return NextResponse.json({ error: "Please review the job details." }, { status: 400 });
-  if ((current.status as string) === "CLOSED" && parsed.data.status !== "OPEN")
+  if (current.status === "CLOSED" && parsed.data.status !== "OPEN")
+    return NextResponse.json({ error: "Closed jobs cannot be changed." }, { status: 409 });
+
+  // A status-only transition (no `mode`, e.g. Close/Reopen from the job detail page) must only
+  // touch `status` — rebuilding the full record from `dataOf()` would null out every field the
+  // caller didn't send.
+  const isStatusOnly =
+    !parsed.data.mode && Object.keys(parsed.data).every((key) => key === "status");
+  if (isStatusOnly) {
+    if (!parsed.data.status)
+      return NextResponse.json({ error: "Please review the job details." }, { status: 400 });
+    const job = await db.clientJob.update({ where: { id }, data: { status: parsed.data.status } });
+    return NextResponse.json({ job });
+  }
+
+  if (current.status === "CLOSED")
     return NextResponse.json({ error: "Closed jobs cannot be changed." }, { status: 409 });
   const fields = parsed.data.mode === "publish" ? await errors(parsed.data) : {};
   if (Object.keys(fields).length)

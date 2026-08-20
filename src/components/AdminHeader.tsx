@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { LogOut, Moon, Sun } from "lucide-react";
+import { useDatabaseStatus } from "@/hooks/use-database-status";
 
 export function AdminHeader({
   theme,
@@ -11,6 +12,7 @@ export function AdminHeader({
   onToggleTheme: () => void;
 }) {
   const router = useRouter();
+  const dbStatus = useDatabaseStatus();
 
   async function logout() {
     await fetch("/api/v1/auth/logout", { method: "POST" });
@@ -30,8 +32,20 @@ export function AdminHeader({
           {theme === "dark" ? <Moon className="h-3.5 w-3.5" /> : <Sun className="h-3.5 w-3.5" />}
           {theme === "dark" ? "Dark" : "Light"}
         </button>
-        <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400">
-          System online
+        <span
+          className={`rounded-full px-3 py-1 text-xs font-semibold ${
+            dbStatus === "connected"
+              ? "bg-emerald-500/10 text-emerald-400"
+              : dbStatus === "disconnected"
+                ? "bg-rose-500/10 text-rose-400"
+                : "bg-white/5 text-slate-400"
+          }`}
+        >
+          {dbStatus === "connected"
+            ? "System online"
+            : dbStatus === "disconnected"
+              ? "Database unreachable"
+              : "Checking…"}
         </span>
         <button
           type="button"

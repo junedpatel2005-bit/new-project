@@ -606,8 +606,19 @@ export default function JobDetails() {
                       </p>
                     </div>
                   </div>
-                  <Button variant="outline" size="sm" disabled>
-                    Download
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={!attachment.previewUrl}
+                    asChild={Boolean(attachment.previewUrl)}
+                  >
+                    {attachment.previewUrl ? (
+                      <a href={attachment.previewUrl} target="_blank" rel="noreferrer">
+                        Download
+                      </a>
+                    ) : (
+                      "Download"
+                    )}
                   </Button>
                 </div>
               ))}
@@ -1122,7 +1133,11 @@ export default function JobDetails() {
                   Reopen Job
                 </Button>
               )}
-              {job.status === "DRAFT" && <Button className="w-full sm:w-auto">Publish Job</Button>}
+              {job.status === "DRAFT" && (
+                <Button className="w-full sm:w-auto" asChild>
+                  <a href={`/post-job?edit=${jobId}`}>Publish Job</a>
+                </Button>
+              )}
             </div>
           )}
         </div>

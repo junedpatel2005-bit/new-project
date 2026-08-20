@@ -16,6 +16,7 @@ export default function Verify() {
   const [newEmail, setNewEmail] = useState("");
   const [emailError, setEmailError] = useState<string | null>(null);
   const [emailMessage, setEmailMessage] = useState<string | null>(null);
+  const [resending, setResending] = useState(false);
 
   useEffect(() => {
     void fetch("/api/v1/auth/me")
@@ -28,12 +29,20 @@ export default function Verify() {
   }, []);
 
   async function resend() {
+    if (resending) return;
     setError(null);
     setMessage(null);
-    const response = await fetch("/api/v1/auth/resend-verification", { method: "POST" });
-    const result = (await response.json()) as { error?: string };
-    if (!response.ok) setError(result.error ?? "Unable to resend the confirmation link.");
-    else setMessage("A new confirmation link has been sent to your email.");
+    setResending(true);
+    try {
+      const response = await fetch("/api/v1/auth/resend-verification", { method: "POST" });
+      const result = (await response.json()) as { error?: string };
+      if (!response.ok) setError(result.error ?? "Unable to resend the confirmation link.");
+      else setMessage("A new confirmation link has been sent to your email.");
+    } catch {
+      setError("Unable to resend the confirmation link. Please check your connection.");
+    } finally {
+      setResending(false);
+    }
   }
 
   async function updateEmail() {
@@ -66,10 +75,11 @@ export default function Verify() {
       footer={
         <button
           type="button"
+          disabled={resending}
           onClick={() => void resend()}
-          className="text-primary hover:underline"
+          className="text-primary hover:underline disabled:opacity-60"
         >
-          Resend confirmation link
+          {resending ? "Sending…" : "Resend confirmation link"}
         </button>
       }
     >
