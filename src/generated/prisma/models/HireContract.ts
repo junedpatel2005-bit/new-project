@@ -278,8 +278,8 @@ export type HireContractWhereInput = {
   professionalId?: Prisma.StringFilter<"HireContract"> | string
   clientProjectId?: Prisma.IntNullableFilter<"HireContract"> | number | null
   trackingId?: Prisma.IntNullableFilter<"HireContract"> | number | null
-  totalAmount?: Prisma.FloatNullableFilter<"HireContract"> | number | null
-  platformFee?: Prisma.FloatNullableFilter<"HireContract"> | number | null
+  totalAmount?: Prisma.IntNullableFilter<"HireContract"> | number | null
+  platformFee?: Prisma.IntNullableFilter<"HireContract"> | number | null
   status?: Prisma.StringFilter<"HireContract"> | string
   startDate?: Prisma.DateTimeNullableFilter<"HireContract"> | Date | string | null
   endDate?: Prisma.DateTimeNullableFilter<"HireContract"> | Date | string | null
@@ -315,8 +315,8 @@ export type HireContractWhereUniqueInput = Prisma.AtLeast<{
   professionalId?: Prisma.StringFilter<"HireContract"> | string
   clientProjectId?: Prisma.IntNullableFilter<"HireContract"> | number | null
   trackingId?: Prisma.IntNullableFilter<"HireContract"> | number | null
-  totalAmount?: Prisma.FloatNullableFilter<"HireContract"> | number | null
-  platformFee?: Prisma.FloatNullableFilter<"HireContract"> | number | null
+  totalAmount?: Prisma.IntNullableFilter<"HireContract"> | number | null
+  platformFee?: Prisma.IntNullableFilter<"HireContract"> | number | null
   status?: Prisma.StringFilter<"HireContract"> | string
   startDate?: Prisma.DateTimeNullableFilter<"HireContract"> | Date | string | null
   endDate?: Prisma.DateTimeNullableFilter<"HireContract"> | Date | string | null
@@ -355,8 +355,8 @@ export type HireContractScalarWhereWithAggregatesInput = {
   professionalId?: Prisma.StringWithAggregatesFilter<"HireContract"> | string
   clientProjectId?: Prisma.IntNullableWithAggregatesFilter<"HireContract"> | number | null
   trackingId?: Prisma.IntNullableWithAggregatesFilter<"HireContract"> | number | null
-  totalAmount?: Prisma.FloatNullableWithAggregatesFilter<"HireContract"> | number | null
-  platformFee?: Prisma.FloatNullableWithAggregatesFilter<"HireContract"> | number | null
+  totalAmount?: Prisma.IntNullableWithAggregatesFilter<"HireContract"> | number | null
+  platformFee?: Prisma.IntNullableWithAggregatesFilter<"HireContract"> | number | null
   status?: Prisma.StringWithAggregatesFilter<"HireContract"> | string
   startDate?: Prisma.DateTimeNullableWithAggregatesFilter<"HireContract"> | Date | string | null
   endDate?: Prisma.DateTimeNullableWithAggregatesFilter<"HireContract"> | Date | string | null
@@ -401,8 +401,8 @@ export type HireContractUpdateInput = {
   professionalId?: Prisma.StringFieldUpdateOperationsInput | string
   clientProjectId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   trackingId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  totalAmount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  platformFee?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  totalAmount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  platformFee?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -418,8 +418,8 @@ export type HireContractUncheckedUpdateInput = {
   professionalId?: Prisma.StringFieldUpdateOperationsInput | string
   clientProjectId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   trackingId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  totalAmount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  platformFee?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  totalAmount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  platformFee?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -448,8 +448,8 @@ export type HireContractUpdateManyMutationInput = {
   professionalId?: Prisma.StringFieldUpdateOperationsInput | string
   clientProjectId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   trackingId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  totalAmount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  platformFee?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  totalAmount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  platformFee?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -463,8 +463,8 @@ export type HireContractUncheckedUpdateManyInput = {
   professionalId?: Prisma.StringFieldUpdateOperationsInput | string
   clientProjectId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   trackingId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  totalAmount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  platformFee?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  totalAmount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  platformFee?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -667,8 +667,8 @@ export type HireContractScalarWhereInput = {
   professionalId?: Prisma.StringFilter<"HireContract"> | string
   clientProjectId?: Prisma.IntNullableFilter<"HireContract"> | number | null
   trackingId?: Prisma.IntNullableFilter<"HireContract"> | number | null
-  totalAmount?: Prisma.FloatNullableFilter<"HireContract"> | number | null
-  platformFee?: Prisma.FloatNullableFilter<"HireContract"> | number | null
+  totalAmount?: Prisma.IntNullableFilter<"HireContract"> | number | null
+  platformFee?: Prisma.IntNullableFilter<"HireContract"> | number | null
   status?: Prisma.StringFilter<"HireContract"> | string
   startDate?: Prisma.DateTimeNullableFilter<"HireContract"> | Date | string | null
   endDate?: Prisma.DateTimeNullableFilter<"HireContract"> | Date | string | null
@@ -727,8 +727,8 @@ export type HireContractUpdateWithoutMilestonesInput = {
   professionalId?: Prisma.StringFieldUpdateOperationsInput | string
   clientProjectId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   trackingId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  totalAmount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  platformFee?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  totalAmount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  platformFee?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -743,8 +743,8 @@ export type HireContractUncheckedUpdateWithoutMilestonesInput = {
   professionalId?: Prisma.StringFieldUpdateOperationsInput | string
   clientProjectId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   trackingId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  totalAmount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  platformFee?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  totalAmount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  platformFee?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -771,8 +771,8 @@ export type HireContractUpdateWithoutJobInput = {
   professionalId?: Prisma.StringFieldUpdateOperationsInput | string
   clientProjectId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   trackingId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  totalAmount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  platformFee?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  totalAmount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  platformFee?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -786,8 +786,8 @@ export type HireContractUncheckedUpdateWithoutJobInput = {
   professionalId?: Prisma.StringFieldUpdateOperationsInput | string
   clientProjectId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   trackingId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  totalAmount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  platformFee?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  totalAmount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  platformFee?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -801,8 +801,8 @@ export type HireContractUncheckedUpdateManyWithoutJobInput = {
   professionalId?: Prisma.StringFieldUpdateOperationsInput | string
   clientProjectId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   trackingId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  totalAmount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  platformFee?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  totalAmount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  platformFee?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1368,8 +1368,8 @@ export interface HireContractFieldRefs {
   readonly professionalId: Prisma.FieldRef<"HireContract", 'String'>
   readonly clientProjectId: Prisma.FieldRef<"HireContract", 'Int'>
   readonly trackingId: Prisma.FieldRef<"HireContract", 'Int'>
-  readonly totalAmount: Prisma.FieldRef<"HireContract", 'Float'>
-  readonly platformFee: Prisma.FieldRef<"HireContract", 'Float'>
+  readonly totalAmount: Prisma.FieldRef<"HireContract", 'Int'>
+  readonly platformFee: Prisma.FieldRef<"HireContract", 'Int'>
   readonly status: Prisma.FieldRef<"HireContract", 'String'>
   readonly startDate: Prisma.FieldRef<"HireContract", 'DateTime'>
   readonly endDate: Prisma.FieldRef<"HireContract", 'DateTime'>

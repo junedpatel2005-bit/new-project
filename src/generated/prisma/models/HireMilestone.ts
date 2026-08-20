@@ -228,7 +228,7 @@ export type HireMilestoneWhereInput = {
   id?: Prisma.StringFilter<"HireMilestone"> | string
   contractId?: Prisma.StringFilter<"HireMilestone"> | string
   title?: Prisma.StringNullableFilter<"HireMilestone"> | string | null
-  amount?: Prisma.FloatNullableFilter<"HireMilestone"> | number | null
+  amount?: Prisma.IntNullableFilter<"HireMilestone"> | number | null
   dueDate?: Prisma.DateTimeNullableFilter<"HireMilestone"> | Date | string | null
   status?: Prisma.StringFilter<"HireMilestone"> | string
   completedProof?: Prisma.StringNullableFilter<"HireMilestone"> | string | null
@@ -253,7 +253,7 @@ export type HireMilestoneWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.HireMilestoneWhereInput | Prisma.HireMilestoneWhereInput[]
   contractId?: Prisma.StringFilter<"HireMilestone"> | string
   title?: Prisma.StringNullableFilter<"HireMilestone"> | string | null
-  amount?: Prisma.FloatNullableFilter<"HireMilestone"> | number | null
+  amount?: Prisma.IntNullableFilter<"HireMilestone"> | number | null
   dueDate?: Prisma.DateTimeNullableFilter<"HireMilestone"> | Date | string | null
   status?: Prisma.StringFilter<"HireMilestone"> | string
   completedProof?: Prisma.StringNullableFilter<"HireMilestone"> | string | null
@@ -282,7 +282,7 @@ export type HireMilestoneScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"HireMilestone"> | string
   contractId?: Prisma.StringWithAggregatesFilter<"HireMilestone"> | string
   title?: Prisma.StringNullableWithAggregatesFilter<"HireMilestone"> | string | null
-  amount?: Prisma.FloatNullableWithAggregatesFilter<"HireMilestone"> | number | null
+  amount?: Prisma.IntNullableWithAggregatesFilter<"HireMilestone"> | number | null
   dueDate?: Prisma.DateTimeNullableWithAggregatesFilter<"HireMilestone"> | Date | string | null
   status?: Prisma.StringWithAggregatesFilter<"HireMilestone"> | string
   completedProof?: Prisma.StringNullableWithAggregatesFilter<"HireMilestone"> | string | null
@@ -311,7 +311,7 @@ export type HireMilestoneUncheckedCreateInput = {
 export type HireMilestoneUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  amount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  amount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   completedProof?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -322,7 +322,7 @@ export type HireMilestoneUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   contractId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  amount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  amount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   completedProof?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -341,7 +341,7 @@ export type HireMilestoneCreateManyInput = {
 export type HireMilestoneUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  amount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  amount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   completedProof?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -351,7 +351,7 @@ export type HireMilestoneUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   contractId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  amount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  amount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   completedProof?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -498,7 +498,7 @@ export type HireMilestoneScalarWhereInput = {
   id?: Prisma.StringFilter<"HireMilestone"> | string
   contractId?: Prisma.StringFilter<"HireMilestone"> | string
   title?: Prisma.StringNullableFilter<"HireMilestone"> | string | null
-  amount?: Prisma.FloatNullableFilter<"HireMilestone"> | number | null
+  amount?: Prisma.IntNullableFilter<"HireMilestone"> | number | null
   dueDate?: Prisma.DateTimeNullableFilter<"HireMilestone"> | Date | string | null
   status?: Prisma.StringFilter<"HireMilestone"> | string
   completedProof?: Prisma.StringNullableFilter<"HireMilestone"> | string | null
@@ -516,7 +516,7 @@ export type HireMilestoneCreateManyContractInput = {
 export type HireMilestoneUpdateWithoutContractInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  amount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  amount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   completedProof?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -525,7 +525,7 @@ export type HireMilestoneUpdateWithoutContractInput = {
 export type HireMilestoneUncheckedUpdateWithoutContractInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  amount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  amount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   completedProof?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -534,7 +534,7 @@ export type HireMilestoneUncheckedUpdateWithoutContractInput = {
 export type HireMilestoneUncheckedUpdateManyWithoutContractInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  amount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  amount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   completedProof?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1036,7 +1036,7 @@ export interface HireMilestoneFieldRefs {
   readonly id: Prisma.FieldRef<"HireMilestone", 'String'>
   readonly contractId: Prisma.FieldRef<"HireMilestone", 'String'>
   readonly title: Prisma.FieldRef<"HireMilestone", 'String'>
-  readonly amount: Prisma.FieldRef<"HireMilestone", 'Float'>
+  readonly amount: Prisma.FieldRef<"HireMilestone", 'Int'>
   readonly dueDate: Prisma.FieldRef<"HireMilestone", 'DateTime'>
   readonly status: Prisma.FieldRef<"HireMilestone", 'String'>
   readonly completedProof: Prisma.FieldRef<"HireMilestone", 'String'>

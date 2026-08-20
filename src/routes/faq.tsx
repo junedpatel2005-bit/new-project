@@ -6,7 +6,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { db } from "@/lib/db";
+import { getPublishedFaqGroups } from "@/lib/queries/faq";
 
 const fallbackGroups = [
   {
@@ -60,21 +60,8 @@ const fallbackGroups = [
 ];
 
 export default async function FAQ() {
-  const faqs = await db.faq.findMany({
-    where: { status: "PUBLISHED" },
-    orderBy: [{ displayOrder: "asc" }, { id: "asc" }],
-  });
-  const groupOrder: string[] = [];
-  const groupsByTitle = new Map<string, { title: string; items: { q: string; a: string }[] }>();
-  for (const faq of faqs) {
-    const title = faq.category?.trim() || "General";
-    if (!groupsByTitle.has(title)) {
-      groupOrder.push(title);
-      groupsByTitle.set(title, { title, items: [] });
-    }
-    groupsByTitle.get(title)!.items.push({ q: faq.question, a: faq.answer });
-  }
-  const groups = faqs.length ? groupOrder.map((title) => groupsByTitle.get(title)!) : fallbackGroups;
+  const groups = await getPublishedFaqGroups();
+  const displayGroups = groups.length ? groups : fallbackGroups;
   return (
     <div className="min-h-screen bg-background">
       <main>
@@ -92,7 +79,7 @@ export default async function FAQ() {
           </div>
         </section>
         <section className="mx-auto max-w-3xl px-4 pb-20 sm:px-6 lg:px-8">
-          {groups.map((g) => (
+          {displayGroups.map((g) => (
             <div key={g.title} className="mt-10">
               <h2 className="font-display text-xl font-semibold">{g.title}</h2>
               <Accordion

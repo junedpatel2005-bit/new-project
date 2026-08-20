@@ -37,8 +37,7 @@ export async function PUT(request: NextRequest) {
   if (!Number.isInteger(id))
     return NextResponse.json({ error: "Invalid FAQ item." }, { status: 400 });
   const parsed = input.partial().safeParse(await request.json().catch(() => null));
-  if (!parsed.success)
-    return NextResponse.json({ error: "Invalid FAQ update." }, { status: 400 });
+  if (!parsed.success) return NextResponse.json({ error: "Invalid FAQ update." }, { status: 400 });
   try {
     const faq = await db.faq.update({ where: { id }, data: parsed.data });
     return NextResponse.json({ faq });

@@ -515,11 +515,7 @@ export default function PostJob() {
           <div className="space-y-5">
             <h2 className="text-xl font-semibold">Review your job</h2>
             <Review label="Title" value={form.title || "Not set"} onEdit={() => setStep(0)} />
-            <Review
-              label="Category"
-              value={form.category || "Not set"}
-              onEdit={() => setStep(0)}
-            />
+            <Review label="Category" value={form.category || "Not set"} onEdit={() => setStep(0)} />
             <Review
               label="Description"
               value={form.description || "Not set"}
@@ -662,15 +658,7 @@ function Mode({
     </button>
   );
 }
-function Review({
-  label,
-  value,
-  onEdit,
-}: {
-  label: string;
-  value: string;
-  onEdit?: () => void;
-}) {
+function Review({ label, value, onEdit }: { label: string; value: string; onEdit?: () => void }) {
   return (
     <div className="flex items-start justify-between gap-3 border-b pb-3">
       <div>

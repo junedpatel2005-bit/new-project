@@ -3,6 +3,7 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { sessionCookie, verifySession } from "@/lib/auth";
 import { notifyAdminsOfNewProposal } from "@/lib/marketplace-notifications";
+import { enqueueBackgroundJob } from "@/lib/background-jobs";
 import { attachLastActorRole } from "@/lib/project-request-actions";
 
 const proposalSchema = z.object({
@@ -119,13 +120,18 @@ export async function POST(request: NextRequest) {
         href: `/job/${job.id}`,
       },
     });
-    await notifyAdminsOfNewProposal({
-      jobId: job.id,
-      jobTitle: job.title,
-      professionalName: professional
-        ? `${professional.firstName} ${professional.lastName}`.trim()
-        : "A professional",
-    });
+    enqueueBackgroundJob(
+      "proposal.created.notifications",
+      () =>
+        notifyAdminsOfNewProposal({
+          jobId: job.id,
+          jobTitle: job.title,
+          professionalName: professional
+            ? `${professional.firstName} ${professional.lastName}`.trim()
+            : "A professional",
+        }),
+      { jobId: job.id, professionalId: session.userId },
+    );
     return NextResponse.json({ proposal }, { status: 201 });
   } catch (error) {
     console.error("professional.proposal.failed", error);

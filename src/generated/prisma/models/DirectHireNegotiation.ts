@@ -264,7 +264,7 @@ export type DirectHireNegotiationWhereInput = {
   professionalId?: Prisma.StringFilter<"DirectHireNegotiation"> | string
   senderId?: Prisma.StringFilter<"DirectHireNegotiation"> | string
   senderRole?: Prisma.StringFilter<"DirectHireNegotiation"> | string
-  bidAmount?: Prisma.FloatNullableFilter<"DirectHireNegotiation"> | number | null
+  bidAmount?: Prisma.IntNullableFilter<"DirectHireNegotiation"> | number | null
   duration?: Prisma.StringNullableFilter<"DirectHireNegotiation"> | string | null
   message?: Prisma.StringFilter<"DirectHireNegotiation"> | string
   createdAt?: Prisma.DateTimeFilter<"DirectHireNegotiation"> | Date | string
@@ -295,7 +295,7 @@ export type DirectHireNegotiationWhereUniqueInput = Prisma.AtLeast<{
   professionalId?: Prisma.StringFilter<"DirectHireNegotiation"> | string
   senderId?: Prisma.StringFilter<"DirectHireNegotiation"> | string
   senderRole?: Prisma.StringFilter<"DirectHireNegotiation"> | string
-  bidAmount?: Prisma.FloatNullableFilter<"DirectHireNegotiation"> | number | null
+  bidAmount?: Prisma.IntNullableFilter<"DirectHireNegotiation"> | number | null
   duration?: Prisma.StringNullableFilter<"DirectHireNegotiation"> | string | null
   message?: Prisma.StringFilter<"DirectHireNegotiation"> | string
   createdAt?: Prisma.DateTimeFilter<"DirectHireNegotiation"> | Date | string
@@ -331,7 +331,7 @@ export type DirectHireNegotiationScalarWhereWithAggregatesInput = {
   professionalId?: Prisma.StringWithAggregatesFilter<"DirectHireNegotiation"> | string
   senderId?: Prisma.StringWithAggregatesFilter<"DirectHireNegotiation"> | string
   senderRole?: Prisma.StringWithAggregatesFilter<"DirectHireNegotiation"> | string
-  bidAmount?: Prisma.FloatNullableWithAggregatesFilter<"DirectHireNegotiation"> | number | null
+  bidAmount?: Prisma.IntNullableWithAggregatesFilter<"DirectHireNegotiation"> | number | null
   duration?: Prisma.StringNullableWithAggregatesFilter<"DirectHireNegotiation"> | string | null
   message?: Prisma.StringWithAggregatesFilter<"DirectHireNegotiation"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"DirectHireNegotiation"> | Date | string
@@ -371,7 +371,7 @@ export type DirectHireNegotiationUpdateInput = {
   professionalId?: Prisma.StringFieldUpdateOperationsInput | string
   senderId?: Prisma.StringFieldUpdateOperationsInput | string
   senderRole?: Prisma.StringFieldUpdateOperationsInput | string
-  bidAmount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  bidAmount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   duration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   message?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -385,7 +385,7 @@ export type DirectHireNegotiationUncheckedUpdateInput = {
   professionalId?: Prisma.StringFieldUpdateOperationsInput | string
   senderId?: Prisma.StringFieldUpdateOperationsInput | string
   senderRole?: Prisma.StringFieldUpdateOperationsInput | string
-  bidAmount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  bidAmount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   duration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   message?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -412,7 +412,7 @@ export type DirectHireNegotiationUpdateManyMutationInput = {
   professionalId?: Prisma.StringFieldUpdateOperationsInput | string
   senderId?: Prisma.StringFieldUpdateOperationsInput | string
   senderRole?: Prisma.StringFieldUpdateOperationsInput | string
-  bidAmount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  bidAmount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   duration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   message?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -426,7 +426,7 @@ export type DirectHireNegotiationUncheckedUpdateManyInput = {
   professionalId?: Prisma.StringFieldUpdateOperationsInput | string
   senderId?: Prisma.StringFieldUpdateOperationsInput | string
   senderRole?: Prisma.StringFieldUpdateOperationsInput | string
-  bidAmount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  bidAmount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   duration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   message?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -989,7 +989,7 @@ export interface DirectHireNegotiationFieldRefs {
   readonly professionalId: Prisma.FieldRef<"DirectHireNegotiation", 'String'>
   readonly senderId: Prisma.FieldRef<"DirectHireNegotiation", 'String'>
   readonly senderRole: Prisma.FieldRef<"DirectHireNegotiation", 'String'>
-  readonly bidAmount: Prisma.FieldRef<"DirectHireNegotiation", 'Float'>
+  readonly bidAmount: Prisma.FieldRef<"DirectHireNegotiation", 'Int'>
   readonly duration: Prisma.FieldRef<"DirectHireNegotiation", 'String'>
   readonly message: Prisma.FieldRef<"DirectHireNegotiation", 'String'>
   readonly createdAt: Prisma.FieldRef<"DirectHireNegotiation", 'DateTime'>

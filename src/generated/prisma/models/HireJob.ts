@@ -293,8 +293,8 @@ export type HireJobWhereInput = {
   clientId?: Prisma.StringFilter<"HireJob"> | string
   title?: Prisma.StringFilter<"HireJob"> | string
   description?: Prisma.StringNullableFilter<"HireJob"> | string | null
-  budgetMin?: Prisma.FloatNullableFilter<"HireJob"> | number | null
-  budgetMax?: Prisma.FloatNullableFilter<"HireJob"> | number | null
+  budgetMin?: Prisma.IntNullableFilter<"HireJob"> | number | null
+  budgetMax?: Prisma.IntNullableFilter<"HireJob"> | number | null
   currency?: Prisma.StringFilter<"HireJob"> | string
   jobType?: Prisma.StringNullableFilter<"HireJob"> | string | null
   city?: Prisma.StringNullableFilter<"HireJob"> | string | null
@@ -336,8 +336,8 @@ export type HireJobWhereUniqueInput = Prisma.AtLeast<{
   clientId?: Prisma.StringFilter<"HireJob"> | string
   title?: Prisma.StringFilter<"HireJob"> | string
   description?: Prisma.StringNullableFilter<"HireJob"> | string | null
-  budgetMin?: Prisma.FloatNullableFilter<"HireJob"> | number | null
-  budgetMax?: Prisma.FloatNullableFilter<"HireJob"> | number | null
+  budgetMin?: Prisma.IntNullableFilter<"HireJob"> | number | null
+  budgetMax?: Prisma.IntNullableFilter<"HireJob"> | number | null
   currency?: Prisma.StringFilter<"HireJob"> | string
   jobType?: Prisma.StringNullableFilter<"HireJob"> | string | null
   city?: Prisma.StringNullableFilter<"HireJob"> | string | null
@@ -382,8 +382,8 @@ export type HireJobScalarWhereWithAggregatesInput = {
   clientId?: Prisma.StringWithAggregatesFilter<"HireJob"> | string
   title?: Prisma.StringWithAggregatesFilter<"HireJob"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"HireJob"> | string | null
-  budgetMin?: Prisma.FloatNullableWithAggregatesFilter<"HireJob"> | number | null
-  budgetMax?: Prisma.FloatNullableWithAggregatesFilter<"HireJob"> | number | null
+  budgetMin?: Prisma.IntNullableWithAggregatesFilter<"HireJob"> | number | null
+  budgetMax?: Prisma.IntNullableWithAggregatesFilter<"HireJob"> | number | null
   currency?: Prisma.StringWithAggregatesFilter<"HireJob"> | string
   jobType?: Prisma.StringNullableWithAggregatesFilter<"HireJob"> | string | null
   city?: Prisma.StringNullableWithAggregatesFilter<"HireJob"> | string | null
@@ -440,8 +440,8 @@ export type HireJobUpdateInput = {
   clientId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  budgetMin?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  budgetMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  budgetMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  budgetMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   jobType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -460,8 +460,8 @@ export type HireJobUncheckedUpdateInput = {
   clientId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  budgetMin?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  budgetMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  budgetMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  budgetMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   jobType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -498,8 +498,8 @@ export type HireJobUpdateManyMutationInput = {
   clientId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  budgetMin?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  budgetMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  budgetMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  budgetMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   jobType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -516,8 +516,8 @@ export type HireJobUncheckedUpdateManyInput = {
   clientId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  budgetMin?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  budgetMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  budgetMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  budgetMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   jobType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -687,8 +687,8 @@ export type HireJobUpdateWithoutContractsInput = {
   clientId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  budgetMin?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  budgetMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  budgetMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  budgetMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   jobType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -706,8 +706,8 @@ export type HireJobUncheckedUpdateWithoutContractsInput = {
   clientId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  budgetMin?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  budgetMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  budgetMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  budgetMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   jobType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -779,8 +779,8 @@ export type HireJobUpdateWithoutAttachmentsInput = {
   clientId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  budgetMin?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  budgetMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  budgetMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  budgetMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   jobType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -798,8 +798,8 @@ export type HireJobUncheckedUpdateWithoutAttachmentsInput = {
   clientId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  budgetMin?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  budgetMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  budgetMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  budgetMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   jobType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1387,8 +1387,8 @@ export interface HireJobFieldRefs {
   readonly clientId: Prisma.FieldRef<"HireJob", 'String'>
   readonly title: Prisma.FieldRef<"HireJob", 'String'>
   readonly description: Prisma.FieldRef<"HireJob", 'String'>
-  readonly budgetMin: Prisma.FieldRef<"HireJob", 'Float'>
-  readonly budgetMax: Prisma.FieldRef<"HireJob", 'Float'>
+  readonly budgetMin: Prisma.FieldRef<"HireJob", 'Int'>
+  readonly budgetMax: Prisma.FieldRef<"HireJob", 'Int'>
   readonly currency: Prisma.FieldRef<"HireJob", 'String'>
   readonly jobType: Prisma.FieldRef<"HireJob", 'String'>
   readonly city: Prisma.FieldRef<"HireJob", 'String'>

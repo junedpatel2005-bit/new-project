@@ -150,9 +150,10 @@ export default function AdminUsersPage() {
   const [activeGroup, setActiveGroup] = useState<"clients" | "professionals">("professionals");
   const [detail, setDetail] = useState<Detail | null>(null);
   const [search, setSearch] = useState("");
-  const [confirmAction, setConfirmAction] = useState<{ user: User; kind: "toggle" | "delete" } | null>(
-    null,
-  );
+  const [confirmAction, setConfirmAction] = useState<{
+    user: User;
+    kind: "toggle" | "delete";
+  } | null>(null);
   useEffect(() => {
     void fetch("/api/v1/admin/data/users", { cache: "no-store" })
       .then((response) => response.json())
@@ -210,8 +211,7 @@ export default function AdminUsersPage() {
       <p className="text-xs font-bold uppercase tracking-[.2em] text-indigo-400">Admin module</p>
       <h1 className="mt-2 font-display text-3xl font-bold">User management</h1>
       <p className="mt-2 text-slate-400">
-        Manage Clients and Professionals independently. Disabled accounts cannot use the
-        platform.
+        Manage Clients and Professionals independently. Disabled accounts cannot use the platform.
       </p>
       <div className="relative mt-6 max-w-sm">
         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />

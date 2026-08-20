@@ -259,8 +259,8 @@ export type LegacyProfessionalDetailWhereInput = {
   OR?: Prisma.LegacyProfessionalDetailWhereInput[]
   NOT?: Prisma.LegacyProfessionalDetailWhereInput | Prisma.LegacyProfessionalDetailWhereInput[]
   userId?: Prisma.StringFilter<"LegacyProfessionalDetail"> | string
-  hourlyRate?: Prisma.FloatNullableFilter<"LegacyProfessionalDetail"> | number | null
-  fixedRate?: Prisma.FloatNullableFilter<"LegacyProfessionalDetail"> | number | null
+  hourlyRate?: Prisma.IntNullableFilter<"LegacyProfessionalDetail"> | number | null
+  fixedRate?: Prisma.IntNullableFilter<"LegacyProfessionalDetail"> | number | null
   experienceYears?: Prisma.IntNullableFilter<"LegacyProfessionalDetail"> | number | null
   skills?: Prisma.StringNullableFilter<"LegacyProfessionalDetail"> | string | null
   serviceType?: Prisma.StringNullableFilter<"LegacyProfessionalDetail"> | string | null
@@ -288,8 +288,8 @@ export type LegacyProfessionalDetailWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.LegacyProfessionalDetailWhereInput | Prisma.LegacyProfessionalDetailWhereInput[]
   OR?: Prisma.LegacyProfessionalDetailWhereInput[]
   NOT?: Prisma.LegacyProfessionalDetailWhereInput | Prisma.LegacyProfessionalDetailWhereInput[]
-  hourlyRate?: Prisma.FloatNullableFilter<"LegacyProfessionalDetail"> | number | null
-  fixedRate?: Prisma.FloatNullableFilter<"LegacyProfessionalDetail"> | number | null
+  hourlyRate?: Prisma.IntNullableFilter<"LegacyProfessionalDetail"> | number | null
+  fixedRate?: Prisma.IntNullableFilter<"LegacyProfessionalDetail"> | number | null
   experienceYears?: Prisma.IntNullableFilter<"LegacyProfessionalDetail"> | number | null
   skills?: Prisma.StringNullableFilter<"LegacyProfessionalDetail"> | string | null
   serviceType?: Prisma.StringNullableFilter<"LegacyProfessionalDetail"> | string | null
@@ -322,8 +322,8 @@ export type LegacyProfessionalDetailScalarWhereWithAggregatesInput = {
   OR?: Prisma.LegacyProfessionalDetailScalarWhereWithAggregatesInput[]
   NOT?: Prisma.LegacyProfessionalDetailScalarWhereWithAggregatesInput | Prisma.LegacyProfessionalDetailScalarWhereWithAggregatesInput[]
   userId?: Prisma.StringWithAggregatesFilter<"LegacyProfessionalDetail"> | string
-  hourlyRate?: Prisma.FloatNullableWithAggregatesFilter<"LegacyProfessionalDetail"> | number | null
-  fixedRate?: Prisma.FloatNullableWithAggregatesFilter<"LegacyProfessionalDetail"> | number | null
+  hourlyRate?: Prisma.IntNullableWithAggregatesFilter<"LegacyProfessionalDetail"> | number | null
+  fixedRate?: Prisma.IntNullableWithAggregatesFilter<"LegacyProfessionalDetail"> | number | null
   experienceYears?: Prisma.IntNullableWithAggregatesFilter<"LegacyProfessionalDetail"> | number | null
   skills?: Prisma.StringNullableWithAggregatesFilter<"LegacyProfessionalDetail"> | string | null
   serviceType?: Prisma.StringNullableWithAggregatesFilter<"LegacyProfessionalDetail"> | string | null
@@ -361,8 +361,8 @@ export type LegacyProfessionalDetailUncheckedCreateInput = {
 
 export type LegacyProfessionalDetailUpdateInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  hourlyRate?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  fixedRate?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  fixedRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   skills?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serviceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -374,8 +374,8 @@ export type LegacyProfessionalDetailUpdateInput = {
 
 export type LegacyProfessionalDetailUncheckedUpdateInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  hourlyRate?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  fixedRate?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  fixedRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   skills?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serviceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -400,8 +400,8 @@ export type LegacyProfessionalDetailCreateManyInput = {
 
 export type LegacyProfessionalDetailUpdateManyMutationInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  hourlyRate?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  fixedRate?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  fixedRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   skills?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serviceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -413,8 +413,8 @@ export type LegacyProfessionalDetailUpdateManyMutationInput = {
 
 export type LegacyProfessionalDetailUncheckedUpdateManyInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  hourlyRate?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  fixedRate?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  fixedRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   skills?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serviceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -971,8 +971,8 @@ export interface Prisma__LegacyProfessionalDetailClient<T, Null = never, ExtArgs
  */
 export interface LegacyProfessionalDetailFieldRefs {
   readonly userId: Prisma.FieldRef<"LegacyProfessionalDetail", 'String'>
-  readonly hourlyRate: Prisma.FieldRef<"LegacyProfessionalDetail", 'Float'>
-  readonly fixedRate: Prisma.FieldRef<"LegacyProfessionalDetail", 'Float'>
+  readonly hourlyRate: Prisma.FieldRef<"LegacyProfessionalDetail", 'Int'>
+  readonly fixedRate: Prisma.FieldRef<"LegacyProfessionalDetail", 'Int'>
   readonly experienceYears: Prisma.FieldRef<"LegacyProfessionalDetail", 'Int'>
   readonly skills: Prisma.FieldRef<"LegacyProfessionalDetail", 'String'>
   readonly serviceType: Prisma.FieldRef<"LegacyProfessionalDetail", 'String'>

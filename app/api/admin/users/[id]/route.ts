@@ -24,7 +24,10 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
   const token = request.cookies.get(sessionCookie)?.value;
   if (!token) return NextResponse.json({ error: "Admin access required." }, { status: 401 });
   try {

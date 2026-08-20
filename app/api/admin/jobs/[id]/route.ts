@@ -23,8 +23,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   const parsed = z
     .object({ status: z.enum(["OPEN", "CLOSED"]) })
     .safeParse(await request.json().catch(() => null));
-  if (!parsed.success)
-    return NextResponse.json({ error: "Invalid job update." }, { status: 400 });
+  if (!parsed.success) return NextResponse.json({ error: "Invalid job update." }, { status: 400 });
   try {
     const job = await db.clientJob.update({
       where: { id: jobId },
@@ -37,7 +36,10 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
   if (!(await requireAdmin(request)))
     return NextResponse.json({ error: "Admin access required." }, { status: 403 });
   const { id } = await params;

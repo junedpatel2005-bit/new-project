@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { sessionCookie, verifySession } from "@/lib/auth";
 import { isRazorpayConfigured } from "@/lib/razorpay";
 import { notifyDisputeRaised } from "@/lib/marketplace-notifications";
+import { enqueueBackgroundJob } from "@/lib/background-jobs";
 
 const attachmentIds = z.array(z.number().int().positive()).min(1).max(10);
 
@@ -567,20 +568,25 @@ export async function POST(request: NextRequest) {
           select: { firstName: true, lastName: true },
         }),
       ]);
-      await notifyDisputeRaised({
-        disputeId: dispute.id,
-        trackingId: project.id,
-        jobTitle: job?.title ?? null,
-        issueType: input.issueType,
-        reporterRole: session.role as "CLIENT" | "PROFESSIONAL",
-        reporterName: reporter
-          ? `${reporter.firstName} ${reporter.lastName}`.trim()
-          : session.role === "CLIENT"
-            ? "The client"
-            : "The professional",
-        clientId: project.clientId,
-        professionalId: project.professionalId,
-      });
+      enqueueBackgroundJob(
+        "dispute.raised.notifications",
+        () =>
+          notifyDisputeRaised({
+            disputeId: dispute.id,
+            trackingId: project.id,
+            jobTitle: job?.title ?? null,
+            issueType: input.issueType,
+            reporterRole: session.role as "CLIENT" | "PROFESSIONAL",
+            reporterName: reporter
+              ? `${reporter.firstName} ${reporter.lastName}`.trim()
+              : session.role === "CLIENT"
+                ? "The client"
+                : "The professional",
+            clientId: project.clientId,
+            professionalId: project.professionalId,
+          }),
+        { disputeId: dispute.id, trackingId: project.id },
+      );
       return NextResponse.json({ ok: true, disputeId: dispute.id });
     }
     return NextResponse.json({ ok: true });

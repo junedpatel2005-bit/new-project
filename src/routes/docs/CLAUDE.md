@@ -27,7 +27,7 @@ Launch market **India**, currency **INR**, English only. Launch category **IT**,
 | ORM          | Prisma                                                                  |
 | Auth         | Own JWT — access + refresh, RS256. **Not NextAuth. Not Supabase Auth.** |
 | Storage      | Supabase Storage, private buckets, signed URLs                          |
-| Payments     | Razorpay Checkout + Route, escrow                                      |
+| Payments     | Razorpay Checkout + Route, escrow                                       |
 | Maps         | **Google Maps** — Maps JS, Places, Geocoding, Distance Matrix           |
 | SMS/OTP      | Twilio                                                                  |
 | Email        | SMTP — Mailtrap in dev, SendGrid in production                          |
