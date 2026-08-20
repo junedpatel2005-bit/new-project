@@ -14,6 +14,7 @@ import { requestPhoneOtp, verifyPhoneOtp } from "@/lib/phone-otp-provider";
 import { clearRateLimit, rateLimit } from "@/lib/rate-limit";
 import { sendAuthEmail } from "@/lib/email";
 import { enqueueBackgroundJob } from "@/lib/background-jobs";
+import { logServerError } from "@/lib/server-logger";
 import {
   notifyAdminsOfNewAccount,
   notifyClientsOfNewProfessional,
@@ -39,6 +40,33 @@ const tokenHash = (value: string) => createHash("sha256").update(value).digest("
 const clientKey = (request: NextRequest) =>
   request.headers.get("x-forwarded-for")?.split(",")[0] ?? "local";
 const safe = (message: string, status = 400) => NextResponse.json({ error: message }, { status });
+function publicAppOrigin(request: NextRequest) {
+  const configured = process.env.APP_URL?.trim();
+  const forwardedHost = request.headers.get("x-forwarded-host")?.split(",")[0]?.trim();
+  const requestHost = forwardedHost || request.headers.get("host")?.trim();
+  const requestProtocol =
+    request.headers.get("x-forwarded-proto")?.split(",")[0]?.trim() ||
+    request.nextUrl.protocol.replace(":", "");
+
+  try {
+    if (configured) {
+      const configuredUrl = new URL(configured);
+      const configuredIsBindAddress = configuredUrl.hostname === "0.0.0.0";
+      const requestHasPublicHost = requestHost && requestHost !== "0.0.0.0:3000";
+      const configuredIsLocal = ["localhost", "127.0.0.1"].includes(configuredUrl.hostname);
+      if (!configuredIsBindAddress && (!configuredIsLocal || !requestHasPublicHost)) {
+        return configuredUrl.origin;
+      }
+    }
+  } catch {
+    // Fall through to the request host when APP_URL is malformed.
+  }
+
+  if (requestHost && requestHost !== "0.0.0.0:3000") {
+    return `${requestProtocol}://${requestHost}`;
+  }
+  return configured || request.nextUrl.origin.replace("0.0.0.0", "localhost");
+}
 async function createEmailVerificationToken(userId: number) {
   const raw = randomBytes(32).toString("hex");
   await db.apiToken.create({
@@ -51,7 +79,7 @@ async function createEmailVerificationToken(userId: number) {
   });
   return raw;
 }
-function sendEmailVerificationLink(userId: number, email: string, raw: string) {
+function sendEmailVerificationLink(userId: number, email: string, raw: string, appOrigin: string) {
   enqueueBackgroundJob(
     "email.verification",
     () =>
@@ -59,7 +87,7 @@ function sendEmailVerificationLink(userId: number, email: string, raw: string) {
         email,
         "Verify your Servio email",
         "Verify your email",
-        `${process.env.APP_URL}/verify-email?token=${raw}`,
+        `${appOrigin}/verify-email?token=${encodeURIComponent(raw)}`,
         "Verify email",
       ),
     { userId },
@@ -349,7 +377,7 @@ export async function POST(
     });
     if (user.role === "PROFESSIONAL") await notifyClientsOfNewProfessional(user);
     const raw = await createEmailVerificationToken(user.id);
-    sendEmailVerificationLink(user.id, user.email, raw);
+    sendEmailVerificationLink(user.id, user.email, raw, publicAppOrigin(request));
     const response = NextResponse.json(
       {
         success: true,
@@ -474,7 +502,7 @@ export async function POST(
           },
         }),
       ]);
-      sendEmailVerificationLink(user.id, parsed.data.email, raw);
+      sendEmailVerificationLink(user.id, parsed.data.email, raw, publicAppOrigin(request));
       return NextResponse.json({
         success: true,
         message: "Email updated. A new confirmation link has been sent.",
@@ -493,7 +521,7 @@ export async function POST(
       const user = await db.user.findUniqueOrThrow({ where: { id: session.userId } });
       if (user.emailVerifiedAt) return NextResponse.json({ success: true });
       const raw = await createEmailVerificationToken(user.id);
-      sendEmailVerificationLink(user.id, user.email, raw);
+      sendEmailVerificationLink(user.id, user.email, raw, publicAppOrigin(request));
       return NextResponse.json({ success: true });
     } catch {
       return safe("Unable to send a new verification code.", 500);
@@ -520,7 +548,7 @@ export async function POST(
             user.email,
             "Reset your Servio password",
             "Reset your password",
-            `${process.env.APP_URL}/reset-password?token=${raw}`,
+            `${publicAppOrigin(request)}/reset-password?token=${encodeURIComponent(raw)}`,
             "Reset password",
           ),
         { userId: user.id },
@@ -566,31 +594,39 @@ export async function POST(
     return NextResponse.json({ success: true, token: raw });
   }
   if (action === "verify-email") {
-    const parsed = z.object({ token: z.string().min(32) }).safeParse(body);
-    if (!parsed.success) return safe("This verification link is invalid or has expired.");
-    const verification = await db.apiToken.findFirst({
-      where: {
-        tokenHash: tokenHash(parsed.data.token),
-        kind: "EMAIL_VERIFICATION",
-        usedAt: null,
-        expiresAt: { gt: new Date() },
-      },
-    });
-    if (!verification) return safe("This verification link is invalid or has expired.");
-    const [, user] = await db.$transaction([
-      db.apiToken.update({ where: { id: verification.id }, data: { usedAt: new Date() } }),
-      db.user.update({ where: { id: verification.userId }, data: { emailVerifiedAt: new Date() } }),
-    ]);
-    const response = NextResponse.json({
-      success: true,
-      redirect: user.role === "CLIENT" ? "/client-profile" : "/professional-home",
-    });
-    response.cookies.set(
-      sessionCookie,
-      await createSession({ userId: user.id, role: user.role }),
-      sessionOptions,
-    );
-    return response;
+    try {
+      const parsed = z.object({ token: z.string().min(32) }).safeParse(body);
+      if (!parsed.success) return safe("This verification link is invalid or has expired.");
+      const verification = await db.apiToken.findFirst({
+        where: {
+          tokenHash: tokenHash(parsed.data.token),
+          kind: "EMAIL_VERIFICATION",
+          usedAt: null,
+          expiresAt: { gt: new Date() },
+        },
+      });
+      if (!verification) return safe("This verification link is invalid or has expired.");
+      const [, user] = await db.$transaction([
+        db.apiToken.update({ where: { id: verification.id }, data: { usedAt: new Date() } }),
+        db.user.update({
+          where: { id: verification.userId },
+          data: { emailVerifiedAt: new Date() },
+        }),
+      ]);
+      const response = NextResponse.json({
+        success: true,
+        redirect: user.role === "CLIENT" ? "/client-profile" : "/professional-home",
+      });
+      response.cookies.set(
+        sessionCookie,
+        await createSession({ userId: user.id, role: user.role }),
+        sessionOptions,
+      );
+      return response;
+    } catch (error) {
+      logServerError("auth.email_verification.failed", error);
+      return safe("Unable to verify your email right now. Please request a new link.", 500);
+    }
   }
   if (action === "reset-password") {
     const parsed = z

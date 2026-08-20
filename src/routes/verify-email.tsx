@@ -28,7 +28,13 @@ function VerifyEmailContent() {
       body: JSON.stringify({ token }),
     })
       .then(async (response) => {
-        const result = (await response.json()) as { error?: string; redirect?: string };
+        const body = await response.text();
+        let result: { error?: string; redirect?: string } = {};
+        try {
+          result = JSON.parse(body) as { error?: string; redirect?: string };
+        } catch {
+          result.error = `Verification request failed (${response.status}).`;
+        }
         if (!response.ok) {
           setStatus("error");
           setError(result.error ?? "This verification link is invalid or has expired.");

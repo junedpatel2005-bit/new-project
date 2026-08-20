@@ -89,12 +89,8 @@ export default function Login() {
       footer={
         <>
           Don&apos;t have an account?{" "}
-          <Link href="/signup?role=client" className="text-primary hover:underline">
-            Sign up as a client
-          </Link>{" "}
-          or{" "}
-          <Link href="/signup?role=pro" className="text-primary hover:underline">
-            Sign up as a professional
+          <Link href="/signup" className="text-primary hover:underline">
+            Sign up
           </Link>
         </>
       }

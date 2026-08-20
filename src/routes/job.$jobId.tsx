@@ -16,6 +16,7 @@ import {
   Star,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { SiteHeader } from "@/components/SiteHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -110,6 +111,22 @@ type JobProposal = {
   } | null;
 };
 type JobHireRequest = JobProposal;
+
+function JobShell({
+  children,
+  viewerRole,
+}: {
+  children: React.ReactNode;
+  viewerRole: "CLIENT" | "PROFESSIONAL" | null;
+}) {
+  if (viewerRole) return <AppShell>{children}</AppShell>;
+  return (
+    <div className="min-h-screen bg-background">
+      <SiteHeader />
+      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">{children}</main>
+    </div>
+  );
+}
 
 function fromMarketplace(job: MarketplaceJob): ViewJob {
   return {
@@ -416,25 +433,25 @@ export default function JobDetails() {
   }
   if (status === "loading")
     return (
-      <AppShell>
+      <JobShell viewerRole={viewerRole}>
         <div className="h-96 animate-pulse rounded-2xl bg-muted" />
-      </AppShell>
+      </JobShell>
     );
   if (status === "missing")
     return (
-      <AppShell>
+      <JobShell viewerRole={viewerRole}>
         <p className="rounded-xl border border-border bg-card p-6 text-muted-foreground">
           This job is no longer available.
         </p>
-      </AppShell>
+      </JobShell>
     );
   if (status === "error" || !job)
     return (
-      <AppShell>
+      <JobShell viewerRole={viewerRole}>
         <p className="rounded-xl border border-destructive/30 bg-destructive/5 p-6 text-destructive">
           The job could not be loaded. Please try again.
         </p>
-      </AppShell>
+      </JobShell>
     );
 
   const isOwner = !job.client;
@@ -443,7 +460,7 @@ export default function JobDetails() {
   const isDeadlinePassed = job.deadline ? new Date(job.deadline) < new Date() : false;
 
   return (
-    <AppShell>
+    <JobShell viewerRole={viewerRole}>
       <article className="mx-auto max-w-4xl rounded-2xl border border-border bg-card p-6 shadow-soft sm:p-8">
         <div className="flex flex-wrap gap-2 text-xs">
           <span className="rounded-full bg-primary/10 px-3 py-1 text-primary">{job.category}</span>
@@ -1300,6 +1317,6 @@ export default function JobDetails() {
           </div>
         </DialogContent>
       </Dialog>
-    </AppShell>
+    </JobShell>
   );
 }
