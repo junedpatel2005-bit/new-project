@@ -6,8 +6,9 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
+import { db } from "@/lib/db";
 
-const groups = [
+const fallbackGroups = [
   {
     title: "General",
     items: [
@@ -58,7 +59,22 @@ const groups = [
   },
 ];
 
-export default function FAQ() {
+export default async function FAQ() {
+  const faqs = await db.faq.findMany({
+    where: { status: "PUBLISHED" },
+    orderBy: [{ displayOrder: "asc" }, { id: "asc" }],
+  });
+  const groupOrder: string[] = [];
+  const groupsByTitle = new Map<string, { title: string; items: { q: string; a: string }[] }>();
+  for (const faq of faqs) {
+    const title = faq.category?.trim() || "General";
+    if (!groupsByTitle.has(title)) {
+      groupOrder.push(title);
+      groupsByTitle.set(title, { title, items: [] });
+    }
+    groupsByTitle.get(title)!.items.push({ q: faq.question, a: faq.answer });
+  }
+  const groups = faqs.length ? groupOrder.map((title) => groupsByTitle.get(title)!) : fallbackGroups;
   return (
     <div className="min-h-screen bg-background">
       <main>

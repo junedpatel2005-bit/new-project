@@ -29,24 +29,30 @@ export type AggregateProjectWithdrawal = {
 export type ProjectWithdrawalAvgAggregateOutputType = {
   id: number | null
   professionalId: number | null
+  paymentId: number | null
   amount: number | null
 }
 
 export type ProjectWithdrawalSumAggregateOutputType = {
   id: number | null
   professionalId: number | null
+  paymentId: number | null
   amount: number | null
 }
 
 export type ProjectWithdrawalMinAggregateOutputType = {
   id: number | null
   professionalId: number | null
+  paymentId: number | null
   amount: number | null
   currency: string | null
   destinationType: string | null
   destinationLabel: string | null
   status: string | null
   note: string | null
+  providerTransferId: string | null
+  failureReason: string | null
+  processedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -54,12 +60,16 @@ export type ProjectWithdrawalMinAggregateOutputType = {
 export type ProjectWithdrawalMaxAggregateOutputType = {
   id: number | null
   professionalId: number | null
+  paymentId: number | null
   amount: number | null
   currency: string | null
   destinationType: string | null
   destinationLabel: string | null
   status: string | null
   note: string | null
+  providerTransferId: string | null
+  failureReason: string | null
+  processedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -67,12 +77,16 @@ export type ProjectWithdrawalMaxAggregateOutputType = {
 export type ProjectWithdrawalCountAggregateOutputType = {
   id: number
   professionalId: number
+  paymentId: number
   amount: number
   currency: number
   destinationType: number
   destinationLabel: number
   status: number
   note: number
+  providerTransferId: number
+  failureReason: number
+  processedAt: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -82,24 +96,30 @@ export type ProjectWithdrawalCountAggregateOutputType = {
 export type ProjectWithdrawalAvgAggregateInputType = {
   id?: true
   professionalId?: true
+  paymentId?: true
   amount?: true
 }
 
 export type ProjectWithdrawalSumAggregateInputType = {
   id?: true
   professionalId?: true
+  paymentId?: true
   amount?: true
 }
 
 export type ProjectWithdrawalMinAggregateInputType = {
   id?: true
   professionalId?: true
+  paymentId?: true
   amount?: true
   currency?: true
   destinationType?: true
   destinationLabel?: true
   status?: true
   note?: true
+  providerTransferId?: true
+  failureReason?: true
+  processedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -107,12 +127,16 @@ export type ProjectWithdrawalMinAggregateInputType = {
 export type ProjectWithdrawalMaxAggregateInputType = {
   id?: true
   professionalId?: true
+  paymentId?: true
   amount?: true
   currency?: true
   destinationType?: true
   destinationLabel?: true
   status?: true
   note?: true
+  providerTransferId?: true
+  failureReason?: true
+  processedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -120,12 +144,16 @@ export type ProjectWithdrawalMaxAggregateInputType = {
 export type ProjectWithdrawalCountAggregateInputType = {
   id?: true
   professionalId?: true
+  paymentId?: true
   amount?: true
   currency?: true
   destinationType?: true
   destinationLabel?: true
   status?: true
   note?: true
+  providerTransferId?: true
+  failureReason?: true
+  processedAt?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -220,12 +248,16 @@ export type ProjectWithdrawalGroupByArgs<ExtArgs extends runtime.Types.Extension
 export type ProjectWithdrawalGroupByOutputType = {
   id: number
   professionalId: number
+  paymentId: number | null
   amount: number
   currency: string
   destinationType: string
   destinationLabel: string | null
   status: string
   note: string | null
+  providerTransferId: string | null
+  failureReason: string | null
+  processedAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: ProjectWithdrawalCountAggregateOutputType | null
@@ -256,12 +288,16 @@ export type ProjectWithdrawalWhereInput = {
   NOT?: Prisma.ProjectWithdrawalWhereInput | Prisma.ProjectWithdrawalWhereInput[]
   id?: Prisma.IntFilter<"ProjectWithdrawal"> | number
   professionalId?: Prisma.IntFilter<"ProjectWithdrawal"> | number
+  paymentId?: Prisma.IntNullableFilter<"ProjectWithdrawal"> | number | null
   amount?: Prisma.IntFilter<"ProjectWithdrawal"> | number
   currency?: Prisma.StringFilter<"ProjectWithdrawal"> | string
   destinationType?: Prisma.StringFilter<"ProjectWithdrawal"> | string
   destinationLabel?: Prisma.StringNullableFilter<"ProjectWithdrawal"> | string | null
   status?: Prisma.StringFilter<"ProjectWithdrawal"> | string
   note?: Prisma.StringNullableFilter<"ProjectWithdrawal"> | string | null
+  providerTransferId?: Prisma.StringNullableFilter<"ProjectWithdrawal"> | string | null
+  failureReason?: Prisma.StringNullableFilter<"ProjectWithdrawal"> | string | null
+  processedAt?: Prisma.DateTimeNullableFilter<"ProjectWithdrawal"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"ProjectWithdrawal"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ProjectWithdrawal"> | Date | string
 }
@@ -269,12 +305,16 @@ export type ProjectWithdrawalWhereInput = {
 export type ProjectWithdrawalOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   professionalId?: Prisma.SortOrder
+  paymentId?: Prisma.SortOrderInput | Prisma.SortOrder
   amount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   destinationType?: Prisma.SortOrder
   destinationLabel?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   note?: Prisma.SortOrderInput | Prisma.SortOrder
+  providerTransferId?: Prisma.SortOrderInput | Prisma.SortOrder
+  failureReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  processedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -285,12 +325,16 @@ export type ProjectWithdrawalWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.ProjectWithdrawalWhereInput[]
   NOT?: Prisma.ProjectWithdrawalWhereInput | Prisma.ProjectWithdrawalWhereInput[]
   professionalId?: Prisma.IntFilter<"ProjectWithdrawal"> | number
+  paymentId?: Prisma.IntNullableFilter<"ProjectWithdrawal"> | number | null
   amount?: Prisma.IntFilter<"ProjectWithdrawal"> | number
   currency?: Prisma.StringFilter<"ProjectWithdrawal"> | string
   destinationType?: Prisma.StringFilter<"ProjectWithdrawal"> | string
   destinationLabel?: Prisma.StringNullableFilter<"ProjectWithdrawal"> | string | null
   status?: Prisma.StringFilter<"ProjectWithdrawal"> | string
   note?: Prisma.StringNullableFilter<"ProjectWithdrawal"> | string | null
+  providerTransferId?: Prisma.StringNullableFilter<"ProjectWithdrawal"> | string | null
+  failureReason?: Prisma.StringNullableFilter<"ProjectWithdrawal"> | string | null
+  processedAt?: Prisma.DateTimeNullableFilter<"ProjectWithdrawal"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"ProjectWithdrawal"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ProjectWithdrawal"> | Date | string
 }, "id">
@@ -298,12 +342,16 @@ export type ProjectWithdrawalWhereUniqueInput = Prisma.AtLeast<{
 export type ProjectWithdrawalOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   professionalId?: Prisma.SortOrder
+  paymentId?: Prisma.SortOrderInput | Prisma.SortOrder
   amount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   destinationType?: Prisma.SortOrder
   destinationLabel?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   note?: Prisma.SortOrderInput | Prisma.SortOrder
+  providerTransferId?: Prisma.SortOrderInput | Prisma.SortOrder
+  failureReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  processedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ProjectWithdrawalCountOrderByAggregateInput
@@ -319,24 +367,32 @@ export type ProjectWithdrawalScalarWhereWithAggregatesInput = {
   NOT?: Prisma.ProjectWithdrawalScalarWhereWithAggregatesInput | Prisma.ProjectWithdrawalScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"ProjectWithdrawal"> | number
   professionalId?: Prisma.IntWithAggregatesFilter<"ProjectWithdrawal"> | number
+  paymentId?: Prisma.IntNullableWithAggregatesFilter<"ProjectWithdrawal"> | number | null
   amount?: Prisma.IntWithAggregatesFilter<"ProjectWithdrawal"> | number
   currency?: Prisma.StringWithAggregatesFilter<"ProjectWithdrawal"> | string
   destinationType?: Prisma.StringWithAggregatesFilter<"ProjectWithdrawal"> | string
   destinationLabel?: Prisma.StringNullableWithAggregatesFilter<"ProjectWithdrawal"> | string | null
   status?: Prisma.StringWithAggregatesFilter<"ProjectWithdrawal"> | string
   note?: Prisma.StringNullableWithAggregatesFilter<"ProjectWithdrawal"> | string | null
+  providerTransferId?: Prisma.StringNullableWithAggregatesFilter<"ProjectWithdrawal"> | string | null
+  failureReason?: Prisma.StringNullableWithAggregatesFilter<"ProjectWithdrawal"> | string | null
+  processedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ProjectWithdrawal"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ProjectWithdrawal"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"ProjectWithdrawal"> | Date | string
 }
 
 export type ProjectWithdrawalCreateInput = {
   professionalId: number
+  paymentId?: number | null
   amount: number
   currency?: string
   destinationType: string
   destinationLabel?: string | null
   status?: string
   note?: string | null
+  providerTransferId?: string | null
+  failureReason?: string | null
+  processedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -344,24 +400,32 @@ export type ProjectWithdrawalCreateInput = {
 export type ProjectWithdrawalUncheckedCreateInput = {
   id?: number
   professionalId: number
+  paymentId?: number | null
   amount: number
   currency?: string
   destinationType: string
   destinationLabel?: string | null
   status?: string
   note?: string | null
+  providerTransferId?: string | null
+  failureReason?: string | null
+  processedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
 export type ProjectWithdrawalUpdateInput = {
   professionalId?: Prisma.IntFieldUpdateOperationsInput | number
+  paymentId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   destinationType?: Prisma.StringFieldUpdateOperationsInput | string
   destinationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerTransferId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  processedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -369,12 +433,16 @@ export type ProjectWithdrawalUpdateInput = {
 export type ProjectWithdrawalUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   professionalId?: Prisma.IntFieldUpdateOperationsInput | number
+  paymentId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   destinationType?: Prisma.StringFieldUpdateOperationsInput | string
   destinationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerTransferId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  processedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -382,24 +450,32 @@ export type ProjectWithdrawalUncheckedUpdateInput = {
 export type ProjectWithdrawalCreateManyInput = {
   id?: number
   professionalId: number
+  paymentId?: number | null
   amount: number
   currency?: string
   destinationType: string
   destinationLabel?: string | null
   status?: string
   note?: string | null
+  providerTransferId?: string | null
+  failureReason?: string | null
+  processedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
 export type ProjectWithdrawalUpdateManyMutationInput = {
   professionalId?: Prisma.IntFieldUpdateOperationsInput | number
+  paymentId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   destinationType?: Prisma.StringFieldUpdateOperationsInput | string
   destinationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerTransferId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  processedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -407,12 +483,16 @@ export type ProjectWithdrawalUpdateManyMutationInput = {
 export type ProjectWithdrawalUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   professionalId?: Prisma.IntFieldUpdateOperationsInput | number
+  paymentId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   destinationType?: Prisma.StringFieldUpdateOperationsInput | string
   destinationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerTransferId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  processedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -420,12 +500,16 @@ export type ProjectWithdrawalUncheckedUpdateManyInput = {
 export type ProjectWithdrawalCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   professionalId?: Prisma.SortOrder
+  paymentId?: Prisma.SortOrder
   amount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   destinationType?: Prisma.SortOrder
   destinationLabel?: Prisma.SortOrder
   status?: Prisma.SortOrder
   note?: Prisma.SortOrder
+  providerTransferId?: Prisma.SortOrder
+  failureReason?: Prisma.SortOrder
+  processedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -433,18 +517,23 @@ export type ProjectWithdrawalCountOrderByAggregateInput = {
 export type ProjectWithdrawalAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
   professionalId?: Prisma.SortOrder
+  paymentId?: Prisma.SortOrder
   amount?: Prisma.SortOrder
 }
 
 export type ProjectWithdrawalMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   professionalId?: Prisma.SortOrder
+  paymentId?: Prisma.SortOrder
   amount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   destinationType?: Prisma.SortOrder
   destinationLabel?: Prisma.SortOrder
   status?: Prisma.SortOrder
   note?: Prisma.SortOrder
+  providerTransferId?: Prisma.SortOrder
+  failureReason?: Prisma.SortOrder
+  processedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -452,12 +541,16 @@ export type ProjectWithdrawalMaxOrderByAggregateInput = {
 export type ProjectWithdrawalMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   professionalId?: Prisma.SortOrder
+  paymentId?: Prisma.SortOrder
   amount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   destinationType?: Prisma.SortOrder
   destinationLabel?: Prisma.SortOrder
   status?: Prisma.SortOrder
   note?: Prisma.SortOrder
+  providerTransferId?: Prisma.SortOrder
+  failureReason?: Prisma.SortOrder
+  processedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -465,6 +558,7 @@ export type ProjectWithdrawalMinOrderByAggregateInput = {
 export type ProjectWithdrawalSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   professionalId?: Prisma.SortOrder
+  paymentId?: Prisma.SortOrder
   amount?: Prisma.SortOrder
 }
 
@@ -473,12 +567,16 @@ export type ProjectWithdrawalSumOrderByAggregateInput = {
 export type ProjectWithdrawalSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   professionalId?: boolean
+  paymentId?: boolean
   amount?: boolean
   currency?: boolean
   destinationType?: boolean
   destinationLabel?: boolean
   status?: boolean
   note?: boolean
+  providerTransferId?: boolean
+  failureReason?: boolean
+  processedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["projectWithdrawal"]>
@@ -486,12 +584,16 @@ export type ProjectWithdrawalSelect<ExtArgs extends runtime.Types.Extensions.Int
 export type ProjectWithdrawalSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   professionalId?: boolean
+  paymentId?: boolean
   amount?: boolean
   currency?: boolean
   destinationType?: boolean
   destinationLabel?: boolean
   status?: boolean
   note?: boolean
+  providerTransferId?: boolean
+  failureReason?: boolean
+  processedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["projectWithdrawal"]>
@@ -499,12 +601,16 @@ export type ProjectWithdrawalSelectCreateManyAndReturn<ExtArgs extends runtime.T
 export type ProjectWithdrawalSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   professionalId?: boolean
+  paymentId?: boolean
   amount?: boolean
   currency?: boolean
   destinationType?: boolean
   destinationLabel?: boolean
   status?: boolean
   note?: boolean
+  providerTransferId?: boolean
+  failureReason?: boolean
+  processedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["projectWithdrawal"]>
@@ -512,17 +618,21 @@ export type ProjectWithdrawalSelectUpdateManyAndReturn<ExtArgs extends runtime.T
 export type ProjectWithdrawalSelectScalar = {
   id?: boolean
   professionalId?: boolean
+  paymentId?: boolean
   amount?: boolean
   currency?: boolean
   destinationType?: boolean
   destinationLabel?: boolean
   status?: boolean
   note?: boolean
+  providerTransferId?: boolean
+  failureReason?: boolean
+  processedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ProjectWithdrawalOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "professionalId" | "amount" | "currency" | "destinationType" | "destinationLabel" | "status" | "note" | "createdAt" | "updatedAt", ExtArgs["result"]["projectWithdrawal"]>
+export type ProjectWithdrawalOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "professionalId" | "paymentId" | "amount" | "currency" | "destinationType" | "destinationLabel" | "status" | "note" | "providerTransferId" | "failureReason" | "processedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["projectWithdrawal"]>
 
 export type $ProjectWithdrawalPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "ProjectWithdrawal"
@@ -530,12 +640,16 @@ export type $ProjectWithdrawalPayload<ExtArgs extends runtime.Types.Extensions.I
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     professionalId: number
+    paymentId: number | null
     amount: number
     currency: string
     destinationType: string
     destinationLabel: string | null
     status: string
     note: string | null
+    providerTransferId: string | null
+    failureReason: string | null
+    processedAt: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["projectWithdrawal"]>
@@ -963,12 +1077,16 @@ export interface Prisma__ProjectWithdrawalClient<T, Null = never, ExtArgs extend
 export interface ProjectWithdrawalFieldRefs {
   readonly id: Prisma.FieldRef<"ProjectWithdrawal", 'Int'>
   readonly professionalId: Prisma.FieldRef<"ProjectWithdrawal", 'Int'>
+  readonly paymentId: Prisma.FieldRef<"ProjectWithdrawal", 'Int'>
   readonly amount: Prisma.FieldRef<"ProjectWithdrawal", 'Int'>
   readonly currency: Prisma.FieldRef<"ProjectWithdrawal", 'String'>
   readonly destinationType: Prisma.FieldRef<"ProjectWithdrawal", 'String'>
   readonly destinationLabel: Prisma.FieldRef<"ProjectWithdrawal", 'String'>
   readonly status: Prisma.FieldRef<"ProjectWithdrawal", 'String'>
   readonly note: Prisma.FieldRef<"ProjectWithdrawal", 'String'>
+  readonly providerTransferId: Prisma.FieldRef<"ProjectWithdrawal", 'String'>
+  readonly failureReason: Prisma.FieldRef<"ProjectWithdrawal", 'String'>
+  readonly processedAt: Prisma.FieldRef<"ProjectWithdrawal", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"ProjectWithdrawal", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"ProjectWithdrawal", 'DateTime'>
 }

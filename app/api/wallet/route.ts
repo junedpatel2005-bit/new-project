@@ -30,6 +30,13 @@ export async function GET(request: NextRequest) {
           where: { clientId: session.userId, status: "COMPLETED" },
           _sum: { amount: true },
         });
+  const commission =
+    session.role === "PROFESSIONAL"
+      ? await db.payment.aggregate({
+          where: { professionalId: session.userId, status: "COMPLETED" },
+          _sum: { commissionAmount: true },
+        })
+      : null;
   const withdrawals =
     session.role === "PROFESSIONAL"
       ? await db.projectWithdrawal.aggregate({
@@ -47,11 +54,18 @@ export async function GET(request: NextRequest) {
       : [];
   const available =
     session.role === "PROFESSIONAL"
-      ? Math.max(0, (earned._sum.amount ?? 0) - (withdrawals?._sum.amount ?? 0))
+      ? Math.max(
+          0,
+          (earned._sum.amount ?? 0) -
+            (commission?._sum.commissionAmount ?? 0) -
+            (withdrawals?._sum.amount ?? 0),
+        )
       : 0;
   return NextResponse.json({
     wallet,
-    total: earned._sum.amount ?? 0,
+    total: Math.max(0, (earned._sum.amount ?? 0) - (commission?._sum.commissionAmount ?? 0)),
+    grossTotal: earned._sum.amount ?? 0,
+    commission: commission?._sum.commissionAmount ?? 0,
     available,
     reserved: withdrawals?._sum.amount ?? 0,
     withdrawals: withdrawalHistory,
@@ -76,11 +90,20 @@ export async function POST(request: NextRequest) {
     where: { professionalId: session.userId, status: "COMPLETED" },
     _sum: { amount: true },
   });
+  const commission = await db.payment.aggregate({
+    where: { professionalId: session.userId, status: "COMPLETED" },
+    _sum: { commissionAmount: true },
+  });
   const reserved = await db.projectWithdrawal.aggregate({
     where: { professionalId: session.userId, status: { in: ["PENDING", "COMPLETED"] } },
     _sum: { amount: true },
   });
-  const available = Math.max(0, (earned._sum.amount ?? 0) - (reserved._sum.amount ?? 0));
+  const available = Math.max(
+    0,
+    (earned._sum.amount ?? 0) -
+      (commission._sum.commissionAmount ?? 0) -
+      (reserved._sum.amount ?? 0),
+  );
   if (parsed.data.amount > available)
     return NextResponse.json(
       { error: "Withdrawal amount exceeds your available balance." },

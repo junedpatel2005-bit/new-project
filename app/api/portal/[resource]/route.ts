@@ -38,15 +38,35 @@ export async function GET(
     if (resource === "earnings") {
       if (!["PROFESSIONAL", "CLIENT"].includes(session.role))
         return NextResponse.json({ error: "Account access required." }, { status: 403 });
+      const transactions = await db.projectTransaction.findMany({
+        where:
+          session.role === "PROFESSIONAL"
+            ? { professionalId: session.userId }
+            : { clientId: session.userId },
+        orderBy: { createdAt: "desc" },
+        take: 50,
+      });
+      const payments = await db.payment.findMany({
+        where: {
+          milestoneId: {
+            in: transactions
+              .map((transaction) => transaction.milestoneId)
+              .filter((id): id is number => id !== null),
+          },
+          status: "COMPLETED",
+        },
+        select: { id: true, milestoneId: true },
+      });
+      const paymentByMilestone = new Map(
+        payments.map((payment) => [payment.milestoneId, payment.id]),
+      );
       return NextResponse.json(
-        await db.projectTransaction.findMany({
-          where:
-            session.role === "PROFESSIONAL"
-              ? { professionalId: session.userId }
-              : { clientId: session.userId },
-          orderBy: { createdAt: "desc" },
-          take: 50,
-        }),
+        transactions.map((transaction) => ({
+          ...transaction,
+          invoicePaymentId: transaction.milestoneId
+            ? (paymentByMilestone.get(transaction.milestoneId) ?? null)
+            : null,
+        })),
       );
     }
     if (resource === "messages")
@@ -507,7 +527,10 @@ export async function GET(
         }),
         db.projectReview.findUnique({ where: { trackingId: project.id } }),
         db.projectDispute.findFirst({
-          where: { trackingId: project.id, reporterId: session.userId },
+          where: {
+            trackingId: project.id,
+            OR: [{ reporterId: project.clientId }, { reporterId: project.professionalId }],
+          },
           orderBy: { createdAt: "desc" },
         }),
       ]);

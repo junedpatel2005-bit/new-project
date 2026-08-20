@@ -1,6 +1,59 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { db } from "@/lib/db";
 import { sessionCookie, verifySession } from "@/lib/auth";
+
+async function requireAdmin(request: NextRequest) {
+  const token = request.cookies.get(sessionCookie)?.value;
+  if (!token) return false;
+  try {
+    return (await verifySession(token)).role === "ADMIN";
+  } catch {
+    return false;
+  }
+}
+
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  if (!(await requireAdmin(request)))
+    return NextResponse.json({ error: "Admin access required." }, { status: 403 });
+  const { id } = await params;
+  const jobId = Number(id);
+  if (!Number.isInteger(jobId) || jobId < 1)
+    return NextResponse.json({ error: "Invalid job ID." }, { status: 400 });
+  const parsed = z
+    .object({ status: z.enum(["OPEN", "CLOSED"]) })
+    .safeParse(await request.json().catch(() => null));
+  if (!parsed.success)
+    return NextResponse.json({ error: "Invalid job update." }, { status: 400 });
+  try {
+    const job = await db.clientJob.update({
+      where: { id: jobId },
+      data: { status: parsed.data.status },
+      select: { id: true, status: true },
+    });
+    return NextResponse.json({ job });
+  } catch {
+    return NextResponse.json({ error: "Unable to update job." }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  if (!(await requireAdmin(request)))
+    return NextResponse.json({ error: "Admin access required." }, { status: 403 });
+  const { id } = await params;
+  const jobId = Number(id);
+  if (!Number.isInteger(jobId) || jobId < 1)
+    return NextResponse.json({ error: "Invalid job ID." }, { status: 400 });
+  try {
+    await db.clientJob.delete({ where: { id: jobId } });
+    return NextResponse.json({ ok: true });
+  } catch {
+    return NextResponse.json(
+      { error: "Unable to delete job. It may have related records." },
+      { status: 500 },
+    );
+  }
+}
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const token = request.cookies.get(sessionCookie)?.value;

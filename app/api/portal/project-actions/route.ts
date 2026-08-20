@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { sessionCookie, verifySession } from "@/lib/auth";
+import { isRazorpayConfigured } from "@/lib/razorpay";
+import { notifyDisputeRaised } from "@/lib/marketplace-notifications";
 
 const attachmentIds = z.array(z.number().int().positive()).min(1).max(10);
 
@@ -330,6 +332,14 @@ export async function POST(request: NextRequest) {
       });
     }
     if (input.action === "approve-milestone") {
+      if (isRazorpayConfigured())
+        return NextResponse.json(
+          {
+            error: "Online payment is required before approving this milestone.",
+            paymentRequired: true,
+          },
+          { status: 402 },
+        );
       const milestone = await db.projectMilestone.findFirst({
         where: { id: input.milestoneId, trackingId: project.id, status: "AWAITING_CLIENT_REVIEW" },
       });
@@ -509,6 +519,29 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: true });
     }
     if (input.action === "submit-dispute") {
+      if (
+        ![
+          "READY_TO_START",
+          "IN_PROGRESS",
+          "AWAITING_CLIENT_REVIEW",
+          "REVISION_REQUESTED",
+          "FINAL_WORK_SUBMITTED",
+          "COMPLETED",
+          "CLOSED",
+        ].includes(project.status)
+      )
+        return NextResponse.json(
+          { error: "A dispute can only be raised while the project is active or closed." },
+          { status: 409 },
+        );
+      const existingOpenDispute = await db.projectDispute.findFirst({
+        where: { trackingId: project.id, status: "OPEN" },
+      });
+      if (existingOpenDispute)
+        return NextResponse.json(
+          { error: "This project already has an open dispute." },
+          { status: 409 },
+        );
       const dispute = await db.projectDispute.create({
         data: {
           trackingId: project.id,
@@ -527,6 +560,27 @@ export async function POST(request: NextRequest) {
         "Dispute raised",
         `Issue type: ${input.issueType}. ${input.message}`,
       );
+      const [job, reporter] = await Promise.all([
+        db.clientJob.findUnique({ where: { id: project.jobId }, select: { title: true } }),
+        db.user.findUnique({
+          where: { id: session.userId },
+          select: { firstName: true, lastName: true },
+        }),
+      ]);
+      await notifyDisputeRaised({
+        disputeId: dispute.id,
+        trackingId: project.id,
+        jobTitle: job?.title ?? null,
+        issueType: input.issueType,
+        reporterRole: session.role as "CLIENT" | "PROFESSIONAL",
+        reporterName: reporter
+          ? `${reporter.firstName} ${reporter.lastName}`.trim()
+          : session.role === "CLIENT"
+            ? "The client"
+            : "The professional",
+        clientId: project.clientId,
+        professionalId: project.professionalId,
+      });
       return NextResponse.json({ ok: true, disputeId: dispute.id });
     }
     return NextResponse.json({ ok: true });

@@ -17,21 +17,38 @@ export async function GET(request: NextRequest) {
   try {
     if (!(await admin(request)))
       return NextResponse.json({ error: "Admin access required." }, { status: 403 });
-    const verifications = await db.professionalVerification.findMany({
-      where: { status: { in: ["PENDING", "REJECTED"] } },
-      include: {
-        user: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            email: true,
-            professionalCategory: true,
+    const [verifications, personaVerifications] = await Promise.all([
+      db.professionalVerification.findMany({
+        where: { status: { in: ["PENDING", "REJECTED"] } },
+        include: {
+          user: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+              professionalCategory: true,
+            },
           },
         },
-      },
-      orderBy: { updatedAt: "desc" },
-    });
+        orderBy: { updatedAt: "desc" },
+      }),
+      db.personaVerification.findMany({
+        where: { adminStatus: "PENDING" },
+        include: {
+          user: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+              professionalCategory: true,
+            },
+          },
+        },
+        orderBy: { updatedAt: "desc" },
+      }),
+    ]);
     const reviews = await db.verificationDocumentReview.findMany({
       where: { userId: { in: verifications.map((item) => item.userId) } },
     });
@@ -40,6 +57,7 @@ export async function GET(request: NextRequest) {
         ...item,
         reviews: reviews.filter((review) => review.userId === item.userId),
       })),
+      personaVerifications,
     });
   } catch (error) {
     console.error("admin.verifications.load.failed", error);
@@ -56,6 +74,7 @@ export async function PATCH(request: NextRequest) {
     .object({
       userId: z.number().int().positive(),
       status: z.enum(["APPROVED", "REJECTED"]),
+      providerInquiryId: z.string().optional(),
       documentKey: z
         .enum(["governmentIdUrl", "licenseUrl", "certificationsJson", "insuranceUrl", "selfieUrl"])
         .optional(),
@@ -63,6 +82,18 @@ export async function PATCH(request: NextRequest) {
     .safeParse(await request.json().catch(() => null));
   if (!parsed.success)
     return NextResponse.json({ error: "Invalid verification decision." }, { status: 400 });
+  const currentAdmin = await admin(request);
+  if (parsed.data.providerInquiryId) {
+    const result = await db.personaVerification.update({
+      where: { providerInquiryId: parsed.data.providerInquiryId },
+      data: {
+        adminStatus: parsed.data.status,
+        reviewedBy: currentAdmin!.userId,
+        reviewedAt: new Date(),
+      },
+    });
+    return NextResponse.json({ personaVerification: result });
+  }
   if (parsed.data.documentKey) {
     const review = await db.verificationDocumentReview.upsert({
       where: {

@@ -26,6 +26,12 @@ type Verification = {
 };
 type Review = { documentKey: Field; status: "APPROVED" | "REJECTED" };
 type Field = "governmentIdUrl" | "licenseUrl" | "certificationsJson" | "insuranceUrl" | "selfieUrl";
+type PersonaState = {
+  enabled: boolean;
+  message?: string;
+  providerStatus?: string;
+  inquiryId?: string;
+};
 
 const items: {
   field: Field;
@@ -80,6 +86,8 @@ export default function Verification() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [persona, setPersona] = useState<PersonaState | null>(null);
+  const [startingPersona, setStartingPersona] = useState(false);
   useEffect(() => {
     void fetch("/api/v1/professional/verification", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : Promise.reject()))
@@ -97,6 +105,11 @@ export default function Verification() {
       })
       .catch(() => setMessage("Verification details could not be loaded."))
       .finally(() => setLoading(false));
+  }, []);
+  useEffect(() => {
+    void fetch("/api/verification/persona/status", { cache: "no-store" })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data: PersonaState | null) => setPersona(data));
   }, []);
   const uploaded = useMemo(
     () => items.filter((item) => Boolean(values[item.field])).length,
@@ -139,6 +152,21 @@ export default function Verification() {
       setSaving(false);
     }
   }
+  async function startPersona() {
+    setStartingPersona(true);
+    try {
+      const response = await fetch("/api/verification/persona/start", { method: "POST" });
+      const data = (await response.json()) as PersonaState & { hostedUrl?: string; error?: string };
+      if (!response.ok) throw new Error(data.error ?? "Unable to start verification.");
+      setPersona(data);
+      if (data.hostedUrl) window.location.assign(data.hostedUrl);
+      else setMessage(data.message ?? "Persona flow is not currently available.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Unable to start verification.");
+    } finally {
+      setStartingPersona(false);
+    }
+  }
   return (
     <div className="space-y-7">
       <section className="relative overflow-hidden rounded-3xl bg-[linear-gradient(120deg,var(--color-ink),var(--color-primary))] px-6 py-7 text-white shadow-card sm:px-8">
@@ -173,6 +201,32 @@ export default function Verification() {
         </AppSkeleton>
       ) : (
         <>
+          <section className="rounded-2xl border border-border bg-card p-5 shadow-soft">
+            <h2 className="font-display text-xl font-semibold">Document Verification</h2>
+            {persona?.enabled ? (
+              <>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Complete your identity document verification securely with Persona.
+                </p>
+                <Button
+                  className="mt-4"
+                  disabled={startingPersona}
+                  onClick={() => void startPersona()}
+                >
+                  {startingPersona ? "Starting…" : "Start Verification"}
+                </Button>
+                {persona.providerStatus && (
+                  <p className="mt-3 text-sm text-muted-foreground">
+                    Persona status: {persona.providerStatus}
+                  </p>
+                )}
+              </>
+            ) : (
+              <p className="mt-1 text-sm text-muted-foreground">
+                Verification service is currently unavailable/configuration pending.
+              </p>
+            )}
+          </section>
           <section className="rounded-2xl border border-border bg-card p-5 shadow-soft">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>

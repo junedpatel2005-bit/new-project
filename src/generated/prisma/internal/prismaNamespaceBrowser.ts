@@ -88,15 +88,20 @@ export const ModelName = {
   UserNotification: 'UserNotification',
   UserNotificationState: 'UserNotificationState',
   Payment: 'Payment',
+  RazorpayWebhookEvent: 'RazorpayWebhookEvent',
   Wallet: 'Wallet',
   WalletTransaction: 'WalletTransaction',
   ProjectWithdrawal: 'ProjectWithdrawal',
+  Invoice: 'Invoice',
   ProjectDispute: 'ProjectDispute',
+  ProjectDisputeMessage: 'ProjectDisputeMessage',
   ProjectCompletionRequest: 'ProjectCompletionRequest',
   ProjectRevisionRequest: 'ProjectRevisionRequest',
   ProjectReviewRequest: 'ProjectReviewRequest',
   ProfessionalVerification: 'ProfessionalVerification',
   VerificationDocumentReview: 'VerificationDocumentReview',
+  PersonaVerification: 'PersonaVerification',
+  PersonaWebhookEvent: 'PersonaWebhookEvent',
   StoredFile: 'StoredFile',
   AuditLog: 'AuditLog',
   ApiToken: 'ApiToken',
@@ -284,6 +289,7 @@ export const UserScalarFieldEnum = {
   biometricType: 'biometricType',
   browserNotificationsEnabled: 'browserNotificationsEnabled',
   emailNotificationsEnabled: 'emailNotificationsEnabled',
+  razorpayAccountId: 'razorpayAccountId',
   emailVerifiedAt: 'emailVerifiedAt',
   phoneVerifiedAt: 'phoneVerifiedAt',
   projectActivityNotificationsEnabled: 'projectActivityNotificationsEnabled'
@@ -721,6 +727,13 @@ export const PaymentScalarFieldEnum = {
   currency: 'currency',
   provider: 'provider',
   providerReference: 'providerReference',
+  razorpayOrderId: 'razorpayOrderId',
+  razorpayPaymentId: 'razorpayPaymentId',
+  razorpaySignature: 'razorpaySignature',
+  projectTrackingId: 'projectTrackingId',
+  milestoneId: 'milestoneId',
+  capturedAt: 'capturedAt',
+  failureReason: 'failureReason',
   status: 'status',
   idempotencyKey: 'idempotencyKey',
   createdAt: 'createdAt',
@@ -728,6 +741,17 @@ export const PaymentScalarFieldEnum = {
 } as const
 
 export type PaymentScalarFieldEnum = (typeof PaymentScalarFieldEnum)[keyof typeof PaymentScalarFieldEnum]
+
+
+export const RazorpayWebhookEventScalarFieldEnum = {
+  id: 'id',
+  eventId: 'eventId',
+  eventName: 'eventName',
+  payloadJson: 'payloadJson',
+  createdAt: 'createdAt'
+} as const
+
+export type RazorpayWebhookEventScalarFieldEnum = (typeof RazorpayWebhookEventScalarFieldEnum)[keyof typeof RazorpayWebhookEventScalarFieldEnum]
 
 
 export const WalletScalarFieldEnum = {
@@ -760,17 +784,39 @@ export type WalletTransactionScalarFieldEnum = (typeof WalletTransactionScalarFi
 export const ProjectWithdrawalScalarFieldEnum = {
   id: 'id',
   professionalId: 'professionalId',
+  paymentId: 'paymentId',
   amount: 'amount',
   currency: 'currency',
   destinationType: 'destinationType',
   destinationLabel: 'destinationLabel',
   status: 'status',
   note: 'note',
+  providerTransferId: 'providerTransferId',
+  failureReason: 'failureReason',
+  processedAt: 'processedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type ProjectWithdrawalScalarFieldEnum = (typeof ProjectWithdrawalScalarFieldEnum)[keyof typeof ProjectWithdrawalScalarFieldEnum]
+
+
+export const InvoiceScalarFieldEnum = {
+  id: 'id',
+  invoiceNumber: 'invoiceNumber',
+  paymentId: 'paymentId',
+  clientId: 'clientId',
+  professionalId: 'professionalId',
+  amount: 'amount',
+  commissionAmount: 'commissionAmount',
+  netAmount: 'netAmount',
+  currency: 'currency',
+  status: 'status',
+  issuedAt: 'issuedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type InvoiceScalarFieldEnum = (typeof InvoiceScalarFieldEnum)[keyof typeof InvoiceScalarFieldEnum]
 
 
 export const ProjectDisputeScalarFieldEnum = {
@@ -790,6 +836,19 @@ export const ProjectDisputeScalarFieldEnum = {
 } as const
 
 export type ProjectDisputeScalarFieldEnum = (typeof ProjectDisputeScalarFieldEnum)[keyof typeof ProjectDisputeScalarFieldEnum]
+
+
+export const ProjectDisputeMessageScalarFieldEnum = {
+  id: 'id',
+  disputeId: 'disputeId',
+  senderId: 'senderId',
+  senderRole: 'senderRole',
+  recipientId: 'recipientId',
+  message: 'message',
+  createdAt: 'createdAt'
+} as const
+
+export type ProjectDisputeMessageScalarFieldEnum = (typeof ProjectDisputeMessageScalarFieldEnum)[keyof typeof ProjectDisputeMessageScalarFieldEnum]
 
 
 export const ProjectCompletionRequestScalarFieldEnum = {
@@ -858,6 +917,35 @@ export const VerificationDocumentReviewScalarFieldEnum = {
 } as const
 
 export type VerificationDocumentReviewScalarFieldEnum = (typeof VerificationDocumentReviewScalarFieldEnum)[keyof typeof VerificationDocumentReviewScalarFieldEnum]
+
+
+export const PersonaVerificationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  provider: 'provider',
+  providerInquiryId: 'providerInquiryId',
+  providerStatus: 'providerStatus',
+  lastProviderEventAt: 'lastProviderEventAt',
+  adminStatus: 'adminStatus',
+  submittedAt: 'submittedAt',
+  reviewedAt: 'reviewedAt',
+  reviewedBy: 'reviewedBy',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PersonaVerificationScalarFieldEnum = (typeof PersonaVerificationScalarFieldEnum)[keyof typeof PersonaVerificationScalarFieldEnum]
+
+
+export const PersonaWebhookEventScalarFieldEnum = {
+  id: 'id',
+  provider: 'provider',
+  providerEventId: 'providerEventId',
+  eventName: 'eventName',
+  createdAt: 'createdAt'
+} as const
+
+export type PersonaWebhookEventScalarFieldEnum = (typeof PersonaWebhookEventScalarFieldEnum)[keyof typeof PersonaWebhookEventScalarFieldEnum]
 
 
 export const StoredFileScalarFieldEnum = {

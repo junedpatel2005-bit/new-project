@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MessageSquareText, Plus, Trash2 } from "lucide-react";
+import { MessageSquareText, Pencil, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type FaqItem = {
@@ -28,8 +28,10 @@ export default function AdminSupportPage() {
   const [contactRequests, setContactRequests] = useState<ContactRequestItem[]>([]);
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
+  const [category, setCategory] = useState("");
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
 
   const load = () =>
     void fetch("/api/v1/admin/data/support", { cache: "no-store" })
@@ -50,31 +52,58 @@ export default function AdminSupportPage() {
       return;
     }
     setSaving(true);
-    const response = await fetch("/api/v1/admin/support", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        question: question.trim(),
-        answer: answer.trim(),
-        displayOrder: faqs.length,
-      }),
-    });
+    const response = await fetch(
+      editingId ? `/api/v1/admin/support?id=${editingId}` : "/api/v1/admin/support",
+      {
+        method: editingId ? "PUT" : "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          question: question.trim(),
+          answer: answer.trim(),
+          category: category.trim() || null,
+          displayOrder: faqs.length,
+        }),
+      },
+    );
     const data = await response.json();
     setSaving(false);
     if (!response.ok) {
       setMessage(data.error ?? "Unable to save FAQ item.");
       return;
     }
-    setFaqs((current) => [...current, data.faq]);
+    setFaqs((current) =>
+      editingId
+        ? current.map((item) => (item.id === editingId ? data.faq : item))
+        : [...current, data.faq],
+    );
+    setMessage(editingId ? "FAQ item updated." : "FAQ item added.");
     setQuestion("");
     setAnswer("");
-    setMessage("FAQ item added.");
+    setCategory("");
+    setEditingId(null);
+  }
+
+  function startEdit(faq: FaqItem) {
+    if (!faq.id) return;
+    setEditingId(faq.id);
+    setQuestion(faq.question);
+    setAnswer(faq.answer);
+    setCategory(faq.category ?? "");
+    setMessage("");
+  }
+
+  function cancelEdit() {
+    setEditingId(null);
+    setQuestion("");
+    setAnswer("");
+    setCategory("");
   }
 
   async function removeFaq(id: number) {
     const response = await fetch(`/api/v1/admin/support?id=${id}`, { method: "DELETE" });
     if (!response.ok) return setMessage("Unable to delete FAQ item.");
     setFaqs((current) => current.filter((item) => item.id !== id));
+    if (editingId === id) cancelEdit();
     setMessage("FAQ item removed.");
   }
 
@@ -92,8 +121,12 @@ export default function AdminSupportPage() {
           className="h-fit rounded-2xl border border-white/10 bg-white/[.035] p-5"
         >
           <div className="flex items-center gap-2">
-            <Plus className="h-5 w-5 text-indigo-400" />
-            <h2 className="font-semibold">Add FAQ</h2>
+            {editingId ? (
+              <Pencil className="h-5 w-5 text-indigo-400" />
+            ) : (
+              <Plus className="h-5 w-5 text-indigo-400" />
+            )}
+            <h2 className="font-semibold">{editingId ? "Edit FAQ" : "Add FAQ"}</h2>
           </div>
 
           <label className="mt-5 block text-sm text-slate-300">
@@ -117,9 +150,34 @@ export default function AdminSupportPage() {
             />
           </label>
 
-          <Button disabled={saving} className="mt-5 w-full bg-indigo-500 hover:bg-indigo-400">
-            {saving ? "Saving..." : "Add FAQ item"}
-          </Button>
+          <label className="mt-4 block text-sm text-slate-300">
+            Category
+            <input
+              value={category}
+              onChange={(event) => setCategory(event.target.value)}
+              className="mt-2 h-11 w-full rounded-xl border border-white/10 bg-[#0b1020] px-3 text-white outline-none focus:ring-2 focus:ring-indigo-500"
+              placeholder="General"
+            />
+            <span className="mt-1 block text-xs text-slate-500">
+              Groups items on the public FAQ page. Leave blank for "General".
+            </span>
+          </label>
+
+          <div className="mt-5 flex gap-2">
+            <Button disabled={saving} className="flex-1 bg-indigo-500 hover:bg-indigo-400">
+              {saving ? "Saving..." : editingId ? "Save changes" : "Add FAQ item"}
+            </Button>
+            {editingId && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={cancelEdit}
+                className="border-white/15 bg-transparent text-white hover:bg-white/10 hover:text-white"
+              >
+                Cancel
+              </Button>
+            )}
+          </div>
           {message && <p className="mt-3 text-sm text-emerald-400">{message}</p>}
         </form>
 
@@ -141,13 +199,26 @@ export default function AdminSupportPage() {
               faqs.map((faq) => (
                 <article
                   key={faq.id ?? `${faq.question}-${faq.displayOrder}`}
-                  className="rounded-xl border border-white/10 bg-[#0b1020]/60 p-4"
+                  className={`rounded-xl border p-4 ${editingId === faq.id ? "border-indigo-400/40 bg-indigo-500/5" : "border-white/10 bg-[#0b1020]/60"}`}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
-                      <p className="font-medium text-white">{faq.question}</p>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="font-medium text-white">{faq.question}</p>
+                        <span className="rounded-full bg-indigo-500/10 px-2 py-0.5 text-[11px] font-semibold text-indigo-300">
+                          {faq.category?.trim() || "General"}
+                        </span>
+                      </div>
                       <p className="mt-2 text-sm text-slate-400">{faq.answer}</p>
                     </div>
+                    <button
+                      type="button"
+                      onClick={() => startEdit(faq)}
+                      className="rounded-lg p-2 text-slate-400 hover:bg-indigo-500/10 hover:text-indigo-300"
+                      aria-label={`Edit FAQ ${faq.question}`}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </button>
                     <button
                       type="button"
                       onClick={() => faq.id && void removeFaq(faq.id)}

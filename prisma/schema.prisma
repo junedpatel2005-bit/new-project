@@ -151,6 +151,7 @@ model User {
   biometricType                       String?
   browserNotificationsEnabled         Boolean                   @default(true)
   emailNotificationsEnabled           Boolean                   @default(true)
+  razorpayAccountId                   String?                   @unique @map("razorpay_account_id")
   emailVerifiedAt                     DateTime?
   phoneVerifiedAt                     DateTime?
   projectActivityNotificationsEnabled Boolean                   @default(true)
@@ -158,6 +159,7 @@ model User {
   clientProfiles                      ClientProfile[]
   favoriteJobs                        FavoriteJob[]
   verification                        ProfessionalVerification?
+  personaVerifications                 PersonaVerification[]
   services                            Service[]
   auditLogs                           AuditLog[]                @relation("AuditActor")
 }
@@ -617,6 +619,13 @@ model Payment {
   currency          String   @default("INR")
   provider          String
   providerReference String?
+  razorpayOrderId   String?  @unique @map("razorpay_order_id")
+  razorpayPaymentId String?  @unique @map("razorpay_payment_id")
+  razorpaySignature String?  @map("razorpay_signature")
+  projectTrackingId Int?     @map("project_tracking_id")
+  milestoneId       Int?     @unique @map("milestone_id")
+  capturedAt        DateTime? @map("captured_at")
+  failureReason     String?  @map("failure_reason")
   status            String   @default("PENDING")
   idempotencyKey    String   @unique
   createdAt         DateTime @default(now())
@@ -624,6 +633,16 @@ model Payment {
 
   @@index([clientId])
   @@index([professionalId])
+}
+
+model RazorpayWebhookEvent {
+  id          Int      @id @default(autoincrement())
+  eventId     String   @unique @map("event_id")
+  eventName   String   @map("event_name")
+  payloadJson String   @map("payload_json")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("razorpay_webhook_events")
 }
 
 model Wallet {
@@ -654,16 +673,40 @@ model WalletTransaction {
 model ProjectWithdrawal {
   id               Int      @id @default(autoincrement())
   professionalId   Int
+  paymentId        Int?     @map("payment_id")
   amount           Int
   currency         String   @default("INR")
   destinationType  String
   destinationLabel String?
   status           String   @default("PENDING")
   note             String?
+  providerTransferId String? @map("provider_transfer_id")
+  failureReason    String?  @map("failure_reason")
+  processedAt      DateTime? @map("processed_at")
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
   @@index([professionalId])
+  @@index([paymentId])
+}
+
+model Invoice {
+  id               Int      @id @default(autoincrement())
+  invoiceNumber    String   @unique @map("invoice_number")
+  paymentId        Int      @unique @map("payment_id")
+  clientId         Int      @map("client_id")
+  professionalId   Int      @map("professional_id")
+  amount           Int
+  commissionAmount Int      @default(0) @map("commission_amount")
+  netAmount        Int      @map("net_amount")
+  currency         String   @default("INR")
+  status           String   @default("ISSUED")
+  issuedAt         DateTime @default(now()) @map("issued_at")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  @@index([clientId])
+  @@index([professionalId])
+  @@map("invoices")
 }
 
 model ProjectDispute {
@@ -684,6 +727,20 @@ model ProjectDispute {
   @@index([trackingId])
   @@index([clientId])
   @@index([professionalId])
+}
+
+model ProjectDisputeMessage {
+  id          Int      @id @default(autoincrement())
+  disputeId   Int      @map("dispute_id")
+  senderId    Int      @map("sender_id")
+  senderRole  String   @map("sender_role")
+  recipientId Int      @map("recipient_id")
+  message     String
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([disputeId, createdAt])
+  @@index([recipientId, createdAt])
+  @@map("project_dispute_messages")
 }
 
 model ProjectCompletionRequest {
@@ -748,6 +805,37 @@ model VerificationDocumentReview {
   @@unique([userId, documentKey])
   @@index([userId])
   @@map("verification_document_reviews")
+}
+
+model PersonaVerification {
+  id                Int       @id @default(autoincrement())
+  userId            Int       @map("user_id")
+  provider          String    @default("persona")
+  providerInquiryId String    @unique @map("provider_inquiry_id")
+  providerStatus    String    @map("provider_status")
+  lastProviderEventAt DateTime? @map("last_provider_event_at")
+  adminStatus       String    @default("PENDING") @map("admin_status")
+  submittedAt       DateTime? @map("submitted_at")
+  reviewedAt        DateTime? @map("reviewed_at")
+  reviewedBy        Int?      @map("reviewed_by")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([providerStatus])
+  @@index([adminStatus])
+  @@map("persona_verifications")
+}
+
+model PersonaWebhookEvent {
+  id          Int      @id @default(autoincrement())
+  provider    String   @default("persona")
+  providerEventId String @unique @map("provider_event_id")
+  eventName   String   @map("event_name")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("persona_webhook_events")
 }
 
 model StoredFile {

@@ -1,6 +1,7 @@
 "use client";
 
-import { Moon, Sun } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { LogOut, Moon, Sun } from "lucide-react";
 
 export function AdminHeader({
   theme,
@@ -9,6 +10,13 @@ export function AdminHeader({
   theme: "dark" | "light";
   onToggleTheme: () => void;
 }) {
+  const router = useRouter();
+
+  async function logout() {
+    await fetch("/api/v1/auth/logout", { method: "POST" });
+    router.replace("/admin/login");
+  }
+
   return (
     <header className="flex h-16 items-center justify-between border-b border-white/10 bg-[#11182b]/80 px-5 backdrop-blur">
       <p className="text-sm text-slate-400">Private administration portal</p>
@@ -25,6 +33,15 @@ export function AdminHeader({
         <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400">
           System online
         </span>
+        <button
+          type="button"
+          onClick={logout}
+          className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-300 hover:bg-rose-500/10 hover:text-rose-400"
+          aria-label="Log out"
+        >
+          <LogOut className="h-3.5 w-3.5" />
+          Log out
+        </button>
       </div>
     </header>
   );

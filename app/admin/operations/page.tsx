@@ -10,11 +10,14 @@ import {
   CircleAlert,
   Clock3,
   MapPin,
+  Power,
   Search,
   SlidersHorizontal,
+  Trash2,
   UserRound,
   X,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 type Job = {
   id: number;
   title: string | null;
@@ -22,6 +25,8 @@ type Job = {
   description: string | null;
   budgetMin: number | null;
   budgetMax: number | null;
+  hourlyRate: number | null;
+  timingType: string;
   urgency: string;
   workMode: string;
   locationLabel: string | null;
@@ -40,6 +45,43 @@ type Dispute = {
   updatedAt: string;
 };
 type OperationsData = { jobs: Job[]; disputes: Dispute[] };
+type DisputeDetails = {
+  dispute: Dispute & { trackingId: number; message: string };
+  client: { id: number; firstName: string; lastName: string; email: string } | null;
+  professional: { id: number; firstName: string; lastName: string; email: string } | null;
+  job: { id: number; title: string | null } | null;
+  project: {
+    id: number;
+    status: string;
+    progress: number;
+    currentStage: string | null;
+    startedAt: string | null;
+    completedAt: string | null;
+  } | null;
+  milestones: {
+    id: number;
+    title: string;
+    amount: number;
+    status: string;
+    dueDate: string | null;
+  }[];
+  milestoneSummary: { completed: number; total: number };
+  financial: {
+    milestoneTotal: number;
+    paidAmount: number;
+    remainingAmount: number;
+    approvedTotal: number;
+    unpaidApproved: number;
+  };
+  messages: {
+    id: number;
+    senderId: number;
+    senderRole: string;
+    recipientId: number;
+    message: string;
+    createdAt: string;
+  }[];
+};
 type JobDetails = Job & {
   budgetMin: number | null;
   budgetMax: number | null;
@@ -115,6 +157,38 @@ const label = (value: string) =>
     .replaceAll("_", " ")
     .toLowerCase()
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
+const projectStage = (project: DisputeDetails["project"]) => {
+  if (!project) return "No active project is linked to this dispute yet.";
+  switch (project.status) {
+    case "READY_TO_START":
+      return "The project hasn't started yet — confirm work has begun.";
+    case "IN_PROGRESS":
+      return project.currentStage
+        ? `Professional is working on "${project.currentStage}".`
+        : "Work is in progress.";
+    case "AWAITING_CLIENT_REVIEW":
+      return project.currentStage
+        ? `Waiting on the client to review "${project.currentStage}".`
+        : "Waiting on the client to review submitted work.";
+    case "REVISION_REQUESTED":
+      return project.currentStage
+        ? `Client requested revisions on "${project.currentStage}".`
+        : "Client requested revisions.";
+    case "COMPLETED":
+      return "The project is complete.";
+    default:
+      return `Current project stage: ${label(project.status)}.`;
+  }
+};
+const adminAction = (details: DisputeDetails) => {
+  if (details.dispute.status === "RESOLVED")
+    return "This dispute is marked resolved. Reopen it if the issue isn't actually fixed.";
+  if (details.financial.unpaidApproved > 0)
+    return `₹${details.financial.unpaidApproved.toLocaleString()} of approved milestone work hasn't been paid out yet. Verify the payment on the client's side and release funds to the professional, then mark this dispute resolved.`;
+  if (details.milestones.length === 0)
+    return "No milestones exist for this project yet. Confirm with the client and professional what payment structure was agreed, then follow up with whoever hasn't set it up.";
+  return "All approved milestones appear paid. Contact both parties to clarify the reported issue, then mark this dispute resolved once it's addressed.";
+};
 
 export default function OperationsPage() {
   const [data, setData] = useState<OperationsData | null>(null);
@@ -123,6 +197,16 @@ export default function OperationsPage() {
   const [filter, setFilter] = useState("ALL");
   const [selectedJob, setSelectedJob] = useState<JobDetails | null>(null);
   const [detailsStatus, setDetailsStatus] = useState<"idle" | "loading" | "error">("idle");
+  const [message, setMessage] = useState("");
+  const [confirmJobAction, setConfirmJobAction] = useState<{
+    kind: "toggle" | "delete";
+    job: JobDetails;
+  } | null>(null);
+  const [selectedDispute, setSelectedDispute] = useState<DisputeDetails | null>(null);
+  const [disputeDetailsStatus, setDisputeDetailsStatus] = useState<"idle" | "loading" | "error">(
+    "idle",
+  );
+  const [confirmDisputeAction, setConfirmDisputeAction] = useState<DisputeDetails | null>(null);
 
   useEffect(() => {
     void fetch("/api/v1/admin/data/jobs", { cache: "no-store" })
@@ -174,6 +258,84 @@ export default function OperationsPage() {
     }
   }
 
+  async function openDispute(id: number) {
+    setDisputeDetailsStatus("loading");
+    setSelectedDispute(null);
+    try {
+      const response = await fetch(`/api/v1/admin/disputes/${id}`, { cache: "no-store" });
+      if (!response.ok) throw new Error("Unable to load dispute details");
+      const result = await response.json();
+      setSelectedDispute(result);
+      setDisputeDetailsStatus("idle");
+    } catch {
+      setDisputeDetailsStatus("error");
+    }
+  }
+
+  async function toggleDisputeStatus(details: DisputeDetails) {
+    const nextStatus = details.dispute.status === "RESOLVED" ? "OPEN" : "RESOLVED";
+    const response = await fetch(`/api/v1/admin/disputes/${details.dispute.id}`, {
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ status: nextStatus }),
+    });
+    const data = await response.json();
+    if (!response.ok) return setMessage(data.error ?? "Unable to update dispute.");
+    setSelectedDispute((current) =>
+      current
+        ? { ...current, dispute: { ...current.dispute, status: data.dispute.status } }
+        : current,
+    );
+    setData((current) =>
+      current
+        ? {
+            ...current,
+            disputes: current.disputes.map((item) =>
+              item.id === details.dispute.id ? { ...item, status: data.dispute.status } : item,
+            ),
+          }
+        : current,
+    );
+    setMessage(`Case #${details.dispute.id} is now ${label(data.dispute.status)}.`);
+  }
+
+  async function toggleJobStatus(job: JobDetails) {
+    const nextStatus = job.status === "CLOSED" ? "OPEN" : "CLOSED";
+    const response = await fetch(`/api/v1/admin/jobs/${job.id}`, {
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ status: nextStatus }),
+    });
+    const data = await response.json();
+    if (!response.ok) return setMessage(data.error ?? "Unable to update job.");
+    setSelectedJob((current) =>
+      current && current.id === job.id ? { ...current, status: data.job.status } : current,
+    );
+    setData((current) =>
+      current
+        ? {
+            ...current,
+            jobs: current.jobs.map((item) =>
+              item.id === job.id ? { ...item, status: data.job.status } : item,
+            ),
+          }
+        : current,
+    );
+    setMessage(`"${job.title ?? `Job #${job.id}`}" is now ${label(data.job.status)}.`);
+  }
+
+  async function deleteJob(job: JobDetails) {
+    const response = await fetch(`/api/v1/admin/jobs/${job.id}`, { method: "DELETE" });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) return setMessage(data.error ?? "Unable to delete job.");
+    setData((current) =>
+      current ? { ...current, jobs: current.jobs.filter((item) => item.id !== job.id) } : current,
+    );
+    setSelectedJob((current) => (current?.id === job.id ? null : current));
+    setDetailsStatus("idle");
+    setMessage(`"${job.title ?? `Job #${job.id}`}" was deleted.`);
+  }
+
   return (
     <div className="pb-5">
       <div className="relative overflow-hidden rounded-3xl border border-indigo-400/15 bg-gradient-to-br from-indigo-500/15 via-[#161d35] to-[#11182b] px-6 py-7 sm:px-8">
@@ -201,6 +363,12 @@ export default function OperationsPage() {
           </div>
         </div>
       </div>
+
+      {message && (
+        <p className="mt-5 rounded-xl bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300">
+          {message}
+        </p>
+      )}
 
       {!data ? (
         <div className="mt-6 h-80 animate-pulse rounded-3xl bg-white/5" />
@@ -321,7 +489,9 @@ export default function OperationsPage() {
             <div className="divide-y divide-white/10">
               {view === "jobs"
                 ? jobs.map((job) => <JobRow key={job.id} job={job} onOpen={openJob} />)
-                : disputes.map((dispute) => <DisputeRow key={dispute.id} dispute={dispute} />)}
+                : disputes.map((dispute) => (
+                    <DisputeRow key={dispute.id} dispute={dispute} onOpen={openDispute} />
+                  ))}
               {(view === "jobs" ? jobs : disputes).length === 0 && <Empty view={view} />}
             </div>
           </section>
@@ -335,7 +505,109 @@ export default function OperationsPage() {
             setSelectedJob(null);
             setDetailsStatus("idle");
           }}
+          onToggle={(job) => setConfirmJobAction({ kind: "toggle", job })}
+          onDelete={(job) => setConfirmJobAction({ kind: "delete", job })}
         />
+      )}
+      {confirmJobAction && (
+        <div className="fixed inset-0 z-[60] grid place-items-center bg-black/65 p-4">
+          <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-[#11182b] p-6">
+            <h2 className="font-display text-lg font-bold text-white">
+              {confirmJobAction.kind === "delete"
+                ? "Delete job?"
+                : confirmJobAction.job.status === "CLOSED"
+                  ? "Enable job?"
+                  : "Disable job?"}
+            </h2>
+            <p className="mt-2 text-sm text-slate-400">
+              {confirmJobAction.kind === "delete"
+                ? `"${confirmJobAction.job.title ?? `Job #${confirmJobAction.job.id}`}" and its attachments will be permanently deleted. This cannot be undone.`
+                : confirmJobAction.job.status === "CLOSED"
+                  ? `"${confirmJobAction.job.title ?? `Job #${confirmJobAction.job.id}`}" will become visible on the marketplace again.`
+                  : `"${confirmJobAction.job.title ?? `Job #${confirmJobAction.job.id}`}" will be hidden from the marketplace.`}
+            </p>
+            <div className="mt-6 flex justify-end gap-3">
+              <Button
+                variant="outline"
+                className="border-white/10 bg-transparent text-slate-300 hover:bg-white/10 hover:text-white"
+                onClick={() => setConfirmJobAction(null)}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="outline"
+                className={
+                  confirmJobAction.kind === "delete" || confirmJobAction.job.status !== "CLOSED"
+                    ? "border-rose-400/30 bg-transparent text-rose-200 hover:bg-rose-500/10 hover:text-rose-100"
+                    : "border-emerald-400/30 bg-transparent text-emerald-200 hover:bg-emerald-500/10 hover:text-emerald-100"
+                }
+                onClick={() => {
+                  const { kind, job } = confirmJobAction;
+                  setConfirmJobAction(null);
+                  if (kind === "delete") void deleteJob(job);
+                  else void toggleJobStatus(job);
+                }}
+              >
+                {confirmJobAction.kind === "delete"
+                  ? "Delete"
+                  : confirmJobAction.job.status === "CLOSED"
+                    ? "Enable"
+                    : "Disable"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+      {(selectedDispute || disputeDetailsStatus !== "idle") && (
+        <DisputeDetailsPanel
+          details={selectedDispute}
+          status={disputeDetailsStatus}
+          onClose={() => {
+            setSelectedDispute(null);
+            setDisputeDetailsStatus("idle");
+          }}
+          onToggle={(details) => setConfirmDisputeAction(details)}
+        />
+      )}
+      {confirmDisputeAction && (
+        <div className="fixed inset-0 z-[60] grid place-items-center bg-black/65 p-4">
+          <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-[#11182b] p-6">
+            <h2 className="font-display text-lg font-bold text-white">
+              {confirmDisputeAction.dispute.status === "RESOLVED"
+                ? "Reopen dispute?"
+                : "Mark dispute resolved?"}
+            </h2>
+            <p className="mt-2 text-sm text-slate-400">
+              {confirmDisputeAction.dispute.status === "RESOLVED"
+                ? `Case #${confirmDisputeAction.dispute.id} will be reopened and flagged for attention again.`
+                : `Case #${confirmDisputeAction.dispute.id} will be marked resolved and cleared from the open queue.`}
+            </p>
+            <div className="mt-6 flex justify-end gap-3">
+              <Button
+                variant="outline"
+                className="border-white/10 bg-transparent text-slate-300 hover:bg-white/10 hover:text-white"
+                onClick={() => setConfirmDisputeAction(null)}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="outline"
+                className={
+                  confirmDisputeAction.dispute.status === "RESOLVED"
+                    ? "border-rose-400/30 bg-transparent text-rose-200 hover:bg-rose-500/10 hover:text-rose-100"
+                    : "border-emerald-400/30 bg-transparent text-emerald-200 hover:bg-emerald-500/10 hover:text-emerald-100"
+                }
+                onClick={() => {
+                  const details = confirmDisputeAction;
+                  setConfirmDisputeAction(null);
+                  void toggleDisputeStatus(details);
+                }}
+              >
+                {confirmDisputeAction.dispute.status === "RESOLVED" ? "Reopen" : "Resolve"}
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
@@ -408,9 +680,13 @@ function Tab({
 }
 function JobRow({ job, onOpen }: { job: Job; onOpen: (id: number) => void }) {
   const budget =
-    job.budgetMin || job.budgetMax
-      ? `₹${(job.budgetMin ?? 0).toLocaleString()} – ₹${(job.budgetMax ?? job.budgetMin ?? 0).toLocaleString()}`
-      : "Budget not set";
+    job.timingType === "HOURLY"
+      ? job.hourlyRate != null
+        ? `₹${job.hourlyRate.toLocaleString()}/hr`
+        : "Rate not set"
+      : job.budgetMin || job.budgetMax
+        ? `₹${(job.budgetMin ?? 0).toLocaleString()} – ₹${(job.budgetMax ?? job.budgetMin ?? 0).toLocaleString()}`
+        : "Budget not set";
   return (
     <div
       role="button"
@@ -454,9 +730,17 @@ function JobRow({ job, onOpen }: { job: Job; onOpen: (id: number) => void }) {
     </div>
   );
 }
-function DisputeRow({ dispute }: { dispute: Dispute }) {
+function DisputeRow({ dispute, onOpen }: { dispute: Dispute; onOpen: (id: number) => void }) {
   return (
-    <article className="group flex flex-wrap items-center gap-x-5 gap-y-4 px-5 py-5 transition hover:bg-white/[.035] sm:px-6">
+    <article
+      role="button"
+      tabIndex={0}
+      onClick={() => void onOpen(dispute.id)}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") void onOpen(dispute.id);
+      }}
+      className="group flex w-full cursor-pointer flex-wrap items-center gap-x-5 gap-y-4 px-5 py-5 text-left transition hover:bg-white/[.035] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-indigo-400 sm:px-6"
+    >
       <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-rose-400/10 text-rose-300">
         <AlertTriangle className="h-5 w-5" />
       </span>
@@ -507,10 +791,14 @@ function JobDetailsPanel({
   job,
   status,
   onClose,
+  onToggle,
+  onDelete,
 }: {
   job: JobDetails | null;
   status: "idle" | "loading" | "error";
   onClose: () => void;
+  onToggle: (job: JobDetails) => void;
+  onDelete: (job: JobDetails) => void;
 }) {
   return (
     <div
@@ -532,14 +820,42 @@ function JobDetailsPanel({
               {job?.title ?? (status === "loading" ? "Loading job…" : "Job details")}
             </h2>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-lg p-2 text-slate-400 transition hover:bg-white/10 hover:text-white"
-            aria-label="Close job details"
-          >
-            <X className="h-5 w-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            {job && (
+              <>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => onToggle(job)}
+                  className={
+                    job.status === "CLOSED"
+                      ? "border-emerald-400/30 bg-transparent text-emerald-200 hover:bg-emerald-500/10 hover:text-emerald-100"
+                      : "border-rose-400/30 bg-transparent text-rose-200 hover:bg-rose-500/10 hover:text-rose-100"
+                  }
+                >
+                  <Power className="mr-2 h-3.5 w-3.5" />
+                  {job.status === "CLOSED" ? "Enable job" : "Disable job"}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => onDelete(job)}
+                  className="border-white/10 bg-transparent text-slate-400 hover:border-rose-400/30 hover:bg-rose-500/10 hover:text-rose-200"
+                >
+                  <Trash2 className="mr-2 h-3.5 w-3.5" />
+                  Delete job
+                </Button>
+              </>
+            )}
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-lg p-2 text-slate-400 transition hover:bg-white/10 hover:text-white"
+              aria-label="Close job details"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
         </div>
         {status === "loading" ? <div className="h-72 animate-pulse bg-white/[.025]" /> : null}
         {status === "error" ? (
@@ -733,5 +1049,273 @@ function DetailGrid({ items }: { items: [string, string][] }) {
         </div>
       ))}
     </dl>
+  );
+}
+
+function DisputeDetailsPanel({
+  details,
+  status,
+  onClose,
+  onToggle,
+}: {
+  details: DisputeDetails | null;
+  status: "idle" | "loading" | "error";
+  onClose: () => void;
+  onToggle: (details: DisputeDetails) => void;
+}) {
+  const dispute = details?.dispute;
+  const [recipient, setRecipient] = useState<"CLIENT" | "PROFESSIONAL">("CLIENT");
+  const [draft, setDraft] = useState("");
+  const [sending, setSending] = useState(false);
+  const [sendMessage, setSendMessage] = useState("");
+
+  async function sendAdminMessage() {
+    if (!details || !draft.trim()) return;
+    setSending(true);
+    setSendMessage("");
+    try {
+      const response = await fetch(`/api/v1/admin/disputes/${details.dispute.id}/messages`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ recipient, message: draft.trim() }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error ?? "Unable to send message.");
+      setDraft("");
+      setSendMessage("Message sent and notification delivered.");
+    } catch (error) {
+      setSendMessage(error instanceof Error ? error.message : "Unable to send message.");
+    } finally {
+      setSending(false);
+    }
+  }
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="dispute-details-title"
+    >
+      <section
+        className="admin-job-details-scroll max-h-[calc(100vh-2rem)] w-full max-w-4xl overflow-y-auto rounded-3xl border border-white/10 bg-[#11182b] shadow-2xl shadow-black/40"
+        aria-live="polite"
+      >
+        <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-white/10 bg-[#11182b] px-5 py-5 sm:px-6">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[.2em] text-indigo-300">
+              Dispute details
+            </p>
+            <h2 id="dispute-details-title" className="mt-1 text-xl font-semibold text-white">
+              {dispute
+                ? label(dispute.issueType)
+                : status === "loading"
+                  ? "Loading dispute…"
+                  : "Dispute details"}
+            </h2>
+          </div>
+          <div className="flex items-center gap-2">
+            {details && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => onToggle(details)}
+                className={
+                  details.dispute.status === "RESOLVED"
+                    ? "border-rose-400/30 bg-transparent text-rose-200 hover:bg-rose-500/10 hover:text-rose-100"
+                    : "border-emerald-400/30 bg-transparent text-emerald-200 hover:bg-emerald-500/10 hover:text-emerald-100"
+                }
+              >
+                {details.dispute.status === "RESOLVED" ? "Reopen dispute" : "Mark resolved"}
+              </Button>
+            )}
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-lg p-2 text-slate-400 transition hover:bg-white/10 hover:text-white"
+              aria-label="Close dispute details"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+        {status === "loading" ? <div className="h-72 animate-pulse bg-white/[.025]" /> : null}
+        {status === "error" ? (
+          <p className="p-6 text-sm text-rose-300">
+            Dispute details could not be loaded. Please try again.
+          </p>
+        ) : null}
+        {details && dispute ? (
+          <div className="grid gap-6 p-5 sm:p-6 lg:grid-cols-[minmax(0,1fr)_300px]">
+            <div className="space-y-6">
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge value={dispute.status} />
+                <Badge value={dispute.priority} />
+                <span className="text-sm text-slate-400">
+                  Case #{dispute.id} · Updated {date(dispute.updatedAt)}
+                </span>
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-white">Reported issue</h3>
+                <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-300">
+                  {dispute.message}
+                </p>
+                <p className="mt-2 text-xs text-slate-500">
+                  Reported by {label(dispute.reporterRole)} · {date(dispute.createdAt)}
+                </p>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/[.03] p-4">
+                <h3 className="text-sm font-semibold text-white">Contact participants</h3>
+                <p className="mt-1 text-xs text-white">
+                  Send a message directly to the selected participant. They will receive a
+                  notification.
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant={recipient === "CLIENT" ? "default" : "outline"}
+                    onClick={() => setRecipient("CLIENT")}
+                    className="text-white hover:text-white disabled:text-white disabled:opacity-100"
+                  >
+                    Message client
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant={recipient === "PROFESSIONAL" ? "default" : "outline"}
+                    onClick={() => setRecipient("PROFESSIONAL")}
+                    className="text-white hover:text-white disabled:text-white disabled:opacity-100"
+                  >
+                    Message professional
+                  </Button>
+                </div>
+                <textarea
+                  value={draft}
+                  onChange={(event) => setDraft(event.target.value)}
+                  placeholder={`Write a message to the ${recipient.toLowerCase()}...`}
+                  className="mt-3 min-h-24 w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm text-white outline-none placeholder:text-white/70 focus:border-indigo-400/60"
+                  maxLength={4000}
+                />
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+                  <p className="text-xs text-white">{draft.length}/4000</p>
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={sendAdminMessage}
+                    disabled={sending || !draft.trim()}
+                    className="text-white hover:text-white disabled:text-white disabled:opacity-100"
+                  >
+                    {sending
+                      ? "Sending..."
+                      : `Send to ${recipient === "CLIENT" ? "client" : "professional"}`}
+                  </Button>
+                </div>
+                {sendMessage ? <p className="mt-2 text-xs text-white">{sendMessage}</p> : null}
+                {details.messages.length ? (
+                  <div className="mt-4 space-y-2 border-t border-white/10 pt-3">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                      Message history
+                    </p>
+                    {details.messages.map((item) => (
+                      <div
+                        key={item.id}
+                        className="rounded-xl bg-black/20 px-3 py-2 text-sm text-slate-300"
+                      >
+                        <p className="text-[11px] font-semibold uppercase text-indigo-300">
+                          {label(item.senderRole)}
+                        </p>
+                        <p className="mt-1 whitespace-pre-wrap">{item.message}</p>
+                        <p className="mt-1 text-[11px] text-slate-500">{date(item.createdAt)}</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+              <div className="rounded-2xl border border-indigo-400/20 bg-indigo-400/[.06] p-4">
+                <h3 className="text-sm font-semibold text-indigo-200">What you should do next</h3>
+                <p className="mt-1 text-sm text-slate-200">{adminAction(details)}</p>
+                <p className="mt-3 border-t border-indigo-400/10 pt-3 text-xs text-slate-400">
+                  Project status: {projectStage(details.project)}
+                </p>
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-white">
+                  Milestones ({details.milestoneSummary.completed} of{" "}
+                  {details.milestoneSummary.total} completed)
+                </h3>
+                <div className="mt-3 space-y-2">
+                  {details.milestones.length ? (
+                    details.milestones.map((milestone) => (
+                      <div
+                        key={milestone.id}
+                        className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-black/10 px-4 py-3 text-sm"
+                      >
+                        <div>
+                          <p className="font-medium text-white">{milestone.title}</p>
+                          <p className="text-xs text-slate-400">
+                            {milestone.dueDate ? `Due ${date(milestone.dueDate)}` : "No due date"}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <Badge value={milestone.status} />
+                          <p className="mt-1 text-sm font-semibold text-white">
+                            ₹{milestone.amount.toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-slate-400">No milestones were created yet.</p>
+                  )}
+                </div>
+              </div>
+            </div>
+            <aside className="h-fit space-y-5 rounded-2xl border border-white/10 bg-black/10 p-5">
+              <div>
+                <h3 className="text-sm font-semibold text-white">Job</h3>
+                <p className="mt-2 text-sm text-slate-300">
+                  {details.job?.title ?? "Untitled job"}
+                </p>
+              </div>
+              <div className="border-t border-white/10 pt-4">
+                <h3 className="text-sm font-semibold text-white">Client</h3>
+                <p className="mt-2 text-sm text-slate-300">
+                  {details.client
+                    ? `${details.client.firstName} ${details.client.lastName}`
+                    : "Unknown"}
+                </p>
+                <p className="text-xs text-slate-500">{details.client?.email}</p>
+              </div>
+              <div className="border-t border-white/10 pt-4">
+                <h3 className="text-sm font-semibold text-white">Professional</h3>
+                <p className="mt-2 text-sm text-slate-300">
+                  {details.professional
+                    ? `${details.professional.firstName} ${details.professional.lastName}`
+                    : "Unknown"}
+                </p>
+                <p className="text-xs text-slate-500">{details.professional?.email}</p>
+              </div>
+              <div className="border-t border-white/10 pt-4">
+                <h3 className="text-sm font-semibold text-white">Payments</h3>
+                <dl className="mt-3 grid grid-cols-2 gap-2 text-center">
+                  <div className="rounded-lg bg-white/5 p-2">
+                    <dt className="text-[10px] uppercase text-slate-500">Paid</dt>
+                    <dd className="mt-1 text-sm font-semibold text-white">
+                      ₹{details.financial.paidAmount.toLocaleString()}
+                    </dd>
+                  </div>
+                  <div className="rounded-lg bg-white/5 p-2">
+                    <dt className="text-[10px] uppercase text-slate-500">Remaining</dt>
+                    <dd className="mt-1 text-sm font-semibold text-white">
+                      ₹{details.financial.remainingAmount.toLocaleString()}
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+            </aside>
+          </div>
+        ) : null}
+      </section>
+    </div>
   );
 }

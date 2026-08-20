@@ -24,6 +24,26 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   }
 }
 
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const token = request.cookies.get(sessionCookie)?.value;
+  if (!token) return NextResponse.json({ error: "Admin access required." }, { status: 401 });
+  try {
+    if ((await verifySession(token)).role !== "ADMIN")
+      return NextResponse.json({ error: "Admin access required." }, { status: 403 });
+    const { id } = await params;
+    const userId = Number(id);
+    if (!Number.isInteger(userId))
+      return NextResponse.json({ error: "Invalid user." }, { status: 400 });
+    await db.user.delete({ where: { id: userId } });
+    return NextResponse.json({ ok: true });
+  } catch {
+    return NextResponse.json(
+      { error: "Unable to delete account. It may have related records." },
+      { status: 500 },
+    );
+  }
+}
+
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const token = request.cookies.get(sessionCookie)?.value;
   if (!token) return NextResponse.json({ error: "Admin access required." }, { status: 401 });

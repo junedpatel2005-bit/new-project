@@ -97,6 +97,7 @@ export type UserMinAggregateOutputType = {
   biometricType: string | null
   browserNotificationsEnabled: boolean | null
   emailNotificationsEnabled: boolean | null
+  razorpayAccountId: string | null
   emailVerifiedAt: Date | null
   phoneVerifiedAt: Date | null
   projectActivityNotificationsEnabled: boolean | null
@@ -149,6 +150,7 @@ export type UserMaxAggregateOutputType = {
   biometricType: string | null
   browserNotificationsEnabled: boolean | null
   emailNotificationsEnabled: boolean | null
+  razorpayAccountId: string | null
   emailVerifiedAt: Date | null
   phoneVerifiedAt: Date | null
   projectActivityNotificationsEnabled: boolean | null
@@ -201,6 +203,7 @@ export type UserCountAggregateOutputType = {
   biometricType: number
   browserNotificationsEnabled: number
   emailNotificationsEnabled: number
+  razorpayAccountId: number
   emailVerifiedAt: number
   phoneVerifiedAt: number
   projectActivityNotificationsEnabled: number
@@ -279,6 +282,7 @@ export type UserMinAggregateInputType = {
   biometricType?: true
   browserNotificationsEnabled?: true
   emailNotificationsEnabled?: true
+  razorpayAccountId?: true
   emailVerifiedAt?: true
   phoneVerifiedAt?: true
   projectActivityNotificationsEnabled?: true
@@ -331,6 +335,7 @@ export type UserMaxAggregateInputType = {
   biometricType?: true
   browserNotificationsEnabled?: true
   emailNotificationsEnabled?: true
+  razorpayAccountId?: true
   emailVerifiedAt?: true
   phoneVerifiedAt?: true
   projectActivityNotificationsEnabled?: true
@@ -383,6 +388,7 @@ export type UserCountAggregateInputType = {
   biometricType?: true
   browserNotificationsEnabled?: true
   emailNotificationsEnabled?: true
+  razorpayAccountId?: true
   emailVerifiedAt?: true
   phoneVerifiedAt?: true
   projectActivityNotificationsEnabled?: true
@@ -522,6 +528,7 @@ export type UserGroupByOutputType = {
   biometricType: string | null
   browserNotificationsEnabled: boolean
   emailNotificationsEnabled: boolean
+  razorpayAccountId: string | null
   emailVerifiedAt: Date | null
   phoneVerifiedAt: Date | null
   projectActivityNotificationsEnabled: boolean
@@ -597,6 +604,7 @@ export type UserWhereInput = {
   biometricType?: Prisma.StringNullableFilter<"User"> | string | null
   browserNotificationsEnabled?: Prisma.BoolFilter<"User"> | boolean
   emailNotificationsEnabled?: Prisma.BoolFilter<"User"> | boolean
+  razorpayAccountId?: Prisma.StringNullableFilter<"User"> | string | null
   emailVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   phoneVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFilter<"User"> | boolean
@@ -604,6 +612,7 @@ export type UserWhereInput = {
   clientProfiles?: Prisma.ClientProfileListRelationFilter
   favoriteJobs?: Prisma.FavoriteJobListRelationFilter
   verification?: Prisma.XOR<Prisma.ProfessionalVerificationNullableScalarRelationFilter, Prisma.ProfessionalVerificationWhereInput> | null
+  personaVerifications?: Prisma.PersonaVerificationListRelationFilter
   services?: Prisma.ServiceListRelationFilter
   auditLogs?: Prisma.AuditLogListRelationFilter
 }
@@ -655,6 +664,7 @@ export type UserOrderByWithRelationInput = {
   biometricType?: Prisma.SortOrderInput | Prisma.SortOrder
   browserNotificationsEnabled?: Prisma.SortOrder
   emailNotificationsEnabled?: Prisma.SortOrder
+  razorpayAccountId?: Prisma.SortOrderInput | Prisma.SortOrder
   emailVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   phoneVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   projectActivityNotificationsEnabled?: Prisma.SortOrder
@@ -662,6 +672,7 @@ export type UserOrderByWithRelationInput = {
   clientProfiles?: Prisma.ClientProfileOrderByRelationAggregateInput
   favoriteJobs?: Prisma.FavoriteJobOrderByRelationAggregateInput
   verification?: Prisma.ProfessionalVerificationOrderByWithRelationInput
+  personaVerifications?: Prisma.PersonaVerificationOrderByRelationAggregateInput
   services?: Prisma.ServiceOrderByRelationAggregateInput
   auditLogs?: Prisma.AuditLogOrderByRelationAggregateInput
 }
@@ -672,6 +683,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   username?: string
   phone?: string
   googleId?: string
+  razorpayAccountId?: string
   AND?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
@@ -723,9 +735,10 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   clientProfiles?: Prisma.ClientProfileListRelationFilter
   favoriteJobs?: Prisma.FavoriteJobListRelationFilter
   verification?: Prisma.XOR<Prisma.ProfessionalVerificationNullableScalarRelationFilter, Prisma.ProfessionalVerificationWhereInput> | null
+  personaVerifications?: Prisma.PersonaVerificationListRelationFilter
   services?: Prisma.ServiceListRelationFilter
   auditLogs?: Prisma.AuditLogListRelationFilter
-}, "id" | "email" | "username" | "phone" | "googleId">
+}, "id" | "email" | "username" | "phone" | "googleId" | "razorpayAccountId">
 
 export type UserOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -774,6 +787,7 @@ export type UserOrderByWithAggregationInput = {
   biometricType?: Prisma.SortOrderInput | Prisma.SortOrder
   browserNotificationsEnabled?: Prisma.SortOrder
   emailNotificationsEnabled?: Prisma.SortOrder
+  razorpayAccountId?: Prisma.SortOrderInput | Prisma.SortOrder
   emailVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   phoneVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   projectActivityNotificationsEnabled?: Prisma.SortOrder
@@ -834,6 +848,7 @@ export type UserScalarWhereWithAggregatesInput = {
   biometricType?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   browserNotificationsEnabled?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   emailNotificationsEnabled?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
+  razorpayAccountId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   emailVerifiedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   phoneVerifiedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
@@ -885,6 +900,7 @@ export type UserCreateInput = {
   biometricType?: string | null
   browserNotificationsEnabled?: boolean
   emailNotificationsEnabled?: boolean
+  razorpayAccountId?: string | null
   emailVerifiedAt?: Date | string | null
   phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
@@ -892,6 +908,7 @@ export type UserCreateInput = {
   clientProfiles?: Prisma.ClientProfileCreateNestedManyWithoutUserInput
   favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutUserInput
   verification?: Prisma.ProfessionalVerificationCreateNestedOneWithoutUserInput
+  personaVerifications?: Prisma.PersonaVerificationCreateNestedManyWithoutUserInput
   services?: Prisma.ServiceCreateNestedManyWithoutProfessionalInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
 }
@@ -943,6 +960,7 @@ export type UserUncheckedCreateInput = {
   biometricType?: string | null
   browserNotificationsEnabled?: boolean
   emailNotificationsEnabled?: boolean
+  razorpayAccountId?: string | null
   emailVerifiedAt?: Date | string | null
   phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
@@ -950,6 +968,7 @@ export type UserUncheckedCreateInput = {
   clientProfiles?: Prisma.ClientProfileUncheckedCreateNestedManyWithoutUserInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedCreateNestedManyWithoutUserInput
   verification?: Prisma.ProfessionalVerificationUncheckedCreateNestedOneWithoutUserInput
+  personaVerifications?: Prisma.PersonaVerificationUncheckedCreateNestedManyWithoutUserInput
   services?: Prisma.ServiceUncheckedCreateNestedManyWithoutProfessionalInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
 }
@@ -1000,6 +1019,7 @@ export type UserUpdateInput = {
   biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  razorpayAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1007,6 +1027,7 @@ export type UserUpdateInput = {
   clientProfiles?: Prisma.ClientProfileUpdateManyWithoutUserNestedInput
   favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutUserNestedInput
   verification?: Prisma.ProfessionalVerificationUpdateOneWithoutUserNestedInput
+  personaVerifications?: Prisma.PersonaVerificationUpdateManyWithoutUserNestedInput
   services?: Prisma.ServiceUpdateManyWithoutProfessionalNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
 }
@@ -1058,6 +1079,7 @@ export type UserUncheckedUpdateInput = {
   biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  razorpayAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1065,6 +1087,7 @@ export type UserUncheckedUpdateInput = {
   clientProfiles?: Prisma.ClientProfileUncheckedUpdateManyWithoutUserNestedInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedUpdateManyWithoutUserNestedInput
   verification?: Prisma.ProfessionalVerificationUncheckedUpdateOneWithoutUserNestedInput
+  personaVerifications?: Prisma.PersonaVerificationUncheckedUpdateManyWithoutUserNestedInput
   services?: Prisma.ServiceUncheckedUpdateManyWithoutProfessionalNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
 }
@@ -1116,6 +1139,7 @@ export type UserCreateManyInput = {
   biometricType?: string | null
   browserNotificationsEnabled?: boolean
   emailNotificationsEnabled?: boolean
+  razorpayAccountId?: string | null
   emailVerifiedAt?: Date | string | null
   phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
@@ -1167,6 +1191,7 @@ export type UserUpdateManyMutationInput = {
   biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  razorpayAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1219,6 +1244,7 @@ export type UserUncheckedUpdateManyInput = {
   biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  razorpayAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1271,6 +1297,7 @@ export type UserCountOrderByAggregateInput = {
   biometricType?: Prisma.SortOrder
   browserNotificationsEnabled?: Prisma.SortOrder
   emailNotificationsEnabled?: Prisma.SortOrder
+  razorpayAccountId?: Prisma.SortOrder
   emailVerifiedAt?: Prisma.SortOrder
   phoneVerifiedAt?: Prisma.SortOrder
   projectActivityNotificationsEnabled?: Prisma.SortOrder
@@ -1335,6 +1362,7 @@ export type UserMaxOrderByAggregateInput = {
   biometricType?: Prisma.SortOrder
   browserNotificationsEnabled?: Prisma.SortOrder
   emailNotificationsEnabled?: Prisma.SortOrder
+  razorpayAccountId?: Prisma.SortOrder
   emailVerifiedAt?: Prisma.SortOrder
   phoneVerifiedAt?: Prisma.SortOrder
   projectActivityNotificationsEnabled?: Prisma.SortOrder
@@ -1387,6 +1415,7 @@ export type UserMinOrderByAggregateInput = {
   biometricType?: Prisma.SortOrder
   browserNotificationsEnabled?: Prisma.SortOrder
   emailNotificationsEnabled?: Prisma.SortOrder
+  razorpayAccountId?: Prisma.SortOrder
   emailVerifiedAt?: Prisma.SortOrder
   phoneVerifiedAt?: Prisma.SortOrder
   projectActivityNotificationsEnabled?: Prisma.SortOrder
@@ -1502,6 +1531,20 @@ export type UserUpdateOneRequiredWithoutVerificationNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutVerificationInput, Prisma.UserUpdateWithoutVerificationInput>, Prisma.UserUncheckedUpdateWithoutVerificationInput>
 }
 
+export type UserCreateNestedOneWithoutPersonaVerificationsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPersonaVerificationsInput, Prisma.UserUncheckedCreateWithoutPersonaVerificationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPersonaVerificationsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutPersonaVerificationsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPersonaVerificationsInput, Prisma.UserUncheckedCreateWithoutPersonaVerificationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPersonaVerificationsInput
+  upsert?: Prisma.UserUpsertWithoutPersonaVerificationsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPersonaVerificationsInput, Prisma.UserUpdateWithoutPersonaVerificationsInput>, Prisma.UserUncheckedUpdateWithoutPersonaVerificationsInput>
+}
+
 export type UserCreateNestedOneWithoutAuditLogsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutAuditLogsInput, Prisma.UserUncheckedCreateWithoutAuditLogsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutAuditLogsInput
@@ -1578,12 +1621,14 @@ export type UserCreateWithoutClientProfilesInput = {
   biometricType?: string | null
   browserNotificationsEnabled?: boolean
   emailNotificationsEnabled?: boolean
+  razorpayAccountId?: string | null
   emailVerifiedAt?: Date | string | null
   phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
   clientJobs?: Prisma.ClientJobCreateNestedManyWithoutUserInput
   favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutUserInput
   verification?: Prisma.ProfessionalVerificationCreateNestedOneWithoutUserInput
+  personaVerifications?: Prisma.PersonaVerificationCreateNestedManyWithoutUserInput
   services?: Prisma.ServiceCreateNestedManyWithoutProfessionalInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
 }
@@ -1635,12 +1680,14 @@ export type UserUncheckedCreateWithoutClientProfilesInput = {
   biometricType?: string | null
   browserNotificationsEnabled?: boolean
   emailNotificationsEnabled?: boolean
+  razorpayAccountId?: string | null
   emailVerifiedAt?: Date | string | null
   phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
   clientJobs?: Prisma.ClientJobUncheckedCreateNestedManyWithoutUserInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedCreateNestedManyWithoutUserInput
   verification?: Prisma.ProfessionalVerificationUncheckedCreateNestedOneWithoutUserInput
+  personaVerifications?: Prisma.PersonaVerificationUncheckedCreateNestedManyWithoutUserInput
   services?: Prisma.ServiceUncheckedCreateNestedManyWithoutProfessionalInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
 }
@@ -1707,12 +1754,14 @@ export type UserUpdateWithoutClientProfilesInput = {
   biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  razorpayAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clientJobs?: Prisma.ClientJobUpdateManyWithoutUserNestedInput
   favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutUserNestedInput
   verification?: Prisma.ProfessionalVerificationUpdateOneWithoutUserNestedInput
+  personaVerifications?: Prisma.PersonaVerificationUpdateManyWithoutUserNestedInput
   services?: Prisma.ServiceUpdateManyWithoutProfessionalNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
 }
@@ -1764,12 +1813,14 @@ export type UserUncheckedUpdateWithoutClientProfilesInput = {
   biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  razorpayAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clientJobs?: Prisma.ClientJobUncheckedUpdateManyWithoutUserNestedInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedUpdateManyWithoutUserNestedInput
   verification?: Prisma.ProfessionalVerificationUncheckedUpdateOneWithoutUserNestedInput
+  personaVerifications?: Prisma.PersonaVerificationUncheckedUpdateManyWithoutUserNestedInput
   services?: Prisma.ServiceUncheckedUpdateManyWithoutProfessionalNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
 }
@@ -1820,12 +1871,14 @@ export type UserCreateWithoutClientJobsInput = {
   biometricType?: string | null
   browserNotificationsEnabled?: boolean
   emailNotificationsEnabled?: boolean
+  razorpayAccountId?: string | null
   emailVerifiedAt?: Date | string | null
   phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
   clientProfiles?: Prisma.ClientProfileCreateNestedManyWithoutUserInput
   favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutUserInput
   verification?: Prisma.ProfessionalVerificationCreateNestedOneWithoutUserInput
+  personaVerifications?: Prisma.PersonaVerificationCreateNestedManyWithoutUserInput
   services?: Prisma.ServiceCreateNestedManyWithoutProfessionalInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
 }
@@ -1877,12 +1930,14 @@ export type UserUncheckedCreateWithoutClientJobsInput = {
   biometricType?: string | null
   browserNotificationsEnabled?: boolean
   emailNotificationsEnabled?: boolean
+  razorpayAccountId?: string | null
   emailVerifiedAt?: Date | string | null
   phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
   clientProfiles?: Prisma.ClientProfileUncheckedCreateNestedManyWithoutUserInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedCreateNestedManyWithoutUserInput
   verification?: Prisma.ProfessionalVerificationUncheckedCreateNestedOneWithoutUserInput
+  personaVerifications?: Prisma.PersonaVerificationUncheckedCreateNestedManyWithoutUserInput
   services?: Prisma.ServiceUncheckedCreateNestedManyWithoutProfessionalInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
 }
@@ -1949,12 +2004,14 @@ export type UserUpdateWithoutClientJobsInput = {
   biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  razorpayAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clientProfiles?: Prisma.ClientProfileUpdateManyWithoutUserNestedInput
   favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutUserNestedInput
   verification?: Prisma.ProfessionalVerificationUpdateOneWithoutUserNestedInput
+  personaVerifications?: Prisma.PersonaVerificationUpdateManyWithoutUserNestedInput
   services?: Prisma.ServiceUpdateManyWithoutProfessionalNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
 }
@@ -2006,12 +2063,14 @@ export type UserUncheckedUpdateWithoutClientJobsInput = {
   biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  razorpayAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clientProfiles?: Prisma.ClientProfileUncheckedUpdateManyWithoutUserNestedInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedUpdateManyWithoutUserNestedInput
   verification?: Prisma.ProfessionalVerificationUncheckedUpdateOneWithoutUserNestedInput
+  personaVerifications?: Prisma.PersonaVerificationUncheckedUpdateManyWithoutUserNestedInput
   services?: Prisma.ServiceUncheckedUpdateManyWithoutProfessionalNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
 }
@@ -2062,12 +2121,14 @@ export type UserCreateWithoutFavoriteJobsInput = {
   biometricType?: string | null
   browserNotificationsEnabled?: boolean
   emailNotificationsEnabled?: boolean
+  razorpayAccountId?: string | null
   emailVerifiedAt?: Date | string | null
   phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
   clientJobs?: Prisma.ClientJobCreateNestedManyWithoutUserInput
   clientProfiles?: Prisma.ClientProfileCreateNestedManyWithoutUserInput
   verification?: Prisma.ProfessionalVerificationCreateNestedOneWithoutUserInput
+  personaVerifications?: Prisma.PersonaVerificationCreateNestedManyWithoutUserInput
   services?: Prisma.ServiceCreateNestedManyWithoutProfessionalInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
 }
@@ -2119,12 +2180,14 @@ export type UserUncheckedCreateWithoutFavoriteJobsInput = {
   biometricType?: string | null
   browserNotificationsEnabled?: boolean
   emailNotificationsEnabled?: boolean
+  razorpayAccountId?: string | null
   emailVerifiedAt?: Date | string | null
   phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
   clientJobs?: Prisma.ClientJobUncheckedCreateNestedManyWithoutUserInput
   clientProfiles?: Prisma.ClientProfileUncheckedCreateNestedManyWithoutUserInput
   verification?: Prisma.ProfessionalVerificationUncheckedCreateNestedOneWithoutUserInput
+  personaVerifications?: Prisma.PersonaVerificationUncheckedCreateNestedManyWithoutUserInput
   services?: Prisma.ServiceUncheckedCreateNestedManyWithoutProfessionalInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
 }
@@ -2191,12 +2254,14 @@ export type UserUpdateWithoutFavoriteJobsInput = {
   biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  razorpayAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clientJobs?: Prisma.ClientJobUpdateManyWithoutUserNestedInput
   clientProfiles?: Prisma.ClientProfileUpdateManyWithoutUserNestedInput
   verification?: Prisma.ProfessionalVerificationUpdateOneWithoutUserNestedInput
+  personaVerifications?: Prisma.PersonaVerificationUpdateManyWithoutUserNestedInput
   services?: Prisma.ServiceUpdateManyWithoutProfessionalNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
 }
@@ -2248,12 +2313,14 @@ export type UserUncheckedUpdateWithoutFavoriteJobsInput = {
   biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  razorpayAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clientJobs?: Prisma.ClientJobUncheckedUpdateManyWithoutUserNestedInput
   clientProfiles?: Prisma.ClientProfileUncheckedUpdateManyWithoutUserNestedInput
   verification?: Prisma.ProfessionalVerificationUncheckedUpdateOneWithoutUserNestedInput
+  personaVerifications?: Prisma.PersonaVerificationUncheckedUpdateManyWithoutUserNestedInput
   services?: Prisma.ServiceUncheckedUpdateManyWithoutProfessionalNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
 }
@@ -2304,12 +2371,14 @@ export type UserCreateWithoutVerificationInput = {
   biometricType?: string | null
   browserNotificationsEnabled?: boolean
   emailNotificationsEnabled?: boolean
+  razorpayAccountId?: string | null
   emailVerifiedAt?: Date | string | null
   phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
   clientJobs?: Prisma.ClientJobCreateNestedManyWithoutUserInput
   clientProfiles?: Prisma.ClientProfileCreateNestedManyWithoutUserInput
   favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutUserInput
+  personaVerifications?: Prisma.PersonaVerificationCreateNestedManyWithoutUserInput
   services?: Prisma.ServiceCreateNestedManyWithoutProfessionalInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
 }
@@ -2361,12 +2430,14 @@ export type UserUncheckedCreateWithoutVerificationInput = {
   biometricType?: string | null
   browserNotificationsEnabled?: boolean
   emailNotificationsEnabled?: boolean
+  razorpayAccountId?: string | null
   emailVerifiedAt?: Date | string | null
   phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
   clientJobs?: Prisma.ClientJobUncheckedCreateNestedManyWithoutUserInput
   clientProfiles?: Prisma.ClientProfileUncheckedCreateNestedManyWithoutUserInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedCreateNestedManyWithoutUserInput
+  personaVerifications?: Prisma.PersonaVerificationUncheckedCreateNestedManyWithoutUserInput
   services?: Prisma.ServiceUncheckedCreateNestedManyWithoutProfessionalInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
 }
@@ -2433,12 +2504,14 @@ export type UserUpdateWithoutVerificationInput = {
   biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  razorpayAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clientJobs?: Prisma.ClientJobUpdateManyWithoutUserNestedInput
   clientProfiles?: Prisma.ClientProfileUpdateManyWithoutUserNestedInput
   favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutUserNestedInput
+  personaVerifications?: Prisma.PersonaVerificationUpdateManyWithoutUserNestedInput
   services?: Prisma.ServiceUpdateManyWithoutProfessionalNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
 }
@@ -2490,12 +2563,264 @@ export type UserUncheckedUpdateWithoutVerificationInput = {
   biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  razorpayAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clientJobs?: Prisma.ClientJobUncheckedUpdateManyWithoutUserNestedInput
   clientProfiles?: Prisma.ClientProfileUncheckedUpdateManyWithoutUserNestedInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedUpdateManyWithoutUserNestedInput
+  personaVerifications?: Prisma.PersonaVerificationUncheckedUpdateManyWithoutUserNestedInput
+  services?: Prisma.ServiceUncheckedUpdateManyWithoutProfessionalNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+}
+
+export type UserCreateWithoutPersonaVerificationsInput = {
+  role?: $Enums.UserRole
+  firstName: string
+  lastName: string
+  email: string
+  username?: string | null
+  phone?: string | null
+  passwordHash?: string | null
+  googleId?: string | null
+  avatarUrl?: string | null
+  companyName?: string | null
+  companyWebsite?: string | null
+  industry?: string | null
+  teamSize?: string | null
+  companyDescription?: string | null
+  address?: string | null
+  professionalCategory?: string | null
+  professionalCity?: string | null
+  professionalSkillsJson?: string | null
+  experienceYears?: number | null
+  hourlyRate?: number | null
+  fixedRate?: number | null
+  portfolioUrl?: string | null
+  workPhotosJson?: string | null
+  certificationsJson?: string | null
+  tradeLicenseUrl?: string | null
+  serviceArea?: string | null
+  workMode?: string
+  serviceRadiusKm?: number | null
+  averageRating?: number
+  reviewCount?: number
+  isVerified?: boolean
+  availabilityStatus?: string
+  savedLocationsJson?: string | null
+  hiringNeedsJson?: string | null
+  authProvider?: string
+  isActive?: boolean
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  professionalLatitude?: number | null
+  professionalLongitude?: number | null
+  biometricEnabled?: boolean
+  biometricType?: string | null
+  browserNotificationsEnabled?: boolean
+  emailNotificationsEnabled?: boolean
+  razorpayAccountId?: string | null
+  emailVerifiedAt?: Date | string | null
+  phoneVerifiedAt?: Date | string | null
+  projectActivityNotificationsEnabled?: boolean
+  clientJobs?: Prisma.ClientJobCreateNestedManyWithoutUserInput
+  clientProfiles?: Prisma.ClientProfileCreateNestedManyWithoutUserInput
+  favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutUserInput
+  verification?: Prisma.ProfessionalVerificationCreateNestedOneWithoutUserInput
+  services?: Prisma.ServiceCreateNestedManyWithoutProfessionalInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+}
+
+export type UserUncheckedCreateWithoutPersonaVerificationsInput = {
+  id?: number
+  role?: $Enums.UserRole
+  firstName: string
+  lastName: string
+  email: string
+  username?: string | null
+  phone?: string | null
+  passwordHash?: string | null
+  googleId?: string | null
+  avatarUrl?: string | null
+  companyName?: string | null
+  companyWebsite?: string | null
+  industry?: string | null
+  teamSize?: string | null
+  companyDescription?: string | null
+  address?: string | null
+  professionalCategory?: string | null
+  professionalCity?: string | null
+  professionalSkillsJson?: string | null
+  experienceYears?: number | null
+  hourlyRate?: number | null
+  fixedRate?: number | null
+  portfolioUrl?: string | null
+  workPhotosJson?: string | null
+  certificationsJson?: string | null
+  tradeLicenseUrl?: string | null
+  serviceArea?: string | null
+  workMode?: string
+  serviceRadiusKm?: number | null
+  averageRating?: number
+  reviewCount?: number
+  isVerified?: boolean
+  availabilityStatus?: string
+  savedLocationsJson?: string | null
+  hiringNeedsJson?: string | null
+  authProvider?: string
+  isActive?: boolean
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  professionalLatitude?: number | null
+  professionalLongitude?: number | null
+  biometricEnabled?: boolean
+  biometricType?: string | null
+  browserNotificationsEnabled?: boolean
+  emailNotificationsEnabled?: boolean
+  razorpayAccountId?: string | null
+  emailVerifiedAt?: Date | string | null
+  phoneVerifiedAt?: Date | string | null
+  projectActivityNotificationsEnabled?: boolean
+  clientJobs?: Prisma.ClientJobUncheckedCreateNestedManyWithoutUserInput
+  clientProfiles?: Prisma.ClientProfileUncheckedCreateNestedManyWithoutUserInput
+  favoriteJobs?: Prisma.FavoriteJobUncheckedCreateNestedManyWithoutUserInput
+  verification?: Prisma.ProfessionalVerificationUncheckedCreateNestedOneWithoutUserInput
+  services?: Prisma.ServiceUncheckedCreateNestedManyWithoutProfessionalInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+}
+
+export type UserCreateOrConnectWithoutPersonaVerificationsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutPersonaVerificationsInput, Prisma.UserUncheckedCreateWithoutPersonaVerificationsInput>
+}
+
+export type UserUpsertWithoutPersonaVerificationsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutPersonaVerificationsInput, Prisma.UserUncheckedUpdateWithoutPersonaVerificationsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutPersonaVerificationsInput, Prisma.UserUncheckedCreateWithoutPersonaVerificationsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutPersonaVerificationsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutPersonaVerificationsInput, Prisma.UserUncheckedUpdateWithoutPersonaVerificationsInput>
+}
+
+export type UserUpdateWithoutPersonaVerificationsInput = {
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyWebsite?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  teamSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalSkillsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  fixedRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  portfolioUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workPhotosJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  certificationsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tradeLicenseUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workMode?: Prisma.StringFieldUpdateOperationsInput | string
+  serviceRadiusKm?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  averageRating?: Prisma.FloatFieldUpdateOperationsInput | number
+  reviewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  availabilityStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  savedLocationsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hiringNeedsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  authProvider?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  professionalLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  professionalLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  razorpayAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clientJobs?: Prisma.ClientJobUpdateManyWithoutUserNestedInput
+  clientProfiles?: Prisma.ClientProfileUpdateManyWithoutUserNestedInput
+  favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutUserNestedInput
+  verification?: Prisma.ProfessionalVerificationUpdateOneWithoutUserNestedInput
+  services?: Prisma.ServiceUpdateManyWithoutProfessionalNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutPersonaVerificationsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyWebsite?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  teamSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalSkillsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  fixedRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  portfolioUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workPhotosJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  certificationsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tradeLicenseUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workMode?: Prisma.StringFieldUpdateOperationsInput | string
+  serviceRadiusKm?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  averageRating?: Prisma.FloatFieldUpdateOperationsInput | number
+  reviewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  availabilityStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  savedLocationsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hiringNeedsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  authProvider?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  professionalLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  professionalLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  razorpayAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clientJobs?: Prisma.ClientJobUncheckedUpdateManyWithoutUserNestedInput
+  clientProfiles?: Prisma.ClientProfileUncheckedUpdateManyWithoutUserNestedInput
+  favoriteJobs?: Prisma.FavoriteJobUncheckedUpdateManyWithoutUserNestedInput
+  verification?: Prisma.ProfessionalVerificationUncheckedUpdateOneWithoutUserNestedInput
   services?: Prisma.ServiceUncheckedUpdateManyWithoutProfessionalNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
 }
@@ -2546,6 +2871,7 @@ export type UserCreateWithoutAuditLogsInput = {
   biometricType?: string | null
   browserNotificationsEnabled?: boolean
   emailNotificationsEnabled?: boolean
+  razorpayAccountId?: string | null
   emailVerifiedAt?: Date | string | null
   phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
@@ -2553,6 +2879,7 @@ export type UserCreateWithoutAuditLogsInput = {
   clientProfiles?: Prisma.ClientProfileCreateNestedManyWithoutUserInput
   favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutUserInput
   verification?: Prisma.ProfessionalVerificationCreateNestedOneWithoutUserInput
+  personaVerifications?: Prisma.PersonaVerificationCreateNestedManyWithoutUserInput
   services?: Prisma.ServiceCreateNestedManyWithoutProfessionalInput
 }
 
@@ -2603,6 +2930,7 @@ export type UserUncheckedCreateWithoutAuditLogsInput = {
   biometricType?: string | null
   browserNotificationsEnabled?: boolean
   emailNotificationsEnabled?: boolean
+  razorpayAccountId?: string | null
   emailVerifiedAt?: Date | string | null
   phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
@@ -2610,6 +2938,7 @@ export type UserUncheckedCreateWithoutAuditLogsInput = {
   clientProfiles?: Prisma.ClientProfileUncheckedCreateNestedManyWithoutUserInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedCreateNestedManyWithoutUserInput
   verification?: Prisma.ProfessionalVerificationUncheckedCreateNestedOneWithoutUserInput
+  personaVerifications?: Prisma.PersonaVerificationUncheckedCreateNestedManyWithoutUserInput
   services?: Prisma.ServiceUncheckedCreateNestedManyWithoutProfessionalInput
 }
 
@@ -2675,6 +3004,7 @@ export type UserUpdateWithoutAuditLogsInput = {
   biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  razorpayAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2682,6 +3012,7 @@ export type UserUpdateWithoutAuditLogsInput = {
   clientProfiles?: Prisma.ClientProfileUpdateManyWithoutUserNestedInput
   favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutUserNestedInput
   verification?: Prisma.ProfessionalVerificationUpdateOneWithoutUserNestedInput
+  personaVerifications?: Prisma.PersonaVerificationUpdateManyWithoutUserNestedInput
   services?: Prisma.ServiceUpdateManyWithoutProfessionalNestedInput
 }
 
@@ -2732,6 +3063,7 @@ export type UserUncheckedUpdateWithoutAuditLogsInput = {
   biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  razorpayAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2739,6 +3071,7 @@ export type UserUncheckedUpdateWithoutAuditLogsInput = {
   clientProfiles?: Prisma.ClientProfileUncheckedUpdateManyWithoutUserNestedInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedUpdateManyWithoutUserNestedInput
   verification?: Prisma.ProfessionalVerificationUncheckedUpdateOneWithoutUserNestedInput
+  personaVerifications?: Prisma.PersonaVerificationUncheckedUpdateManyWithoutUserNestedInput
   services?: Prisma.ServiceUncheckedUpdateManyWithoutProfessionalNestedInput
 }
 
@@ -2788,6 +3121,7 @@ export type UserCreateWithoutServicesInput = {
   biometricType?: string | null
   browserNotificationsEnabled?: boolean
   emailNotificationsEnabled?: boolean
+  razorpayAccountId?: string | null
   emailVerifiedAt?: Date | string | null
   phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
@@ -2795,6 +3129,7 @@ export type UserCreateWithoutServicesInput = {
   clientProfiles?: Prisma.ClientProfileCreateNestedManyWithoutUserInput
   favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutUserInput
   verification?: Prisma.ProfessionalVerificationCreateNestedOneWithoutUserInput
+  personaVerifications?: Prisma.PersonaVerificationCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
 }
 
@@ -2845,6 +3180,7 @@ export type UserUncheckedCreateWithoutServicesInput = {
   biometricType?: string | null
   browserNotificationsEnabled?: boolean
   emailNotificationsEnabled?: boolean
+  razorpayAccountId?: string | null
   emailVerifiedAt?: Date | string | null
   phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
@@ -2852,6 +3188,7 @@ export type UserUncheckedCreateWithoutServicesInput = {
   clientProfiles?: Prisma.ClientProfileUncheckedCreateNestedManyWithoutUserInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedCreateNestedManyWithoutUserInput
   verification?: Prisma.ProfessionalVerificationUncheckedCreateNestedOneWithoutUserInput
+  personaVerifications?: Prisma.PersonaVerificationUncheckedCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
 }
 
@@ -2917,6 +3254,7 @@ export type UserUpdateWithoutServicesInput = {
   biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  razorpayAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2924,6 +3262,7 @@ export type UserUpdateWithoutServicesInput = {
   clientProfiles?: Prisma.ClientProfileUpdateManyWithoutUserNestedInput
   favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutUserNestedInput
   verification?: Prisma.ProfessionalVerificationUpdateOneWithoutUserNestedInput
+  personaVerifications?: Prisma.PersonaVerificationUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
 }
 
@@ -2974,6 +3313,7 @@ export type UserUncheckedUpdateWithoutServicesInput = {
   biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  razorpayAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2981,6 +3321,7 @@ export type UserUncheckedUpdateWithoutServicesInput = {
   clientProfiles?: Prisma.ClientProfileUncheckedUpdateManyWithoutUserNestedInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedUpdateManyWithoutUserNestedInput
   verification?: Prisma.ProfessionalVerificationUncheckedUpdateOneWithoutUserNestedInput
+  personaVerifications?: Prisma.PersonaVerificationUncheckedUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
 }
 
@@ -2993,6 +3334,7 @@ export type UserCountOutputType = {
   clientJobs: number
   clientProfiles: number
   favoriteJobs: number
+  personaVerifications: number
   services: number
   auditLogs: number
 }
@@ -3001,6 +3343,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   clientJobs?: boolean | UserCountOutputTypeCountClientJobsArgs
   clientProfiles?: boolean | UserCountOutputTypeCountClientProfilesArgs
   favoriteJobs?: boolean | UserCountOutputTypeCountFavoriteJobsArgs
+  personaVerifications?: boolean | UserCountOutputTypeCountPersonaVerificationsArgs
   services?: boolean | UserCountOutputTypeCountServicesArgs
   auditLogs?: boolean | UserCountOutputTypeCountAuditLogsArgs
 }
@@ -3034,6 +3377,13 @@ export type UserCountOutputTypeCountClientProfilesArgs<ExtArgs extends runtime.T
  */
 export type UserCountOutputTypeCountFavoriteJobsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.FavoriteJobWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountPersonaVerificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PersonaVerificationWhereInput
 }
 
 /**
@@ -3098,6 +3448,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   biometricType?: boolean
   browserNotificationsEnabled?: boolean
   emailNotificationsEnabled?: boolean
+  razorpayAccountId?: boolean
   emailVerifiedAt?: boolean
   phoneVerifiedAt?: boolean
   projectActivityNotificationsEnabled?: boolean
@@ -3105,6 +3456,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   clientProfiles?: boolean | Prisma.User$clientProfilesArgs<ExtArgs>
   favoriteJobs?: boolean | Prisma.User$favoriteJobsArgs<ExtArgs>
   verification?: boolean | Prisma.User$verificationArgs<ExtArgs>
+  personaVerifications?: boolean | Prisma.User$personaVerificationsArgs<ExtArgs>
   services?: boolean | Prisma.User$servicesArgs<ExtArgs>
   auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -3157,6 +3509,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   biometricType?: boolean
   browserNotificationsEnabled?: boolean
   emailNotificationsEnabled?: boolean
+  razorpayAccountId?: boolean
   emailVerifiedAt?: boolean
   phoneVerifiedAt?: boolean
   projectActivityNotificationsEnabled?: boolean
@@ -3209,6 +3562,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   biometricType?: boolean
   browserNotificationsEnabled?: boolean
   emailNotificationsEnabled?: boolean
+  razorpayAccountId?: boolean
   emailVerifiedAt?: boolean
   phoneVerifiedAt?: boolean
   projectActivityNotificationsEnabled?: boolean
@@ -3261,17 +3615,19 @@ export type UserSelectScalar = {
   biometricType?: boolean
   browserNotificationsEnabled?: boolean
   emailNotificationsEnabled?: boolean
+  razorpayAccountId?: boolean
   emailVerifiedAt?: boolean
   phoneVerifiedAt?: boolean
   projectActivityNotificationsEnabled?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "role" | "firstName" | "lastName" | "email" | "username" | "phone" | "passwordHash" | "googleId" | "avatarUrl" | "companyName" | "companyWebsite" | "industry" | "teamSize" | "companyDescription" | "address" | "professionalCategory" | "professionalCity" | "professionalSkillsJson" | "experienceYears" | "hourlyRate" | "fixedRate" | "portfolioUrl" | "workPhotosJson" | "certificationsJson" | "tradeLicenseUrl" | "serviceArea" | "workMode" | "serviceRadiusKm" | "averageRating" | "reviewCount" | "isVerified" | "availabilityStatus" | "savedLocationsJson" | "hiringNeedsJson" | "authProvider" | "isActive" | "lastLoginAt" | "createdAt" | "updatedAt" | "professionalLatitude" | "professionalLongitude" | "biometricEnabled" | "biometricType" | "browserNotificationsEnabled" | "emailNotificationsEnabled" | "emailVerifiedAt" | "phoneVerifiedAt" | "projectActivityNotificationsEnabled", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "role" | "firstName" | "lastName" | "email" | "username" | "phone" | "passwordHash" | "googleId" | "avatarUrl" | "companyName" | "companyWebsite" | "industry" | "teamSize" | "companyDescription" | "address" | "professionalCategory" | "professionalCity" | "professionalSkillsJson" | "experienceYears" | "hourlyRate" | "fixedRate" | "portfolioUrl" | "workPhotosJson" | "certificationsJson" | "tradeLicenseUrl" | "serviceArea" | "workMode" | "serviceRadiusKm" | "averageRating" | "reviewCount" | "isVerified" | "availabilityStatus" | "savedLocationsJson" | "hiringNeedsJson" | "authProvider" | "isActive" | "lastLoginAt" | "createdAt" | "updatedAt" | "professionalLatitude" | "professionalLongitude" | "biometricEnabled" | "biometricType" | "browserNotificationsEnabled" | "emailNotificationsEnabled" | "razorpayAccountId" | "emailVerifiedAt" | "phoneVerifiedAt" | "projectActivityNotificationsEnabled", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   clientJobs?: boolean | Prisma.User$clientJobsArgs<ExtArgs>
   clientProfiles?: boolean | Prisma.User$clientProfilesArgs<ExtArgs>
   favoriteJobs?: boolean | Prisma.User$favoriteJobsArgs<ExtArgs>
   verification?: boolean | Prisma.User$verificationArgs<ExtArgs>
+  personaVerifications?: boolean | Prisma.User$personaVerificationsArgs<ExtArgs>
   services?: boolean | Prisma.User$servicesArgs<ExtArgs>
   auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -3286,6 +3642,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     clientProfiles: Prisma.$ClientProfilePayload<ExtArgs>[]
     favoriteJobs: Prisma.$FavoriteJobPayload<ExtArgs>[]
     verification: Prisma.$ProfessionalVerificationPayload<ExtArgs> | null
+    personaVerifications: Prisma.$PersonaVerificationPayload<ExtArgs>[]
     services: Prisma.$ServicePayload<ExtArgs>[]
     auditLogs: Prisma.$AuditLogPayload<ExtArgs>[]
   }
@@ -3336,6 +3693,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     biometricType: string | null
     browserNotificationsEnabled: boolean
     emailNotificationsEnabled: boolean
+    razorpayAccountId: string | null
     emailVerifiedAt: Date | null
     phoneVerifiedAt: Date | null
     projectActivityNotificationsEnabled: boolean
@@ -3737,6 +4095,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   clientProfiles<T extends Prisma.User$clientProfilesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$clientProfilesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClientProfilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   favoriteJobs<T extends Prisma.User$favoriteJobsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$favoriteJobsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FavoriteJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   verification<T extends Prisma.User$verificationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$verificationArgs<ExtArgs>>): Prisma.Prisma__ProfessionalVerificationClient<runtime.Types.Result.GetResult<Prisma.$ProfessionalVerificationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  personaVerifications<T extends Prisma.User$personaVerificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$personaVerificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PersonaVerificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   services<T extends Prisma.User$servicesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$servicesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ServicePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   auditLogs<T extends Prisma.User$auditLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$auditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -3814,6 +4173,7 @@ export interface UserFieldRefs {
   readonly biometricType: Prisma.FieldRef<"User", 'String'>
   readonly browserNotificationsEnabled: Prisma.FieldRef<"User", 'Boolean'>
   readonly emailNotificationsEnabled: Prisma.FieldRef<"User", 'Boolean'>
+  readonly razorpayAccountId: Prisma.FieldRef<"User", 'String'>
   readonly emailVerifiedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly phoneVerifiedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly projectActivityNotificationsEnabled: Prisma.FieldRef<"User", 'Boolean'>
@@ -4298,6 +4658,30 @@ export type User$verificationArgs<ExtArgs extends runtime.Types.Extensions.Inter
    */
   include?: Prisma.ProfessionalVerificationInclude<ExtArgs> | null
   where?: Prisma.ProfessionalVerificationWhereInput
+}
+
+/**
+ * User.personaVerifications
+ */
+export type User$personaVerificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PersonaVerification
+   */
+  select?: Prisma.PersonaVerificationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PersonaVerification
+   */
+  omit?: Prisma.PersonaVerificationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PersonaVerificationInclude<ExtArgs> | null
+  where?: Prisma.PersonaVerificationWhereInput
+  orderBy?: Prisma.PersonaVerificationOrderByWithRelationInput | Prisma.PersonaVerificationOrderByWithRelationInput[]
+  cursor?: Prisma.PersonaVerificationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PersonaVerificationScalarFieldEnum | Prisma.PersonaVerificationScalarFieldEnum[]
 }
 
 /**

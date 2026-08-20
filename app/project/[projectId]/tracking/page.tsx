@@ -103,6 +103,7 @@ type Data = {
     issueType: string;
     message: string;
     status: string;
+    reporterRole: string;
     createdAt: string;
   } | null;
 };
@@ -151,6 +152,15 @@ const needsAction = (status: string) =>
   status === "REVISION_REQUESTED" ||
   status === "AWAITING_CLIENT_REVIEW" ||
   status === "FINAL_WORK_SUBMITTED";
+const disputeEligibleStatuses = [
+  "READY_TO_START",
+  "IN_PROGRESS",
+  "AWAITING_CLIENT_REVIEW",
+  "REVISION_REQUESTED",
+  "FINAL_WORK_SUBMITTED",
+  "COMPLETED",
+  "CLOSED",
+];
 
 export default function SharedProjectTrackingPage() {
   const { projectId } = useParams<{ projectId: string }>();
@@ -263,6 +273,75 @@ export default function SharedProjectTrackingPage() {
       actionInFlight.current = false;
     }
   };
+
+  async function approveMilestoneWithPayment(milestoneId: number) {
+    const response = await fetch("/api/payments/razorpay/order", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ projectId: Number(projectId), milestoneId }),
+    });
+    const order = (await response.json().catch(() => null)) as {
+      enabled?: boolean;
+      keyId?: string;
+      orderId?: string;
+      amount?: number;
+      currency?: string;
+      error?: string;
+    } | null;
+    if (!response.ok) return setMessage(order?.error ?? "Unable to start payment.");
+    if (!order?.enabled) return void action("approve-milestone", { milestoneId });
+    if (!order.keyId || !order.orderId || !order.amount)
+      return setMessage("Razorpay payment details are incomplete.");
+    await new Promise<void>((resolve, reject) => {
+      const open = () => {
+        const Razorpay = (
+          window as Window & {
+            Razorpay?: new (options: Record<string, unknown>) => { open: () => void };
+          }
+        ).Razorpay;
+        if (!Razorpay) return reject(new Error("Razorpay checkout could not be loaded."));
+        const checkout = new Razorpay({
+          key: order.keyId,
+          amount: order.amount,
+          currency: order.currency ?? "INR",
+          name: "Servio",
+          description: "Project milestone payment",
+          order_id: order.orderId,
+          handler: async (result: {
+            razorpay_payment_id: string;
+            razorpay_order_id: string;
+            razorpay_signature: string;
+          }) => {
+            const verified = await fetch("/api/payments/razorpay/verify", {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({
+                razorpayOrderId: result.razorpay_order_id,
+                razorpayPaymentId: result.razorpay_payment_id,
+                razorpaySignature: result.razorpay_signature,
+              }),
+            });
+            if (!verified.ok)
+              return reject(new Error("Payment verification failed. Please contact support."));
+            resolve();
+          },
+          modal: { ondismiss: () => reject(new Error("Payment was cancelled.")) },
+        });
+        checkout.open();
+      };
+      if (document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]'))
+        return open();
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = open;
+      script.onerror = () => reject(new Error("Unable to load Razorpay checkout."));
+      document.body.appendChild(script);
+    })
+      .then(() => refresh().catch(() => undefined))
+      .catch((error: unknown) =>
+        setMessage(error instanceof Error ? error.message : "Payment was not completed."),
+      );
+  }
 
   // This effect must run on every render. Keeping it below the loading return
   // changes the hook order as soon as project data arrives, which crashes the
@@ -669,62 +748,39 @@ export default function SharedProjectTrackingPage() {
                   </div>
                 </div>
 
-                <div className="mt-5 grid gap-4 md:grid-cols-2">
-                  <div className="rounded-xl border bg-card p-4 shadow-soft">
-                    <p className="font-medium">
-                      {isClient ? "Rate professional" : "View ratings & client reviews"}
+                <div className="mt-5 rounded-xl border bg-card p-4 shadow-soft">
+                  <p className="font-medium">
+                    {isClient ? "Rate professional" : "View ratings & client reviews"}
+                  </p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {isClient
+                      ? data.review
+                        ? `Submitted: ${data.review.rating}/5`
+                        : "Share your feedback and experience."
+                      : data.review
+                        ? `${data.review.rating}/5${data.review.comment ? ` · “${data.review.comment}”` : ""}`
+                        : "The client has not left a review yet."}
+                  </p>
+                  {isClient && !data.review && (
+                    <Button className="mt-4" size="sm" onClick={() => setShowReviewForm(true)}>
+                      {isClient ? "Rate professional" : "Rate client"}
+                    </Button>
+                  )}
+                  {!isClient && data.review && !data.review.professionalResponse && (
+                    <Button
+                      className="mt-4"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowReviewResponseForm(true)}
+                    >
+                      Respond to review
+                    </Button>
+                  )}
+                  {!isClient && data.review?.professionalResponse && (
+                    <p className="mt-3 text-sm text-muted-foreground">
+                      Your response: {data.review.professionalResponse}
                     </p>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {isClient
-                        ? data.review
-                          ? `Submitted: ${data.review.rating}/5`
-                          : "Share your feedback and experience."
-                        : data.review
-                          ? `${data.review.rating}/5${data.review.comment ? ` · “${data.review.comment}”` : ""}`
-                          : "The client has not left a review yet."}
-                    </p>
-                    {isClient && !data.review && (
-                      <Button className="mt-4" size="sm" onClick={() => setShowReviewForm(true)}>
-                        {isClient ? "Rate professional" : "Rate client"}
-                      </Button>
-                    )}
-                  </div>
-                  <div className="rounded-xl border bg-card p-4 shadow-soft">
-                    <p className="font-medium">
-                      {isClient ? "Report issue / Raise dispute" : "Respond to review"}
-                    </p>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {data.dispute
-                        ? `${data.dispute.issueType} · ${data.dispute.status}`
-                        : isClient
-                          ? "Escalate any unresolved payment, quality, or delivery issue."
-                          : data.review?.professionalResponse
-                            ? `Your response: ${data.review.professionalResponse}`
-                            : data.review
-                              ? "Thank the client or provide helpful context."
-                              : "A response becomes available after the client submits a review."}
-                    </p>
-                    {isClient && !data.dispute && (
-                      <Button
-                        className="mt-4"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setShowDisputeForm((value) => !value)}
-                      >
-                        {showDisputeForm ? "Hide dispute form" : "Report an issue"}
-                      </Button>
-                    )}
-                    {!isClient && data.review && !data.review.professionalResponse && (
-                      <Button
-                        className="mt-4"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setShowReviewResponseForm(true)}
-                      >
-                        Respond to review
-                      </Button>
-                    )}
-                  </div>
+                  )}
                 </div>
 
                 {showReviewForm && !data.review && (
@@ -818,6 +874,40 @@ export default function SharedProjectTrackingPage() {
                       </div>
                     </div>
                   )}
+              </section>
+            )}
+
+            {disputeEligibleStatuses.includes(data.project.status) && (
+              <section className="rounded-2xl border bg-card p-5 shadow-soft">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p className="font-medium">Report issue / Raise dispute</p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {data.dispute
+                        ? `${data.dispute.issueType} · ${data.dispute.status}`
+                        : "Escalate any unresolved payment, quality, or delivery issue."}
+                    </p>
+                    {data.dispute && (
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        Raised by{" "}
+                        {(data.dispute.reporterRole === "CLIENT") === isClient
+                          ? "you"
+                          : data.dispute.reporterRole === "CLIENT"
+                            ? "the client"
+                            : "the professional"}
+                      </p>
+                    )}
+                  </div>
+                  {!data.dispute && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowDisputeForm((value) => !value)}
+                    >
+                      {showDisputeForm ? "Hide dispute form" : "Raise dispute"}
+                    </Button>
+                  )}
+                </div>
 
                 {showDisputeForm && !data.dispute && (
                   <div className="mt-4 rounded-xl border bg-card p-4">
@@ -1033,7 +1123,7 @@ export default function SharedProjectTrackingPage() {
                             disabled={busy === "approve-milestone"}
                             onClick={() => {
                               if (confirm(`Approve ${m.title}?`))
-                                void action("approve-milestone", { milestoneId: m.id });
+                                void approveMilestoneWithPayment(m.id);
                             }}
                           >
                             Approve

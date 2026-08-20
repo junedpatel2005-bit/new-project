@@ -7,6 +7,7 @@ type PrismaWithSharedTracking = PrismaClient & {
   projectTimelineEvent?: unknown;
   verificationDocumentReview?: unknown;
   pageTextOverride?: unknown;
+  projectDisputeMessage?: unknown;
 };
 const globalForPrisma = global as unknown as {
   prisma?: PrismaWithSharedTracking;
@@ -34,6 +35,7 @@ export const db =
   globalForPrisma.prisma?.projectTimelineEvent &&
   globalForPrisma.prisma?.verificationDocumentReview &&
   globalForPrisma.prisma?.pageTextOverride &&
+  globalForPrisma.prisma?.projectDisputeMessage &&
   globalForPrisma.pgPool
     ? globalForPrisma.prisma
     : new PrismaClient({ adapter });

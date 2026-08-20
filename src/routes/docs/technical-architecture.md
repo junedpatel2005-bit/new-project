@@ -23,7 +23,7 @@
 | OTD-10 | Audit log retention            | 7 years                                                             |
 | OTD-11 | Min reviews for rating display | 3                                                                   |
 | OTD-12 | Providers                      | Twilio (SMS), Mailtrap→SendGrid (email), **Web Push/VAPID**         |
-| OTD-13 | Payments                       | **Stripe Connect Express**, escrow                                  |
+| OTD-13 | Payments                       | **Razorpay Checkout + Route**, escrow                               |
 | OTD-14 | Environments                   | local → preview (per PR) → staging → production                     |
 | —      | **Maps**                       | **Google Maps** — Maps JS, Places, Geocoding, Distance Matrix       |
 | —      | **Tax**                        | Per-province `TaxRate`, versioned by effective date                 |

@@ -17,6 +17,7 @@ type Transaction = {
   status: string;
   description: string;
   createdAt: string;
+  invoicePaymentId: number | null;
 };
 type Withdrawal = {
   id: number;
@@ -25,13 +26,21 @@ type Withdrawal = {
   destinationLabel: string | null;
   createdAt: string;
 };
-type Wallet = { total: number; available: number; reserved: number; withdrawals: Withdrawal[] };
+type Wallet = {
+  total: number;
+  grossTotal?: number;
+  commission: number;
+  available: number;
+  reserved: number;
+  withdrawals: Withdrawal[];
+};
 export default function Earnings() {
   const [items, setItems] = useState<Transaction[] | null>(null);
   const [wallet, setWallet] = useState<Wallet | null>(null);
   const [amount, setAmount] = useState("");
   const [destination, setDestination] = useState("");
   const [message, setMessage] = useState("");
+  const [razorpayAccountId, setRazorpayAccountId] = useState("");
   const load = () => {
     void fetch("/api/v1/portal/earnings", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : []))
@@ -39,6 +48,11 @@ export default function Earnings() {
     void fetch("/api/v1/wallet", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
       .then(setWallet);
+    void fetch("/api/professional/razorpay-account", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: { razorpayAccountId?: string | null } | null) =>
+        setRazorpayAccountId(d?.razorpayAccountId ?? ""),
+      );
   };
   useEffect(load, []);
   const thisMonth = useMemo(
@@ -70,6 +84,19 @@ export default function Earnings() {
       load();
     }
   }
+  async function saveRazorpayAccount() {
+    const response = await fetch("/api/professional/razorpay-account", {
+      method: "PUT",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ razorpayAccountId: razorpayAccountId.trim() || null }),
+    });
+    const result = await response.json();
+    setMessage(
+      response.ok
+        ? "Razorpay payout account saved."
+        : (result.error ?? "Unable to save payout account."),
+    );
+  }
   return (
     <div className="space-y-6">
       <section className="rounded-3xl bg-[linear-gradient(120deg,var(--color-ink),var(--color-primary))] p-7 text-white shadow-card">
@@ -85,7 +112,7 @@ export default function Earnings() {
         <div className="h-72 animate-pulse rounded-2xl bg-muted" />
       ) : (
         <>
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
             <Stat
               icon={WalletCards}
               label="Available balance"
@@ -97,6 +124,12 @@ export default function Earnings() {
               label="Total earned"
               value={`₹${wallet.total.toLocaleString()}`}
             />
+            <Stat
+              icon={ReceiptText}
+              label="Commission deducted"
+              value={`₹${wallet.commission.toLocaleString()}`}
+              tone="amber"
+            />
             <Stat icon={Clock3} label="This month" value={`₹${thisMonth.toLocaleString()}`} />
             <Stat
               icon={Landmark}
@@ -104,6 +137,21 @@ export default function Earnings() {
               value={`₹${wallet.reserved.toLocaleString()}`}
             />
           </div>
+          <section className="rounded-2xl border border-border bg-card p-5 shadow-soft">
+            <h2 className="font-display text-xl font-semibold">Commission deduction breakdown</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Commission is deducted from each completed Razorpay payment before earnings become
+              available.
+            </p>
+            <div className="mt-5 grid gap-3 sm:grid-cols-3">
+              <Breakdown
+                label="Gross completed payments"
+                value={wallet.grossTotal ?? wallet.total + wallet.commission}
+              />
+              <Breakdown label="Platform commission" value={wallet.commission} tone="amber" />
+              <Breakdown label="Net professional earnings" value={wallet.total} tone="success" />
+            </div>
+          </section>
           <div className="grid gap-6 xl:grid-cols-[1.25fr_.75fr]">
             <section className="overflow-hidden rounded-2xl border border-border bg-card shadow-soft">
               <div className="flex items-center justify-between border-b border-border p-5">
@@ -132,8 +180,16 @@ export default function Earnings() {
                     </p>
                   </div>
                   <p className="font-bold text-success">
-                    +${i.amount.toLocaleString()} <span className="text-xs">{i.currency}</span>
+                    +₹{i.amount.toLocaleString()} <span className="text-xs">{i.currency}</span>
                   </p>
+                  {i.invoicePaymentId ? (
+                    <a
+                      className="text-xs font-semibold text-primary hover:underline"
+                      href={`/api/portal/invoices/${i.invoicePaymentId}`}
+                    >
+                      Invoice PDF
+                    </a>
+                  ) : null}
                 </div>
               ))}
               {!items.length && (
@@ -144,6 +200,25 @@ export default function Earnings() {
               )}
             </section>
             <aside className="space-y-6">
+              <section className="rounded-2xl border border-border bg-card p-5 shadow-soft">
+                <h2 className="font-display text-xl font-semibold">Razorpay payout account</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Add your Razorpay Route Linked Account ID to receive marketplace earnings.
+                </p>
+                <input
+                  className="mt-4 h-11 w-full rounded-xl border border-input bg-background px-3 text-sm"
+                  placeholder="acc_..."
+                  value={razorpayAccountId}
+                  onChange={(e) => setRazorpayAccountId(e.target.value)}
+                />
+                <Button
+                  className="mt-3 w-full"
+                  variant="outline"
+                  onClick={() => void saveRazorpayAccount()}
+                >
+                  Save payout account
+                </Button>
+              </section>
               <section className="rounded-2xl border border-border bg-card p-5 shadow-soft">
                 <h2 className="font-display text-xl font-semibold">Request withdrawal</h2>
                 <p className="mt-1 text-sm text-muted-foreground">
@@ -230,6 +305,27 @@ function Stat({
       <Icon className="h-5 w-5 text-primary" />
       <p className="mt-4 text-2xl font-bold">{value}</p>
       <p className="text-sm text-muted-foreground">{label}</p>
+    </div>
+  );
+}
+
+function Breakdown({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: number;
+  tone?: "amber" | "success";
+}) {
+  return (
+    <div className="rounded-xl border border-border bg-background/60 p-4">
+      <p className="text-sm text-muted-foreground">{label}</p>
+      <p
+        className={`mt-2 text-xl font-bold ${tone === "amber" ? "text-amber-600" : tone === "success" ? "text-success" : ""}`}
+      >
+        ₹{value.toLocaleString()}
+      </p>
     </div>
   );
 }

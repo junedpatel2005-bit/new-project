@@ -434,15 +434,20 @@ export const ModelName = {
   UserNotification: 'UserNotification',
   UserNotificationState: 'UserNotificationState',
   Payment: 'Payment',
+  RazorpayWebhookEvent: 'RazorpayWebhookEvent',
   Wallet: 'Wallet',
   WalletTransaction: 'WalletTransaction',
   ProjectWithdrawal: 'ProjectWithdrawal',
+  Invoice: 'Invoice',
   ProjectDispute: 'ProjectDispute',
+  ProjectDisputeMessage: 'ProjectDisputeMessage',
   ProjectCompletionRequest: 'ProjectCompletionRequest',
   ProjectRevisionRequest: 'ProjectRevisionRequest',
   ProjectReviewRequest: 'ProjectReviewRequest',
   ProfessionalVerification: 'ProfessionalVerification',
   VerificationDocumentReview: 'VerificationDocumentReview',
+  PersonaVerification: 'PersonaVerification',
+  PersonaWebhookEvent: 'PersonaWebhookEvent',
   StoredFile: 'StoredFile',
   AuditLog: 'AuditLog',
   ApiToken: 'ApiToken',
@@ -474,7 +479,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "cmsPage" | "cmsPageVersion" | "cmsMedia" | "sQLiteMigrationTableArchive" | "sQLiteMigrationAudit" | "websitePage" | "legalPage" | "serviceCategory" | "user" | "clientProfile" | "clientSavedLocation" | "clientHiringNeed" | "clientJob" | "favoriteJob" | "clientJobAttachment" | "projectTransaction" | "projectNegotiation" | "projectReview" | "projectRequest" | "projectTracking" | "projectTimelineEvent" | "projectMilestone" | "projectWorkUpload" | "hireJob" | "hireContract" | "hireAttachment" | "hireMilestone" | "directHireNegotiation" | "socketConversation" | "socketMessage" | "socketConversationClear" | "callSession" | "messageConversation" | "message" | "userNotification" | "userNotificationState" | "payment" | "wallet" | "walletTransaction" | "projectWithdrawal" | "projectDispute" | "projectCompletionRequest" | "projectRevisionRequest" | "projectReviewRequest" | "professionalVerification" | "verificationDocumentReview" | "storedFile" | "auditLog" | "apiToken" | "otpCode" | "browserSubscription" | "faq" | "contactRequest" | "service" | "pageConfiguration" | "websitePageOverride" | "pageTextOverride" | "legacyUser" | "legacyUserProfile" | "legacyProfessionalDetail" | "legacyLocation" | "legacyVerification"
+    modelProps: "cmsPage" | "cmsPageVersion" | "cmsMedia" | "sQLiteMigrationTableArchive" | "sQLiteMigrationAudit" | "websitePage" | "legalPage" | "serviceCategory" | "user" | "clientProfile" | "clientSavedLocation" | "clientHiringNeed" | "clientJob" | "favoriteJob" | "clientJobAttachment" | "projectTransaction" | "projectNegotiation" | "projectReview" | "projectRequest" | "projectTracking" | "projectTimelineEvent" | "projectMilestone" | "projectWorkUpload" | "hireJob" | "hireContract" | "hireAttachment" | "hireMilestone" | "directHireNegotiation" | "socketConversation" | "socketMessage" | "socketConversationClear" | "callSession" | "messageConversation" | "message" | "userNotification" | "userNotificationState" | "payment" | "razorpayWebhookEvent" | "wallet" | "walletTransaction" | "projectWithdrawal" | "invoice" | "projectDispute" | "projectDisputeMessage" | "projectCompletionRequest" | "projectRevisionRequest" | "projectReviewRequest" | "professionalVerification" | "verificationDocumentReview" | "personaVerification" | "personaWebhookEvent" | "storedFile" | "auditLog" | "apiToken" | "otpCode" | "browserSubscription" | "faq" | "contactRequest" | "service" | "pageConfiguration" | "websitePageOverride" | "pageTextOverride" | "legacyUser" | "legacyUserProfile" | "legacyProfessionalDetail" | "legacyLocation" | "legacyVerification"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -3216,6 +3221,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    RazorpayWebhookEvent: {
+      payload: Prisma.$RazorpayWebhookEventPayload<ExtArgs>
+      fields: Prisma.RazorpayWebhookEventFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RazorpayWebhookEventFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RazorpayWebhookEventPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RazorpayWebhookEventFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RazorpayWebhookEventPayload>
+        }
+        findFirst: {
+          args: Prisma.RazorpayWebhookEventFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RazorpayWebhookEventPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RazorpayWebhookEventFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RazorpayWebhookEventPayload>
+        }
+        findMany: {
+          args: Prisma.RazorpayWebhookEventFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RazorpayWebhookEventPayload>[]
+        }
+        create: {
+          args: Prisma.RazorpayWebhookEventCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RazorpayWebhookEventPayload>
+        }
+        createMany: {
+          args: Prisma.RazorpayWebhookEventCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RazorpayWebhookEventCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RazorpayWebhookEventPayload>[]
+        }
+        delete: {
+          args: Prisma.RazorpayWebhookEventDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RazorpayWebhookEventPayload>
+        }
+        update: {
+          args: Prisma.RazorpayWebhookEventUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RazorpayWebhookEventPayload>
+        }
+        deleteMany: {
+          args: Prisma.RazorpayWebhookEventDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RazorpayWebhookEventUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RazorpayWebhookEventUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RazorpayWebhookEventPayload>[]
+        }
+        upsert: {
+          args: Prisma.RazorpayWebhookEventUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RazorpayWebhookEventPayload>
+        }
+        aggregate: {
+          args: Prisma.RazorpayWebhookEventAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRazorpayWebhookEvent>
+        }
+        groupBy: {
+          args: Prisma.RazorpayWebhookEventGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RazorpayWebhookEventGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RazorpayWebhookEventCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RazorpayWebhookEventCountAggregateOutputType> | number
+        }
+      }
+    }
     Wallet: {
       payload: Prisma.$WalletPayload<ExtArgs>
       fields: Prisma.WalletFieldRefs
@@ -3438,6 +3517,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Invoice: {
+      payload: Prisma.$InvoicePayload<ExtArgs>
+      fields: Prisma.InvoiceFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.InvoiceFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InvoicePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.InvoiceFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InvoicePayload>
+        }
+        findFirst: {
+          args: Prisma.InvoiceFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InvoicePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.InvoiceFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InvoicePayload>
+        }
+        findMany: {
+          args: Prisma.InvoiceFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InvoicePayload>[]
+        }
+        create: {
+          args: Prisma.InvoiceCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InvoicePayload>
+        }
+        createMany: {
+          args: Prisma.InvoiceCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.InvoiceCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InvoicePayload>[]
+        }
+        delete: {
+          args: Prisma.InvoiceDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InvoicePayload>
+        }
+        update: {
+          args: Prisma.InvoiceUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InvoicePayload>
+        }
+        deleteMany: {
+          args: Prisma.InvoiceDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.InvoiceUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.InvoiceUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InvoicePayload>[]
+        }
+        upsert: {
+          args: Prisma.InvoiceUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InvoicePayload>
+        }
+        aggregate: {
+          args: Prisma.InvoiceAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateInvoice>
+        }
+        groupBy: {
+          args: Prisma.InvoiceGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.InvoiceGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.InvoiceCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.InvoiceCountAggregateOutputType> | number
+        }
+      }
+    }
     ProjectDispute: {
       payload: Prisma.$ProjectDisputePayload<ExtArgs>
       fields: Prisma.ProjectDisputeFieldRefs
@@ -3509,6 +3662,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.ProjectDisputeCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.ProjectDisputeCountAggregateOutputType> | number
+        }
+      }
+    }
+    ProjectDisputeMessage: {
+      payload: Prisma.$ProjectDisputeMessagePayload<ExtArgs>
+      fields: Prisma.ProjectDisputeMessageFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ProjectDisputeMessageFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectDisputeMessagePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ProjectDisputeMessageFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectDisputeMessagePayload>
+        }
+        findFirst: {
+          args: Prisma.ProjectDisputeMessageFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectDisputeMessagePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ProjectDisputeMessageFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectDisputeMessagePayload>
+        }
+        findMany: {
+          args: Prisma.ProjectDisputeMessageFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectDisputeMessagePayload>[]
+        }
+        create: {
+          args: Prisma.ProjectDisputeMessageCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectDisputeMessagePayload>
+        }
+        createMany: {
+          args: Prisma.ProjectDisputeMessageCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ProjectDisputeMessageCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectDisputeMessagePayload>[]
+        }
+        delete: {
+          args: Prisma.ProjectDisputeMessageDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectDisputeMessagePayload>
+        }
+        update: {
+          args: Prisma.ProjectDisputeMessageUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectDisputeMessagePayload>
+        }
+        deleteMany: {
+          args: Prisma.ProjectDisputeMessageDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ProjectDisputeMessageUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ProjectDisputeMessageUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectDisputeMessagePayload>[]
+        }
+        upsert: {
+          args: Prisma.ProjectDisputeMessageUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectDisputeMessagePayload>
+        }
+        aggregate: {
+          args: Prisma.ProjectDisputeMessageAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProjectDisputeMessage>
+        }
+        groupBy: {
+          args: Prisma.ProjectDisputeMessageGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProjectDisputeMessageGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ProjectDisputeMessageCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProjectDisputeMessageCountAggregateOutputType> | number
         }
       }
     }
@@ -3879,6 +4106,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.VerificationDocumentReviewCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.VerificationDocumentReviewCountAggregateOutputType> | number
+        }
+      }
+    }
+    PersonaVerification: {
+      payload: Prisma.$PersonaVerificationPayload<ExtArgs>
+      fields: Prisma.PersonaVerificationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PersonaVerificationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PersonaVerificationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PersonaVerificationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PersonaVerificationPayload>
+        }
+        findFirst: {
+          args: Prisma.PersonaVerificationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PersonaVerificationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PersonaVerificationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PersonaVerificationPayload>
+        }
+        findMany: {
+          args: Prisma.PersonaVerificationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PersonaVerificationPayload>[]
+        }
+        create: {
+          args: Prisma.PersonaVerificationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PersonaVerificationPayload>
+        }
+        createMany: {
+          args: Prisma.PersonaVerificationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PersonaVerificationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PersonaVerificationPayload>[]
+        }
+        delete: {
+          args: Prisma.PersonaVerificationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PersonaVerificationPayload>
+        }
+        update: {
+          args: Prisma.PersonaVerificationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PersonaVerificationPayload>
+        }
+        deleteMany: {
+          args: Prisma.PersonaVerificationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PersonaVerificationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PersonaVerificationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PersonaVerificationPayload>[]
+        }
+        upsert: {
+          args: Prisma.PersonaVerificationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PersonaVerificationPayload>
+        }
+        aggregate: {
+          args: Prisma.PersonaVerificationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePersonaVerification>
+        }
+        groupBy: {
+          args: Prisma.PersonaVerificationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PersonaVerificationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PersonaVerificationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PersonaVerificationCountAggregateOutputType> | number
+        }
+      }
+    }
+    PersonaWebhookEvent: {
+      payload: Prisma.$PersonaWebhookEventPayload<ExtArgs>
+      fields: Prisma.PersonaWebhookEventFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PersonaWebhookEventFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PersonaWebhookEventPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PersonaWebhookEventFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PersonaWebhookEventPayload>
+        }
+        findFirst: {
+          args: Prisma.PersonaWebhookEventFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PersonaWebhookEventPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PersonaWebhookEventFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PersonaWebhookEventPayload>
+        }
+        findMany: {
+          args: Prisma.PersonaWebhookEventFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PersonaWebhookEventPayload>[]
+        }
+        create: {
+          args: Prisma.PersonaWebhookEventCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PersonaWebhookEventPayload>
+        }
+        createMany: {
+          args: Prisma.PersonaWebhookEventCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PersonaWebhookEventCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PersonaWebhookEventPayload>[]
+        }
+        delete: {
+          args: Prisma.PersonaWebhookEventDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PersonaWebhookEventPayload>
+        }
+        update: {
+          args: Prisma.PersonaWebhookEventUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PersonaWebhookEventPayload>
+        }
+        deleteMany: {
+          args: Prisma.PersonaWebhookEventDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PersonaWebhookEventUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PersonaWebhookEventUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PersonaWebhookEventPayload>[]
+        }
+        upsert: {
+          args: Prisma.PersonaWebhookEventUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PersonaWebhookEventPayload>
+        }
+        aggregate: {
+          args: Prisma.PersonaWebhookEventAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePersonaWebhookEvent>
+        }
+        groupBy: {
+          args: Prisma.PersonaWebhookEventGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PersonaWebhookEventGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PersonaWebhookEventCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PersonaWebhookEventCountAggregateOutputType> | number
         }
       }
     }
@@ -5258,6 +5633,7 @@ export const UserScalarFieldEnum = {
   biometricType: 'biometricType',
   browserNotificationsEnabled: 'browserNotificationsEnabled',
   emailNotificationsEnabled: 'emailNotificationsEnabled',
+  razorpayAccountId: 'razorpayAccountId',
   emailVerifiedAt: 'emailVerifiedAt',
   phoneVerifiedAt: 'phoneVerifiedAt',
   projectActivityNotificationsEnabled: 'projectActivityNotificationsEnabled'
@@ -5695,6 +6071,13 @@ export const PaymentScalarFieldEnum = {
   currency: 'currency',
   provider: 'provider',
   providerReference: 'providerReference',
+  razorpayOrderId: 'razorpayOrderId',
+  razorpayPaymentId: 'razorpayPaymentId',
+  razorpaySignature: 'razorpaySignature',
+  projectTrackingId: 'projectTrackingId',
+  milestoneId: 'milestoneId',
+  capturedAt: 'capturedAt',
+  failureReason: 'failureReason',
   status: 'status',
   idempotencyKey: 'idempotencyKey',
   createdAt: 'createdAt',
@@ -5702,6 +6085,17 @@ export const PaymentScalarFieldEnum = {
 } as const
 
 export type PaymentScalarFieldEnum = (typeof PaymentScalarFieldEnum)[keyof typeof PaymentScalarFieldEnum]
+
+
+export const RazorpayWebhookEventScalarFieldEnum = {
+  id: 'id',
+  eventId: 'eventId',
+  eventName: 'eventName',
+  payloadJson: 'payloadJson',
+  createdAt: 'createdAt'
+} as const
+
+export type RazorpayWebhookEventScalarFieldEnum = (typeof RazorpayWebhookEventScalarFieldEnum)[keyof typeof RazorpayWebhookEventScalarFieldEnum]
 
 
 export const WalletScalarFieldEnum = {
@@ -5734,17 +6128,39 @@ export type WalletTransactionScalarFieldEnum = (typeof WalletTransactionScalarFi
 export const ProjectWithdrawalScalarFieldEnum = {
   id: 'id',
   professionalId: 'professionalId',
+  paymentId: 'paymentId',
   amount: 'amount',
   currency: 'currency',
   destinationType: 'destinationType',
   destinationLabel: 'destinationLabel',
   status: 'status',
   note: 'note',
+  providerTransferId: 'providerTransferId',
+  failureReason: 'failureReason',
+  processedAt: 'processedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type ProjectWithdrawalScalarFieldEnum = (typeof ProjectWithdrawalScalarFieldEnum)[keyof typeof ProjectWithdrawalScalarFieldEnum]
+
+
+export const InvoiceScalarFieldEnum = {
+  id: 'id',
+  invoiceNumber: 'invoiceNumber',
+  paymentId: 'paymentId',
+  clientId: 'clientId',
+  professionalId: 'professionalId',
+  amount: 'amount',
+  commissionAmount: 'commissionAmount',
+  netAmount: 'netAmount',
+  currency: 'currency',
+  status: 'status',
+  issuedAt: 'issuedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type InvoiceScalarFieldEnum = (typeof InvoiceScalarFieldEnum)[keyof typeof InvoiceScalarFieldEnum]
 
 
 export const ProjectDisputeScalarFieldEnum = {
@@ -5764,6 +6180,19 @@ export const ProjectDisputeScalarFieldEnum = {
 } as const
 
 export type ProjectDisputeScalarFieldEnum = (typeof ProjectDisputeScalarFieldEnum)[keyof typeof ProjectDisputeScalarFieldEnum]
+
+
+export const ProjectDisputeMessageScalarFieldEnum = {
+  id: 'id',
+  disputeId: 'disputeId',
+  senderId: 'senderId',
+  senderRole: 'senderRole',
+  recipientId: 'recipientId',
+  message: 'message',
+  createdAt: 'createdAt'
+} as const
+
+export type ProjectDisputeMessageScalarFieldEnum = (typeof ProjectDisputeMessageScalarFieldEnum)[keyof typeof ProjectDisputeMessageScalarFieldEnum]
 
 
 export const ProjectCompletionRequestScalarFieldEnum = {
@@ -5832,6 +6261,35 @@ export const VerificationDocumentReviewScalarFieldEnum = {
 } as const
 
 export type VerificationDocumentReviewScalarFieldEnum = (typeof VerificationDocumentReviewScalarFieldEnum)[keyof typeof VerificationDocumentReviewScalarFieldEnum]
+
+
+export const PersonaVerificationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  provider: 'provider',
+  providerInquiryId: 'providerInquiryId',
+  providerStatus: 'providerStatus',
+  lastProviderEventAt: 'lastProviderEventAt',
+  adminStatus: 'adminStatus',
+  submittedAt: 'submittedAt',
+  reviewedAt: 'reviewedAt',
+  reviewedBy: 'reviewedBy',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PersonaVerificationScalarFieldEnum = (typeof PersonaVerificationScalarFieldEnum)[keyof typeof PersonaVerificationScalarFieldEnum]
+
+
+export const PersonaWebhookEventScalarFieldEnum = {
+  id: 'id',
+  provider: 'provider',
+  providerEventId: 'providerEventId',
+  eventName: 'eventName',
+  createdAt: 'createdAt'
+} as const
+
+export type PersonaWebhookEventScalarFieldEnum = (typeof PersonaWebhookEventScalarFieldEnum)[keyof typeof PersonaWebhookEventScalarFieldEnum]
 
 
 export const StoredFileScalarFieldEnum = {
@@ -6450,15 +6908,20 @@ export type GlobalOmitConfig = {
   userNotification?: Prisma.UserNotificationOmit
   userNotificationState?: Prisma.UserNotificationStateOmit
   payment?: Prisma.PaymentOmit
+  razorpayWebhookEvent?: Prisma.RazorpayWebhookEventOmit
   wallet?: Prisma.WalletOmit
   walletTransaction?: Prisma.WalletTransactionOmit
   projectWithdrawal?: Prisma.ProjectWithdrawalOmit
+  invoice?: Prisma.InvoiceOmit
   projectDispute?: Prisma.ProjectDisputeOmit
+  projectDisputeMessage?: Prisma.ProjectDisputeMessageOmit
   projectCompletionRequest?: Prisma.ProjectCompletionRequestOmit
   projectRevisionRequest?: Prisma.ProjectRevisionRequestOmit
   projectReviewRequest?: Prisma.ProjectReviewRequestOmit
   professionalVerification?: Prisma.ProfessionalVerificationOmit
   verificationDocumentReview?: Prisma.VerificationDocumentReviewOmit
+  personaVerification?: Prisma.PersonaVerificationOmit
+  personaWebhookEvent?: Prisma.PersonaWebhookEventOmit
   storedFile?: Prisma.StoredFileOmit
   auditLog?: Prisma.AuditLogOmit
   apiToken?: Prisma.ApiTokenOmit

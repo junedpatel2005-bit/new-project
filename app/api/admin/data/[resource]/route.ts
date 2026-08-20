@@ -13,6 +13,8 @@ const publicPages = [
   { title: "Pricing", slug: "pricing", pageKey: "pricing" },
   { title: "FAQ", slug: "faq", pageKey: "faq" },
   { title: "Contact", slug: "contact", pageKey: "contact" },
+  { title: "Terms & Conditions", slug: "terms", pageKey: "terms" },
+  { title: "Privacy Policy", slug: "privacy-policy", pageKey: "privacy-policy" },
 ];
 
 export async function GET(
@@ -131,14 +133,37 @@ export async function GET(
     return NextResponse.json({ jobs: jobsWithProjectStatus, disputes });
   }
   if (resource === "finance") {
-    const [transactions, withdrawals] = await Promise.all([
+    const [transactions, withdrawals, payments] = await Promise.all([
       db.projectTransaction.findMany({ orderBy: { createdAt: "desc" }, take: 100 }),
       db.projectWithdrawal.findMany({ orderBy: { createdAt: "desc" }, take: 100 }),
+      db.payment.findMany({
+        orderBy: { createdAt: "desc" },
+        take: 100,
+        select: {
+          id: true,
+          clientId: true,
+          professionalId: true,
+          amount: true,
+          commissionAmount: true,
+          currency: true,
+          provider: true,
+          razorpayOrderId: true,
+          razorpayPaymentId: true,
+          projectTrackingId: true,
+          milestoneId: true,
+          status: true,
+          failureReason: true,
+          capturedAt: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      }),
     ]);
     const ids = [
       ...new Set([
         ...transactions.flatMap((item) => [item.clientId, item.professionalId]),
         ...withdrawals.map((item) => item.professionalId),
+        ...payments.flatMap((item) => [item.clientId, item.professionalId]),
       ]),
     ];
     const [users, legacyProfiles] = await Promise.all([
@@ -156,7 +181,7 @@ export async function GET(
     );
     for (const profile of legacyProfiles)
       if (profile.fullName && !names[profile.userId]) names[profile.userId] = profile.fullName;
-    return NextResponse.json({ transactions, withdrawals, names });
+    return NextResponse.json({ transactions, withdrawals, payments, names });
   }
   if (resource === "cms") {
     const now = new Date();

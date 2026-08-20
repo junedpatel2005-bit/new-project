@@ -10,7 +10,7 @@ Root project memory. Read this before every task. Package-level `CLAUDE.md` file
 
 A two-sided, location-aware service marketplace. **Clients** post jobs; **Professionals** quote on them and deliver. Geography is core: jobs match professionals by service radius, not just category. Money moves through the platform in escrow and is released against milestones, net of a 10% commission.
 
-Launch market **Canada**, currency **CAD**, English only. Launch category **IT**, two-level taxonomy, trades to follow.
+Launch market **India**, currency **INR**, English only. Launch category **IT**, two-level taxonomy, trades to follow.
 
 **Delivery is sequential: web first, Flutter in phase 2.** See ADR-001 — this shapes how the API is built, not just when.
 
@@ -27,7 +27,7 @@ Launch market **Canada**, currency **CAD**, English only. Launch category **IT**
 | ORM          | Prisma                                                                  |
 | Auth         | Own JWT — access + refresh, RS256. **Not NextAuth. Not Supabase Auth.** |
 | Storage      | Supabase Storage, private buckets, signed URLs                          |
-| Payments     | Stripe Connect (Express), escrow                                        |
+| Payments     | Razorpay Checkout + Route, escrow                                      |
 | Maps         | **Google Maps** — Maps JS, Places, Geocoding, Distance Matrix           |
 | SMS/OTP      | Twilio                                                                  |
 | Email        | SMTP — Mailtrap in dev, SendGrid in production                          |
@@ -110,7 +110,7 @@ These encode legal, financial and trust requirements. Each has burned a real mar
 
 11. **Never block a user-facing request on an external call beyond 5s.** Notification fan-out, geocode batches and reconciliation are queued through `BackgroundJob`.
 
-12. **Never make a Stripe webhook non-idempotent.** Check `StripeEvent` by event ID before acting.
+12. **Never make a Razorpay webhook non-idempotent.** Check `RazorpayWebhookEvent` by event ID before acting.
 
 13. **Never create `tailwind.config.js`.** Tailwind v4 has no config file. If one appears it is a hallucination from v3-era training data.
 

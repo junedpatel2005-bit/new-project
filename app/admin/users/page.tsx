@@ -8,6 +8,7 @@ import {
   Power,
   Search,
   ShieldCheck,
+  Trash2,
   UserRound,
   UsersRound,
   X,
@@ -51,12 +52,14 @@ function UserGroup({
   kind,
   onToggle,
   onOpen,
+  onDelete,
 }: {
   title: string;
   users: User[];
   kind: "client" | "professional";
   onToggle: (user: User) => void;
   onOpen: (user: User) => void;
+  onDelete: (user: User) => void;
 }) {
   const Icon = kind === "professional" ? ShieldCheck : UsersRound;
   return (
@@ -104,7 +107,7 @@ function UserGroup({
             <span
               className={`rounded-full px-2.5 py-1 text-xs font-semibold ${user.isActive ? "bg-emerald-400/10 text-emerald-300" : "bg-rose-400/10 text-rose-300"}`}
             >
-              {user.isActive ? "Active" : "Deactivated"}
+              {user.isActive ? "Enabled" : "Disabled"}
             </span>
             <Button
               onClick={(event) => {
@@ -119,7 +122,18 @@ function UserGroup({
               }
             >
               <Power className="mr-2 h-4 w-4" />
-              {user.isActive ? "Deactivate" : "Activate"}
+              {user.isActive ? "Disable" : "Enable"}
+            </Button>
+            <Button
+              onClick={(event) => {
+                event.stopPropagation();
+                onDelete(user);
+              }}
+              variant="outline"
+              className="border-white/10 bg-transparent text-slate-400 hover:border-rose-400/30 hover:bg-rose-500/10 hover:text-rose-200"
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Delete
             </Button>
           </article>
         ))}
@@ -136,6 +150,9 @@ export default function AdminUsersPage() {
   const [activeGroup, setActiveGroup] = useState<"clients" | "professionals">("professionals");
   const [detail, setDetail] = useState<Detail | null>(null);
   const [search, setSearch] = useState("");
+  const [confirmAction, setConfirmAction] = useState<{ user: User; kind: "toggle" | "delete" } | null>(
+    null,
+  );
   useEffect(() => {
     void fetch("/api/v1/admin/data/users", { cache: "no-store" })
       .then((response) => response.json())
@@ -164,8 +181,6 @@ export default function AdminUsersPage() {
       .then(setDetail);
   };
   const toggle = async (user: User) => {
-    const label = user.isActive ? "Deactivate" : "Activate";
-    if (!window.confirm(`${label} ${user.firstName} ${user.lastName}?`)) return;
     const response = await fetch(`/api/v1/admin/users/${user.id}`, {
       method: "PATCH",
       headers: { "content-type": "application/json" },
@@ -179,15 +194,23 @@ export default function AdminUsersPage() {
       ),
     );
     setMessage(
-      `${user.firstName}'s account is now ${data.user.isActive ? "active" : "deactivated"}.`,
+      `${user.firstName}'s account is now ${data.user.isActive ? "enabled" : "disabled"}.`,
     );
+  };
+  const deleteUser = async (user: User) => {
+    const response = await fetch(`/api/v1/admin/users/${user.id}`, { method: "DELETE" });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) return setMessage(data.error ?? "Unable to delete account.");
+    setUsers((current) => current.filter((item) => item.id !== user.id));
+    setDetail((current) => (current?.user.id === user.id ? null : current));
+    setMessage(`${user.firstName} ${user.lastName}'s account was deleted.`);
   };
   return (
     <div>
       <p className="text-xs font-bold uppercase tracking-[.2em] text-indigo-400">Admin module</p>
       <h1 className="mt-2 font-display text-3xl font-bold">User management</h1>
       <p className="mt-2 text-slate-400">
-        Manage Clients and Professionals independently. Deactivated accounts cannot use the
+        Manage Clients and Professionals independently. Disabled accounts cannot use the
         platform.
       </p>
       <div className="relative mt-6 max-w-sm">
@@ -230,19 +253,74 @@ export default function AdminUsersPage() {
             title="Professionals"
             users={professionals}
             kind="professional"
-            onToggle={(user) => void toggle(user)}
+            onToggle={(user) => setConfirmAction({ user, kind: "toggle" })}
             onOpen={openUser}
+            onDelete={(user) => setConfirmAction({ user, kind: "delete" })}
           />
         ) : (
           <UserGroup
             title="Clients"
             users={clients}
             kind="client"
-            onToggle={(user) => void toggle(user)}
+            onToggle={(user) => setConfirmAction({ user, kind: "toggle" })}
             onOpen={openUser}
+            onDelete={(user) => setConfirmAction({ user, kind: "delete" })}
           />
         )}
       </div>
+      {confirmAction && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-black/65 p-4">
+          <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-[#11182b] p-6">
+            <h2 className="font-display text-lg font-bold text-white">
+              {confirmAction.kind === "delete"
+                ? "Delete account?"
+                : `${confirmAction.user.isActive ? "Disable" : "Enable"} account?`}
+            </h2>
+            <p className="mt-2 text-sm text-slate-400">
+              {confirmAction.user.firstName} {confirmAction.user.lastName}{" "}
+              <span
+                className={`rounded-full px-2 py-0.5 text-xs font-semibold ${confirmAction.user.role === "PROFESSIONAL" ? "bg-indigo-500/15 text-indigo-300" : "bg-cyan-500/15 text-cyan-300"}`}
+              >
+                {confirmAction.user.role === "PROFESSIONAL" ? "Professional" : "Client"}
+              </span>{" "}
+              {confirmAction.kind === "delete"
+                ? "and their account data will be permanently deleted. This cannot be undone."
+                : confirmAction.user.isActive
+                  ? "will lose access to the platform."
+                  : "will regain access to the platform."}
+            </p>
+            <div className="mt-6 flex justify-end gap-3">
+              <Button
+                variant="outline"
+                className="border-white/10 bg-transparent text-slate-300 hover:bg-white/10 hover:text-white"
+                onClick={() => setConfirmAction(null)}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="outline"
+                className={
+                  confirmAction.kind === "delete" || confirmAction.user.isActive
+                    ? "border-rose-400/30 bg-transparent text-rose-200 hover:bg-rose-500/10 hover:text-rose-100"
+                    : "border-emerald-400/30 bg-transparent text-emerald-200 hover:bg-emerald-500/10 hover:text-emerald-100"
+                }
+                onClick={() => {
+                  const { user, kind } = confirmAction;
+                  setConfirmAction(null);
+                  if (kind === "delete") void deleteUser(user);
+                  else void toggle(user);
+                }}
+              >
+                {confirmAction.kind === "delete"
+                  ? "Delete"
+                  : confirmAction.user.isActive
+                    ? "Disable"
+                    : "Enable"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
       {detail && (
         <div className="fixed inset-0 z-50 grid place-items-center bg-black/65 p-4">
           <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-3xl border border-white/10 bg-[#11182b] p-6">
@@ -292,7 +370,7 @@ export default function AdminUsersPage() {
                 <p className="text-slate-400">
                   Status{" "}
                   <span className="ml-2 text-white">
-                    {detail.user.isActive ? "Active" : "Deactivated"}
+                    {detail.user.isActive ? "Enabled" : "Disabled"}
                   </span>
                 </p>
                 <p className="text-slate-400">

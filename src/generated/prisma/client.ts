@@ -227,6 +227,11 @@ export type UserNotificationState = Prisma.UserNotificationStateModel
  */
 export type Payment = Prisma.PaymentModel
 /**
+ * Model RazorpayWebhookEvent
+ * 
+ */
+export type RazorpayWebhookEvent = Prisma.RazorpayWebhookEventModel
+/**
  * Model Wallet
  * 
  */
@@ -242,10 +247,20 @@ export type WalletTransaction = Prisma.WalletTransactionModel
  */
 export type ProjectWithdrawal = Prisma.ProjectWithdrawalModel
 /**
+ * Model Invoice
+ * 
+ */
+export type Invoice = Prisma.InvoiceModel
+/**
  * Model ProjectDispute
  * 
  */
 export type ProjectDispute = Prisma.ProjectDisputeModel
+/**
+ * Model ProjectDisputeMessage
+ * 
+ */
+export type ProjectDisputeMessage = Prisma.ProjectDisputeMessageModel
 /**
  * Model ProjectCompletionRequest
  * 
@@ -271,6 +286,16 @@ export type ProfessionalVerification = Prisma.ProfessionalVerificationModel
  * 
  */
 export type VerificationDocumentReview = Prisma.VerificationDocumentReviewModel
+/**
+ * Model PersonaVerification
+ * 
+ */
+export type PersonaVerification = Prisma.PersonaVerificationModel
+/**
+ * Model PersonaWebhookEvent
+ * 
+ */
+export type PersonaWebhookEvent = Prisma.PersonaWebhookEventModel
 /**
  * Model StoredFile
  * 

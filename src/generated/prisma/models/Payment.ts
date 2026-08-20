@@ -33,6 +33,8 @@ export type PaymentAvgAggregateOutputType = {
   jobId: number | null
   amount: number | null
   commissionAmount: number | null
+  projectTrackingId: number | null
+  milestoneId: number | null
 }
 
 export type PaymentSumAggregateOutputType = {
@@ -42,6 +44,8 @@ export type PaymentSumAggregateOutputType = {
   jobId: number | null
   amount: number | null
   commissionAmount: number | null
+  projectTrackingId: number | null
+  milestoneId: number | null
 }
 
 export type PaymentMinAggregateOutputType = {
@@ -54,6 +58,13 @@ export type PaymentMinAggregateOutputType = {
   currency: string | null
   provider: string | null
   providerReference: string | null
+  razorpayOrderId: string | null
+  razorpayPaymentId: string | null
+  razorpaySignature: string | null
+  projectTrackingId: number | null
+  milestoneId: number | null
+  capturedAt: Date | null
+  failureReason: string | null
   status: string | null
   idempotencyKey: string | null
   createdAt: Date | null
@@ -70,6 +81,13 @@ export type PaymentMaxAggregateOutputType = {
   currency: string | null
   provider: string | null
   providerReference: string | null
+  razorpayOrderId: string | null
+  razorpayPaymentId: string | null
+  razorpaySignature: string | null
+  projectTrackingId: number | null
+  milestoneId: number | null
+  capturedAt: Date | null
+  failureReason: string | null
   status: string | null
   idempotencyKey: string | null
   createdAt: Date | null
@@ -86,6 +104,13 @@ export type PaymentCountAggregateOutputType = {
   currency: number
   provider: number
   providerReference: number
+  razorpayOrderId: number
+  razorpayPaymentId: number
+  razorpaySignature: number
+  projectTrackingId: number
+  milestoneId: number
+  capturedAt: number
+  failureReason: number
   status: number
   idempotencyKey: number
   createdAt: number
@@ -101,6 +126,8 @@ export type PaymentAvgAggregateInputType = {
   jobId?: true
   amount?: true
   commissionAmount?: true
+  projectTrackingId?: true
+  milestoneId?: true
 }
 
 export type PaymentSumAggregateInputType = {
@@ -110,6 +137,8 @@ export type PaymentSumAggregateInputType = {
   jobId?: true
   amount?: true
   commissionAmount?: true
+  projectTrackingId?: true
+  milestoneId?: true
 }
 
 export type PaymentMinAggregateInputType = {
@@ -122,6 +151,13 @@ export type PaymentMinAggregateInputType = {
   currency?: true
   provider?: true
   providerReference?: true
+  razorpayOrderId?: true
+  razorpayPaymentId?: true
+  razorpaySignature?: true
+  projectTrackingId?: true
+  milestoneId?: true
+  capturedAt?: true
+  failureReason?: true
   status?: true
   idempotencyKey?: true
   createdAt?: true
@@ -138,6 +174,13 @@ export type PaymentMaxAggregateInputType = {
   currency?: true
   provider?: true
   providerReference?: true
+  razorpayOrderId?: true
+  razorpayPaymentId?: true
+  razorpaySignature?: true
+  projectTrackingId?: true
+  milestoneId?: true
+  capturedAt?: true
+  failureReason?: true
   status?: true
   idempotencyKey?: true
   createdAt?: true
@@ -154,6 +197,13 @@ export type PaymentCountAggregateInputType = {
   currency?: true
   provider?: true
   providerReference?: true
+  razorpayOrderId?: true
+  razorpayPaymentId?: true
+  razorpaySignature?: true
+  projectTrackingId?: true
+  milestoneId?: true
+  capturedAt?: true
+  failureReason?: true
   status?: true
   idempotencyKey?: true
   createdAt?: true
@@ -257,6 +307,13 @@ export type PaymentGroupByOutputType = {
   currency: string
   provider: string
   providerReference: string | null
+  razorpayOrderId: string | null
+  razorpayPaymentId: string | null
+  razorpaySignature: string | null
+  projectTrackingId: number | null
+  milestoneId: number | null
+  capturedAt: Date | null
+  failureReason: string | null
   status: string
   idempotencyKey: string
   createdAt: Date
@@ -296,6 +353,13 @@ export type PaymentWhereInput = {
   currency?: Prisma.StringFilter<"Payment"> | string
   provider?: Prisma.StringFilter<"Payment"> | string
   providerReference?: Prisma.StringNullableFilter<"Payment"> | string | null
+  razorpayOrderId?: Prisma.StringNullableFilter<"Payment"> | string | null
+  razorpayPaymentId?: Prisma.StringNullableFilter<"Payment"> | string | null
+  razorpaySignature?: Prisma.StringNullableFilter<"Payment"> | string | null
+  projectTrackingId?: Prisma.IntNullableFilter<"Payment"> | number | null
+  milestoneId?: Prisma.IntNullableFilter<"Payment"> | number | null
+  capturedAt?: Prisma.DateTimeNullableFilter<"Payment"> | Date | string | null
+  failureReason?: Prisma.StringNullableFilter<"Payment"> | string | null
   status?: Prisma.StringFilter<"Payment"> | string
   idempotencyKey?: Prisma.StringFilter<"Payment"> | string
   createdAt?: Prisma.DateTimeFilter<"Payment"> | Date | string
@@ -312,6 +376,13 @@ export type PaymentOrderByWithRelationInput = {
   currency?: Prisma.SortOrder
   provider?: Prisma.SortOrder
   providerReference?: Prisma.SortOrderInput | Prisma.SortOrder
+  razorpayOrderId?: Prisma.SortOrderInput | Prisma.SortOrder
+  razorpayPaymentId?: Prisma.SortOrderInput | Prisma.SortOrder
+  razorpaySignature?: Prisma.SortOrderInput | Prisma.SortOrder
+  projectTrackingId?: Prisma.SortOrderInput | Prisma.SortOrder
+  milestoneId?: Prisma.SortOrderInput | Prisma.SortOrder
+  capturedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  failureReason?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -320,6 +391,9 @@ export type PaymentOrderByWithRelationInput = {
 
 export type PaymentWhereUniqueInput = Prisma.AtLeast<{
   id?: number
+  razorpayOrderId?: string
+  razorpayPaymentId?: string
+  milestoneId?: number
   idempotencyKey?: string
   AND?: Prisma.PaymentWhereInput | Prisma.PaymentWhereInput[]
   OR?: Prisma.PaymentWhereInput[]
@@ -332,10 +406,14 @@ export type PaymentWhereUniqueInput = Prisma.AtLeast<{
   currency?: Prisma.StringFilter<"Payment"> | string
   provider?: Prisma.StringFilter<"Payment"> | string
   providerReference?: Prisma.StringNullableFilter<"Payment"> | string | null
+  razorpaySignature?: Prisma.StringNullableFilter<"Payment"> | string | null
+  projectTrackingId?: Prisma.IntNullableFilter<"Payment"> | number | null
+  capturedAt?: Prisma.DateTimeNullableFilter<"Payment"> | Date | string | null
+  failureReason?: Prisma.StringNullableFilter<"Payment"> | string | null
   status?: Prisma.StringFilter<"Payment"> | string
   createdAt?: Prisma.DateTimeFilter<"Payment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Payment"> | Date | string
-}, "id" | "idempotencyKey">
+}, "id" | "razorpayOrderId" | "razorpayPaymentId" | "milestoneId" | "idempotencyKey">
 
 export type PaymentOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -347,6 +425,13 @@ export type PaymentOrderByWithAggregationInput = {
   currency?: Prisma.SortOrder
   provider?: Prisma.SortOrder
   providerReference?: Prisma.SortOrderInput | Prisma.SortOrder
+  razorpayOrderId?: Prisma.SortOrderInput | Prisma.SortOrder
+  razorpayPaymentId?: Prisma.SortOrderInput | Prisma.SortOrder
+  razorpaySignature?: Prisma.SortOrderInput | Prisma.SortOrder
+  projectTrackingId?: Prisma.SortOrderInput | Prisma.SortOrder
+  milestoneId?: Prisma.SortOrderInput | Prisma.SortOrder
+  capturedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  failureReason?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -371,6 +456,13 @@ export type PaymentScalarWhereWithAggregatesInput = {
   currency?: Prisma.StringWithAggregatesFilter<"Payment"> | string
   provider?: Prisma.StringWithAggregatesFilter<"Payment"> | string
   providerReference?: Prisma.StringNullableWithAggregatesFilter<"Payment"> | string | null
+  razorpayOrderId?: Prisma.StringNullableWithAggregatesFilter<"Payment"> | string | null
+  razorpayPaymentId?: Prisma.StringNullableWithAggregatesFilter<"Payment"> | string | null
+  razorpaySignature?: Prisma.StringNullableWithAggregatesFilter<"Payment"> | string | null
+  projectTrackingId?: Prisma.IntNullableWithAggregatesFilter<"Payment"> | number | null
+  milestoneId?: Prisma.IntNullableWithAggregatesFilter<"Payment"> | number | null
+  capturedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Payment"> | Date | string | null
+  failureReason?: Prisma.StringNullableWithAggregatesFilter<"Payment"> | string | null
   status?: Prisma.StringWithAggregatesFilter<"Payment"> | string
   idempotencyKey?: Prisma.StringWithAggregatesFilter<"Payment"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Payment"> | Date | string
@@ -386,6 +478,13 @@ export type PaymentCreateInput = {
   currency?: string
   provider: string
   providerReference?: string | null
+  razorpayOrderId?: string | null
+  razorpayPaymentId?: string | null
+  razorpaySignature?: string | null
+  projectTrackingId?: number | null
+  milestoneId?: number | null
+  capturedAt?: Date | string | null
+  failureReason?: string | null
   status?: string
   idempotencyKey: string
   createdAt?: Date | string
@@ -402,6 +501,13 @@ export type PaymentUncheckedCreateInput = {
   currency?: string
   provider: string
   providerReference?: string | null
+  razorpayOrderId?: string | null
+  razorpayPaymentId?: string | null
+  razorpaySignature?: string | null
+  projectTrackingId?: number | null
+  milestoneId?: number | null
+  capturedAt?: Date | string | null
+  failureReason?: string | null
   status?: string
   idempotencyKey: string
   createdAt?: Date | string
@@ -417,6 +523,13 @@ export type PaymentUpdateInput = {
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   providerReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpayOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpayPaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpaySignature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectTrackingId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  milestoneId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  capturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -433,6 +546,13 @@ export type PaymentUncheckedUpdateInput = {
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   providerReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpayOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpayPaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpaySignature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectTrackingId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  milestoneId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  capturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -449,6 +569,13 @@ export type PaymentCreateManyInput = {
   currency?: string
   provider: string
   providerReference?: string | null
+  razorpayOrderId?: string | null
+  razorpayPaymentId?: string | null
+  razorpaySignature?: string | null
+  projectTrackingId?: number | null
+  milestoneId?: number | null
+  capturedAt?: Date | string | null
+  failureReason?: string | null
   status?: string
   idempotencyKey: string
   createdAt?: Date | string
@@ -464,6 +591,13 @@ export type PaymentUpdateManyMutationInput = {
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   providerReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpayOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpayPaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpaySignature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectTrackingId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  milestoneId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  capturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -480,6 +614,13 @@ export type PaymentUncheckedUpdateManyInput = {
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   providerReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpayOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpayPaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpaySignature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectTrackingId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  milestoneId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  capturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -496,6 +637,13 @@ export type PaymentCountOrderByAggregateInput = {
   currency?: Prisma.SortOrder
   provider?: Prisma.SortOrder
   providerReference?: Prisma.SortOrder
+  razorpayOrderId?: Prisma.SortOrder
+  razorpayPaymentId?: Prisma.SortOrder
+  razorpaySignature?: Prisma.SortOrder
+  projectTrackingId?: Prisma.SortOrder
+  milestoneId?: Prisma.SortOrder
+  capturedAt?: Prisma.SortOrder
+  failureReason?: Prisma.SortOrder
   status?: Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -509,6 +657,8 @@ export type PaymentAvgOrderByAggregateInput = {
   jobId?: Prisma.SortOrder
   amount?: Prisma.SortOrder
   commissionAmount?: Prisma.SortOrder
+  projectTrackingId?: Prisma.SortOrder
+  milestoneId?: Prisma.SortOrder
 }
 
 export type PaymentMaxOrderByAggregateInput = {
@@ -521,6 +671,13 @@ export type PaymentMaxOrderByAggregateInput = {
   currency?: Prisma.SortOrder
   provider?: Prisma.SortOrder
   providerReference?: Prisma.SortOrder
+  razorpayOrderId?: Prisma.SortOrder
+  razorpayPaymentId?: Prisma.SortOrder
+  razorpaySignature?: Prisma.SortOrder
+  projectTrackingId?: Prisma.SortOrder
+  milestoneId?: Prisma.SortOrder
+  capturedAt?: Prisma.SortOrder
+  failureReason?: Prisma.SortOrder
   status?: Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -537,6 +694,13 @@ export type PaymentMinOrderByAggregateInput = {
   currency?: Prisma.SortOrder
   provider?: Prisma.SortOrder
   providerReference?: Prisma.SortOrder
+  razorpayOrderId?: Prisma.SortOrder
+  razorpayPaymentId?: Prisma.SortOrder
+  razorpaySignature?: Prisma.SortOrder
+  projectTrackingId?: Prisma.SortOrder
+  milestoneId?: Prisma.SortOrder
+  capturedAt?: Prisma.SortOrder
+  failureReason?: Prisma.SortOrder
   status?: Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -550,6 +714,8 @@ export type PaymentSumOrderByAggregateInput = {
   jobId?: Prisma.SortOrder
   amount?: Prisma.SortOrder
   commissionAmount?: Prisma.SortOrder
+  projectTrackingId?: Prisma.SortOrder
+  milestoneId?: Prisma.SortOrder
 }
 
 
@@ -564,6 +730,13 @@ export type PaymentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   currency?: boolean
   provider?: boolean
   providerReference?: boolean
+  razorpayOrderId?: boolean
+  razorpayPaymentId?: boolean
+  razorpaySignature?: boolean
+  projectTrackingId?: boolean
+  milestoneId?: boolean
+  capturedAt?: boolean
+  failureReason?: boolean
   status?: boolean
   idempotencyKey?: boolean
   createdAt?: boolean
@@ -580,6 +753,13 @@ export type PaymentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   currency?: boolean
   provider?: boolean
   providerReference?: boolean
+  razorpayOrderId?: boolean
+  razorpayPaymentId?: boolean
+  razorpaySignature?: boolean
+  projectTrackingId?: boolean
+  milestoneId?: boolean
+  capturedAt?: boolean
+  failureReason?: boolean
   status?: boolean
   idempotencyKey?: boolean
   createdAt?: boolean
@@ -596,6 +776,13 @@ export type PaymentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   currency?: boolean
   provider?: boolean
   providerReference?: boolean
+  razorpayOrderId?: boolean
+  razorpayPaymentId?: boolean
+  razorpaySignature?: boolean
+  projectTrackingId?: boolean
+  milestoneId?: boolean
+  capturedAt?: boolean
+  failureReason?: boolean
   status?: boolean
   idempotencyKey?: boolean
   createdAt?: boolean
@@ -612,13 +799,20 @@ export type PaymentSelectScalar = {
   currency?: boolean
   provider?: boolean
   providerReference?: boolean
+  razorpayOrderId?: boolean
+  razorpayPaymentId?: boolean
+  razorpaySignature?: boolean
+  projectTrackingId?: boolean
+  milestoneId?: boolean
+  capturedAt?: boolean
+  failureReason?: boolean
   status?: boolean
   idempotencyKey?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type PaymentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clientId" | "professionalId" | "jobId" | "amount" | "commissionAmount" | "currency" | "provider" | "providerReference" | "status" | "idempotencyKey" | "createdAt" | "updatedAt", ExtArgs["result"]["payment"]>
+export type PaymentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clientId" | "professionalId" | "jobId" | "amount" | "commissionAmount" | "currency" | "provider" | "providerReference" | "razorpayOrderId" | "razorpayPaymentId" | "razorpaySignature" | "projectTrackingId" | "milestoneId" | "capturedAt" | "failureReason" | "status" | "idempotencyKey" | "createdAt" | "updatedAt", ExtArgs["result"]["payment"]>
 
 export type $PaymentPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Payment"
@@ -633,6 +827,13 @@ export type $PaymentPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     currency: string
     provider: string
     providerReference: string | null
+    razorpayOrderId: string | null
+    razorpayPaymentId: string | null
+    razorpaySignature: string | null
+    projectTrackingId: number | null
+    milestoneId: number | null
+    capturedAt: Date | null
+    failureReason: string | null
     status: string
     idempotencyKey: string
     createdAt: Date
@@ -1069,6 +1270,13 @@ export interface PaymentFieldRefs {
   readonly currency: Prisma.FieldRef<"Payment", 'String'>
   readonly provider: Prisma.FieldRef<"Payment", 'String'>
   readonly providerReference: Prisma.FieldRef<"Payment", 'String'>
+  readonly razorpayOrderId: Prisma.FieldRef<"Payment", 'String'>
+  readonly razorpayPaymentId: Prisma.FieldRef<"Payment", 'String'>
+  readonly razorpaySignature: Prisma.FieldRef<"Payment", 'String'>
+  readonly projectTrackingId: Prisma.FieldRef<"Payment", 'Int'>
+  readonly milestoneId: Prisma.FieldRef<"Payment", 'Int'>
+  readonly capturedAt: Prisma.FieldRef<"Payment", 'DateTime'>
+  readonly failureReason: Prisma.FieldRef<"Payment", 'String'>
   readonly status: Prisma.FieldRef<"Payment", 'String'>
   readonly idempotencyKey: Prisma.FieldRef<"Payment", 'String'>
   readonly createdAt: Prisma.FieldRef<"Payment", 'DateTime'>

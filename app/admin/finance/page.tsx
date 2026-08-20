@@ -28,16 +28,38 @@ type Withdrawal = {
   destinationLabel: string | null;
   status: string;
   createdAt: string;
+  failureReason?: string | null;
+};
+type RazorpayPayment = {
+  id: number;
+  clientId: number;
+  professionalId: number;
+  amount: number;
+  commissionAmount: number;
+  currency: string;
+  provider: string;
+  razorpayOrderId: string | null;
+  razorpayPaymentId: string | null;
+  projectTrackingId: number | null;
+  milestoneId: number | null;
+  status: string;
+  failureReason: string | null;
+  capturedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
 };
 type Finance = {
   transactions: Transaction[];
   withdrawals: Withdrawal[];
+  payments: RazorpayPayment[];
   names: Record<string, string>;
 };
 const money = (value: number) => `₹${value.toLocaleString()}`;
 export default function FinancePage() {
   const [data, setData] = useState<Finance | null>(null);
-  const [tab, setTab] = useState<"payments" | "payouts">("payments");
+  const [tab, setTab] = useState<"earnings" | "commission" | "payouts">("earnings");
+  const [payoutPayment, setPayoutPayment] = useState<Record<number, string>>({});
+  const [processing, setProcessing] = useState<number | null>(null);
   useEffect(() => {
     void fetch("/api/v1/admin/data/finance", { cache: "no-store" })
       .then((response) => response.json())
@@ -45,7 +67,7 @@ export default function FinancePage() {
   }, []);
   const paid = useMemo(
     () =>
-      data?.transactions
+      data?.payments
         .filter((item) => item.status === "COMPLETED")
         .reduce((sum, item) => sum + item.amount, 0) ?? 0,
     [data],
@@ -57,6 +79,27 @@ export default function FinancePage() {
         .reduce((sum, item) => sum + item.amount, 0) ?? 0,
     [data],
   );
+  const commission = useMemo(
+    () =>
+      data?.payments
+        .filter((item) => item.status === "COMPLETED")
+        .reduce((sum, item) => sum + item.commissionAmount, 0) ?? 0,
+    [data],
+  );
+  async function processPayout(withdrawalId: number) {
+    const paymentId = Number(payoutPayment[withdrawalId]);
+    if (!paymentId) return;
+    setProcessing(withdrawalId);
+    const response = await fetch("/api/admin/finance/payouts", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ withdrawalId, paymentId }),
+    });
+    const result = await response.json().catch(() => null);
+    setProcessing(null);
+    if (!response.ok) window.alert(result?.error ?? "Unable to process payout.");
+    else window.location.reload();
+  }
   return (
     <div>
       <p className="text-xs font-bold uppercase tracking-[.2em] text-indigo-400">Finance center</p>
@@ -77,8 +120,8 @@ export default function FinancePage() {
             />
             <Metric
               icon={ReceiptText}
-              label="Payment records"
-              value={String(data.transactions.length)}
+              label="Razorpay payment records"
+              value={String(data.payments.length)}
               tone="blue"
             />
             <Metric icon={Clock3} label="Pending payouts" value={money(pending)} tone="amber" />
@@ -88,19 +131,33 @@ export default function FinancePage() {
               value={String(data.withdrawals.length)}
               tone="indigo"
             />
+            <Metric
+              icon={CircleDollarSign}
+              label="Platform commission"
+              value={money(commission)}
+              tone="blue"
+            />
           </div>
           <section className="mt-6 overflow-hidden rounded-3xl border border-white/10 bg-white/[.035]">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 p-5">
               <div>
                 <h2 className="font-display text-xl font-semibold">Financial activity</h2>
-                <p className="mt-1 text-sm text-slate-400">Latest marketplace money movement</p>
+                <p className="mt-1 text-sm text-slate-400">
+                  Razorpay payments and professional payouts
+                </p>
               </div>
               <div className="flex rounded-xl bg-[#0b1020] p-1">
                 <button
-                  onClick={() => setTab("payments")}
-                  className={`rounded-lg px-4 py-2 text-sm font-semibold ${tab === "payments" ? "bg-indigo-500 text-white" : "text-slate-400"}`}
+                  onClick={() => setTab("earnings")}
+                  className={`rounded-lg px-4 py-2 text-sm font-semibold ${tab === "earnings" ? "bg-indigo-500 text-white" : "text-slate-400"}`}
                 >
-                  Payments
+                  Earnings reports
+                </button>
+                <button
+                  onClick={() => setTab("commission")}
+                  className={`rounded-lg px-4 py-2 text-sm font-semibold ${tab === "commission" ? "bg-indigo-500 text-white" : "text-slate-400"}`}
+                >
+                  Commission reports
                 </button>
                 <button
                   onClick={() => setTab("payouts")}
@@ -110,33 +167,112 @@ export default function FinancePage() {
                 </button>
               </div>
             </div>
-            {tab === "payments" ? (
+            {tab === "earnings" ? (
               <div className="divide-y divide-white/10">
-                {data.transactions.map((item) => (
+                {data.payments.map((item) => (
                   <div key={item.id} className="flex flex-wrap items-center gap-4 px-5 py-4">
                     <span className="grid h-10 w-10 place-items-center rounded-xl bg-emerald-400/10 text-emerald-300">
                       <ArrowDownLeft className="h-5 w-5" />
                     </span>
                     <div className="min-w-52 flex-1">
-                      <p className="font-semibold text-white">{item.description}</p>
+                      <p className="font-semibold text-white">
+                        Razorpay payment #{item.razorpayPaymentId ?? "pending"}
+                      </p>
                       <p className="mt-1 text-xs text-slate-400">
                         Client: {data.names[item.clientId] ?? `#${item.clientId}`} · Professional:{" "}
                         {data.names[item.professionalId] ?? `#${item.professionalId}`}
+                      </p>
+                      <p className="mt-1 text-xs text-slate-500">
+                        Order: {item.razorpayOrderId ?? "Not created"}
+                        {item.projectTrackingId ? ` · Project #${item.projectTrackingId}` : ""}
+                        {item.milestoneId ? ` · Milestone #${item.milestoneId}` : ""}
                       </p>
                     </div>
                     <span className="text-sm text-slate-400">
                       {new Date(item.createdAt).toLocaleDateString()}
                     </span>
-                    <span className="rounded-full bg-emerald-400/10 px-2.5 py-1 text-xs font-semibold text-emerald-300">
+                    <span
+                      className={`rounded-full px-2.5 py-1 text-xs font-semibold ${item.status === "COMPLETED" ? "bg-emerald-400/10 text-emerald-300" : item.status === "FAILED" ? "bg-rose-400/10 text-rose-300" : "bg-amber-400/10 text-amber-300"}`}
+                    >
                       {item.status}
                     </span>
                     <p className="min-w-24 text-right font-bold text-white">
                       {money(item.amount)}{" "}
                       <span className="text-xs text-slate-400">{item.currency}</span>
                     </p>
+                    {item.status === "PENDING" ? (
+                      <div className="flex w-full items-center justify-end gap-2">
+                        <select
+                          className="rounded-lg border border-white/10 bg-[#0b1020] px-2 py-2 text-xs text-slate-300"
+                          value={payoutPayment[item.id] ?? ""}
+                          onChange={(event) =>
+                            setPayoutPayment((current) => ({
+                              ...current,
+                              [item.id]: event.target.value,
+                            }))
+                          }
+                        >
+                          <option value="">Select captured payment</option>
+                          {data.payments
+                            .filter(
+                              (payment) =>
+                                payment.status === "COMPLETED" &&
+                                payment.professionalId === item.professionalId &&
+                                payment.razorpayPaymentId,
+                            )
+                            .map((payment) => (
+                              <option key={payment.id} value={payment.id}>
+                                Payment #{payment.id} · {money(payment.amount)}
+                              </option>
+                            ))}
+                        </select>
+                        <button
+                          className="rounded-lg bg-indigo-500 px-3 py-2 text-xs font-semibold text-white disabled:opacity-50"
+                          disabled={!payoutPayment[item.id] || processing === item.id}
+                          onClick={() => void processPayout(item.id)}
+                        >
+                          {processing === item.id ? "Processing…" : "Send with Razorpay"}
+                        </button>
+                      </div>
+                    ) : null}
+                    {item.failureReason ? (
+                      <p className="basis-full text-xs text-rose-300">{item.failureReason}</p>
+                    ) : null}
+                    {item.failureReason ? (
+                      <p className="basis-full text-xs text-rose-300">{item.failureReason}</p>
+                    ) : null}
                   </div>
                 ))}
-                {!data.transactions.length && <Empty text="No payment records yet." />}
+                {!data.payments.length && <Empty text="No Razorpay payment records yet." />}
+              </div>
+            ) : tab === "commission" ? (
+              <div className="divide-y divide-white/10">
+                {data.payments
+                  .filter((item) => item.status === "COMPLETED")
+                  .map((item) => (
+                    <div key={item.id} className="flex flex-wrap items-center gap-4 px-5 py-4">
+                      <span className="grid h-10 w-10 place-items-center rounded-xl bg-blue-400/10 text-blue-300">
+                        <CircleDollarSign className="h-5 w-5" />
+                      </span>
+                      <div className="min-w-52 flex-1">
+                        <p className="font-semibold text-white">Payment #{item.id}</p>
+                        <p className="mt-1 text-xs text-slate-400">
+                          {data.names[item.clientId] ?? `Client #${item.clientId}`} · Razorpay
+                          payment
+                        </p>
+                      </div>
+                      <span className="text-sm text-slate-400">
+                        {new Date(item.createdAt).toLocaleDateString()}
+                      </span>
+                      <p className="text-sm text-slate-400">Payment: {money(item.amount)}</p>
+                      <p className="min-w-28 text-right font-bold text-blue-300">
+                        Commission: {money(item.commissionAmount)}
+                      </p>
+                    </div>
+                  ))}
+                {!data.payments.some((item) => item.status === "COMPLETED") && (
+                  <Empty text="No commission records yet." />
+                )}
               </div>
             ) : (
               <div className="divide-y divide-white/10">

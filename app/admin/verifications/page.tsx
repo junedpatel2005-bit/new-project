@@ -32,6 +32,16 @@ type Verification = {
     professionalCategory: string | null;
   };
 };
+type PersonaVerification = {
+  userId: number;
+  provider: string;
+  providerInquiryId: string;
+  providerStatus: string;
+  adminStatus: string;
+  submittedAt: string | null;
+  reviewedAt: string | null;
+  user: Verification["user"];
+};
 const docs = (item: Verification) => [
   { key: "governmentIdUrl" as const, label: "Government ID", value: item.governmentIdUrl },
   { key: "licenseUrl" as const, label: "Professional license", value: item.licenseUrl },
@@ -42,23 +52,36 @@ const docs = (item: Verification) => [
 
 export default function AdminVerificationsPage() {
   const [items, setItems] = useState<Verification[]>([]);
+  const [personaItems, setPersonaItems] = useState<PersonaVerification[]>([]);
   const [selected, setSelected] = useState<Verification | null>(null);
   const [document, setDocument] = useState<{ label: string; value: string; owner: string } | null>(
     null,
   );
   const [message, setMessage] = useState("");
+  const [confirmOverall, setConfirmOverall] = useState<"APPROVED" | "REJECTED" | null>(null);
+  const [confirmDoc, setConfirmDoc] = useState<{
+    key: DocumentKey;
+    label: string;
+    status: "APPROVED" | "REJECTED";
+  } | null>(null);
   const load = () =>
     void fetch("/api/v1/admin/verifications", { cache: "no-store" })
       .then(async (response) => {
         const body = await response.text();
         if (!response.ok) throw new Error(body || "Unable to load verification requests.");
         try {
-          return JSON.parse(body) as { verifications?: Verification[] };
+          return JSON.parse(body) as {
+            verifications?: Verification[];
+            personaVerifications?: PersonaVerification[];
+          };
         } catch {
           throw new Error("Verification service returned an invalid response.");
         }
       })
-      .then((data) => setItems(data.verifications ?? []))
+      .then((data) => {
+        setItems(data.verifications ?? []);
+        setPersonaItems(data.personaVerifications ?? []);
+      })
       .catch(() => {
         setItems([]);
         setMessage("Verification records are temporarily unavailable. Please refresh.");
@@ -75,6 +98,22 @@ export default function AdminVerificationsPage() {
     setItems((current) => current.filter((item) => item.userId !== selected.userId));
     setSelected(null);
     setMessage(`${selected.user.firstName}'s verification was ${status.toLowerCase()}.`);
+  };
+  const decidePersona = async (item: PersonaVerification, status: "APPROVED" | "REJECTED") => {
+    const response = await fetch("/api/v1/admin/verifications", {
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        userId: item.userId,
+        providerInquiryId: item.providerInquiryId,
+        status,
+      }),
+    });
+    if (!response.ok) return setMessage("Could not update Persona verification.");
+    setPersonaItems((current) =>
+      current.filter((entry) => entry.providerInquiryId !== item.providerInquiryId),
+    );
+    setMessage(`${item.user.firstName}'s Persona verification was ${status.toLowerCase()}.`);
   };
   const decideDocument = async (key: DocumentKey, status: "APPROVED" | "REJECTED") => {
     if (!selected) return;
@@ -159,6 +198,68 @@ export default function AdminVerificationsPage() {
           );
         })}
       </div>
+      {personaItems.length > 0 && (
+        <section className="mt-10">
+          <h2 className="font-display text-2xl font-bold text-white">
+            Persona document verification
+          </h2>
+          <div className="mt-4 overflow-x-auto rounded-2xl border border-white/10">
+            <table className="min-w-full text-left text-sm">
+              <thead className="bg-white/[.04] text-xs uppercase tracking-wide text-slate-400">
+                <tr>
+                  <th className="p-4">User</th>
+                  <th className="p-4">Provider</th>
+                  <th className="p-4">Persona Inquiry ID</th>
+                  <th className="p-4">Persona Status</th>
+                  <th className="p-4">Admin Status</th>
+                  <th className="p-4">Submitted At</th>
+                  <th className="p-4">Reviewed At</th>
+                  <th className="p-4">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {personaItems.map((item) => (
+                  <tr
+                    key={item.providerInquiryId}
+                    className="border-t border-white/10 text-slate-200"
+                  >
+                    <td className="p-4">
+                      {item.user.firstName} {item.user.lastName}
+                    </td>
+                    <td className="p-4">{item.provider}</td>
+                    <td className="p-4 font-mono text-xs">{item.providerInquiryId}</td>
+                    <td className="p-4">{item.providerStatus}</td>
+                    <td className="p-4">{item.adminStatus}</td>
+                    <td className="p-4">
+                      {item.submittedAt ? new Date(item.submittedAt).toLocaleString() : "—"}
+                    </td>
+                    <td className="p-4">
+                      {item.reviewedAt ? new Date(item.reviewedAt).toLocaleString() : "—"}
+                    </td>
+                    <td className="p-4">
+                      <Button
+                        size="sm"
+                        onClick={() => void decidePersona(item, "APPROVED")}
+                        className="mr-2 bg-emerald-500 hover:bg-emerald-400"
+                      >
+                        Approve
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => void decidePersona(item, "REJECTED")}
+                        className="border-rose-400/30 text-rose-200"
+                      >
+                        Reject
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
       {items.length === 0 && (
         <div className="mt-8 rounded-2xl border border-dashed border-white/15 p-12 text-center">
           <CheckCircle2 className="mx-auto h-9 w-9 text-emerald-400" />
@@ -221,7 +322,9 @@ export default function AdminVerificationsPage() {
                       </Button>
                       <Button
                         size="sm"
-                        onClick={() => void decideDocument(item.key, "APPROVED")}
+                        onClick={() =>
+                          setConfirmDoc({ key: item.key, label: item.label, status: "APPROVED" })
+                        }
                         className={
                           selected.reviews.find((review) => review.documentKey === item.key)
                             ?.status === "APPROVED"
@@ -234,6 +337,24 @@ export default function AdminVerificationsPage() {
                           ? "Approved"
                           : "Approve document"}
                       </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() =>
+                          setConfirmDoc({ key: item.key, label: item.label, status: "REJECTED" })
+                        }
+                        className={
+                          selected.reviews.find((review) => review.documentKey === item.key)
+                            ?.status === "REJECTED"
+                            ? "ml-2 border-rose-400/30 bg-rose-500/20 text-rose-100"
+                            : "ml-2 border-rose-400/30 bg-transparent text-rose-200 hover:bg-rose-500/10 hover:text-rose-100"
+                        }
+                      >
+                        {selected.reviews.find((review) => review.documentKey === item.key)
+                          ?.status === "REJECTED"
+                          ? "Rejected"
+                          : "Reject document"}
+                      </Button>
                     </div>
                   ) : (
                     <p className="mt-3 text-sm text-slate-500">Not submitted</p>
@@ -244,17 +365,93 @@ export default function AdminVerificationsPage() {
             <div className="mt-7 flex flex-wrap justify-end gap-3">
               <Button
                 variant="outline"
-                onClick={() => void decide("REJECTED")}
+                onClick={() => setConfirmOverall("REJECTED")}
                 className="border-rose-400/30 bg-transparent text-rose-200 hover:bg-rose-500/10 hover:text-rose-100"
               >
                 Reject
               </Button>
               <Button
-                onClick={() => void decide("APPROVED")}
+                onClick={() => setConfirmOverall("APPROVED")}
                 className="bg-emerald-500 hover:bg-emerald-400"
               >
                 <ShieldCheck className="mr-2 h-4 w-4" />
                 Approve verification
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+      {confirmDoc && (
+        <div className="fixed inset-0 z-[60] grid place-items-center bg-black/65 p-4">
+          <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-[#11182b] p-6">
+            <h2 className="font-display text-lg font-bold text-white">
+              {confirmDoc.status === "APPROVED" ? "Approve document?" : "Reject document?"}
+            </h2>
+            <p className="mt-2 text-sm text-slate-400">
+              {confirmDoc.status === "APPROVED"
+                ? `Mark "${confirmDoc.label}" as approved for ${selected?.user.firstName} ${selected?.user.lastName}.`
+                : `Mark "${confirmDoc.label}" as rejected for ${selected?.user.firstName} ${selected?.user.lastName}.`}
+            </p>
+            <div className="mt-6 flex justify-end gap-3">
+              <Button
+                variant="outline"
+                className="border-white/10 bg-transparent text-slate-300 hover:bg-white/10 hover:text-white"
+                onClick={() => setConfirmDoc(null)}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="outline"
+                className={
+                  confirmDoc.status === "APPROVED"
+                    ? "border-emerald-400/30 bg-transparent text-emerald-200 hover:bg-emerald-500/10 hover:text-emerald-100"
+                    : "border-rose-400/30 bg-transparent text-rose-200 hover:bg-rose-500/10 hover:text-rose-100"
+                }
+                onClick={() => {
+                  const { key, status } = confirmDoc;
+                  setConfirmDoc(null);
+                  void decideDocument(key, status);
+                }}
+              >
+                {confirmDoc.status === "APPROVED" ? "Approve" : "Reject"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+      {confirmOverall && selected && (
+        <div className="fixed inset-0 z-[60] grid place-items-center bg-black/65 p-4">
+          <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-[#11182b] p-6">
+            <h2 className="font-display text-lg font-bold text-white">
+              {confirmOverall === "APPROVED" ? "Approve verification?" : "Reject verification?"}
+            </h2>
+            <p className="mt-2 text-sm text-slate-400">
+              {confirmOverall === "APPROVED"
+                ? `${selected.user.firstName} ${selected.user.lastName} will be marked as a verified professional.`
+                : `${selected.user.firstName} ${selected.user.lastName}'s verification request will be rejected.`}
+            </p>
+            <div className="mt-6 flex justify-end gap-3">
+              <Button
+                variant="outline"
+                className="border-white/10 bg-transparent text-slate-300 hover:bg-white/10 hover:text-white"
+                onClick={() => setConfirmOverall(null)}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="outline"
+                className={
+                  confirmOverall === "APPROVED"
+                    ? "border-emerald-400/30 bg-transparent text-emerald-200 hover:bg-emerald-500/10 hover:text-emerald-100"
+                    : "border-rose-400/30 bg-transparent text-rose-200 hover:bg-rose-500/10 hover:text-rose-100"
+                }
+                onClick={() => {
+                  const status = confirmOverall;
+                  setConfirmOverall(null);
+                  void decide(status);
+                }}
+              >
+                {confirmOverall === "APPROVED" ? "Approve" : "Reject"}
               </Button>
             </div>
           </div>
