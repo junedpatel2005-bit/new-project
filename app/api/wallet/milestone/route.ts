@@ -3,6 +3,7 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { sessionCookie, verifySession } from "@/lib/auth";
 import { calculateMilestoneMoney, fundMilestoneFromWallet } from "@/lib/wallet-ledger";
+import { notifyMilestoneFunded } from "@/lib/marketplace-notifications";
 
 const schema = z.object({
   projectId: z.number().int().positive(),
@@ -127,6 +128,14 @@ export async function POST(request: NextRequest) {
       });
       return { remainingBalance: clientWallet?.balance ?? 0 };
     }, { maxWait: 10000, timeout: 30000 });
+    await notifyMilestoneFunded({
+      projectId: project.id,
+      milestoneId: milestone.id,
+      milestoneTitle: milestone.title,
+      amount: money.baseAmount,
+      clientId: project.clientId,
+      professionalId: project.professionalId,
+    });
     return NextResponse.json({
       ok: true,
       charged: money.clientChargeAmount,

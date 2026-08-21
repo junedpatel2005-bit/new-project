@@ -1,6 +1,8 @@
 import "server-only";
 import nodemailer from "nodemailer";
 
+let emailConfigurationWarningShown = false;
+
 function escapeHtml(value: string) {
   return value.replace(
     /[&<>"']/g,
@@ -49,7 +51,15 @@ export async function sendNotificationEmail(input: {
   description: string;
   href?: string;
 }) {
-  if (!isEmailConfigured()) return;
+  if (!isEmailConfigured()) {
+    if (!emailConfigurationWarningShown) {
+      emailConfigurationWarningShown = true;
+      console.warn(
+        "Email notifications are disabled. Configure SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, and SMTP_FROM.",
+      );
+    }
+    return;
+  }
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: Number(process.env.SMTP_PORT ?? 587),

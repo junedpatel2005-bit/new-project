@@ -23,7 +23,10 @@ export function RealtimeNotifications() {
     const socket = io({
       path: "/api/realtime",
       transports: ["websocket", "polling"],
-      reconnectionAttempts: 3,
+      withCredentials: true,
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 10000,
     });
     const onNotification = (notification: RealtimeNotification) => {
       toast(notification.title, { description: notification.description });
@@ -45,13 +48,9 @@ export function RealtimeNotifications() {
       }
       window.dispatchEvent(new CustomEvent("servio:notification"));
     };
-    const onConnectError = () => {
-      socket.disconnect();
-    };
     socket.on("notification:new", onNotification);
-    socket.on("connect_error", onConnectError);
     return () => {
-      socket.off("connect_error", onConnectError);
+      socket.off("notification:new", onNotification);
       socket.disconnect();
     };
   }, []);

@@ -12,6 +12,23 @@ type BroadcastNotification = {
   href: string;
 };
 
+async function sendEmails(
+  recipients: Array<{ email: string; emailNotificationsEnabled: boolean }>,
+  notification: BroadcastNotification,
+) {
+  const results = await Promise.allSettled(
+    recipients
+      .filter((recipient) => recipient.emailNotificationsEnabled)
+      .map((recipient) => sendNotificationEmail({ to: recipient.email, ...notification })),
+  );
+  results.forEach((result) => {
+    if (result.status === "rejected")
+      logServerError("marketplace.notification.email.failed", result.reason, {
+        type: notification.type,
+      });
+  });
+}
+
 async function notifyRole(
   role: "ADMIN" | "CLIENT" | "PROFESSIONAL",
   notification: BroadcastNotification,
@@ -34,15 +51,15 @@ async function notifyRole(
       role === "ADMIN" && process.env.ADMIN_EMAIL?.includes("@")
         ? process.env.ADMIN_EMAIL.trim().toLowerCase()
         : null;
-    await Promise.allSettled(
-      recipients
-        .filter((recipient) => recipient.emailNotificationsEnabled)
-        .map((recipient) => {
-          const isLocalAddress = recipient.email.endsWith(".local");
-          const to =
-            isLocalAddress && configuredAdminEmail ? configuredAdminEmail : recipient.email;
-          return sendNotificationEmail({ to, ...notification });
-        }),
+    await sendEmails(
+      recipients.map((recipient) => ({
+        ...recipient,
+        email:
+          recipient.email.endsWith(".local") && configuredAdminEmail
+            ? configuredAdminEmail
+            : recipient.email,
+      })),
+      notification,
     );
   } catch (error) {
     // A failed notification must never block account creation or job publishing.
@@ -138,11 +155,7 @@ async function notifyUsers(userIds: number[], notification: BroadcastNotificatio
       recipients.map((recipient) => recipient.id),
       notification,
     );
-    await Promise.allSettled(
-      recipients
-        .filter((recipient) => recipient.emailNotificationsEnabled)
-        .map((recipient) => sendNotificationEmail({ to: recipient.email, ...notification })),
-    );
+    await sendEmails(recipients, notification);
   } catch (error) {
     logServerError("marketplace.notification.direct.failed", error, {
       userIds: ids.join(","),
@@ -208,5 +221,65 @@ export function notifyDisputeMessage(input: {
     title: `Message from Servio support about dispute #${input.disputeId}`,
     description: `${input.senderName}: ${input.message.slice(0, 180)}`,
     href: `/project/${input.trackingId}/tracking`,
+  });
+}
+
+export async function notifyMilestoneFunded(input: {
+  projectId: number;
+  milestoneId: number;
+  milestoneTitle: string;
+  amount: number;
+  clientId: number;
+  professionalId: number;
+}) {
+  const href = `/project/${input.projectId}/tracking`;
+  const amount = `₹${input.amount.toLocaleString("en-IN")}`;
+  await notifyUsers([input.clientId], {
+    type: "MILESTONE_FUNDED",
+    title: "Milestone payment received",
+    description: `${amount} has been received for ${input.milestoneTitle}. The professional payout is waiting for admin approval.`,
+    href,
+  });
+  await notifyUsers([input.professionalId], {
+    type: "MILESTONE_FUNDED",
+    title: "Milestone funded",
+    description: `${input.milestoneTitle} is funded for ${amount}. Your payout is waiting for admin approval.`,
+    href,
+  });
+  await notifyRole("ADMIN", {
+    type: "MILESTONE_FUNDED",
+    title: "Milestone payout approval required",
+    description: `${input.milestoneTitle} has received ${amount}. Review and approve the professional payout.`,
+    href: "/admin/finance",
+  });
+}
+
+export async function notifyMilestonePayoutApproved(input: {
+  projectId: number;
+  milestoneTitle: string;
+  payoutAmount: number;
+  platformEarnings: number;
+  clientId: number;
+  professionalId: number;
+}) {
+  const href = `/project/${input.projectId}/tracking`;
+  const payout = `₹${input.payoutAmount.toLocaleString("en-IN")}`;
+  await notifyUsers([input.clientId], {
+    type: "MILESTONE_PAYOUT_APPROVED",
+    title: "Professional payout approved",
+    description: `The payout of ${payout} for ${input.milestoneTitle} has been approved and released.`,
+    href,
+  });
+  await notifyUsers([input.professionalId], {
+    type: "MILESTONE_PAYOUT_APPROVED",
+    title: "Your milestone payment was released",
+    description: `${payout} for ${input.milestoneTitle} has been added to your wallet.`,
+    href: "/professional/earnings",
+  });
+  await notifyRole("ADMIN", {
+    type: "MILESTONE_PAYOUT_APPROVED",
+    title: "Milestone payout completed",
+    description: `${payout} was released for ${input.milestoneTitle}. Platform earnings: ₹${input.platformEarnings.toLocaleString("en-IN")}.`,
+    href: "/admin/finance",
   });
 }

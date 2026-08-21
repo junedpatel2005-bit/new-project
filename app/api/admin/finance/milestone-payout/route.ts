@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db, releaseMilestoneToProfessional } from "@/lib/wallet-ledger";
 import { sessionCookie, verifySession } from "@/lib/auth";
+import { notifyMilestonePayoutApproved } from "@/lib/marketplace-notifications";
 
 const schema = z.object({ paymentId: z.number().int().positive() });
 
@@ -119,6 +120,14 @@ export async function POST(request: NextRequest) {
       },
       { maxWait: 10000, timeout: 30000 },
     );
+    await notifyMilestonePayoutApproved({
+      projectId: payment.projectTrackingId,
+      milestoneTitle: milestone.title,
+      payoutAmount: result.professionalPayoutAmount,
+      platformEarnings: result.adminNetAmount,
+      clientId: payment.clientId,
+      professionalId: payment.professionalId,
+    });
     return NextResponse.json({
       ok: true,
       paidToProfessional: result.professionalPayoutAmount,
