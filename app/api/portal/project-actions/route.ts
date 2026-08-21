@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { sessionCookie, verifySession } from "@/lib/auth";
-import { isRazorpayConfigured } from "@/lib/razorpay";
 import { notifyDisputeRaised } from "@/lib/marketplace-notifications";
 import { enqueueBackgroundJob } from "@/lib/background-jobs";
 
@@ -333,69 +332,10 @@ export async function POST(request: NextRequest) {
       });
     }
     if (input.action === "approve-milestone") {
-      if (isRazorpayConfigured())
-        return NextResponse.json(
-          {
-            error: "Online payment is required before approving this milestone.",
-            paymentRequired: true,
-          },
-          { status: 402 },
-        );
-      const milestone = await db.projectMilestone.findFirst({
-        where: { id: input.milestoneId, trackingId: project.id, status: "AWAITING_CLIENT_REVIEW" },
-      });
-      if (!milestone)
-        return NextResponse.json(
-          { error: "This milestone is not awaiting approval." },
-          { status: 409 },
-        );
-      await db.projectMilestone.update({
-        where: { id: milestone.id },
-        data: { status: "APPROVED", approvedAt: new Date() },
-      });
-      await db.projectTransaction.create({
-        data: {
-          trackingId: project.id,
-          milestoneId: milestone.id,
-          clientId: project.clientId,
-          professionalId: project.professionalId,
-          amount: milestone.amount,
-          type: "MILESTONE_PAYMENT",
-          status: "COMPLETED",
-          description: `Milestone payment: ${milestone.title}`,
-        },
-      });
-      const approvedCount = await db.projectMilestone.count({
-        where: { trackingId: project.id, status: "APPROVED" },
-      });
-      const totalCount = await db.projectMilestone.count({ where: { trackingId: project.id } });
-      const next = await db.projectMilestone.findFirst({
-        where: { trackingId: project.id, status: "UPCOMING" },
-        orderBy: { createdAt: "asc" },
-      });
-      if (approvedCount === totalCount && totalCount === 5) {
-        await db.projectTracking.update({
-          where: { id: project.id },
-          data: { status: "COMPLETED", progress: 100, completedAt: new Date(), currentStage: null },
-        });
-        await db.clientJob.updateMany({
-          where: { id: project.jobId, userId: project.clientId },
-          data: { status: "CLOSED" },
-        });
-      } else {
-        if (next)
-          await db.projectMilestone.update({
-            where: { id: next.id },
-            data: { status: "IN_PROGRESS" },
-          });
-        await db.projectTracking.update({
-          where: { id: project.id },
-          data: { status: "IN_PROGRESS", currentStage: next?.title ?? null },
-        });
-      }
-      await event("MILESTONE_APPROVED", "Milestone approved", milestone.title, {
-        milestoneId: milestone.id,
-      });
+      return NextResponse.json(
+        { error: "Milestones must be paid from the client wallet.", paymentRequired: true },
+        { status: 402 },
+      );
     }
     if (input.action === "submit-final-work") {
       const milestones = await db.projectMilestone.findMany({ where: { trackingId: project.id } });

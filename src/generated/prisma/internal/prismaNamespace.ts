@@ -6067,6 +6067,10 @@ export const PaymentScalarFieldEnum = {
   professionalId: 'professionalId',
   jobId: 'jobId',
   amount: 'amount',
+  baseAmount: 'baseAmount',
+  clientFeeAmount: 'clientFeeAmount',
+  professionalPayoutAmount: 'professionalPayoutAmount',
+  adminNetAmount: 'adminNetAmount',
   commissionAmount: 'commissionAmount',
   currency: 'currency',
   provider: 'provider',
@@ -6119,6 +6123,8 @@ export const WalletTransactionScalarFieldEnum = {
   status: 'status',
   description: 'description',
   metadataJson: 'metadataJson',
+  idempotencyKey: 'idempotencyKey',
+  providerReference: 'providerReference',
   createdAt: 'createdAt'
 } as const
 

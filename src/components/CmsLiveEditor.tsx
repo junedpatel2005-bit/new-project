@@ -160,10 +160,27 @@ export function CmsLiveEditor() {
     // `app/loading.tsx` streams the route tree in via its own Suspense boundary, so a
     // below-the-fold footer can still be mid-hydration well after this component's effect
     // fires. Mutating it earlier races that and trips a hydration-mismatch error.
-    const startTimer = scheduleIdle(() => {
-      void load();
-      observer.observe(document.body, { childList: true, subtree: true });
-    });
+    //
+    // requestIdleCallback alone isn't enough, though: it only tracks CPU idleness, not
+    // network activity. A segment with async server work (e.g. /earnings' verifySession)
+    // keeps streaming in over the *same* response after the shell has already mounted and
+    // gone idle, so rIC can fire — and sync() can stamp data-cms-key onto that segment's
+    // DOM — before React has hydrated content that hasn't even finished arriving yet.
+    // The `load` event only fires once the whole streamed document is in, so gate the
+    // first scan on it (falling back to immediate scheduling for client-side navigations,
+    // where `load` already fired long ago and there's no further response to wait on).
+    let startTimer: number | undefined;
+    const beginSync = () => {
+      startTimer = scheduleIdle(() => {
+        void load();
+        observer.observe(document.body, { childList: true, subtree: true });
+      });
+    };
+    if (document.readyState === "complete") {
+      beginSync();
+    } else {
+      window.addEventListener("load", beginSync, { once: true });
+    }
 
     let removeToolbarListeners: (() => void) | undefined;
     if (editing) {
@@ -193,6 +210,7 @@ export function CmsLiveEditor() {
     }
 
     return () => {
+      window.removeEventListener("load", beginSync);
       cancelIdle(startTimer);
       observer.disconnect();
       document.removeEventListener("click", blockActions, true);

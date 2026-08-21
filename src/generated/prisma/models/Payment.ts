@@ -32,6 +32,10 @@ export type PaymentAvgAggregateOutputType = {
   professionalId: number | null
   jobId: number | null
   amount: number | null
+  baseAmount: number | null
+  clientFeeAmount: number | null
+  professionalPayoutAmount: number | null
+  adminNetAmount: number | null
   commissionAmount: number | null
   projectTrackingId: number | null
   milestoneId: number | null
@@ -43,6 +47,10 @@ export type PaymentSumAggregateOutputType = {
   professionalId: number | null
   jobId: number | null
   amount: number | null
+  baseAmount: number | null
+  clientFeeAmount: number | null
+  professionalPayoutAmount: number | null
+  adminNetAmount: number | null
   commissionAmount: number | null
   projectTrackingId: number | null
   milestoneId: number | null
@@ -54,6 +62,10 @@ export type PaymentMinAggregateOutputType = {
   professionalId: number | null
   jobId: number | null
   amount: number | null
+  baseAmount: number | null
+  clientFeeAmount: number | null
+  professionalPayoutAmount: number | null
+  adminNetAmount: number | null
   commissionAmount: number | null
   currency: string | null
   provider: string | null
@@ -77,6 +89,10 @@ export type PaymentMaxAggregateOutputType = {
   professionalId: number | null
   jobId: number | null
   amount: number | null
+  baseAmount: number | null
+  clientFeeAmount: number | null
+  professionalPayoutAmount: number | null
+  adminNetAmount: number | null
   commissionAmount: number | null
   currency: string | null
   provider: string | null
@@ -100,6 +116,10 @@ export type PaymentCountAggregateOutputType = {
   professionalId: number
   jobId: number
   amount: number
+  baseAmount: number
+  clientFeeAmount: number
+  professionalPayoutAmount: number
+  adminNetAmount: number
   commissionAmount: number
   currency: number
   provider: number
@@ -125,6 +145,10 @@ export type PaymentAvgAggregateInputType = {
   professionalId?: true
   jobId?: true
   amount?: true
+  baseAmount?: true
+  clientFeeAmount?: true
+  professionalPayoutAmount?: true
+  adminNetAmount?: true
   commissionAmount?: true
   projectTrackingId?: true
   milestoneId?: true
@@ -136,6 +160,10 @@ export type PaymentSumAggregateInputType = {
   professionalId?: true
   jobId?: true
   amount?: true
+  baseAmount?: true
+  clientFeeAmount?: true
+  professionalPayoutAmount?: true
+  adminNetAmount?: true
   commissionAmount?: true
   projectTrackingId?: true
   milestoneId?: true
@@ -147,6 +175,10 @@ export type PaymentMinAggregateInputType = {
   professionalId?: true
   jobId?: true
   amount?: true
+  baseAmount?: true
+  clientFeeAmount?: true
+  professionalPayoutAmount?: true
+  adminNetAmount?: true
   commissionAmount?: true
   currency?: true
   provider?: true
@@ -170,6 +202,10 @@ export type PaymentMaxAggregateInputType = {
   professionalId?: true
   jobId?: true
   amount?: true
+  baseAmount?: true
+  clientFeeAmount?: true
+  professionalPayoutAmount?: true
+  adminNetAmount?: true
   commissionAmount?: true
   currency?: true
   provider?: true
@@ -193,6 +229,10 @@ export type PaymentCountAggregateInputType = {
   professionalId?: true
   jobId?: true
   amount?: true
+  baseAmount?: true
+  clientFeeAmount?: true
+  professionalPayoutAmount?: true
+  adminNetAmount?: true
   commissionAmount?: true
   currency?: true
   provider?: true
@@ -303,6 +343,10 @@ export type PaymentGroupByOutputType = {
   professionalId: number
   jobId: number | null
   amount: number
+  baseAmount: number
+  clientFeeAmount: number
+  professionalPayoutAmount: number
+  adminNetAmount: number
   commissionAmount: number
   currency: string
   provider: string
@@ -349,6 +393,10 @@ export type PaymentWhereInput = {
   professionalId?: Prisma.IntFilter<"Payment"> | number
   jobId?: Prisma.IntNullableFilter<"Payment"> | number | null
   amount?: Prisma.IntFilter<"Payment"> | number
+  baseAmount?: Prisma.IntFilter<"Payment"> | number
+  clientFeeAmount?: Prisma.IntFilter<"Payment"> | number
+  professionalPayoutAmount?: Prisma.IntFilter<"Payment"> | number
+  adminNetAmount?: Prisma.IntFilter<"Payment"> | number
   commissionAmount?: Prisma.IntFilter<"Payment"> | number
   currency?: Prisma.StringFilter<"Payment"> | string
   provider?: Prisma.StringFilter<"Payment"> | string
@@ -364,6 +412,7 @@ export type PaymentWhereInput = {
   idempotencyKey?: Prisma.StringFilter<"Payment"> | string
   createdAt?: Prisma.DateTimeFilter<"Payment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Payment"> | Date | string
+  milestone?: Prisma.XOR<Prisma.ProjectMilestoneNullableScalarRelationFilter, Prisma.ProjectMilestoneWhereInput> | null
 }
 
 export type PaymentOrderByWithRelationInput = {
@@ -372,6 +421,10 @@ export type PaymentOrderByWithRelationInput = {
   professionalId?: Prisma.SortOrder
   jobId?: Prisma.SortOrderInput | Prisma.SortOrder
   amount?: Prisma.SortOrder
+  baseAmount?: Prisma.SortOrder
+  clientFeeAmount?: Prisma.SortOrder
+  professionalPayoutAmount?: Prisma.SortOrder
+  adminNetAmount?: Prisma.SortOrder
   commissionAmount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   provider?: Prisma.SortOrder
@@ -387,6 +440,7 @@ export type PaymentOrderByWithRelationInput = {
   idempotencyKey?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  milestone?: Prisma.ProjectMilestoneOrderByWithRelationInput
 }
 
 export type PaymentWhereUniqueInput = Prisma.AtLeast<{
@@ -402,6 +456,10 @@ export type PaymentWhereUniqueInput = Prisma.AtLeast<{
   professionalId?: Prisma.IntFilter<"Payment"> | number
   jobId?: Prisma.IntNullableFilter<"Payment"> | number | null
   amount?: Prisma.IntFilter<"Payment"> | number
+  baseAmount?: Prisma.IntFilter<"Payment"> | number
+  clientFeeAmount?: Prisma.IntFilter<"Payment"> | number
+  professionalPayoutAmount?: Prisma.IntFilter<"Payment"> | number
+  adminNetAmount?: Prisma.IntFilter<"Payment"> | number
   commissionAmount?: Prisma.IntFilter<"Payment"> | number
   currency?: Prisma.StringFilter<"Payment"> | string
   provider?: Prisma.StringFilter<"Payment"> | string
@@ -413,6 +471,7 @@ export type PaymentWhereUniqueInput = Prisma.AtLeast<{
   status?: Prisma.StringFilter<"Payment"> | string
   createdAt?: Prisma.DateTimeFilter<"Payment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Payment"> | Date | string
+  milestone?: Prisma.XOR<Prisma.ProjectMilestoneNullableScalarRelationFilter, Prisma.ProjectMilestoneWhereInput> | null
 }, "id" | "razorpayOrderId" | "razorpayPaymentId" | "milestoneId" | "idempotencyKey">
 
 export type PaymentOrderByWithAggregationInput = {
@@ -421,6 +480,10 @@ export type PaymentOrderByWithAggregationInput = {
   professionalId?: Prisma.SortOrder
   jobId?: Prisma.SortOrderInput | Prisma.SortOrder
   amount?: Prisma.SortOrder
+  baseAmount?: Prisma.SortOrder
+  clientFeeAmount?: Prisma.SortOrder
+  professionalPayoutAmount?: Prisma.SortOrder
+  adminNetAmount?: Prisma.SortOrder
   commissionAmount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   provider?: Prisma.SortOrder
@@ -452,6 +515,10 @@ export type PaymentScalarWhereWithAggregatesInput = {
   professionalId?: Prisma.IntWithAggregatesFilter<"Payment"> | number
   jobId?: Prisma.IntNullableWithAggregatesFilter<"Payment"> | number | null
   amount?: Prisma.IntWithAggregatesFilter<"Payment"> | number
+  baseAmount?: Prisma.IntWithAggregatesFilter<"Payment"> | number
+  clientFeeAmount?: Prisma.IntWithAggregatesFilter<"Payment"> | number
+  professionalPayoutAmount?: Prisma.IntWithAggregatesFilter<"Payment"> | number
+  adminNetAmount?: Prisma.IntWithAggregatesFilter<"Payment"> | number
   commissionAmount?: Prisma.IntWithAggregatesFilter<"Payment"> | number
   currency?: Prisma.StringWithAggregatesFilter<"Payment"> | string
   provider?: Prisma.StringWithAggregatesFilter<"Payment"> | string
@@ -474,6 +541,10 @@ export type PaymentCreateInput = {
   professionalId: number
   jobId?: number | null
   amount: number
+  baseAmount?: number
+  clientFeeAmount?: number
+  professionalPayoutAmount?: number
+  adminNetAmount?: number
   commissionAmount?: number
   currency?: string
   provider: string
@@ -482,13 +553,13 @@ export type PaymentCreateInput = {
   razorpayPaymentId?: string | null
   razorpaySignature?: string | null
   projectTrackingId?: number | null
-  milestoneId?: number | null
   capturedAt?: Date | string | null
   failureReason?: string | null
   status?: string
   idempotencyKey: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  milestone?: Prisma.ProjectMilestoneCreateNestedOneWithoutPaymentInput
 }
 
 export type PaymentUncheckedCreateInput = {
@@ -497,6 +568,10 @@ export type PaymentUncheckedCreateInput = {
   professionalId: number
   jobId?: number | null
   amount: number
+  baseAmount?: number
+  clientFeeAmount?: number
+  professionalPayoutAmount?: number
+  adminNetAmount?: number
   commissionAmount?: number
   currency?: string
   provider: string
@@ -519,6 +594,10 @@ export type PaymentUpdateInput = {
   professionalId?: Prisma.IntFieldUpdateOperationsInput | number
   jobId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   amount?: Prisma.IntFieldUpdateOperationsInput | number
+  baseAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  clientFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalPayoutAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  adminNetAmount?: Prisma.IntFieldUpdateOperationsInput | number
   commissionAmount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.StringFieldUpdateOperationsInput | string
@@ -527,13 +606,13 @@ export type PaymentUpdateInput = {
   razorpayPaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   razorpaySignature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   projectTrackingId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  milestoneId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   capturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  milestone?: Prisma.ProjectMilestoneUpdateOneWithoutPaymentNestedInput
 }
 
 export type PaymentUncheckedUpdateInput = {
@@ -542,6 +621,10 @@ export type PaymentUncheckedUpdateInput = {
   professionalId?: Prisma.IntFieldUpdateOperationsInput | number
   jobId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   amount?: Prisma.IntFieldUpdateOperationsInput | number
+  baseAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  clientFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalPayoutAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  adminNetAmount?: Prisma.IntFieldUpdateOperationsInput | number
   commissionAmount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.StringFieldUpdateOperationsInput | string
@@ -565,6 +648,10 @@ export type PaymentCreateManyInput = {
   professionalId: number
   jobId?: number | null
   amount: number
+  baseAmount?: number
+  clientFeeAmount?: number
+  professionalPayoutAmount?: number
+  adminNetAmount?: number
   commissionAmount?: number
   currency?: string
   provider: string
@@ -587,6 +674,10 @@ export type PaymentUpdateManyMutationInput = {
   professionalId?: Prisma.IntFieldUpdateOperationsInput | number
   jobId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   amount?: Prisma.IntFieldUpdateOperationsInput | number
+  baseAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  clientFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalPayoutAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  adminNetAmount?: Prisma.IntFieldUpdateOperationsInput | number
   commissionAmount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.StringFieldUpdateOperationsInput | string
@@ -595,7 +686,6 @@ export type PaymentUpdateManyMutationInput = {
   razorpayPaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   razorpaySignature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   projectTrackingId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  milestoneId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   capturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
@@ -610,6 +700,10 @@ export type PaymentUncheckedUpdateManyInput = {
   professionalId?: Prisma.IntFieldUpdateOperationsInput | number
   jobId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   amount?: Prisma.IntFieldUpdateOperationsInput | number
+  baseAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  clientFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalPayoutAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  adminNetAmount?: Prisma.IntFieldUpdateOperationsInput | number
   commissionAmount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.StringFieldUpdateOperationsInput | string
@@ -627,12 +721,21 @@ export type PaymentUncheckedUpdateManyInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+export type PaymentNullableScalarRelationFilter = {
+  is?: Prisma.PaymentWhereInput | null
+  isNot?: Prisma.PaymentWhereInput | null
+}
+
 export type PaymentCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   clientId?: Prisma.SortOrder
   professionalId?: Prisma.SortOrder
   jobId?: Prisma.SortOrder
   amount?: Prisma.SortOrder
+  baseAmount?: Prisma.SortOrder
+  clientFeeAmount?: Prisma.SortOrder
+  professionalPayoutAmount?: Prisma.SortOrder
+  adminNetAmount?: Prisma.SortOrder
   commissionAmount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   provider?: Prisma.SortOrder
@@ -656,6 +759,10 @@ export type PaymentAvgOrderByAggregateInput = {
   professionalId?: Prisma.SortOrder
   jobId?: Prisma.SortOrder
   amount?: Prisma.SortOrder
+  baseAmount?: Prisma.SortOrder
+  clientFeeAmount?: Prisma.SortOrder
+  professionalPayoutAmount?: Prisma.SortOrder
+  adminNetAmount?: Prisma.SortOrder
   commissionAmount?: Prisma.SortOrder
   projectTrackingId?: Prisma.SortOrder
   milestoneId?: Prisma.SortOrder
@@ -667,6 +774,10 @@ export type PaymentMaxOrderByAggregateInput = {
   professionalId?: Prisma.SortOrder
   jobId?: Prisma.SortOrder
   amount?: Prisma.SortOrder
+  baseAmount?: Prisma.SortOrder
+  clientFeeAmount?: Prisma.SortOrder
+  professionalPayoutAmount?: Prisma.SortOrder
+  adminNetAmount?: Prisma.SortOrder
   commissionAmount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   provider?: Prisma.SortOrder
@@ -690,6 +801,10 @@ export type PaymentMinOrderByAggregateInput = {
   professionalId?: Prisma.SortOrder
   jobId?: Prisma.SortOrder
   amount?: Prisma.SortOrder
+  baseAmount?: Prisma.SortOrder
+  clientFeeAmount?: Prisma.SortOrder
+  professionalPayoutAmount?: Prisma.SortOrder
+  adminNetAmount?: Prisma.SortOrder
   commissionAmount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   provider?: Prisma.SortOrder
@@ -713,9 +828,163 @@ export type PaymentSumOrderByAggregateInput = {
   professionalId?: Prisma.SortOrder
   jobId?: Prisma.SortOrder
   amount?: Prisma.SortOrder
+  baseAmount?: Prisma.SortOrder
+  clientFeeAmount?: Prisma.SortOrder
+  professionalPayoutAmount?: Prisma.SortOrder
+  adminNetAmount?: Prisma.SortOrder
   commissionAmount?: Prisma.SortOrder
   projectTrackingId?: Prisma.SortOrder
   milestoneId?: Prisma.SortOrder
+}
+
+export type PaymentCreateNestedOneWithoutMilestoneInput = {
+  create?: Prisma.XOR<Prisma.PaymentCreateWithoutMilestoneInput, Prisma.PaymentUncheckedCreateWithoutMilestoneInput>
+  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutMilestoneInput
+  connect?: Prisma.PaymentWhereUniqueInput
+}
+
+export type PaymentUncheckedCreateNestedOneWithoutMilestoneInput = {
+  create?: Prisma.XOR<Prisma.PaymentCreateWithoutMilestoneInput, Prisma.PaymentUncheckedCreateWithoutMilestoneInput>
+  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutMilestoneInput
+  connect?: Prisma.PaymentWhereUniqueInput
+}
+
+export type PaymentUpdateOneWithoutMilestoneNestedInput = {
+  create?: Prisma.XOR<Prisma.PaymentCreateWithoutMilestoneInput, Prisma.PaymentUncheckedCreateWithoutMilestoneInput>
+  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutMilestoneInput
+  upsert?: Prisma.PaymentUpsertWithoutMilestoneInput
+  disconnect?: Prisma.PaymentWhereInput | boolean
+  delete?: Prisma.PaymentWhereInput | boolean
+  connect?: Prisma.PaymentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PaymentUpdateToOneWithWhereWithoutMilestoneInput, Prisma.PaymentUpdateWithoutMilestoneInput>, Prisma.PaymentUncheckedUpdateWithoutMilestoneInput>
+}
+
+export type PaymentUncheckedUpdateOneWithoutMilestoneNestedInput = {
+  create?: Prisma.XOR<Prisma.PaymentCreateWithoutMilestoneInput, Prisma.PaymentUncheckedCreateWithoutMilestoneInput>
+  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutMilestoneInput
+  upsert?: Prisma.PaymentUpsertWithoutMilestoneInput
+  disconnect?: Prisma.PaymentWhereInput | boolean
+  delete?: Prisma.PaymentWhereInput | boolean
+  connect?: Prisma.PaymentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PaymentUpdateToOneWithWhereWithoutMilestoneInput, Prisma.PaymentUpdateWithoutMilestoneInput>, Prisma.PaymentUncheckedUpdateWithoutMilestoneInput>
+}
+
+export type PaymentCreateWithoutMilestoneInput = {
+  clientId: number
+  professionalId: number
+  jobId?: number | null
+  amount: number
+  baseAmount?: number
+  clientFeeAmount?: number
+  professionalPayoutAmount?: number
+  adminNetAmount?: number
+  commissionAmount?: number
+  currency?: string
+  provider: string
+  providerReference?: string | null
+  razorpayOrderId?: string | null
+  razorpayPaymentId?: string | null
+  razorpaySignature?: string | null
+  projectTrackingId?: number | null
+  capturedAt?: Date | string | null
+  failureReason?: string | null
+  status?: string
+  idempotencyKey: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type PaymentUncheckedCreateWithoutMilestoneInput = {
+  id?: number
+  clientId: number
+  professionalId: number
+  jobId?: number | null
+  amount: number
+  baseAmount?: number
+  clientFeeAmount?: number
+  professionalPayoutAmount?: number
+  adminNetAmount?: number
+  commissionAmount?: number
+  currency?: string
+  provider: string
+  providerReference?: string | null
+  razorpayOrderId?: string | null
+  razorpayPaymentId?: string | null
+  razorpaySignature?: string | null
+  projectTrackingId?: number | null
+  capturedAt?: Date | string | null
+  failureReason?: string | null
+  status?: string
+  idempotencyKey: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type PaymentCreateOrConnectWithoutMilestoneInput = {
+  where: Prisma.PaymentWhereUniqueInput
+  create: Prisma.XOR<Prisma.PaymentCreateWithoutMilestoneInput, Prisma.PaymentUncheckedCreateWithoutMilestoneInput>
+}
+
+export type PaymentUpsertWithoutMilestoneInput = {
+  update: Prisma.XOR<Prisma.PaymentUpdateWithoutMilestoneInput, Prisma.PaymentUncheckedUpdateWithoutMilestoneInput>
+  create: Prisma.XOR<Prisma.PaymentCreateWithoutMilestoneInput, Prisma.PaymentUncheckedCreateWithoutMilestoneInput>
+  where?: Prisma.PaymentWhereInput
+}
+
+export type PaymentUpdateToOneWithWhereWithoutMilestoneInput = {
+  where?: Prisma.PaymentWhereInput
+  data: Prisma.XOR<Prisma.PaymentUpdateWithoutMilestoneInput, Prisma.PaymentUncheckedUpdateWithoutMilestoneInput>
+}
+
+export type PaymentUpdateWithoutMilestoneInput = {
+  clientId?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalId?: Prisma.IntFieldUpdateOperationsInput | number
+  jobId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
+  baseAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  clientFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalPayoutAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  adminNetAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  commissionAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.StringFieldUpdateOperationsInput | string
+  providerReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpayOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpayPaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpaySignature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectTrackingId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  capturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type PaymentUncheckedUpdateWithoutMilestoneInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  clientId?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalId?: Prisma.IntFieldUpdateOperationsInput | number
+  jobId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
+  baseAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  clientFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalPayoutAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  adminNetAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  commissionAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.StringFieldUpdateOperationsInput | string
+  providerReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpayOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpayPaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpaySignature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectTrackingId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  capturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -726,6 +995,10 @@ export type PaymentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   professionalId?: boolean
   jobId?: boolean
   amount?: boolean
+  baseAmount?: boolean
+  clientFeeAmount?: boolean
+  professionalPayoutAmount?: boolean
+  adminNetAmount?: boolean
   commissionAmount?: boolean
   currency?: boolean
   provider?: boolean
@@ -741,6 +1014,7 @@ export type PaymentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   idempotencyKey?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  milestone?: boolean | Prisma.Payment$milestoneArgs<ExtArgs>
 }, ExtArgs["result"]["payment"]>
 
 export type PaymentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -749,6 +1023,10 @@ export type PaymentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   professionalId?: boolean
   jobId?: boolean
   amount?: boolean
+  baseAmount?: boolean
+  clientFeeAmount?: boolean
+  professionalPayoutAmount?: boolean
+  adminNetAmount?: boolean
   commissionAmount?: boolean
   currency?: boolean
   provider?: boolean
@@ -764,6 +1042,7 @@ export type PaymentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   idempotencyKey?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  milestone?: boolean | Prisma.Payment$milestoneArgs<ExtArgs>
 }, ExtArgs["result"]["payment"]>
 
 export type PaymentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -772,6 +1051,10 @@ export type PaymentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   professionalId?: boolean
   jobId?: boolean
   amount?: boolean
+  baseAmount?: boolean
+  clientFeeAmount?: boolean
+  professionalPayoutAmount?: boolean
+  adminNetAmount?: boolean
   commissionAmount?: boolean
   currency?: boolean
   provider?: boolean
@@ -787,6 +1070,7 @@ export type PaymentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   idempotencyKey?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  milestone?: boolean | Prisma.Payment$milestoneArgs<ExtArgs>
 }, ExtArgs["result"]["payment"]>
 
 export type PaymentSelectScalar = {
@@ -795,6 +1079,10 @@ export type PaymentSelectScalar = {
   professionalId?: boolean
   jobId?: boolean
   amount?: boolean
+  baseAmount?: boolean
+  clientFeeAmount?: boolean
+  professionalPayoutAmount?: boolean
+  adminNetAmount?: boolean
   commissionAmount?: boolean
   currency?: boolean
   provider?: boolean
@@ -812,17 +1100,32 @@ export type PaymentSelectScalar = {
   updatedAt?: boolean
 }
 
-export type PaymentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clientId" | "professionalId" | "jobId" | "amount" | "commissionAmount" | "currency" | "provider" | "providerReference" | "razorpayOrderId" | "razorpayPaymentId" | "razorpaySignature" | "projectTrackingId" | "milestoneId" | "capturedAt" | "failureReason" | "status" | "idempotencyKey" | "createdAt" | "updatedAt", ExtArgs["result"]["payment"]>
+export type PaymentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clientId" | "professionalId" | "jobId" | "amount" | "baseAmount" | "clientFeeAmount" | "professionalPayoutAmount" | "adminNetAmount" | "commissionAmount" | "currency" | "provider" | "providerReference" | "razorpayOrderId" | "razorpayPaymentId" | "razorpaySignature" | "projectTrackingId" | "milestoneId" | "capturedAt" | "failureReason" | "status" | "idempotencyKey" | "createdAt" | "updatedAt", ExtArgs["result"]["payment"]>
+export type PaymentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  milestone?: boolean | Prisma.Payment$milestoneArgs<ExtArgs>
+}
+export type PaymentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  milestone?: boolean | Prisma.Payment$milestoneArgs<ExtArgs>
+}
+export type PaymentIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  milestone?: boolean | Prisma.Payment$milestoneArgs<ExtArgs>
+}
 
 export type $PaymentPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Payment"
-  objects: {}
+  objects: {
+    milestone: Prisma.$ProjectMilestonePayload<ExtArgs> | null
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     clientId: number
     professionalId: number
     jobId: number | null
     amount: number
+    baseAmount: number
+    clientFeeAmount: number
+    professionalPayoutAmount: number
+    adminNetAmount: number
     commissionAmount: number
     currency: string
     provider: string
@@ -1232,6 +1535,7 @@ readonly fields: PaymentFieldRefs;
  */
 export interface Prisma__PaymentClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  milestone<T extends Prisma.Payment$milestoneArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Payment$milestoneArgs<ExtArgs>>): Prisma.Prisma__ProjectMilestoneClient<runtime.Types.Result.GetResult<Prisma.$ProjectMilestonePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1266,6 +1570,10 @@ export interface PaymentFieldRefs {
   readonly professionalId: Prisma.FieldRef<"Payment", 'Int'>
   readonly jobId: Prisma.FieldRef<"Payment", 'Int'>
   readonly amount: Prisma.FieldRef<"Payment", 'Int'>
+  readonly baseAmount: Prisma.FieldRef<"Payment", 'Int'>
+  readonly clientFeeAmount: Prisma.FieldRef<"Payment", 'Int'>
+  readonly professionalPayoutAmount: Prisma.FieldRef<"Payment", 'Int'>
+  readonly adminNetAmount: Prisma.FieldRef<"Payment", 'Int'>
   readonly commissionAmount: Prisma.FieldRef<"Payment", 'Int'>
   readonly currency: Prisma.FieldRef<"Payment", 'String'>
   readonly provider: Prisma.FieldRef<"Payment", 'String'>
@@ -1298,6 +1606,10 @@ export type PaymentFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Inter
    */
   omit?: Prisma.PaymentOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PaymentInclude<ExtArgs> | null
+  /**
    * Filter, which Payment to fetch.
    */
   where: Prisma.PaymentWhereUniqueInput
@@ -1316,6 +1628,10 @@ export type PaymentFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extension
    */
   omit?: Prisma.PaymentOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PaymentInclude<ExtArgs> | null
+  /**
    * Filter, which Payment to fetch.
    */
   where: Prisma.PaymentWhereUniqueInput
@@ -1333,6 +1649,10 @@ export type PaymentFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Omit specific fields from the Payment
    */
   omit?: Prisma.PaymentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PaymentInclude<ExtArgs> | null
   /**
    * Filter, which Payment to fetch.
    */
@@ -1382,6 +1702,10 @@ export type PaymentFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions
    */
   omit?: Prisma.PaymentOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PaymentInclude<ExtArgs> | null
+  /**
    * Filter, which Payment to fetch.
    */
   where?: Prisma.PaymentWhereInput
@@ -1429,6 +1753,10 @@ export type PaymentFindManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Omit specific fields from the Payment
    */
   omit?: Prisma.PaymentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PaymentInclude<ExtArgs> | null
   /**
    * Filter, which Payments to fetch.
    */
@@ -1478,6 +1806,10 @@ export type PaymentCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    */
   omit?: Prisma.PaymentOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PaymentInclude<ExtArgs> | null
+  /**
    * The data needed to create a Payment.
    */
   data: Prisma.XOR<Prisma.PaymentCreateInput, Prisma.PaymentUncheckedCreateInput>
@@ -1511,6 +1843,10 @@ export type PaymentCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensi
    */
   data: Prisma.PaymentCreateManyInput | Prisma.PaymentCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PaymentIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1525,6 +1861,10 @@ export type PaymentUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Omit specific fields from the Payment
    */
   omit?: Prisma.PaymentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PaymentInclude<ExtArgs> | null
   /**
    * The data needed to update a Payment.
    */
@@ -1577,6 +1917,10 @@ export type PaymentUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensi
    * Limit how many Payments to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PaymentIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1591,6 +1935,10 @@ export type PaymentUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Omit specific fields from the Payment
    */
   omit?: Prisma.PaymentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PaymentInclude<ExtArgs> | null
   /**
    * The filter to search for the Payment to update in case it exists.
    */
@@ -1618,6 +1966,10 @@ export type PaymentDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    */
   omit?: Prisma.PaymentOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PaymentInclude<ExtArgs> | null
+  /**
    * Filter which Payment to delete.
    */
   where: Prisma.PaymentWhereUniqueInput
@@ -1638,6 +1990,25 @@ export type PaymentDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
 }
 
 /**
+ * Payment.milestone
+ */
+export type Payment$milestoneArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProjectMilestone
+   */
+  select?: Prisma.ProjectMilestoneSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ProjectMilestone
+   */
+  omit?: Prisma.ProjectMilestoneOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectMilestoneInclude<ExtArgs> | null
+  where?: Prisma.ProjectMilestoneWhereInput
+}
+
+/**
  * Payment without action
  */
 export type PaymentDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1649,4 +2020,8 @@ export type PaymentDefaultArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Omit specific fields from the Payment
    */
   omit?: Prisma.PaymentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PaymentInclude<ExtArgs> | null
 }

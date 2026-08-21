@@ -296,6 +296,7 @@ export type ProjectMilestoneWhereInput = {
   approvedAt?: Prisma.DateTimeNullableFilter<"ProjectMilestone"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"ProjectMilestone"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ProjectMilestone"> | Date | string
+  payment?: Prisma.XOR<Prisma.PaymentNullableScalarRelationFilter, Prisma.PaymentWhereInput> | null
 }
 
 export type ProjectMilestoneOrderByWithRelationInput = {
@@ -312,6 +313,7 @@ export type ProjectMilestoneOrderByWithRelationInput = {
   approvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  payment?: Prisma.PaymentOrderByWithRelationInput
 }
 
 export type ProjectMilestoneWhereUniqueInput = Prisma.AtLeast<{
@@ -331,6 +333,7 @@ export type ProjectMilestoneWhereUniqueInput = Prisma.AtLeast<{
   approvedAt?: Prisma.DateTimeNullableFilter<"ProjectMilestone"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"ProjectMilestone"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ProjectMilestone"> | Date | string
+  payment?: Prisma.XOR<Prisma.PaymentNullableScalarRelationFilter, Prisma.PaymentWhereInput> | null
 }, "id">
 
 export type ProjectMilestoneOrderByWithAggregationInput = {
@@ -386,6 +389,7 @@ export type ProjectMilestoneCreateInput = {
   approvedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  payment?: Prisma.PaymentCreateNestedOneWithoutMilestoneInput
 }
 
 export type ProjectMilestoneUncheckedCreateInput = {
@@ -402,6 +406,7 @@ export type ProjectMilestoneUncheckedCreateInput = {
   approvedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  payment?: Prisma.PaymentUncheckedCreateNestedOneWithoutMilestoneInput
 }
 
 export type ProjectMilestoneUpdateInput = {
@@ -417,6 +422,7 @@ export type ProjectMilestoneUpdateInput = {
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  payment?: Prisma.PaymentUpdateOneWithoutMilestoneNestedInput
 }
 
 export type ProjectMilestoneUncheckedUpdateInput = {
@@ -433,6 +439,7 @@ export type ProjectMilestoneUncheckedUpdateInput = {
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  payment?: Prisma.PaymentUncheckedUpdateOneWithoutMilestoneNestedInput
 }
 
 export type ProjectMilestoneCreateManyInput = {
@@ -546,6 +553,105 @@ export type ProjectMilestoneSumOrderByAggregateInput = {
   amount?: Prisma.SortOrder
 }
 
+export type ProjectMilestoneNullableScalarRelationFilter = {
+  is?: Prisma.ProjectMilestoneWhereInput | null
+  isNot?: Prisma.ProjectMilestoneWhereInput | null
+}
+
+export type ProjectMilestoneCreateNestedOneWithoutPaymentInput = {
+  create?: Prisma.XOR<Prisma.ProjectMilestoneCreateWithoutPaymentInput, Prisma.ProjectMilestoneUncheckedCreateWithoutPaymentInput>
+  connectOrCreate?: Prisma.ProjectMilestoneCreateOrConnectWithoutPaymentInput
+  connect?: Prisma.ProjectMilestoneWhereUniqueInput
+}
+
+export type ProjectMilestoneUpdateOneWithoutPaymentNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectMilestoneCreateWithoutPaymentInput, Prisma.ProjectMilestoneUncheckedCreateWithoutPaymentInput>
+  connectOrCreate?: Prisma.ProjectMilestoneCreateOrConnectWithoutPaymentInput
+  upsert?: Prisma.ProjectMilestoneUpsertWithoutPaymentInput
+  disconnect?: Prisma.ProjectMilestoneWhereInput | boolean
+  delete?: Prisma.ProjectMilestoneWhereInput | boolean
+  connect?: Prisma.ProjectMilestoneWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectMilestoneUpdateToOneWithWhereWithoutPaymentInput, Prisma.ProjectMilestoneUpdateWithoutPaymentInput>, Prisma.ProjectMilestoneUncheckedUpdateWithoutPaymentInput>
+}
+
+export type ProjectMilestoneCreateWithoutPaymentInput = {
+  trackingId: number
+  clientId: number
+  professionalId: number
+  title: string
+  description?: string | null
+  amount: number
+  dueDate?: Date | string | null
+  status?: string
+  submittedAt?: Date | string | null
+  approvedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type ProjectMilestoneUncheckedCreateWithoutPaymentInput = {
+  id?: number
+  trackingId: number
+  clientId: number
+  professionalId: number
+  title: string
+  description?: string | null
+  amount: number
+  dueDate?: Date | string | null
+  status?: string
+  submittedAt?: Date | string | null
+  approvedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type ProjectMilestoneCreateOrConnectWithoutPaymentInput = {
+  where: Prisma.ProjectMilestoneWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProjectMilestoneCreateWithoutPaymentInput, Prisma.ProjectMilestoneUncheckedCreateWithoutPaymentInput>
+}
+
+export type ProjectMilestoneUpsertWithoutPaymentInput = {
+  update: Prisma.XOR<Prisma.ProjectMilestoneUpdateWithoutPaymentInput, Prisma.ProjectMilestoneUncheckedUpdateWithoutPaymentInput>
+  create: Prisma.XOR<Prisma.ProjectMilestoneCreateWithoutPaymentInput, Prisma.ProjectMilestoneUncheckedCreateWithoutPaymentInput>
+  where?: Prisma.ProjectMilestoneWhereInput
+}
+
+export type ProjectMilestoneUpdateToOneWithWhereWithoutPaymentInput = {
+  where?: Prisma.ProjectMilestoneWhereInput
+  data: Prisma.XOR<Prisma.ProjectMilestoneUpdateWithoutPaymentInput, Prisma.ProjectMilestoneUncheckedUpdateWithoutPaymentInput>
+}
+
+export type ProjectMilestoneUpdateWithoutPaymentInput = {
+  trackingId?: Prisma.IntFieldUpdateOperationsInput | number
+  clientId?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalId?: Prisma.IntFieldUpdateOperationsInput | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
+  dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ProjectMilestoneUncheckedUpdateWithoutPaymentInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  trackingId?: Prisma.IntFieldUpdateOperationsInput | number
+  clientId?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalId?: Prisma.IntFieldUpdateOperationsInput | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
+  dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 
 
 export type ProjectMilestoneSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -562,6 +668,7 @@ export type ProjectMilestoneSelect<ExtArgs extends runtime.Types.Extensions.Inte
   approvedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  payment?: boolean | Prisma.ProjectMilestone$paymentArgs<ExtArgs>
 }, ExtArgs["result"]["projectMilestone"]>
 
 export type ProjectMilestoneSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -613,10 +720,17 @@ export type ProjectMilestoneSelectScalar = {
 }
 
 export type ProjectMilestoneOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "trackingId" | "clientId" | "professionalId" | "title" | "description" | "amount" | "dueDate" | "status" | "submittedAt" | "approvedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["projectMilestone"]>
+export type ProjectMilestoneInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  payment?: boolean | Prisma.ProjectMilestone$paymentArgs<ExtArgs>
+}
+export type ProjectMilestoneIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type ProjectMilestoneIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
 
 export type $ProjectMilestonePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "ProjectMilestone"
-  objects: {}
+  objects: {
+    payment: Prisma.$PaymentPayload<ExtArgs> | null
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     trackingId: number
@@ -1025,6 +1139,7 @@ readonly fields: ProjectMilestoneFieldRefs;
  */
 export interface Prisma__ProjectMilestoneClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  payment<T extends Prisma.ProjectMilestone$paymentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProjectMilestone$paymentArgs<ExtArgs>>): Prisma.Prisma__PaymentClient<runtime.Types.Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1084,6 +1199,10 @@ export type ProjectMilestoneFindUniqueArgs<ExtArgs extends runtime.Types.Extensi
    */
   omit?: Prisma.ProjectMilestoneOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectMilestoneInclude<ExtArgs> | null
+  /**
    * Filter, which ProjectMilestone to fetch.
    */
   where: Prisma.ProjectMilestoneWhereUniqueInput
@@ -1102,6 +1221,10 @@ export type ProjectMilestoneFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.
    */
   omit?: Prisma.ProjectMilestoneOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectMilestoneInclude<ExtArgs> | null
+  /**
    * Filter, which ProjectMilestone to fetch.
    */
   where: Prisma.ProjectMilestoneWhereUniqueInput
@@ -1119,6 +1242,10 @@ export type ProjectMilestoneFindFirstArgs<ExtArgs extends runtime.Types.Extensio
    * Omit specific fields from the ProjectMilestone
    */
   omit?: Prisma.ProjectMilestoneOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectMilestoneInclude<ExtArgs> | null
   /**
    * Filter, which ProjectMilestone to fetch.
    */
@@ -1168,6 +1295,10 @@ export type ProjectMilestoneFindFirstOrThrowArgs<ExtArgs extends runtime.Types.E
    */
   omit?: Prisma.ProjectMilestoneOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectMilestoneInclude<ExtArgs> | null
+  /**
    * Filter, which ProjectMilestone to fetch.
    */
   where?: Prisma.ProjectMilestoneWhereInput
@@ -1215,6 +1346,10 @@ export type ProjectMilestoneFindManyArgs<ExtArgs extends runtime.Types.Extension
    * Omit specific fields from the ProjectMilestone
    */
   omit?: Prisma.ProjectMilestoneOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectMilestoneInclude<ExtArgs> | null
   /**
    * Filter, which ProjectMilestones to fetch.
    */
@@ -1264,6 +1399,10 @@ export type ProjectMilestoneCreateArgs<ExtArgs extends runtime.Types.Extensions.
    */
   omit?: Prisma.ProjectMilestoneOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectMilestoneInclude<ExtArgs> | null
+  /**
    * The data needed to create a ProjectMilestone.
    */
   data: Prisma.XOR<Prisma.ProjectMilestoneCreateInput, Prisma.ProjectMilestoneUncheckedCreateInput>
@@ -1311,6 +1450,10 @@ export type ProjectMilestoneUpdateArgs<ExtArgs extends runtime.Types.Extensions.
    * Omit specific fields from the ProjectMilestone
    */
   omit?: Prisma.ProjectMilestoneOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectMilestoneInclude<ExtArgs> | null
   /**
    * The data needed to update a ProjectMilestone.
    */
@@ -1378,6 +1521,10 @@ export type ProjectMilestoneUpsertArgs<ExtArgs extends runtime.Types.Extensions.
    */
   omit?: Prisma.ProjectMilestoneOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectMilestoneInclude<ExtArgs> | null
+  /**
    * The filter to search for the ProjectMilestone to update in case it exists.
    */
   where: Prisma.ProjectMilestoneWhereUniqueInput
@@ -1404,6 +1551,10 @@ export type ProjectMilestoneDeleteArgs<ExtArgs extends runtime.Types.Extensions.
    */
   omit?: Prisma.ProjectMilestoneOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectMilestoneInclude<ExtArgs> | null
+  /**
    * Filter which ProjectMilestone to delete.
    */
   where: Prisma.ProjectMilestoneWhereUniqueInput
@@ -1424,6 +1575,25 @@ export type ProjectMilestoneDeleteManyArgs<ExtArgs extends runtime.Types.Extensi
 }
 
 /**
+ * ProjectMilestone.payment
+ */
+export type ProjectMilestone$paymentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Payment
+   */
+  select?: Prisma.PaymentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Payment
+   */
+  omit?: Prisma.PaymentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PaymentInclude<ExtArgs> | null
+  where?: Prisma.PaymentWhereInput
+}
+
+/**
  * ProjectMilestone without action
  */
 export type ProjectMilestoneDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1435,4 +1605,8 @@ export type ProjectMilestoneDefaultArgs<ExtArgs extends runtime.Types.Extensions
    * Omit specific fields from the ProjectMilestone
    */
   omit?: Prisma.ProjectMilestoneOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectMilestoneInclude<ExtArgs> | null
 }

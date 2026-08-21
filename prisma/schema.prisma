@@ -156,6 +156,7 @@ model User {
   phoneVerifiedAt                     DateTime?
   projectActivityNotificationsEnabled Boolean                   @default(true)
   clientJobs                          ClientJob[]
+  wallet                              Wallet?
   clientProfiles                      ClientProfile[]
   favoriteJobs                        FavoriteJob[]
   verification                        ProfessionalVerification?
@@ -396,6 +397,7 @@ model ProjectMilestone {
   approvedAt     DateTime?
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
+  payment        Payment?
 
   @@index([trackingId])
   @@map("ProjectMilestone")
@@ -615,6 +617,10 @@ model Payment {
   professionalId    Int
   jobId             Int?
   amount            Int
+  baseAmount        Int      @default(0) @map("base_amount")
+  clientFeeAmount   Int      @default(0) @map("client_fee_amount")
+  professionalPayoutAmount Int @default(0) @map("professional_payout_amount")
+  adminNetAmount    Int      @default(0) @map("admin_net_amount")
   commissionAmount  Int      @default(0)
   currency          String   @default("INR")
   provider          String
@@ -624,6 +630,7 @@ model Payment {
   razorpaySignature String?  @map("razorpay_signature")
   projectTrackingId Int?     @map("project_tracking_id")
   milestoneId       Int?     @unique @map("milestone_id")
+  milestone         ProjectMilestone? @relation(fields: [milestoneId], references: [id])
   capturedAt        DateTime? @map("captured_at")
   failureReason     String?  @map("failure_reason")
   status            String   @default("PENDING")
@@ -652,6 +659,7 @@ model Wallet {
   balance        Int                 @default(0)
   pendingBalance Int                 @default(0)
   updatedAt      DateTime            @updatedAt
+  user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   transactions   WalletTransaction[]
 }
 
@@ -664,6 +672,8 @@ model WalletTransaction {
   status       String
   description  String
   metadataJson String?
+  idempotencyKey String @unique @map("idempotency_key")
+  providerReference String? @unique @map("provider_reference")
   createdAt    DateTime @default(now())
   wallet       Wallet   @relation(fields: [walletId], references: [id], onDelete: Cascade)
 

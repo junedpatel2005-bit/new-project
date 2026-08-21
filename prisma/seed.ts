@@ -6,6 +6,8 @@ import { PrismaClient } from "../src/generated/prisma/client";
 
 const SEED_PASSWORD = "ServioSeed#2026";
 const SEED_CLIENT_EMAIL = "seed.client@servio.example";
+const SEED_ADMIN_EMAIL = "seed.admin@servio.example";
+const SEED_PROFESSIONAL_EMAIL = "surat.pro@servio.example";
 const SEED_DOMAIN = "seed.servio.example";
 const categories = [
   "Development",
@@ -196,6 +198,197 @@ async function createJobs(clientId: number) {
   );
 }
 
+// Mirrors src/lib/wallet-ledger.ts#calculateMilestoneMoney — kept as a plain copy here so the
+// seed script doesn't have to import a "server-only"-guarded module outside of Next's runtime.
+function calculateMilestoneMoney(baseAmount: number) {
+  const clientFeeAmount = Math.ceil(baseAmount * 0.1);
+  const professionalFeeAmount = Math.ceil(baseAmount * 0.1);
+  const clientChargeAmount = baseAmount + clientFeeAmount;
+  const professionalPayoutAmount = Math.max(0, baseAmount - professionalFeeAmount);
+  return {
+    baseAmount,
+    clientFeeAmount,
+    clientChargeAmount,
+    professionalPayoutAmount,
+    adminNetAmount: clientChargeAmount - professionalPayoutAmount,
+  };
+}
+
+async function ensureWallet(userId: number) {
+  return db.wallet.upsert({ where: { userId }, update: {}, create: { userId } });
+}
+
+async function seedWalletActivity(client: { id: number }, professional: { id: number }) {
+  const admin = await db.user.upsert({
+    where: { email: SEED_ADMIN_EMAIL },
+    update: {},
+    create: {
+      email: SEED_ADMIN_EMAIL,
+      username: "seed-admin",
+      firstName: "Seed",
+      lastName: "Admin",
+      passwordHash: await bcrypt.hash(SEED_PASSWORD, 12),
+      role: "ADMIN",
+      authProvider: "LOCAL",
+      emailVerifiedAt: new Date(),
+    },
+  });
+
+  const [clientWallet, professionalWallet, adminWallet] = await Promise.all([
+    ensureWallet(client.id),
+    ensureWallet(professional.id),
+    ensureWallet(admin.id),
+  ]);
+
+  const topUps = [20000, 15000];
+  for (const [index, amount] of topUps.entries()) {
+    const idempotencyKey = `seed-topup-${client.id}-${index}`;
+    if (await db.walletTransaction.findUnique({ where: { idempotencyKey } })) continue;
+    await db.walletTransaction.create({
+      data: {
+        walletId: clientWallet.id,
+        amount,
+        type: "WALLET_TOP_UP",
+        status: "COMPLETED",
+        description: `Wallet top-up: ${amount}`,
+        idempotencyKey,
+      },
+    });
+    await db.wallet.update({
+      where: { id: clientWallet.id },
+      data: { balance: { increment: amount } },
+    });
+  }
+
+  const milestones = [
+    { base: 5000, title: "Homepage redesign milestone" },
+    { base: 12000, title: "API integration milestone" },
+    { base: 8000, title: "QA & handoff milestone" },
+  ];
+  for (const [index, milestone] of milestones.entries()) {
+    const idempotencyKey = `seed-milestone-${client.id}-${professional.id}-${index}`;
+    if (await db.payment.findUnique({ where: { idempotencyKey } })) continue;
+    const milestoneId = 900_001 + index;
+    const money = calculateMilestoneMoney(milestone.base);
+
+    const payment = await db.payment.create({
+      data: {
+        clientId: client.id,
+        professionalId: professional.id,
+        amount: money.clientChargeAmount,
+        baseAmount: money.baseAmount,
+        clientFeeAmount: money.clientFeeAmount,
+        professionalPayoutAmount: money.professionalPayoutAmount,
+        adminNetAmount: money.adminNetAmount,
+        commissionAmount: money.adminNetAmount,
+        currency: "INR",
+        provider: "wallet",
+        milestoneId,
+        status: "COMPLETED",
+        capturedAt: new Date(),
+        idempotencyKey,
+      },
+    });
+    await db.invoice.create({
+      data: {
+        invoiceNumber: `INV-SEED-${String(payment.id).padStart(6, "0")}`,
+        paymentId: payment.id,
+        clientId: client.id,
+        professionalId: professional.id,
+        amount: money.clientChargeAmount,
+        commissionAmount: money.adminNetAmount,
+        netAmount: money.professionalPayoutAmount,
+        currency: "INR",
+      },
+    });
+    await db.projectTransaction.create({
+      data: {
+        trackingId: 900_000 + index,
+        milestoneId,
+        clientId: client.id,
+        professionalId: professional.id,
+        amount: milestone.base,
+        currency: "INR",
+        type: "WALLET_MILESTONE_PAYMENT",
+        status: "COMPLETED",
+        description: `Wallet milestone payment: ${milestone.title}`,
+      },
+    });
+
+    await db.walletTransaction.create({
+      data: {
+        walletId: clientWallet.id,
+        amount: -money.clientChargeAmount,
+        type: "MILESTONE_PAYMENT",
+        status: "COMPLETED",
+        description: `Milestone payment debited: ${money.baseAmount}`,
+        idempotencyKey: `${idempotencyKey}-client-debit`,
+      },
+    });
+    await db.walletTransaction.create({
+      data: {
+        walletId: adminWallet.id,
+        amount: money.clientChargeAmount,
+        type: "ADMIN_MILESTONE_RECEIPT",
+        status: "COMPLETED",
+        description: `Client milestone receipt: ${money.clientChargeAmount}`,
+        idempotencyKey: `${idempotencyKey}-admin-credit`,
+      },
+    });
+    await db.walletTransaction.create({
+      data: {
+        walletId: adminWallet.id,
+        amount: -money.professionalPayoutAmount,
+        type: "PROFESSIONAL_PAYOUT",
+        status: "COMPLETED",
+        description: `Professional payout: ${money.professionalPayoutAmount}`,
+        idempotencyKey: `${idempotencyKey}-admin-debit`,
+      },
+    });
+    await db.walletTransaction.create({
+      data: {
+        walletId: professionalWallet.id,
+        amount: money.professionalPayoutAmount,
+        type: "MILESTONE_EARNING",
+        status: "COMPLETED",
+        description: `Milestone earning: ${money.professionalPayoutAmount}`,
+        idempotencyKey: `${idempotencyKey}-professional-credit`,
+      },
+    });
+    await Promise.all([
+      db.wallet.update({
+        where: { id: clientWallet.id },
+        data: { balance: { decrement: money.clientChargeAmount } },
+      }),
+      db.wallet.update({
+        where: { id: adminWallet.id },
+        data: { balance: { increment: money.adminNetAmount } },
+      }),
+      db.wallet.update({
+        where: { id: professionalWallet.id },
+        data: { balance: { increment: money.professionalPayoutAmount } },
+      }),
+    ]);
+  }
+
+  const pendingWithdrawalNote = "seed-pending-withdrawal";
+  const existingWithdrawal = await db.projectWithdrawal.findFirst({
+    where: { professionalId: professional.id, note: pendingWithdrawalNote },
+  });
+  if (!existingWithdrawal) {
+    await db.projectWithdrawal.create({
+      data: {
+        professionalId: professional.id,
+        amount: 4000,
+        destinationType: "BANK",
+        destinationLabel: "HDFC Bank •••• 4821",
+        status: "PENDING",
+        note: pendingWithdrawalNote,
+      },
+    });
+  }
+}
+
 async function main() {
   faker.seed(20260810);
   const passwordHash = await bcrypt.hash(SEED_PASSWORD, 12);
@@ -215,6 +408,11 @@ async function main() {
   });
   await createProfessionals(passwordHash);
   await createJobs(client.id);
+  const professional = await db.user.findUniqueOrThrow({
+    where: { email: SEED_PROFESSIONAL_EMAIL },
+    select: { id: true },
+  });
+  await seedWalletActivity(client, professional);
   console.info("seed.completed", { categories: categories.length, professionals: 12, jobs: 8 });
 }
 

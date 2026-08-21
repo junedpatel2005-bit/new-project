@@ -49,6 +49,8 @@ export type WalletTransactionMinAggregateOutputType = {
   status: string | null
   description: string | null
   metadataJson: string | null
+  idempotencyKey: string | null
+  providerReference: string | null
   createdAt: Date | null
 }
 
@@ -61,6 +63,8 @@ export type WalletTransactionMaxAggregateOutputType = {
   status: string | null
   description: string | null
   metadataJson: string | null
+  idempotencyKey: string | null
+  providerReference: string | null
   createdAt: Date | null
 }
 
@@ -73,6 +77,8 @@ export type WalletTransactionCountAggregateOutputType = {
   status: number
   description: number
   metadataJson: number
+  idempotencyKey: number
+  providerReference: number
   createdAt: number
   _all: number
 }
@@ -101,6 +107,8 @@ export type WalletTransactionMinAggregateInputType = {
   status?: true
   description?: true
   metadataJson?: true
+  idempotencyKey?: true
+  providerReference?: true
   createdAt?: true
 }
 
@@ -113,6 +121,8 @@ export type WalletTransactionMaxAggregateInputType = {
   status?: true
   description?: true
   metadataJson?: true
+  idempotencyKey?: true
+  providerReference?: true
   createdAt?: true
 }
 
@@ -125,6 +135,8 @@ export type WalletTransactionCountAggregateInputType = {
   status?: true
   description?: true
   metadataJson?: true
+  idempotencyKey?: true
+  providerReference?: true
   createdAt?: true
   _all?: true
 }
@@ -224,6 +236,8 @@ export type WalletTransactionGroupByOutputType = {
   status: string
   description: string
   metadataJson: string | null
+  idempotencyKey: string
+  providerReference: string | null
   createdAt: Date
   _count: WalletTransactionCountAggregateOutputType | null
   _avg: WalletTransactionAvgAggregateOutputType | null
@@ -259,6 +273,8 @@ export type WalletTransactionWhereInput = {
   status?: Prisma.StringFilter<"WalletTransaction"> | string
   description?: Prisma.StringFilter<"WalletTransaction"> | string
   metadataJson?: Prisma.StringNullableFilter<"WalletTransaction"> | string | null
+  idempotencyKey?: Prisma.StringFilter<"WalletTransaction"> | string
+  providerReference?: Prisma.StringNullableFilter<"WalletTransaction"> | string | null
   createdAt?: Prisma.DateTimeFilter<"WalletTransaction"> | Date | string
   wallet?: Prisma.XOR<Prisma.WalletScalarRelationFilter, Prisma.WalletWhereInput>
 }
@@ -272,12 +288,16 @@ export type WalletTransactionOrderByWithRelationInput = {
   status?: Prisma.SortOrder
   description?: Prisma.SortOrder
   metadataJson?: Prisma.SortOrderInput | Prisma.SortOrder
+  idempotencyKey?: Prisma.SortOrder
+  providerReference?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   wallet?: Prisma.WalletOrderByWithRelationInput
 }
 
 export type WalletTransactionWhereUniqueInput = Prisma.AtLeast<{
   id?: number
+  idempotencyKey?: string
+  providerReference?: string
   AND?: Prisma.WalletTransactionWhereInput | Prisma.WalletTransactionWhereInput[]
   OR?: Prisma.WalletTransactionWhereInput[]
   NOT?: Prisma.WalletTransactionWhereInput | Prisma.WalletTransactionWhereInput[]
@@ -290,7 +310,7 @@ export type WalletTransactionWhereUniqueInput = Prisma.AtLeast<{
   metadataJson?: Prisma.StringNullableFilter<"WalletTransaction"> | string | null
   createdAt?: Prisma.DateTimeFilter<"WalletTransaction"> | Date | string
   wallet?: Prisma.XOR<Prisma.WalletScalarRelationFilter, Prisma.WalletWhereInput>
-}, "id">
+}, "id" | "idempotencyKey" | "providerReference">
 
 export type WalletTransactionOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -301,6 +321,8 @@ export type WalletTransactionOrderByWithAggregationInput = {
   status?: Prisma.SortOrder
   description?: Prisma.SortOrder
   metadataJson?: Prisma.SortOrderInput | Prisma.SortOrder
+  idempotencyKey?: Prisma.SortOrder
+  providerReference?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.WalletTransactionCountOrderByAggregateInput
   _avg?: Prisma.WalletTransactionAvgOrderByAggregateInput
@@ -321,6 +343,8 @@ export type WalletTransactionScalarWhereWithAggregatesInput = {
   status?: Prisma.StringWithAggregatesFilter<"WalletTransaction"> | string
   description?: Prisma.StringWithAggregatesFilter<"WalletTransaction"> | string
   metadataJson?: Prisma.StringNullableWithAggregatesFilter<"WalletTransaction"> | string | null
+  idempotencyKey?: Prisma.StringWithAggregatesFilter<"WalletTransaction"> | string
+  providerReference?: Prisma.StringNullableWithAggregatesFilter<"WalletTransaction"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"WalletTransaction"> | Date | string
 }
 
@@ -331,6 +355,8 @@ export type WalletTransactionCreateInput = {
   status: string
   description: string
   metadataJson?: string | null
+  idempotencyKey: string
+  providerReference?: string | null
   createdAt?: Date | string
   wallet: Prisma.WalletCreateNestedOneWithoutTransactionsInput
 }
@@ -344,6 +370,8 @@ export type WalletTransactionUncheckedCreateInput = {
   status: string
   description: string
   metadataJson?: string | null
+  idempotencyKey: string
+  providerReference?: string | null
   createdAt?: Date | string
 }
 
@@ -354,6 +382,8 @@ export type WalletTransactionUpdateInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   metadataJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  providerReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   wallet?: Prisma.WalletUpdateOneRequiredWithoutTransactionsNestedInput
 }
@@ -367,6 +397,8 @@ export type WalletTransactionUncheckedUpdateInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   metadataJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  providerReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -379,6 +411,8 @@ export type WalletTransactionCreateManyInput = {
   status: string
   description: string
   metadataJson?: string | null
+  idempotencyKey: string
+  providerReference?: string | null
   createdAt?: Date | string
 }
 
@@ -389,6 +423,8 @@ export type WalletTransactionUpdateManyMutationInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   metadataJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  providerReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -401,6 +437,8 @@ export type WalletTransactionUncheckedUpdateManyInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   metadataJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  providerReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -423,6 +461,8 @@ export type WalletTransactionCountOrderByAggregateInput = {
   status?: Prisma.SortOrder
   description?: Prisma.SortOrder
   metadataJson?: Prisma.SortOrder
+  idempotencyKey?: Prisma.SortOrder
+  providerReference?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -442,6 +482,8 @@ export type WalletTransactionMaxOrderByAggregateInput = {
   status?: Prisma.SortOrder
   description?: Prisma.SortOrder
   metadataJson?: Prisma.SortOrder
+  idempotencyKey?: Prisma.SortOrder
+  providerReference?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -454,6 +496,8 @@ export type WalletTransactionMinOrderByAggregateInput = {
   status?: Prisma.SortOrder
   description?: Prisma.SortOrder
   metadataJson?: Prisma.SortOrder
+  idempotencyKey?: Prisma.SortOrder
+  providerReference?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -513,6 +557,8 @@ export type WalletTransactionCreateWithoutWalletInput = {
   status: string
   description: string
   metadataJson?: string | null
+  idempotencyKey: string
+  providerReference?: string | null
   createdAt?: Date | string
 }
 
@@ -524,6 +570,8 @@ export type WalletTransactionUncheckedCreateWithoutWalletInput = {
   status: string
   description: string
   metadataJson?: string | null
+  idempotencyKey: string
+  providerReference?: string | null
   createdAt?: Date | string
 }
 
@@ -565,6 +613,8 @@ export type WalletTransactionScalarWhereInput = {
   status?: Prisma.StringFilter<"WalletTransaction"> | string
   description?: Prisma.StringFilter<"WalletTransaction"> | string
   metadataJson?: Prisma.StringNullableFilter<"WalletTransaction"> | string | null
+  idempotencyKey?: Prisma.StringFilter<"WalletTransaction"> | string
+  providerReference?: Prisma.StringNullableFilter<"WalletTransaction"> | string | null
   createdAt?: Prisma.DateTimeFilter<"WalletTransaction"> | Date | string
 }
 
@@ -576,6 +626,8 @@ export type WalletTransactionCreateManyWalletInput = {
   status: string
   description: string
   metadataJson?: string | null
+  idempotencyKey: string
+  providerReference?: string | null
   createdAt?: Date | string
 }
 
@@ -586,6 +638,8 @@ export type WalletTransactionUpdateWithoutWalletInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   metadataJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  providerReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -597,6 +651,8 @@ export type WalletTransactionUncheckedUpdateWithoutWalletInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   metadataJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  providerReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -608,6 +664,8 @@ export type WalletTransactionUncheckedUpdateManyWithoutWalletInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   metadataJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  providerReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -622,6 +680,8 @@ export type WalletTransactionSelect<ExtArgs extends runtime.Types.Extensions.Int
   status?: boolean
   description?: boolean
   metadataJson?: boolean
+  idempotencyKey?: boolean
+  providerReference?: boolean
   createdAt?: boolean
   wallet?: boolean | Prisma.WalletDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["walletTransaction"]>
@@ -635,6 +695,8 @@ export type WalletTransactionSelectCreateManyAndReturn<ExtArgs extends runtime.T
   status?: boolean
   description?: boolean
   metadataJson?: boolean
+  idempotencyKey?: boolean
+  providerReference?: boolean
   createdAt?: boolean
   wallet?: boolean | Prisma.WalletDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["walletTransaction"]>
@@ -648,6 +710,8 @@ export type WalletTransactionSelectUpdateManyAndReturn<ExtArgs extends runtime.T
   status?: boolean
   description?: boolean
   metadataJson?: boolean
+  idempotencyKey?: boolean
+  providerReference?: boolean
   createdAt?: boolean
   wallet?: boolean | Prisma.WalletDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["walletTransaction"]>
@@ -661,10 +725,12 @@ export type WalletTransactionSelectScalar = {
   status?: boolean
   description?: boolean
   metadataJson?: boolean
+  idempotencyKey?: boolean
+  providerReference?: boolean
   createdAt?: boolean
 }
 
-export type WalletTransactionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "walletId" | "paymentId" | "type" | "amount" | "status" | "description" | "metadataJson" | "createdAt", ExtArgs["result"]["walletTransaction"]>
+export type WalletTransactionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "walletId" | "paymentId" | "type" | "amount" | "status" | "description" | "metadataJson" | "idempotencyKey" | "providerReference" | "createdAt", ExtArgs["result"]["walletTransaction"]>
 export type WalletTransactionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   wallet?: boolean | Prisma.WalletDefaultArgs<ExtArgs>
 }
@@ -689,6 +755,8 @@ export type $WalletTransactionPayload<ExtArgs extends runtime.Types.Extensions.I
     status: string
     description: string
     metadataJson: string | null
+    idempotencyKey: string
+    providerReference: string | null
     createdAt: Date
   }, ExtArgs["result"]["walletTransaction"]>
   composites: {}
@@ -1122,6 +1190,8 @@ export interface WalletTransactionFieldRefs {
   readonly status: Prisma.FieldRef<"WalletTransaction", 'String'>
   readonly description: Prisma.FieldRef<"WalletTransaction", 'String'>
   readonly metadataJson: Prisma.FieldRef<"WalletTransaction", 'String'>
+  readonly idempotencyKey: Prisma.FieldRef<"WalletTransaction", 'String'>
+  readonly providerReference: Prisma.FieldRef<"WalletTransaction", 'String'>
   readonly createdAt: Prisma.FieldRef<"WalletTransaction", 'DateTime'>
 }
     

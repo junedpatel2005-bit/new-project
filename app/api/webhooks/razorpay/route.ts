@@ -41,6 +41,17 @@ export async function POST(request: Request) {
           : {}),
       },
     });
+    if (payload.event === "payment.failed") {
+      await db.walletTransaction.updateMany({
+        where: { providerReference: entity.order_id, status: "PENDING" },
+        data: {
+          status: "FAILED",
+          metadataJson: JSON.stringify({
+            reason: entity.error_description ?? "Razorpay payment failed.",
+          }),
+        },
+      });
+    }
   }
   return NextResponse.json({ received: true });
 }

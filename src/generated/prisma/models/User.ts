@@ -609,6 +609,7 @@ export type UserWhereInput = {
   phoneVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFilter<"User"> | boolean
   clientJobs?: Prisma.ClientJobListRelationFilter
+  wallet?: Prisma.XOR<Prisma.WalletNullableScalarRelationFilter, Prisma.WalletWhereInput> | null
   clientProfiles?: Prisma.ClientProfileListRelationFilter
   favoriteJobs?: Prisma.FavoriteJobListRelationFilter
   verification?: Prisma.XOR<Prisma.ProfessionalVerificationNullableScalarRelationFilter, Prisma.ProfessionalVerificationWhereInput> | null
@@ -669,6 +670,7 @@ export type UserOrderByWithRelationInput = {
   phoneVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   projectActivityNotificationsEnabled?: Prisma.SortOrder
   clientJobs?: Prisma.ClientJobOrderByRelationAggregateInput
+  wallet?: Prisma.WalletOrderByWithRelationInput
   clientProfiles?: Prisma.ClientProfileOrderByRelationAggregateInput
   favoriteJobs?: Prisma.FavoriteJobOrderByRelationAggregateInput
   verification?: Prisma.ProfessionalVerificationOrderByWithRelationInput
@@ -732,6 +734,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   phoneVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFilter<"User"> | boolean
   clientJobs?: Prisma.ClientJobListRelationFilter
+  wallet?: Prisma.XOR<Prisma.WalletNullableScalarRelationFilter, Prisma.WalletWhereInput> | null
   clientProfiles?: Prisma.ClientProfileListRelationFilter
   favoriteJobs?: Prisma.FavoriteJobListRelationFilter
   verification?: Prisma.XOR<Prisma.ProfessionalVerificationNullableScalarRelationFilter, Prisma.ProfessionalVerificationWhereInput> | null
@@ -905,6 +908,7 @@ export type UserCreateInput = {
   phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
   clientJobs?: Prisma.ClientJobCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   clientProfiles?: Prisma.ClientProfileCreateNestedManyWithoutUserInput
   favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutUserInput
   verification?: Prisma.ProfessionalVerificationCreateNestedOneWithoutUserInput
@@ -965,6 +969,7 @@ export type UserUncheckedCreateInput = {
   phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
   clientJobs?: Prisma.ClientJobUncheckedCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   clientProfiles?: Prisma.ClientProfileUncheckedCreateNestedManyWithoutUserInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedCreateNestedManyWithoutUserInput
   verification?: Prisma.ProfessionalVerificationUncheckedCreateNestedOneWithoutUserInput
@@ -1024,6 +1029,7 @@ export type UserUpdateInput = {
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clientJobs?: Prisma.ClientJobUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   clientProfiles?: Prisma.ClientProfileUpdateManyWithoutUserNestedInput
   favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutUserNestedInput
   verification?: Prisma.ProfessionalVerificationUpdateOneWithoutUserNestedInput
@@ -1084,6 +1090,7 @@ export type UserUncheckedUpdateInput = {
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clientJobs?: Prisma.ClientJobUncheckedUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   clientProfiles?: Prisma.ClientProfileUncheckedUpdateManyWithoutUserNestedInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedUpdateManyWithoutUserNestedInput
   verification?: Prisma.ProfessionalVerificationUncheckedUpdateOneWithoutUserNestedInput
@@ -1517,6 +1524,20 @@ export type UserUpdateOneRequiredWithoutFavoriteJobsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutFavoriteJobsInput, Prisma.UserUpdateWithoutFavoriteJobsInput>, Prisma.UserUncheckedUpdateWithoutFavoriteJobsInput>
 }
 
+export type UserCreateNestedOneWithoutWalletInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutWalletInput, Prisma.UserUncheckedCreateWithoutWalletInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutWalletInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutWalletNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutWalletInput, Prisma.UserUncheckedCreateWithoutWalletInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutWalletInput
+  upsert?: Prisma.UserUpsertWithoutWalletInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutWalletInput, Prisma.UserUpdateWithoutWalletInput>, Prisma.UserUncheckedUpdateWithoutWalletInput>
+}
+
 export type UserCreateNestedOneWithoutVerificationInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutVerificationInput, Prisma.UserUncheckedCreateWithoutVerificationInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutVerificationInput
@@ -1626,6 +1647,7 @@ export type UserCreateWithoutClientProfilesInput = {
   phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
   clientJobs?: Prisma.ClientJobCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutUserInput
   verification?: Prisma.ProfessionalVerificationCreateNestedOneWithoutUserInput
   personaVerifications?: Prisma.PersonaVerificationCreateNestedManyWithoutUserInput
@@ -1685,6 +1707,7 @@ export type UserUncheckedCreateWithoutClientProfilesInput = {
   phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
   clientJobs?: Prisma.ClientJobUncheckedCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedCreateNestedManyWithoutUserInput
   verification?: Prisma.ProfessionalVerificationUncheckedCreateNestedOneWithoutUserInput
   personaVerifications?: Prisma.PersonaVerificationUncheckedCreateNestedManyWithoutUserInput
@@ -1759,6 +1782,7 @@ export type UserUpdateWithoutClientProfilesInput = {
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clientJobs?: Prisma.ClientJobUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutUserNestedInput
   verification?: Prisma.ProfessionalVerificationUpdateOneWithoutUserNestedInput
   personaVerifications?: Prisma.PersonaVerificationUpdateManyWithoutUserNestedInput
@@ -1818,6 +1842,7 @@ export type UserUncheckedUpdateWithoutClientProfilesInput = {
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clientJobs?: Prisma.ClientJobUncheckedUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedUpdateManyWithoutUserNestedInput
   verification?: Prisma.ProfessionalVerificationUncheckedUpdateOneWithoutUserNestedInput
   personaVerifications?: Prisma.PersonaVerificationUncheckedUpdateManyWithoutUserNestedInput
@@ -1875,6 +1900,7 @@ export type UserCreateWithoutClientJobsInput = {
   emailVerifiedAt?: Date | string | null
   phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   clientProfiles?: Prisma.ClientProfileCreateNestedManyWithoutUserInput
   favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutUserInput
   verification?: Prisma.ProfessionalVerificationCreateNestedOneWithoutUserInput
@@ -1934,6 +1960,7 @@ export type UserUncheckedCreateWithoutClientJobsInput = {
   emailVerifiedAt?: Date | string | null
   phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   clientProfiles?: Prisma.ClientProfileUncheckedCreateNestedManyWithoutUserInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedCreateNestedManyWithoutUserInput
   verification?: Prisma.ProfessionalVerificationUncheckedCreateNestedOneWithoutUserInput
@@ -2008,6 +2035,7 @@ export type UserUpdateWithoutClientJobsInput = {
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   clientProfiles?: Prisma.ClientProfileUpdateManyWithoutUserNestedInput
   favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutUserNestedInput
   verification?: Prisma.ProfessionalVerificationUpdateOneWithoutUserNestedInput
@@ -2067,6 +2095,7 @@ export type UserUncheckedUpdateWithoutClientJobsInput = {
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   clientProfiles?: Prisma.ClientProfileUncheckedUpdateManyWithoutUserNestedInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedUpdateManyWithoutUserNestedInput
   verification?: Prisma.ProfessionalVerificationUncheckedUpdateOneWithoutUserNestedInput
@@ -2126,6 +2155,7 @@ export type UserCreateWithoutFavoriteJobsInput = {
   phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
   clientJobs?: Prisma.ClientJobCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   clientProfiles?: Prisma.ClientProfileCreateNestedManyWithoutUserInput
   verification?: Prisma.ProfessionalVerificationCreateNestedOneWithoutUserInput
   personaVerifications?: Prisma.PersonaVerificationCreateNestedManyWithoutUserInput
@@ -2185,6 +2215,7 @@ export type UserUncheckedCreateWithoutFavoriteJobsInput = {
   phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
   clientJobs?: Prisma.ClientJobUncheckedCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   clientProfiles?: Prisma.ClientProfileUncheckedCreateNestedManyWithoutUserInput
   verification?: Prisma.ProfessionalVerificationUncheckedCreateNestedOneWithoutUserInput
   personaVerifications?: Prisma.PersonaVerificationUncheckedCreateNestedManyWithoutUserInput
@@ -2259,6 +2290,7 @@ export type UserUpdateWithoutFavoriteJobsInput = {
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clientJobs?: Prisma.ClientJobUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   clientProfiles?: Prisma.ClientProfileUpdateManyWithoutUserNestedInput
   verification?: Prisma.ProfessionalVerificationUpdateOneWithoutUserNestedInput
   personaVerifications?: Prisma.PersonaVerificationUpdateManyWithoutUserNestedInput
@@ -2318,7 +2350,262 @@ export type UserUncheckedUpdateWithoutFavoriteJobsInput = {
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clientJobs?: Prisma.ClientJobUncheckedUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   clientProfiles?: Prisma.ClientProfileUncheckedUpdateManyWithoutUserNestedInput
+  verification?: Prisma.ProfessionalVerificationUncheckedUpdateOneWithoutUserNestedInput
+  personaVerifications?: Prisma.PersonaVerificationUncheckedUpdateManyWithoutUserNestedInput
+  services?: Prisma.ServiceUncheckedUpdateManyWithoutProfessionalNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+}
+
+export type UserCreateWithoutWalletInput = {
+  role?: $Enums.UserRole
+  firstName: string
+  lastName: string
+  email: string
+  username?: string | null
+  phone?: string | null
+  passwordHash?: string | null
+  googleId?: string | null
+  avatarUrl?: string | null
+  companyName?: string | null
+  companyWebsite?: string | null
+  industry?: string | null
+  teamSize?: string | null
+  companyDescription?: string | null
+  address?: string | null
+  professionalCategory?: string | null
+  professionalCity?: string | null
+  professionalSkillsJson?: string | null
+  experienceYears?: number | null
+  hourlyRate?: number | null
+  fixedRate?: number | null
+  portfolioUrl?: string | null
+  workPhotosJson?: string | null
+  certificationsJson?: string | null
+  tradeLicenseUrl?: string | null
+  serviceArea?: string | null
+  workMode?: string
+  serviceRadiusKm?: number | null
+  averageRating?: number
+  reviewCount?: number
+  isVerified?: boolean
+  availabilityStatus?: string
+  savedLocationsJson?: string | null
+  hiringNeedsJson?: string | null
+  authProvider?: string
+  isActive?: boolean
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  professionalLatitude?: number | null
+  professionalLongitude?: number | null
+  biometricEnabled?: boolean
+  biometricType?: string | null
+  browserNotificationsEnabled?: boolean
+  emailNotificationsEnabled?: boolean
+  razorpayAccountId?: string | null
+  emailVerifiedAt?: Date | string | null
+  phoneVerifiedAt?: Date | string | null
+  projectActivityNotificationsEnabled?: boolean
+  clientJobs?: Prisma.ClientJobCreateNestedManyWithoutUserInput
+  clientProfiles?: Prisma.ClientProfileCreateNestedManyWithoutUserInput
+  favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutUserInput
+  verification?: Prisma.ProfessionalVerificationCreateNestedOneWithoutUserInput
+  personaVerifications?: Prisma.PersonaVerificationCreateNestedManyWithoutUserInput
+  services?: Prisma.ServiceCreateNestedManyWithoutProfessionalInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+}
+
+export type UserUncheckedCreateWithoutWalletInput = {
+  id?: number
+  role?: $Enums.UserRole
+  firstName: string
+  lastName: string
+  email: string
+  username?: string | null
+  phone?: string | null
+  passwordHash?: string | null
+  googleId?: string | null
+  avatarUrl?: string | null
+  companyName?: string | null
+  companyWebsite?: string | null
+  industry?: string | null
+  teamSize?: string | null
+  companyDescription?: string | null
+  address?: string | null
+  professionalCategory?: string | null
+  professionalCity?: string | null
+  professionalSkillsJson?: string | null
+  experienceYears?: number | null
+  hourlyRate?: number | null
+  fixedRate?: number | null
+  portfolioUrl?: string | null
+  workPhotosJson?: string | null
+  certificationsJson?: string | null
+  tradeLicenseUrl?: string | null
+  serviceArea?: string | null
+  workMode?: string
+  serviceRadiusKm?: number | null
+  averageRating?: number
+  reviewCount?: number
+  isVerified?: boolean
+  availabilityStatus?: string
+  savedLocationsJson?: string | null
+  hiringNeedsJson?: string | null
+  authProvider?: string
+  isActive?: boolean
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  professionalLatitude?: number | null
+  professionalLongitude?: number | null
+  biometricEnabled?: boolean
+  biometricType?: string | null
+  browserNotificationsEnabled?: boolean
+  emailNotificationsEnabled?: boolean
+  razorpayAccountId?: string | null
+  emailVerifiedAt?: Date | string | null
+  phoneVerifiedAt?: Date | string | null
+  projectActivityNotificationsEnabled?: boolean
+  clientJobs?: Prisma.ClientJobUncheckedCreateNestedManyWithoutUserInput
+  clientProfiles?: Prisma.ClientProfileUncheckedCreateNestedManyWithoutUserInput
+  favoriteJobs?: Prisma.FavoriteJobUncheckedCreateNestedManyWithoutUserInput
+  verification?: Prisma.ProfessionalVerificationUncheckedCreateNestedOneWithoutUserInput
+  personaVerifications?: Prisma.PersonaVerificationUncheckedCreateNestedManyWithoutUserInput
+  services?: Prisma.ServiceUncheckedCreateNestedManyWithoutProfessionalInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+}
+
+export type UserCreateOrConnectWithoutWalletInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutWalletInput, Prisma.UserUncheckedCreateWithoutWalletInput>
+}
+
+export type UserUpsertWithoutWalletInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutWalletInput, Prisma.UserUncheckedUpdateWithoutWalletInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutWalletInput, Prisma.UserUncheckedCreateWithoutWalletInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutWalletInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutWalletInput, Prisma.UserUncheckedUpdateWithoutWalletInput>
+}
+
+export type UserUpdateWithoutWalletInput = {
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyWebsite?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  teamSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalSkillsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  fixedRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  portfolioUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workPhotosJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  certificationsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tradeLicenseUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workMode?: Prisma.StringFieldUpdateOperationsInput | string
+  serviceRadiusKm?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  averageRating?: Prisma.FloatFieldUpdateOperationsInput | number
+  reviewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  availabilityStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  savedLocationsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hiringNeedsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  authProvider?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  professionalLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  professionalLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  razorpayAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clientJobs?: Prisma.ClientJobUpdateManyWithoutUserNestedInput
+  clientProfiles?: Prisma.ClientProfileUpdateManyWithoutUserNestedInput
+  favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutUserNestedInput
+  verification?: Prisma.ProfessionalVerificationUpdateOneWithoutUserNestedInput
+  personaVerifications?: Prisma.PersonaVerificationUpdateManyWithoutUserNestedInput
+  services?: Prisma.ServiceUpdateManyWithoutProfessionalNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutWalletInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyWebsite?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  teamSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalSkillsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  fixedRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  portfolioUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workPhotosJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  certificationsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tradeLicenseUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workMode?: Prisma.StringFieldUpdateOperationsInput | string
+  serviceRadiusKm?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  averageRating?: Prisma.FloatFieldUpdateOperationsInput | number
+  reviewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  availabilityStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  savedLocationsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hiringNeedsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  authProvider?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  professionalLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  professionalLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  razorpayAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clientJobs?: Prisma.ClientJobUncheckedUpdateManyWithoutUserNestedInput
+  clientProfiles?: Prisma.ClientProfileUncheckedUpdateManyWithoutUserNestedInput
+  favoriteJobs?: Prisma.FavoriteJobUncheckedUpdateManyWithoutUserNestedInput
   verification?: Prisma.ProfessionalVerificationUncheckedUpdateOneWithoutUserNestedInput
   personaVerifications?: Prisma.PersonaVerificationUncheckedUpdateManyWithoutUserNestedInput
   services?: Prisma.ServiceUncheckedUpdateManyWithoutProfessionalNestedInput
@@ -2376,6 +2663,7 @@ export type UserCreateWithoutVerificationInput = {
   phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
   clientJobs?: Prisma.ClientJobCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   clientProfiles?: Prisma.ClientProfileCreateNestedManyWithoutUserInput
   favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutUserInput
   personaVerifications?: Prisma.PersonaVerificationCreateNestedManyWithoutUserInput
@@ -2435,6 +2723,7 @@ export type UserUncheckedCreateWithoutVerificationInput = {
   phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
   clientJobs?: Prisma.ClientJobUncheckedCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   clientProfiles?: Prisma.ClientProfileUncheckedCreateNestedManyWithoutUserInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedCreateNestedManyWithoutUserInput
   personaVerifications?: Prisma.PersonaVerificationUncheckedCreateNestedManyWithoutUserInput
@@ -2509,6 +2798,7 @@ export type UserUpdateWithoutVerificationInput = {
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clientJobs?: Prisma.ClientJobUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   clientProfiles?: Prisma.ClientProfileUpdateManyWithoutUserNestedInput
   favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutUserNestedInput
   personaVerifications?: Prisma.PersonaVerificationUpdateManyWithoutUserNestedInput
@@ -2568,6 +2858,7 @@ export type UserUncheckedUpdateWithoutVerificationInput = {
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clientJobs?: Prisma.ClientJobUncheckedUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   clientProfiles?: Prisma.ClientProfileUncheckedUpdateManyWithoutUserNestedInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedUpdateManyWithoutUserNestedInput
   personaVerifications?: Prisma.PersonaVerificationUncheckedUpdateManyWithoutUserNestedInput
@@ -2626,6 +2917,7 @@ export type UserCreateWithoutPersonaVerificationsInput = {
   phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
   clientJobs?: Prisma.ClientJobCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   clientProfiles?: Prisma.ClientProfileCreateNestedManyWithoutUserInput
   favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutUserInput
   verification?: Prisma.ProfessionalVerificationCreateNestedOneWithoutUserInput
@@ -2685,6 +2977,7 @@ export type UserUncheckedCreateWithoutPersonaVerificationsInput = {
   phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
   clientJobs?: Prisma.ClientJobUncheckedCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   clientProfiles?: Prisma.ClientProfileUncheckedCreateNestedManyWithoutUserInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedCreateNestedManyWithoutUserInput
   verification?: Prisma.ProfessionalVerificationUncheckedCreateNestedOneWithoutUserInput
@@ -2759,6 +3052,7 @@ export type UserUpdateWithoutPersonaVerificationsInput = {
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clientJobs?: Prisma.ClientJobUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   clientProfiles?: Prisma.ClientProfileUpdateManyWithoutUserNestedInput
   favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutUserNestedInput
   verification?: Prisma.ProfessionalVerificationUpdateOneWithoutUserNestedInput
@@ -2818,6 +3112,7 @@ export type UserUncheckedUpdateWithoutPersonaVerificationsInput = {
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clientJobs?: Prisma.ClientJobUncheckedUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   clientProfiles?: Prisma.ClientProfileUncheckedUpdateManyWithoutUserNestedInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedUpdateManyWithoutUserNestedInput
   verification?: Prisma.ProfessionalVerificationUncheckedUpdateOneWithoutUserNestedInput
@@ -2876,6 +3171,7 @@ export type UserCreateWithoutAuditLogsInput = {
   phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
   clientJobs?: Prisma.ClientJobCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   clientProfiles?: Prisma.ClientProfileCreateNestedManyWithoutUserInput
   favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutUserInput
   verification?: Prisma.ProfessionalVerificationCreateNestedOneWithoutUserInput
@@ -2935,6 +3231,7 @@ export type UserUncheckedCreateWithoutAuditLogsInput = {
   phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
   clientJobs?: Prisma.ClientJobUncheckedCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   clientProfiles?: Prisma.ClientProfileUncheckedCreateNestedManyWithoutUserInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedCreateNestedManyWithoutUserInput
   verification?: Prisma.ProfessionalVerificationUncheckedCreateNestedOneWithoutUserInput
@@ -3009,6 +3306,7 @@ export type UserUpdateWithoutAuditLogsInput = {
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clientJobs?: Prisma.ClientJobUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   clientProfiles?: Prisma.ClientProfileUpdateManyWithoutUserNestedInput
   favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutUserNestedInput
   verification?: Prisma.ProfessionalVerificationUpdateOneWithoutUserNestedInput
@@ -3068,6 +3366,7 @@ export type UserUncheckedUpdateWithoutAuditLogsInput = {
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clientJobs?: Prisma.ClientJobUncheckedUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   clientProfiles?: Prisma.ClientProfileUncheckedUpdateManyWithoutUserNestedInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedUpdateManyWithoutUserNestedInput
   verification?: Prisma.ProfessionalVerificationUncheckedUpdateOneWithoutUserNestedInput
@@ -3126,6 +3425,7 @@ export type UserCreateWithoutServicesInput = {
   phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
   clientJobs?: Prisma.ClientJobCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   clientProfiles?: Prisma.ClientProfileCreateNestedManyWithoutUserInput
   favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutUserInput
   verification?: Prisma.ProfessionalVerificationCreateNestedOneWithoutUserInput
@@ -3185,6 +3485,7 @@ export type UserUncheckedCreateWithoutServicesInput = {
   phoneVerifiedAt?: Date | string | null
   projectActivityNotificationsEnabled?: boolean
   clientJobs?: Prisma.ClientJobUncheckedCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   clientProfiles?: Prisma.ClientProfileUncheckedCreateNestedManyWithoutUserInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedCreateNestedManyWithoutUserInput
   verification?: Prisma.ProfessionalVerificationUncheckedCreateNestedOneWithoutUserInput
@@ -3259,6 +3560,7 @@ export type UserUpdateWithoutServicesInput = {
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clientJobs?: Prisma.ClientJobUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   clientProfiles?: Prisma.ClientProfileUpdateManyWithoutUserNestedInput
   favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutUserNestedInput
   verification?: Prisma.ProfessionalVerificationUpdateOneWithoutUserNestedInput
@@ -3318,6 +3620,7 @@ export type UserUncheckedUpdateWithoutServicesInput = {
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clientJobs?: Prisma.ClientJobUncheckedUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   clientProfiles?: Prisma.ClientProfileUncheckedUpdateManyWithoutUserNestedInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedUpdateManyWithoutUserNestedInput
   verification?: Prisma.ProfessionalVerificationUncheckedUpdateOneWithoutUserNestedInput
@@ -3453,6 +3756,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   phoneVerifiedAt?: boolean
   projectActivityNotificationsEnabled?: boolean
   clientJobs?: boolean | Prisma.User$clientJobsArgs<ExtArgs>
+  wallet?: boolean | Prisma.User$walletArgs<ExtArgs>
   clientProfiles?: boolean | Prisma.User$clientProfilesArgs<ExtArgs>
   favoriteJobs?: boolean | Prisma.User$favoriteJobsArgs<ExtArgs>
   verification?: boolean | Prisma.User$verificationArgs<ExtArgs>
@@ -3624,6 +3928,7 @@ export type UserSelectScalar = {
 export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "role" | "firstName" | "lastName" | "email" | "username" | "phone" | "passwordHash" | "googleId" | "avatarUrl" | "companyName" | "companyWebsite" | "industry" | "teamSize" | "companyDescription" | "address" | "professionalCategory" | "professionalCity" | "professionalSkillsJson" | "experienceYears" | "hourlyRate" | "fixedRate" | "portfolioUrl" | "workPhotosJson" | "certificationsJson" | "tradeLicenseUrl" | "serviceArea" | "workMode" | "serviceRadiusKm" | "averageRating" | "reviewCount" | "isVerified" | "availabilityStatus" | "savedLocationsJson" | "hiringNeedsJson" | "authProvider" | "isActive" | "lastLoginAt" | "createdAt" | "updatedAt" | "professionalLatitude" | "professionalLongitude" | "biometricEnabled" | "biometricType" | "browserNotificationsEnabled" | "emailNotificationsEnabled" | "razorpayAccountId" | "emailVerifiedAt" | "phoneVerifiedAt" | "projectActivityNotificationsEnabled", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   clientJobs?: boolean | Prisma.User$clientJobsArgs<ExtArgs>
+  wallet?: boolean | Prisma.User$walletArgs<ExtArgs>
   clientProfiles?: boolean | Prisma.User$clientProfilesArgs<ExtArgs>
   favoriteJobs?: boolean | Prisma.User$favoriteJobsArgs<ExtArgs>
   verification?: boolean | Prisma.User$verificationArgs<ExtArgs>
@@ -3639,6 +3944,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   name: "User"
   objects: {
     clientJobs: Prisma.$ClientJobPayload<ExtArgs>[]
+    wallet: Prisma.$WalletPayload<ExtArgs> | null
     clientProfiles: Prisma.$ClientProfilePayload<ExtArgs>[]
     favoriteJobs: Prisma.$FavoriteJobPayload<ExtArgs>[]
     verification: Prisma.$ProfessionalVerificationPayload<ExtArgs> | null
@@ -4092,6 +4398,7 @@ readonly fields: UserFieldRefs;
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   clientJobs<T extends Prisma.User$clientJobsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$clientJobsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClientJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  wallet<T extends Prisma.User$walletArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$walletArgs<ExtArgs>>): Prisma.Prisma__WalletClient<runtime.Types.Result.GetResult<Prisma.$WalletPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   clientProfiles<T extends Prisma.User$clientProfilesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$clientProfilesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClientProfilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   favoriteJobs<T extends Prisma.User$favoriteJobsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$favoriteJobsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FavoriteJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   verification<T extends Prisma.User$verificationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$verificationArgs<ExtArgs>>): Prisma.Prisma__ProfessionalVerificationClient<runtime.Types.Result.GetResult<Prisma.$ProfessionalVerificationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
@@ -4591,6 +4898,25 @@ export type User$clientJobsArgs<ExtArgs extends runtime.Types.Extensions.Interna
   take?: number
   skip?: number
   distinct?: Prisma.ClientJobScalarFieldEnum | Prisma.ClientJobScalarFieldEnum[]
+}
+
+/**
+ * User.wallet
+ */
+export type User$walletArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Wallet
+   */
+  select?: Prisma.WalletSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Wallet
+   */
+  omit?: Prisma.WalletOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WalletInclude<ExtArgs> | null
+  where?: Prisma.WalletWhereInput
 }
 
 /**

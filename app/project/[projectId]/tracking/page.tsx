@@ -176,6 +176,16 @@ export default function SharedProjectTrackingPage() {
   const [workFiles, setWorkFiles] = useState<File[]>([]);
   const [workMilestoneId, setWorkMilestoneId] = useState("auto");
   const [showMilestoneModal, setShowMilestoneModal] = useState(false);
+  const [approvalMilestone, setApprovalMilestone] = useState<Milestone | null>(null);
+  const [approvalWalletBalance, setApprovalWalletBalance] = useState<number | null>(null);
+  const [approvalError, setApprovalError] = useState("");
+  const [approvalSuccess, setApprovalSuccess] = useState<{
+    charged: number;
+    professionalReceives: number;
+    adminReceives: number;
+    platformEarnings: number;
+    remainingBalance: number;
+  } | null>(null);
   const [milestoneTitle, setMilestoneTitle] = useState("");
   const [milestoneAmount, setMilestoneAmount] = useState<number | "">("");
   const [milestoneNote, setMilestoneNote] = useState("");
@@ -207,6 +217,18 @@ export default function SharedProjectTrackingPage() {
       setMessage(error instanceof Error ? error.message : "Unable to load this project."),
     );
   }, [refresh]);
+
+  useEffect(() => {
+    if (!approvalMilestone) return;
+    setApprovalError("");
+    setApprovalSuccess(null);
+    void fetch("/api/v1/wallet", { cache: "no-store" })
+      .then((response) => (response.ok ? response.json() : Promise.reject()))
+      .then((wallet: { wallet?: { balance?: number } }) =>
+        setApprovalWalletBalance(wallet.wallet?.balance ?? 0),
+      )
+      .catch(() => setApprovalWalletBalance(null));
+  }, [approvalMilestone]);
 
   const action = async (
     key: string,
@@ -275,72 +297,41 @@ export default function SharedProjectTrackingPage() {
   };
 
   async function approveMilestoneWithPayment(milestoneId: number) {
-    const response = await fetch("/api/payments/razorpay/order", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ projectId: Number(projectId), milestoneId }),
-    });
-    const order = (await response.json().catch(() => null)) as {
-      enabled?: boolean;
-      keyId?: string;
-      orderId?: string;
-      amount?: number;
-      currency?: string;
-      error?: string;
-    } | null;
-    if (!response.ok) return setMessage(order?.error ?? "Unable to start payment.");
-    if (!order?.enabled) return void action("approve-milestone", { milestoneId });
-    if (!order.keyId || !order.orderId || !order.amount)
-      return setMessage("Razorpay payment details are incomplete.");
-    await new Promise<void>((resolve, reject) => {
-      const open = () => {
-        const Razorpay = (
-          window as Window & {
-            Razorpay?: new (options: Record<string, unknown>) => { open: () => void };
-          }
-        ).Razorpay;
-        if (!Razorpay) return reject(new Error("Razorpay checkout could not be loaded."));
-        const checkout = new Razorpay({
-          key: order.keyId,
-          amount: order.amount,
-          currency: order.currency ?? "INR",
-          name: "Servio",
-          description: "Project milestone payment",
-          order_id: order.orderId,
-          handler: async (result: {
-            razorpay_payment_id: string;
-            razorpay_order_id: string;
-            razorpay_signature: string;
-          }) => {
-            const verified = await fetch("/api/payments/razorpay/verify", {
-              method: "POST",
-              headers: { "content-type": "application/json" },
-              body: JSON.stringify({
-                razorpayOrderId: result.razorpay_order_id,
-                razorpayPaymentId: result.razorpay_payment_id,
-                razorpaySignature: result.razorpay_signature,
-              }),
-            });
-            if (!verified.ok)
-              return reject(new Error("Payment verification failed. Please contact support."));
-            resolve();
-          },
-          modal: { ondismiss: () => reject(new Error("Payment was cancelled.")) },
-        });
-        checkout.open();
-      };
-      if (document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]'))
-        return open();
-      const script = document.createElement("script");
-      script.src = "https://checkout.razorpay.com/v1/checkout.js";
-      script.onload = open;
-      script.onerror = () => reject(new Error("Unable to load Razorpay checkout."));
-      document.body.appendChild(script);
-    })
-      .then(() => refresh().catch(() => undefined))
-      .catch((error: unknown) =>
-        setMessage(error instanceof Error ? error.message : "Payment was not completed."),
-      );
+    if (actionInFlight.current) return false;
+    actionInFlight.current = true;
+    setBusy("approve-milestone");
+    try {
+      const response = await fetch("/api/wallet/milestone", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ projectId: Number(projectId), milestoneId }),
+      });
+      const result = (await response.json().catch(() => null)) as {
+        error?: string;
+        charged?: number;
+        professionalReceives?: number;
+        adminReceives?: number;
+        platformEarnings?: number;
+        remainingBalance?: number;
+      } | null;
+      if (!response.ok) {
+        setApprovalError(result?.error ?? "Unable to complete wallet payment.");
+        return false;
+      }
+      await refresh().catch(() => undefined);
+      setApprovalWalletBalance(result?.remainingBalance ?? null);
+      setApprovalSuccess({
+        charged: result?.charged ?? 0,
+        professionalReceives: result?.professionalReceives ?? 0,
+        adminReceives: result?.adminReceives ?? 0,
+        platformEarnings: result?.platformEarnings ?? 0,
+        remainingBalance: result?.remainingBalance ?? 0,
+      });
+      return true;
+    } finally {
+      actionInFlight.current = false;
+      setBusy(null);
+    }
   }
 
   // This effect must run on every render. Keeping it below the loading return
@@ -1121,10 +1112,7 @@ export default function SharedProjectTrackingPage() {
                         <div className="mt-3 flex gap-2">
                           <Button
                             disabled={busy === "approve-milestone"}
-                            onClick={() => {
-                              if (confirm(`Approve ${m.title}?`))
-                                void approveMilestoneWithPayment(m.id);
-                            }}
+                            onClick={() => setApprovalMilestone(m)}
                           >
                             Approve
                           </Button>
@@ -1413,6 +1401,147 @@ export default function SharedProjectTrackingPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      <Dialog
+        open={approvalMilestone !== null}
+        onOpenChange={(open) => {
+          if (!open) setApprovalMilestone(null);
+        }}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Approve milestone payment</DialogTitle>
+            <DialogDescription>
+              Review the wallet payment breakdown before approving this milestone.
+            </DialogDescription>
+          </DialogHeader>
+          {approvalMilestone ? (
+            <div className="mt-4 space-y-3">
+              {(() => {
+                const clientFee = Math.ceil(approvalMilestone.amount * 0.1);
+                const clientCharge = approvalMilestone.amount + clientFee;
+                const professionalPayout = Math.max(0, approvalMilestone.amount - clientFee);
+                return (
+                  <>
+                    {approvalSuccess ? (
+                      <div className="space-y-3">
+                        <div className="rounded-2xl bg-success/10 p-4">
+                          <p className="text-sm font-semibold text-success">Payment completed</p>
+                          <p className="mt-1 text-2xl font-bold">
+                            ₹{approvalSuccess.charged.toLocaleString("en-IN")} charged
+                          </p>
+                          <p className="mt-1 text-sm text-muted-foreground">
+                            Client payment received. Professional payout is waiting for admin approval.
+                          </p>
+                        </div>
+                        <div className="space-y-3 rounded-2xl border border-border p-4 text-sm">
+                          <div className="flex justify-between gap-4">
+                            <span className="text-muted-foreground">Professional payout pending</span>
+                            <span className="font-semibold text-success">
+                              ₹{approvalSuccess.professionalReceives.toLocaleString("en-IN")}
+                            </span>
+                          </div>
+                          <div className="flex justify-between gap-4">
+                            <span className="text-muted-foreground">Admin wallet receives</span>
+                            <span className="font-semibold">
+                              ₹{approvalSuccess.adminReceives.toLocaleString("en-IN")}
+                            </span>
+                          </div>
+                          <div className="flex justify-between gap-4">
+                            <span className="text-muted-foreground">Platform earnings after payout</span>
+                            <span className="font-semibold">
+                              ₹{approvalSuccess.platformEarnings.toLocaleString("en-IN")}
+                            </span>
+                          </div>
+                          <div className="flex justify-between gap-4 border-t border-border pt-3">
+                            <span className="font-semibold">Wallet balance after payment</span>
+                            <span className="font-bold text-primary">
+                              ₹{approvalSuccess.remainingBalance.toLocaleString("en-IN")}
+                            </span>
+                          </div>
+                        </div>
+                        <DialogFooter className="pt-2">
+                          <Button onClick={() => setApprovalMilestone(null)}>Done</Button>
+                        </DialogFooter>
+                      </div>
+                    ) : null}
+                    {!approvalSuccess ? (
+                    <div className="space-y-3">
+                    <div className="rounded-2xl bg-primary/5 p-4">
+                      <p className="text-sm text-muted-foreground">{approvalMilestone.title}</p>
+                      <p className="mt-1 text-2xl font-bold">
+                        ₹{approvalMilestone.amount.toLocaleString("en-IN")}
+                      </p>
+                      <p className="mt-1 text-xs text-muted-foreground">Milestone value</p>
+                    </div>
+                    <div className="space-y-3 rounded-2xl border border-border p-4 text-sm">
+                      <div className="flex justify-between gap-4">
+                        <span className="text-muted-foreground">Milestone amount</span>
+                        <span className="font-semibold">
+                          ₹{approvalMilestone.amount.toLocaleString("en-IN")}
+                        </span>
+                      </div>
+                      <div className="flex justify-between gap-4">
+                        <span className="text-muted-foreground">Client wallet fee (10%)</span>
+                        <span className="font-semibold">+₹{clientFee.toLocaleString("en-IN")}</span>
+                      </div>
+                      <div className="flex justify-between gap-4 border-t border-border pt-3">
+                        <span className="font-semibold">Client wallet debit</span>
+                        <span className="font-bold text-primary">
+                          ₹{clientCharge.toLocaleString("en-IN")}
+                        </span>
+                      </div>
+                      <div className="flex justify-between gap-4">
+                        <span className="text-muted-foreground">Professional receives</span>
+                        <span className="font-semibold text-success">
+                          ₹{professionalPayout.toLocaleString("en-IN")}
+                        </span>
+                      </div>
+                    </div>
+                    <p className="rounded-xl bg-muted p-3 text-xs text-muted-foreground">
+                      Approval will debit ₹{clientCharge.toLocaleString("en-IN")} from your wallet.
+                      Make sure your wallet has enough balance.
+                    </p>
+                    <div className="flex items-center justify-between rounded-xl border border-border px-3 py-2 text-sm">
+                      <span className="text-muted-foreground">Current wallet balance</span>
+                      <span
+                        className={`font-bold ${approvalWalletBalance !== null && approvalWalletBalance < clientCharge ? "text-destructive" : "text-success"}`}
+                      >
+                        {approvalWalletBalance === null
+                          ? "Loading…"
+                          : `₹${approvalWalletBalance.toLocaleString("en-IN")}`}
+                      </span>
+                    </div>
+                    {approvalError ? (
+                      <p className="rounded-xl bg-destructive/10 p-3 text-sm font-medium text-destructive">
+                        {approvalError}
+                      </p>
+                    ) : null}
+                    <DialogFooter className="pt-2">
+                      <Button variant="outline" onClick={() => setApprovalMilestone(null)}>
+                        Cancel
+                      </Button>
+                      <Button
+                        disabled={
+                          busy === "approve-milestone" ||
+                          (approvalWalletBalance !== null && approvalWalletBalance < clientCharge)
+                        }
+                        onClick={async () => {
+                          await approveMilestoneWithPayment(approvalMilestone.id);
+                        }}
+                      >
+                        {busy === "approve-milestone" ? "Processing…" : "Approve & pay"}
+                      </Button>
+                    </DialogFooter>
+                    </div>
+                    ) : null}
+                  </>
+                );
+              })()}
+            </div>
+          ) : null}
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={showMilestoneModal} onOpenChange={setShowMilestoneModal}>
         <DialogContent>
           <DialogHeader>
