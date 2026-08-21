@@ -87,18 +87,13 @@ async function createEmailVerificationToken(userId: number) {
   });
   return raw;
 }
-function sendEmailVerificationLink(userId: number, email: string, raw: string, appOrigin: string) {
-  enqueueBackgroundJob(
-    "email.verification",
-    () =>
-      sendAuthEmail(
-        email,
-        "Verify your Servio email",
-        "Verify your email",
-        `${appOrigin}/verify-email?token=${encodeURIComponent(raw)}`,
-        "Verify email",
-      ),
-    { userId },
+async function sendEmailVerificationLink(email: string, raw: string, appOrigin: string) {
+  await sendAuthEmail(
+    email,
+    "Verify your Servio email",
+    "Verify your email",
+    `${appOrigin}/verify-email?token=${encodeURIComponent(raw)}`,
+    "Verify email",
   );
 }
 
@@ -377,7 +372,7 @@ export async function POST(
     });
     if (user.role === "PROFESSIONAL") await notifyClientsOfNewProfessional(user);
     const raw = await createEmailVerificationToken(user.id);
-    sendEmailVerificationLink(user.id, user.email, raw, publicAppOrigin(request));
+     await sendEmailVerificationLink(user.email, raw, publicAppOrigin(request));
     const response = NextResponse.json(
       {
         success: true,
@@ -502,7 +497,7 @@ export async function POST(
           },
         }),
       ]);
-      sendEmailVerificationLink(user.id, parsed.data.email, raw, publicAppOrigin(request));
+       await sendEmailVerificationLink(parsed.data.email, raw, publicAppOrigin(request));
       return NextResponse.json({
         success: true,
         message: "Email updated. A new confirmation link has been sent.",
@@ -521,7 +516,7 @@ export async function POST(
       const user = await db.user.findUniqueOrThrow({ where: { id: session.userId } });
       if (user.emailVerifiedAt) return NextResponse.json({ success: true });
       const raw = await createEmailVerificationToken(user.id);
-      sendEmailVerificationLink(user.id, user.email, raw, publicAppOrigin(request));
+      await sendEmailVerificationLink(user.email, raw, publicAppOrigin(request));
       return NextResponse.json({ success: true });
     } catch {
       return safe("Unable to send a new verification code.", 500);
