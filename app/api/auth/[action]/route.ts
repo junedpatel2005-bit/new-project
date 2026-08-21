@@ -19,6 +19,7 @@ import {
   notifyAdminsOfNewAccount,
   notifyClientsOfNewProfessional,
 } from "@/lib/marketplace-notifications";
+import { isValidInternationalPhoneNumber } from "@/lib/phone-validation";
 
 const passwordSchema = z.string().min(8).regex(/[A-Z]/).regex(/[a-z]/).regex(/\d/);
 const registerSchema = z
@@ -32,8 +33,14 @@ const registerSchema = z
     terms: z.literal(true),
   })
   .superRefine((value, context) => {
-    if (!value.phone?.trim()) {
+    if (!value.phone.trim()) {
       context.addIssue({ code: "custom", path: ["phone"], message: "A phone number is required." });
+    } else if (!isValidInternationalPhoneNumber(value.phone)) {
+      context.addIssue({
+        code: "custom",
+        path: ["phone"],
+        message: "Enter a valid phone number for the selected country.",
+      });
     }
   });
 const credentials = z.object({ email: z.string().email(), password: z.string().min(1) });
@@ -243,6 +250,10 @@ export async function POST(
         phone: z.string().min(7).max(25),
         role: z.enum(["CLIENT", "PROFESSIONAL"]),
       })
+      .refine((value) => isValidInternationalPhoneNumber(value.phone), {
+        path: ["phone"],
+        message: "Enter a valid phone number for the selected country.",
+      })
       .safeParse(body);
     if (!parsed.success) return safe("Enter a valid phone number and account type.");
     const existingUser = await db.user.findFirst({ where: { phone: parsed.data.phone } });
@@ -269,6 +280,10 @@ export async function POST(
         code: z.string().min(1).max(20),
         role: z.enum(["CLIENT", "PROFESSIONAL"]),
       })
+      .refine((value) => isValidInternationalPhoneNumber(value.phone), {
+        path: ["phone"],
+        message: "Enter a valid phone number for the selected country.",
+      })
       .safeParse(body);
     if (!parsed.success) return safe("Enter a valid phone number, account type, and code.");
     if (
@@ -289,6 +304,10 @@ export async function POST(
   if (action === "check-availability") {
     const parsed = z
       .object({ email: z.string().email().optional(), phone: z.string().min(7).max(25).optional() })
+      .refine((value) => !value.phone || isValidInternationalPhoneNumber(value.phone), {
+        path: ["phone"],
+        message: "Enter a valid phone number for the selected country.",
+      })
       .refine((value) => Boolean(value.email || value.phone), {
         message: "Email or phone is required.",
       })

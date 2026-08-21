@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
 import { countryCodes } from "@/lib/country-codes";
+import { getPhoneDigits, isValidPhoneNumber, phoneValidationMessage } from "@/lib/phone-validation";
 
 const emptyOtp = ["", "", "", ""];
 
@@ -72,8 +73,8 @@ function SignupContent() {
 
   async function requestCode() {
     setPhoneError(null);
-    if (phone.trim().length < 7) {
-      setPhoneError("Enter a valid phone number first.");
+    if (!isValidPhoneNumber(phone, countryCode)) {
+      setPhoneError(phoneValidationMessage(countryCode));
       return;
     }
     setSendingCode(true);
@@ -188,7 +189,8 @@ function SignupContent() {
     if (!firstName) nextErrors.firstName = "First name is required.";
     if (!lastName) nextErrors.lastName = "Last name is required.";
     if (!email) nextErrors.email = "Email is required.";
-    else if (!/^\S+@\S+\.\S+$/.test(email)) nextErrors.email = "Enter a valid email address.";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email))
+      nextErrors.email = "Enter a valid email address.";
     if (!password) nextErrors.password = "Password is required.";
     else if (password.length < 8) nextErrors.password = "Password must be at least 8 characters.";
     else if (!/[A-Z]/.test(password))
@@ -200,9 +202,10 @@ function SignupContent() {
     else if (password !== draft.confirmPassword) {
       nextErrors.confirmPassword = "Passwords do not match.";
     }
-    const phoneDigits = phone.replace(/\D/g, "");
+    const phoneDigits = getPhoneDigits(phone);
     if (!phoneDigits) nextErrors.phone = "Phone number is required.";
-    else if (phoneDigits.length < 7) nextErrors.phone = "Enter a valid phone number.";
+    else if (!isValidPhoneNumber(phone, countryCode))
+      nextErrors.phone = phoneValidationMessage(countryCode);
     if (!draft.terms) nextErrors.terms = "Please accept the Terms and Privacy Policy.";
     setFieldErrors(nextErrors);
     if (Object.keys(nextErrors).length) {
@@ -361,9 +364,10 @@ function SignupContent() {
                 });
               }}
               onBlur={() => {
-                if (phone.trim().length >= 7) checkAvailability("phone", fullPhone);
+                if (isValidPhoneNumber(phone, countryCode)) checkAvailability("phone", fullPhone);
               }}
               type="tel"
+              inputMode="numeric"
               required
               disabled={phoneVerified}
               placeholder="98765 43210"
