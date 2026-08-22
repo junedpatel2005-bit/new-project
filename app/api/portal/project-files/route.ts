@@ -42,7 +42,10 @@ export async function POST(request: NextRequest) {
       select: { id: true, status: true },
     });
     if (!project) return NextResponse.json({ error: "Project not found." }, { status: 404 });
-    if (!["IN_PROGRESS", "REVISION_REQUESTED"].includes(project.status))
+    // A milestone can already be active while the parent project still has its
+    // initial READY_TO_START status. The upload action will transition the project
+    // to IN_PROGRESS after the files are stored.
+    if (!["READY_TO_START", "IN_PROGRESS", "REVISION_REQUESTED"].includes(project.status))
       return NextResponse.json(
         { error: "Files can only be uploaded while work or a revision is in progress." },
         { status: 409 },

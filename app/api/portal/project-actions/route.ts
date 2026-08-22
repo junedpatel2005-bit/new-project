@@ -220,7 +220,8 @@ export async function POST(request: NextRequest) {
       });
     }
     if (input.action === "upload-work") {
-      if (!["IN_PROGRESS", "REVISION_REQUESTED"].includes(project.status))
+      const startsProject = project.status === "READY_TO_START";
+      if (!startsProject && !["IN_PROGRESS", "REVISION_REQUESTED"].includes(project.status))
         return NextResponse.json(
           { error: "Work can only be uploaded while the project is in progress." },
           { status: 409 },
@@ -244,6 +245,12 @@ export async function POST(request: NextRequest) {
           status: "UPLOADED",
         },
       });
+      if (startsProject) {
+        await db.projectTracking.update({
+          where: { id: project.id },
+          data: { status: "IN_PROGRESS", startedAt: new Date() },
+        });
+      }
       await event(
         upload.roundNumber > 1 ? "REVISED_WORK_UPLOADED" : "WORK_UPLOADED",
         upload.roundNumber > 1 ? "Revised work uploaded" : "Work uploaded",

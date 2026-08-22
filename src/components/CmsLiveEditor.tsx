@@ -80,6 +80,9 @@ export function CmsLiveEditor() {
     const params = new URLSearchParams(window.location.search);
     const editing = params.get("cmsEdit") === "1";
     const preview = params.get("cmsPreview") === "1";
+    // The editor mutates rendered DOM to add editable metadata. Keep it completely
+    // dormant on normal pages so those mutations cannot race React hydration.
+    if (!editing && !preview) return;
     const path = window.location.pathname;
     if (path.startsWith("/admin")) return;
     let overrides: Overrides = {};
