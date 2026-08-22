@@ -372,7 +372,7 @@ export async function POST(
     });
     if (user.role === "PROFESSIONAL") await notifyClientsOfNewProfessional(user);
     const raw = await createEmailVerificationToken(user.id);
-     await sendEmailVerificationLink(user.email, raw, publicAppOrigin(request));
+    await sendEmailVerificationLink(user.email, raw, publicAppOrigin(request));
     const response = NextResponse.json(
       {
         success: true,
@@ -497,7 +497,7 @@ export async function POST(
           },
         }),
       ]);
-       await sendEmailVerificationLink(parsed.data.email, raw, publicAppOrigin(request));
+      await sendEmailVerificationLink(parsed.data.email, raw, publicAppOrigin(request));
       return NextResponse.json({
         success: true,
         message: "Email updated. A new confirmation link has been sent.",
