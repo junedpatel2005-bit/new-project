@@ -175,6 +175,12 @@ export async function readProjectFile(storageKey: string) {
   return getStorageProvider().get(storageKey);
 }
 
+export function isProjectFileNotFound(error: unknown) {
+  if (!error || typeof error !== "object") return false;
+  const candidate = error as { code?: string; name?: string };
+  return candidate.code === "ENOENT" || candidate.name === "NoSuchKey";
+}
+
 export async function removeProjectFile(storageKey: string) {
   await getStorageProvider().remove(storageKey);
 }

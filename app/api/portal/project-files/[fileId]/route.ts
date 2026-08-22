@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { sessionCookie, verifySession } from "@/lib/auth";
-import { readProjectFile } from "@/lib/project-file-storage";
+import { isProjectFileNotFound, readProjectFile } from "@/lib/project-file-storage";
+import { logServerError } from "@/lib/server-logger";
 
 export const runtime = "nodejs";
 
@@ -42,7 +43,14 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error("project.file.read.failed", error);
-    return NextResponse.json({ error: "Unable to access this file." }, { status: 404 });
+    if (isProjectFileNotFound(error))
+      return NextResponse.json({ error: "File not found." }, { status: 404 });
+    logServerError("project.file.read.failed", error, {
+      requestId: request.headers.get("x-request-id"),
+    });
+    return NextResponse.json(
+      { error: "Unable to access this file right now. Please try again." },
+      { status: 500 },
+    );
   }
 }
