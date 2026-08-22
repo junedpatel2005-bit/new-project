@@ -89,6 +89,9 @@ export default function Verify() {
           {userEmail ? userEmail : "your email"} to activate your account. The link expires in 24
           hours.
         </p>
+        <Button type="button" onClick={() => void resend()} disabled={resending} className="w-full">
+          {resending ? "Sending confirmation link…" : "Send confirmation link again"}
+        </Button>
         {editingEmail ? (
           <div className="space-y-3 rounded-2xl border border-border bg-muted p-4">
             <Label htmlFor="new-email">Edit email</Label>
