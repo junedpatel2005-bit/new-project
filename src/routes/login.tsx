@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { AuthLayout } from "@/components/AuthLayout";
@@ -16,7 +15,6 @@ const DEMO_ACCOUNTS = {
 } as const;
 
 export default function Login() {
-  const router = useRouter();
   const [oauthError, setOauthError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -62,22 +60,30 @@ export default function Login() {
     setTimeout(() => setButtonScale(1), 150);
     setPending(true);
     setError(null);
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 15_000);
 
     try {
       const response = await fetch("/api/v1/auth/login", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ email, password }),
+        signal: controller.signal,
       });
       const result = (await response.json()) as { error?: string; redirect?: string };
       if (!response.ok) {
         setError(result.error ?? "Unable to sign in.");
         return;
       }
-      router.push(result.redirect ?? "/dashboard");
-    } catch {
-      setError("Unable to sign in. Please check your connection and try again.");
+      window.location.assign(result.redirect ?? "/dashboard");
+    } catch (caught) {
+      setError(
+        caught instanceof DOMException && caught.name === "AbortError"
+          ? "Sign-in is taking too long. Please try again."
+          : "Unable to sign in. Please check your connection and try again.",
+      );
     } finally {
+      window.clearTimeout(timeout);
       setPending(false);
     }
   }

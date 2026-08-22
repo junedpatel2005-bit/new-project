@@ -391,7 +391,8 @@ export async function POST(
   if (action === "login") {
     const parsed = credentials.safeParse(body);
     if (!parsed.success) return safe("Invalid email or password.", 401);
-    const user = await db.user.findUnique({ where: { email: parsed.data.email } });
+    const email = parsed.data.email.trim().toLowerCase();
+    const user = await db.user.findUnique({ where: { email } });
     if (
       !user?.passwordHash ||
       !user.isActive ||
