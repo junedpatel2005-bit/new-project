@@ -14,6 +14,7 @@ const profileSchema = z.object({
     .max(2048)
     .optional()
     .or(z.literal("")),
+  phone: z.string().trim().min(7).max(25).optional().or(z.literal("")),
 });
 
 async function getSession(request: NextRequest) {
@@ -81,12 +82,22 @@ export async function POST(request: NextRequest) {
       { status: 400 },
     );
   const data = parsed.data;
+  if (data.phone && data.phone !== user.phone) {
+    const duplicate = await db.user.findFirst({
+      where: { phone: data.phone, id: { not: user.id } },
+    });
+    if (duplicate)
+      return NextResponse.json(
+        { error: "This phone number is already registered." },
+        { status: 409 },
+      );
+  }
   const companyName = data.companyName || null;
   const profilePhotoUrl = data.profilePhotoUrl || null;
   const fullName = `${data.firstName} ${data.lastName}`;
   const profileData = {
     fullName,
-    phone: user.phone ?? "",
+    phone: data.phone || user.phone || "",
     companyName,
     address: data.address,
     profilePhotoUrl,
@@ -106,6 +117,7 @@ export async function POST(request: NextRequest) {
         companyName,
         address: data.address,
         avatarUrl: profilePhotoUrl,
+        phone: data.phone || null,
       },
     });
     const sameAddress = await tx.clientSavedLocation.findFirst({

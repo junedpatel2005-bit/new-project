@@ -42,6 +42,8 @@ export async function GET(request: NextRequest) {
       workMode: true,
       companyDescription: true,
       professionalSkillsJson: true,
+      phone: true,
+      phoneVerifiedAt: true,
     },
   });
   return NextResponse.json({ profile });

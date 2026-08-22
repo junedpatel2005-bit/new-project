@@ -7,6 +7,7 @@ import { AuthLayout } from "@/components/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PhoneVerification } from "@/components/PhoneVerification";
 import { Textarea } from "@/components/ui/textarea";
 import type { MarketplaceCategory } from "@/lib/types/marketplace";
 
@@ -25,6 +26,7 @@ type Profile = {
   workMode: string;
   companyDescription: string | null;
   professionalSkillsJson: string | null;
+  phone: string | null;
 };
 
 export function ProfessionalProfileSetup() {
@@ -118,6 +120,7 @@ export function ProfessionalProfileSetup() {
       }
     >
       <form onSubmit={submit} className="space-y-4">
+        <PhoneVerification role="PROFESSIONAL" initialPhone={profile?.phone} />
         <div className="space-y-1.5">
           <Label htmlFor="category">Service category</Label>
           <select

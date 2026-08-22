@@ -2,36 +2,17 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  ClipboardEvent,
-  FormEvent,
-  KeyboardEvent,
-  Suspense,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { FormEvent, Suspense, useEffect, useState } from "react";
 import { AuthLayout } from "@/components/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
-import { countryCodes } from "@/lib/country-codes";
-import { getPhoneDigits, isValidPhoneNumber, phoneValidationMessage } from "@/lib/phone-validation";
-
-const emptyOtp = ["", "", "", ""];
 
 function SignupContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const otpRefs = useRef<Array<HTMLInputElement | null>>([]);
   const [role, setRole] = useState<"client" | "pro">("client");
-  const [countryCode, setCountryCode] = useState("+91");
-  const [phone, setPhone] = useState("");
-  const fullPhone = `${countryCode}${phone.trim().replace(/\D/g, "")}`;
-  const [otp, setOtp] = useState(emptyOtp);
-  const [otpOpen, setOtpOpen] = useState(false);
-  const [phoneVerified, setPhoneVerified] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [draft, setDraft] = useState({
@@ -42,10 +23,7 @@ function SignupContent() {
     confirmPassword: "",
     terms: false,
   });
-  const [phoneError, setPhoneError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
-  const [sendingCode, setSendingCode] = useState(false);
-  const [verifyingPhone, setVerifyingPhone] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -58,102 +36,12 @@ function SignupContent() {
     }
   }, [searchParams]);
 
-  function resetPhoneVerification() {
-    setOtp(emptyOtp);
-    setOtpOpen(false);
-    setPhoneVerified(false);
-    setPhoneError(null);
-  }
-
   function chooseRole(nextRole: "client" | "pro") {
     setRole(nextRole);
     setError(null);
-    resetPhoneVerification();
   }
 
-  async function requestCode() {
-    setPhoneError(null);
-    if (!isValidPhoneNumber(phone, countryCode)) {
-      setPhoneError(phoneValidationMessage(countryCode));
-      return;
-    }
-    setSendingCode(true);
-    try {
-      const response = await fetch("/api/v1/auth/send-phone-otp", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          phone: fullPhone,
-          role: role === "pro" ? "PROFESSIONAL" : "CLIENT",
-        }),
-      });
-      const result = (await response.json()) as { error?: string };
-      if (!response.ok) {
-        setPhoneError(result.error ?? "Unable to start phone verification.");
-        return;
-      }
-      setOtpOpen(true);
-      requestAnimationFrame(() => otpRefs.current[0]?.focus());
-    } catch {
-      setPhoneError("Network error. Check your connection and try again.");
-    } finally {
-      setSendingCode(false);
-    }
-  }
-
-  function updateOtp(index: number, value: string) {
-    const digit = value.replace(/\D/g, "").slice(-1);
-    setOtp((current) => current.map((item, itemIndex) => (itemIndex === index ? digit : item)));
-    if (digit && index < otpRefs.current.length - 1) otpRefs.current[index + 1]?.focus();
-  }
-
-  function handleOtpKeyDown(index: number, event: KeyboardEvent<HTMLInputElement>) {
-    if (event.key === "Backspace" && !otp[index] && index > 0) {
-      otpRefs.current[index - 1]?.focus();
-    }
-  }
-
-  function handleOtpPaste(event: ClipboardEvent<HTMLInputElement>) {
-    const digits = event.clipboardData.getData("text").replace(/\D/g, "").slice(0, 4);
-    if (!digits) return;
-    event.preventDefault();
-    setOtp(Array.from({ length: 4 }, (_, index) => digits[index] ?? ""));
-    otpRefs.current[Math.min(digits.length, 4) - 1]?.focus();
-  }
-
-  async function verifyPhone() {
-    const code = otp.join("");
-    if (code.length !== 4) {
-      setPhoneError("Enter the 4-digit verification code.");
-      return;
-    }
-    setPhoneError(null);
-    setVerifyingPhone(true);
-    try {
-      const response = await fetch("/api/v1/auth/verify-phone", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          phone: fullPhone,
-          code,
-          role: role === "pro" ? "PROFESSIONAL" : "CLIENT",
-        }),
-      });
-      const result = (await response.json()) as { error?: string };
-      if (!response.ok) {
-        setPhoneError(result.error ?? "Unable to verify this phone number.");
-        return;
-      }
-      setPhoneVerified(true);
-      setOtpOpen(false);
-    } catch {
-      setPhoneError("Network error. Check your connection and try again.");
-    } finally {
-      setVerifyingPhone(false);
-    }
-  }
-
-  async function checkAvailability(field: "email" | "phone", value: string) {
+  async function checkAvailability(field: "email", value: string) {
     const trimmed = value.trim();
     if (!trimmed) return;
     const response = await fetch("/api/v1/auth/check-availability", {
@@ -202,20 +90,9 @@ function SignupContent() {
     else if (password !== draft.confirmPassword) {
       nextErrors.confirmPassword = "Passwords do not match.";
     }
-    const phoneDigits = getPhoneDigits(phone);
-    if (!phoneDigits) nextErrors.phone = "Phone number is required.";
-    else if (!isValidPhoneNumber(phone, countryCode))
-      nextErrors.phone = phoneValidationMessage(countryCode);
     if (!draft.terms) nextErrors.terms = "Please accept the Terms and Privacy Policy.";
     setFieldErrors(nextErrors);
     if (Object.keys(nextErrors).length) {
-      return;
-    }
-    if (!phoneVerified) {
-      setFieldErrors((current) => ({
-        ...current,
-        phone: "Verify your phone number before creating your account.",
-      }));
       return;
     }
     setPending(true);
@@ -227,7 +104,6 @@ function SignupContent() {
           firstName,
           lastName,
           email,
-          phone: fullPhone,
           password,
           role: role === "pro" ? "PROFESSIONAL" : "CLIENT",
           terms: draft.terms,
@@ -332,116 +208,6 @@ function SignupContent() {
           }}
           onBlur={() => checkAvailability("email", draft.email)}
         />
-        <div className="space-y-2">
-          <Label htmlFor="phone">Phone number</Label>
-          <div className="flex gap-2">
-            <select
-              aria-label="Country code"
-              value={countryCode}
-              onChange={(event) => {
-                setCountryCode(event.target.value);
-                resetPhoneVerification();
-              }}
-              disabled={phoneVerified}
-              className="h-10 w-[104px] shrink-0 rounded-md border border-input bg-background px-2 text-sm disabled:opacity-50"
-            >
-              {countryCodes.map((country) => (
-                <option key={country.code} value={country.code}>
-                  {country.flag} {country.code}
-                </option>
-              ))}
-            </select>
-            <Input
-              id="phone"
-              value={phone}
-              onChange={(event) => {
-                setPhone(event.target.value.replace(/[^\d\s-]/g, ""));
-                resetPhoneVerification();
-                setFieldErrors((current) => {
-                  const next = { ...current };
-                  delete next.phone;
-                  return next;
-                });
-              }}
-              onBlur={() => {
-                if (isValidPhoneNumber(phone, countryCode)) checkAvailability("phone", fullPhone);
-              }}
-              type="tel"
-              inputMode="numeric"
-              required
-              disabled={phoneVerified}
-              placeholder="98765 43210"
-              className={
-                fieldErrors.phone
-                  ? "border-destructive placeholder:text-destructive focus-visible:ring-destructive"
-                  : ""
-              }
-              aria-invalid={Boolean(fieldErrors.phone)}
-              aria-describedby={fieldErrors.phone ? "phone-error" : undefined}
-            />
-            {!phoneVerified && (
-              <Button type="button" variant="outline" onClick={requestCode} disabled={sendingCode}>
-                {sendingCode ? "Sending…" : otpOpen ? "Resend" : "Verify"}
-              </Button>
-            )}
-          </div>
-          {phoneVerified ? (
-            <div className="flex animate-in items-center justify-between rounded-md bg-muted px-3 py-2 text-sm text-primary fade-in zoom-in-95 duration-300">
-              <span className="animate-in fade-in slide-in-from-left-1 duration-300">
-                ✓ Phone number verified
-              </span>
-              <Button type="button" variant="ghost" size="sm" onClick={resetPhoneVerification}>
-                Change phone number
-              </Button>
-            </div>
-          ) : (
-            otpOpen && (
-              <div className="animate-in space-y-3 rounded-lg border border-border p-3 fade-in slide-in-from-top-2 duration-300">
-                <Label>Verification code</Label>
-                <div className="flex gap-2">
-                  {otp.map((digit, index) => (
-                    <Input
-                      key={index}
-                      ref={(element) => {
-                        otpRefs.current[index] = element;
-                      }}
-                      value={digit}
-                      onChange={(event) => updateOtp(index, event.target.value)}
-                      onKeyDown={(event) => handleOtpKeyDown(index, event)}
-                      onPaste={handleOtpPaste}
-                      inputMode="numeric"
-                      autoComplete="one-time-code"
-                      maxLength={1}
-                      aria-label={`Verification digit ${index + 1}`}
-                      className="h-11 w-11 animate-in text-center text-lg fade-in zoom-in-95 duration-300"
-                    />
-                  ))}
-                </div>
-                <Button
-                  type="button"
-                  onClick={verifyPhone}
-                  disabled={verifyingPhone || otp.join("").length !== 4}
-                >
-                  {verifyingPhone ? "Verifying…" : "Verify OTP"}
-                </Button>
-                <Button
-                  type="button"
-                  variant="link"
-                  size="sm"
-                  onClick={requestCode}
-                  disabled={sendingCode}
-                >
-                  {sendingCode ? "Sending…" : "Resend code"}
-                </Button>
-              </div>
-            )
-          )}
-          {(phoneError || fieldErrors.phone) && (
-            <p id="phone-error" className="text-sm text-destructive">
-              {phoneError || fieldErrors.phone}
-            </p>
-          )}
-        </div>
         <Field
           id="password"
           name="password"

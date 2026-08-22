@@ -73,6 +73,8 @@ export default function Login() {
       const result = (await response.json()) as { error?: string; redirect?: string };
       if (!response.ok) {
         setError(result.error ?? "Unable to sign in.");
+        if (result.redirect === "/verify")
+          window.setTimeout(() => window.location.assign("/verify"), 900);
         return;
       }
       window.location.assign(result.redirect ?? "/dashboard");

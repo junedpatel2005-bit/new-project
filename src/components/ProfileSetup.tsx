@@ -6,6 +6,7 @@ import { AuthLayout } from "@/components/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PhoneVerification } from "@/components/PhoneVerification";
 
 type SavedLocation = { id: number; label: string; address: string };
 type ClientProfile = {
@@ -122,14 +123,7 @@ function ClientFields({ profile }: { profile: ClientProfile | null }) {
         placeholder="Jane Doe"
         defaultValue={profile?.fullName}
       />
-      <Field
-        name="phone"
-        label="Phone number"
-        type="tel"
-        required
-        placeholder="+1 555 123 4567"
-        defaultValue={profile?.phone}
-      />
+      <PhoneVerification role="CLIENT" initialPhone={profile?.phone} />
       <Field
         name="companyName"
         label="Company name (optional)"

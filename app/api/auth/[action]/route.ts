@@ -6,7 +6,6 @@ import { db } from "@/lib/db";
 import { createSession, sessionCookie, sessionOptions, verifySession } from "@/lib/auth";
 import {
   createPhoneVerificationProof,
-  hasValidPhoneVerificationProof,
   phoneProofCookie,
   phoneProofCookieOptions,
 } from "@/lib/dev-phone-otp";
@@ -22,27 +21,15 @@ import {
 import { isValidInternationalPhoneNumber } from "@/lib/phone-validation";
 
 const passwordSchema = z.string().min(8).regex(/[A-Z]/).regex(/[a-z]/).regex(/\d/);
-const registerSchema = z
-  .object({
-    firstName: z.string().min(1).max(80),
-    lastName: z.string().min(1).max(80),
-    email: z.string().email(),
-    phone: z.string().min(7).max(25),
-    password: passwordSchema,
-    role: z.enum(["CLIENT", "PROFESSIONAL"]),
-    terms: z.literal(true),
-  })
-  .superRefine((value, context) => {
-    if (!value.phone.trim()) {
-      context.addIssue({ code: "custom", path: ["phone"], message: "A phone number is required." });
-    } else if (!isValidInternationalPhoneNumber(value.phone)) {
-      context.addIssue({
-        code: "custom",
-        path: ["phone"],
-        message: "Enter a valid phone number for the selected country.",
-      });
-    }
-  });
+const registerSchema = z.object({
+  firstName: z.string().min(1).max(80),
+  lastName: z.string().min(1).max(80),
+  email: z.string().email(),
+  phone: z.string().min(7).max(25).optional(),
+  password: passwordSchema,
+  role: z.enum(["CLIENT", "PROFESSIONAL"]),
+  terms: z.literal(true),
+});
 const credentials = z.object({ email: z.string().email(), password: z.string().min(1) });
 const tokenHash = (value: string) => createHash("sha256").update(value).digest("hex");
 const clientKey = (request: NextRequest) =>
@@ -251,7 +238,18 @@ export async function POST(
       })
       .safeParse(body);
     if (!parsed.success) return safe("Enter a valid phone number and account type.");
-    const existingUser = await db.user.findFirst({ where: { phone: parsed.data.phone } });
+    const sessionToken = request.cookies.get(sessionCookie)?.value;
+    let sessionUserId: number | null = null;
+    if (sessionToken) {
+      try {
+        sessionUserId = (await verifySession(sessionToken)).userId;
+      } catch {
+        sessionUserId = null;
+      }
+    }
+    const existingUser = await db.user.findFirst({
+      where: { phone: parsed.data.phone, ...(sessionUserId ? { id: { not: sessionUserId } } : {}) },
+    });
     if (existingUser)
       return NextResponse.json(
         {
@@ -273,7 +271,7 @@ export async function POST(
       .object({
         phone: z.string().min(7).max(25),
         code: z.string().min(1).max(20),
-        role: z.enum(["CLIENT", "PROFESSIONAL"]),
+        role: z.enum(["CLIENT", "PROFESSIONAL"]).optional(),
       })
       .refine((value) => isValidInternationalPhoneNumber(value.phone), {
         path: ["phone"],
@@ -285,13 +283,41 @@ export async function POST(
       !rateLimit(`verify-phone:${clientKey(request)}:${parsed.data.phone.trim()}`, 5, 10 * 60_000)
     )
       return safe("Too many verification attempts. Please try again later.", 429);
-    const result = await verifyPhoneOtp(parsed.data.phone, parsed.data.code, parsed.data.role);
+    let role = parsed.data.role;
+    const sessionToken = request.cookies.get(sessionCookie)?.value;
+    let session: Awaited<ReturnType<typeof verifySession>> | null = null;
+    if (sessionToken) {
+      try {
+        session = await verifySession(sessionToken);
+        role = session.role === "CLIENT" || session.role === "PROFESSIONAL" ? session.role : role;
+      } catch {
+        session = null;
+      }
+    }
+    if (!role || (session && session.role !== role)) return safe("Your account type is invalid.");
+    const verifiedRole = role;
+    if (session) {
+      const duplicate = await db.user.findFirst({
+        where: { phone: parsed.data.phone.trim(), id: { not: session.userId } },
+        select: { id: true },
+      });
+      if (duplicate) return safe("This phone number is already registered.", 409);
+    }
+    const result = await verifyPhoneOtp(parsed.data.phone, parsed.data.code, verifiedRole);
     if (!result.ok) return safe(result.error, result.status);
+
+    if (session) {
+      await db.user.update({
+        where: { id: session.userId },
+        data: { phone: parsed.data.phone.trim(), phoneVerifiedAt: new Date() },
+      });
+      return NextResponse.json({ success: true });
+    }
 
     const response = NextResponse.json({ success: true });
     response.cookies.set(
       phoneProofCookie,
-      await createPhoneVerificationProof(parsed.data.phone, parsed.data.role),
+      await createPhoneVerificationProof(parsed.data.phone, verifiedRole),
       phoneProofCookieOptions,
     );
     return response;
@@ -334,19 +360,10 @@ export async function POST(
       );
     }
     const data = parsed.data;
-    if (
-      !(await hasValidPhoneVerificationProof(
-        request.cookies.get(phoneProofCookie)?.value,
-        data.phone!,
-        data.role,
-      ))
-    ) {
-      return safe("Verify this phone number before creating an account.", 403);
-    }
-    const [existingEmailUser, existingPhoneUser] = await Promise.all([
-      db.user.findUnique({ where: { email: data.email } }),
-      db.user.findFirst({ where: { phone: data.phone } }),
-    ]);
+    const existingEmailUser = await db.user.findUnique({ where: { email: data.email } });
+    const existingPhoneUser = data.phone
+      ? await db.user.findFirst({ where: { phone: data.phone } })
+      : null;
     const duplicateFields: Record<string, string> = {};
     if (existingEmailUser) duplicateFields.email = "Email is already registered.";
     if (existingPhoneUser) duplicateFields.phone = "Phone number is already registered.";
@@ -367,7 +384,6 @@ export async function POST(
         phone: data.phone,
         passwordHash: await bcrypt.hash(data.password, 12),
         role: data.role,
-        phoneVerifiedAt: new Date(),
       },
     });
     if (user.role === "PROFESSIONAL") await notifyClientsOfNewProfessional(user);
@@ -413,6 +429,23 @@ export async function POST(
               ? "/professional-home"
               : "/professional/setup"
             : "/dashboard";
+
+    if (!user.emailVerifiedAt) {
+      const response = NextResponse.json(
+        {
+          error:
+            "You are registered, but your email is not confirmed. Please confirm your email before continuing.",
+          redirect: "/verify",
+        },
+        { status: 403 },
+      );
+      response.cookies.set(
+        sessionCookie,
+        await createSession({ userId: user.id, role: user.role }),
+        sessionOptions,
+      );
+      return response;
+    }
 
     await db.$transaction([
       db.user.update({

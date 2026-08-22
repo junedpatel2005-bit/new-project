@@ -70,8 +70,8 @@ export default function Verify() {
 
   return (
     <AuthLayout
-      title="Confirm your email"
-      subtitle="We sent a confirmation link to your email. Click it to activate your account."
+      title="Registration successful"
+      subtitle="Your account was created, but your email is not verified yet."
       footer={
         <button
           type="button"
@@ -84,9 +84,10 @@ export default function Verify() {
       }
     >
       <div className="space-y-4">
-        <p className="text-sm text-muted-foreground">
-          We sent a confirmation link to {userEmail ? userEmail : "your email"}. Open it on this
-          device or any other to activate your account. The link expires in 24 hours.
+        <p className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+          Your Gmail/email is not verified. Please open the confirmation link sent to{" "}
+          {userEmail ? userEmail : "your email"} to activate your account. The link expires in 24
+          hours.
         </p>
         {editingEmail ? (
           <div className="space-y-3 rounded-2xl border border-border bg-muted p-4">
