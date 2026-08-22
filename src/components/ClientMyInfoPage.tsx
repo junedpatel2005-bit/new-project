@@ -53,14 +53,46 @@ function getCompletion(data: ClientAccountSummaryResponse) {
 export function ClientMyInfoPage({ data }: { data: ClientAccountSummaryResponse }) {
   const router = useRouter();
   const [loggingOut, setLoggingOut] = useState(false);
+  const [savedLocations, setSavedLocations] = useState(data.savedLocations);
+  const [primaryLocationId, setPrimaryLocationId] = useState<number | null>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
+  const [primaryAddress, setPrimaryAddress] = useState(data.profile?.address || null);
 
   const completion = getCompletion(data);
   const initials =
     `${data.account.firstName[0] ?? ""}${data.account.lastName[0] ?? ""}`.toUpperCase();
   const profileName = formatName(data.account.firstName, data.account.lastName);
   const companyName = data.profile?.companyName || "Not added";
-  const address = data.profile?.address || null;
-  const savedLocations = data.savedLocations;
+
+  async function setPrimaryLocation(location: (typeof savedLocations)[number]) {
+    setPrimaryLocationId(location.id);
+    setLocationError(null);
+
+    try {
+      const response = await fetch(`/api/v1/profile/locations/${location.id}`, {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          label: location.label,
+          address: location.address,
+          isPrimary: true,
+        }),
+      });
+      const result = (await response.json().catch(() => null)) as { error?: string } | null;
+      if (!response.ok) throw new Error(result?.error ?? "Unable to set the primary location.");
+
+      setSavedLocations((current) =>
+        current.map((item) => ({ ...item, isPrimary: item.id === location.id })),
+      );
+      setPrimaryAddress(location.address);
+    } catch (error) {
+      setLocationError(
+        error instanceof Error ? error.message : "Unable to set the primary location.",
+      );
+    } finally {
+      setPrimaryLocationId(null);
+    }
+  }
 
   async function handleLogout() {
     setLoggingOut(true);
@@ -194,8 +226,8 @@ export function ClientMyInfoPage({ data }: { data: ClientAccountSummaryResponse 
                 <CardDescription>Where you want work to be arranged or managed.</CardDescription>
               </CardHeader>
               <CardContent>
-                {address ? (
-                  <p className="text-sm leading-relaxed text-foreground">{address}</p>
+                {primaryAddress ? (
+                  <p className="text-sm leading-relaxed text-foreground">{primaryAddress}</p>
                 ) : (
                   <p className="text-sm text-muted-foreground">No primary address added.</p>
                 )}
@@ -213,13 +245,36 @@ export function ClientMyInfoPage({ data }: { data: ClientAccountSummaryResponse 
                 {savedLocations.length > 0 ? (
                   savedLocations.map((location) => (
                     <div key={location.id} className="rounded-2xl border border-border bg-card p-4">
-                      <p className="font-medium">{location.label}</p>
-                      <p className="text-sm text-muted-foreground">{location.address}</p>
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                        <div>
+                          <p className="font-medium">
+                            {location.label}
+                            {location.isPrimary ? (
+                              <span className="ml-2 text-xs font-semibold text-primary">
+                                Primary
+                              </span>
+                            ) : null}
+                          </p>
+                          <p className="text-sm text-muted-foreground">{location.address}</p>
+                        </div>
+                        {!location.isPrimary ? (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => void setPrimaryLocation(location)}
+                            disabled={primaryLocationId !== null}
+                          >
+                            {primaryLocationId === location.id ? "Setting…" : "Set as primary"}
+                          </Button>
+                        ) : null}
+                      </div>
                     </div>
                   ))
                 ) : (
                   <p className="text-sm text-muted-foreground">No saved locations yet.</p>
                 )}
+                {locationError ? <p className="text-sm text-destructive">{locationError}</p> : null}
               </CardContent>
             </Card>
 

@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 50;
 const segmentOptions: [string, string][] = [
   ["RESIDENTIAL", "Residential"],
   ["COMMERCIAL", "Commercial"],
@@ -573,13 +573,12 @@ function DiscoverContent() {
             >
               <div className="flex h-full items-center justify-between gap-6">
                 <div className="text-left">
-                  <p className="text-sm font-semibold">Professionals near you</p>
+                  <p className="text-sm font-semibold">All professionals</p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {(results?.professionals ?? []).filter((p) => p.displayPoint).length} available
-                    • Click to view on map
+                    {totalProfessionals} available • Click to view on map
                   </p>
                   <p className="mt-1 text-[11px] text-muted-foreground">
-                    Approximate location — shown for privacy
+                    Browse verified professionals across all categories
                   </p>
                 </div>
                 <div className="h-full w-1/2">

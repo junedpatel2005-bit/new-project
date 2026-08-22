@@ -37,6 +37,8 @@ type OwnerJob = {
   title: string | null;
   description: string | null;
   category: string | null;
+  mainCategory: string | null;
+  categorySegment: string | null;
   budgetMin: number | null;
   budgetMax: number | null;
   urgency: "LOW" | "MEDIUM" | "HIGH";
@@ -65,6 +67,8 @@ type ViewJob = {
   title: string;
   description: string;
   category: string;
+  mainCategory: string | null;
+  categorySegment: string | null;
   budgetMin: number | null;
   budgetMax: number | null;
   urgency: "LOW" | "MEDIUM" | "HIGH";
@@ -131,6 +135,8 @@ function JobShell({
 function fromMarketplace(job: MarketplaceJob): ViewJob {
   return {
     ...job,
+    mainCategory: null,
+    categorySegment: null,
     locationLat: job.locationLat,
     locationLng: job.locationLng,
     proposalCount: job.proposalCount,
@@ -144,6 +150,8 @@ function fromOwner(job: OwnerJob): ViewJob {
     title: job.title ?? "Untitled job",
     description: job.description ?? "",
     category: job.category ?? "Uncategorized",
+    mainCategory: null,
+    categorySegment: job.categorySegment,
     budgetMin: job.budgetMin,
     budgetMax: job.budgetMax,
     urgency: job.urgency,
@@ -309,6 +317,13 @@ export default function JobDetails() {
     setFinderStatus("loading");
     try {
       const params = new URLSearchParams({ limit: "50" });
+      // The finder belongs to this job, so show verified professionals from
+      // the job's main segment (Residential, Commercial, or Industrial).
+      if (job?.categorySegment) {
+        params.set("segment", job.categorySegment);
+      } else if (job?.category && job.category !== "Uncategorized") {
+        params.set("category", job.category);
+      }
       if (query.trim()) params.set("query", query.trim());
       const response = await fetch(`/api/v1/professionals?${params.toString()}`);
       if (!response.ok) throw new Error();
@@ -463,6 +478,16 @@ export default function JobDetails() {
     <JobShell viewerRole={viewerRole}>
       <article className="mx-auto max-w-4xl rounded-2xl border border-border bg-card p-6 shadow-soft sm:p-8">
         <div className="flex flex-wrap gap-2 text-xs">
+          {job.mainCategory && job.mainCategory !== job.category && (
+            <span className="rounded-full bg-primary/10 px-3 py-1 text-primary">
+              {job.mainCategory}
+            </span>
+          )}
+          {job.categorySegment && (
+            <span className="rounded-full bg-muted px-3 py-1 capitalize">
+              {job.categorySegment.toLowerCase()}
+            </span>
+          )}
           <span className="rounded-full bg-primary/10 px-3 py-1 text-primary">{job.category}</span>
           <span className="rounded-full bg-muted px-3 py-1">
             {job.urgency.toLowerCase()} urgency

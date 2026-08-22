@@ -323,6 +323,7 @@ export const ClientSavedLocationScalarFieldEnum = {
   clientProfileId: 'clientProfileId',
   label: 'label',
   address: 'address',
+  isPrimary: 'isPrimary',
   createdAt: 'createdAt'
 } as const
 

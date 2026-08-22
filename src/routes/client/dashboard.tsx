@@ -10,12 +10,13 @@ import {
   Plus,
   Star,
   UsersRound,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DashboardSkeleton } from "@/components/LoadingSkeleton";
 
 type DashboardData = {
-  user: { firstName: string; averageRating: number };
+  user: { firstName: string; averageRating: number; phoneVerifiedAt: string | null };
   spent: number;
   projectSummary: { total: number; open: number; running: number; drafts: number };
   jobs: {
@@ -65,7 +66,11 @@ export default function Dashboard() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"proposals" | "hireRequests">("proposals");
+  const [phoneReminderDismissed, setPhoneReminderDismissed] = useState(false);
   useEffect(() => {
+    setPhoneReminderDismissed(
+      window.localStorage.getItem("servio-phone-reminder-dismissed") === "1",
+    );
     void fetch("/api/v1/dashboard", { cache: "no-store" })
       .then((response) =>
         response.ok ? (response.json() as Promise<DashboardData>) : Promise.reject(),
@@ -83,6 +88,32 @@ export default function Dashboard() {
         <DashboardSkeleton />
       ) : (
         <div className="space-y-7">
+          {!data.user.phoneVerifiedAt && !phoneReminderDismissed && (
+            <section className="flex flex-col gap-4 rounded-2xl border border-amber-300 bg-amber-50 p-4 text-amber-950 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="font-semibold">Your phone number is not verified</p>
+                <p className="mt-1 text-sm">
+                  Verify your phone number from your profile to keep your account secure.
+                </p>
+              </div>
+              <div className="flex shrink-0 items-center gap-2">
+                <Button asChild size="sm">
+                  <Link href="/client-profile">Verify phone</Link>
+                </Button>
+                <button
+                  type="button"
+                  aria-label="Dismiss phone verification reminder"
+                  onClick={() => {
+                    window.localStorage.setItem("servio-phone-reminder-dismissed", "1");
+                    setPhoneReminderDismissed(true);
+                  }}
+                  className="rounded-lg p-2 text-amber-800 hover:bg-amber-200"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            </section>
+          )}
           <section className="relative overflow-hidden rounded-3xl bg-[linear-gradient(120deg,var(--color-ink),var(--color-primary))] px-6 py-7 text-white shadow-card sm:px-8 sm:py-8">
             <div className="absolute -right-12 -top-24 h-64 w-64 rounded-full bg-cta/20 blur-3xl" />
             <div className="absolute -bottom-24 left-1/3 h-48 w-48 rounded-full bg-white/10 blur-3xl" />

@@ -105,6 +105,7 @@ export async function GET(
           role: true,
           isActive: true,
           isVerified: true,
+          emailVerifiedAt: true,
           createdAt: true,
         },
         orderBy: { createdAt: "desc" },

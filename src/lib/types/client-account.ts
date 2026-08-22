@@ -2,6 +2,7 @@ export type ClientSavedLocationSummary = {
   id: number;
   label: string;
   address: string;
+  isPrimary: boolean;
 };
 
 export type ClientAccountProfileSummary = {

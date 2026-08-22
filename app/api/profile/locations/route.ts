@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     );
   const locations = await db.clientSavedLocation.findMany({
     where: { clientProfileId: result.profile.id },
-    orderBy: { createdAt: "desc" },
+    orderBy: [{ isPrimary: "desc" }, { createdAt: "desc" }],
   });
   return NextResponse.json({ locations });
 }
@@ -41,8 +41,13 @@ export async function POST(request: NextRequest) {
   const parsed = locationSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success)
     return NextResponse.json({ error: "Enter a label and address." }, { status: 400 });
+  const locationCount = await db.clientSavedLocation.count({
+    where: { clientProfileId: result.profile.id },
+  });
+  if (locationCount >= 3)
+    return NextResponse.json({ error: "You can save up to 3 locations." }, { status: 409 });
   const location = await db.clientSavedLocation.create({
-    data: { clientProfileId: result.profile.id, ...parsed.data },
+    data: { clientProfileId: result.profile.id, ...parsed.data, isPrimary: locationCount === 0 },
   });
   return NextResponse.json({ location }, { status: 201 });
 }

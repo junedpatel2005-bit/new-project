@@ -23,6 +23,7 @@ type User = {
   role: "CLIENT" | "PROFESSIONAL" | "ADMIN";
   isActive: boolean;
   isVerified: boolean;
+  emailVerifiedAt: string | null;
   createdAt: string;
 };
 type Detail = {
@@ -35,7 +36,34 @@ type Detail = {
     averageRating: number;
     reviewCount: number;
     companyName: string | null;
+    companyWebsite: string | null;
+    industry: string | null;
+    teamSize: string | null;
+    companyDescription: string | null;
     address: string | null;
+    phoneVerifiedAt: string | null;
+    emailVerifiedAt: string | null;
+    serviceArea: string | null;
+    workMode: string;
+    serviceRadiusKm: number | null;
+    availabilityStatus: string;
+    experienceYears: number | null;
+    professionalSkillsJson: string | null;
+    professionalLatitude: number | null;
+    professionalLongitude: number | null;
+    updatedAt: string;
+    clientProfiles: {
+      fullName: string;
+      email: string;
+      phone: string;
+      companyName: string | null;
+      companyWebsite: string | null;
+      industry: string | null;
+      teamSize: string | null;
+      companyDescription: string | null;
+      address: string;
+      savedLocations: { label: string; address: string; isPrimary: boolean }[];
+    }[];
   };
   stats: {
     jobsPosted: number;
@@ -46,6 +74,17 @@ type Detail = {
     services: number;
   };
 };
+function parseSkills(value: string | null) {
+  if (!value) return "—";
+  try {
+    const skills = JSON.parse(value) as unknown;
+    return Array.isArray(skills)
+      ? skills.filter((item) => typeof item === "string").join(", ") || "—"
+      : "—";
+  } catch {
+    return "—";
+  }
+}
 function UserGroup({
   title,
   users,
@@ -98,6 +137,11 @@ function UserGroup({
                     Verified
                   </span>
                 )}
+                <span
+                  className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${user.emailVerifiedAt ? "bg-emerald-400/10 text-emerald-300" : "bg-amber-400/10 text-amber-300"}`}
+                >
+                  {user.emailVerifiedAt ? "Email verified" : "Email not verified"}
+                </span>
               </div>
               <p className="mt-0.5 text-sm text-slate-400">{user.email}</p>
               <p className="mt-1 text-xs text-indigo-300">
@@ -206,6 +250,9 @@ export default function AdminUsersPage() {
     setDetail((current) => (current?.user.id === user.id ? null : current));
     setMessage(`${user.firstName} ${user.lastName}'s account was deleted.`);
   };
+  const clientProfile = detail?.user.clientProfiles?.[0];
+  const mobileNumber = detail?.user.phone ?? clientProfile?.phone ?? null;
+  const skills = detail ? parseSkills(detail.user.professionalSkillsJson) : "—";
   return (
     <div>
       <p className="text-xs font-bold uppercase tracking-[.2em] text-indigo-400">Admin module</p>
@@ -364,6 +411,61 @@ export default function AdminUsersPage() {
             <section className="mt-6 rounded-xl border border-white/10 bg-[#0b1020] p-5">
               <h3 className="font-semibold text-white">Account details</h3>
               <div className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+                <p className="text-slate-400">
+                  Mobile <span className="ml-2 text-white">{mobileNumber ?? "Not added"}</span>
+                </p>
+                <p className="text-slate-400">
+                  Email status{" "}
+                  <span className="ml-2 text-white">
+                    {detail.user.emailVerifiedAt ? "Verified" : "Not verified"}
+                  </span>
+                </p>
+                <p className="text-slate-400">
+                  Phone status{" "}
+                  <span className="ml-2 text-white">
+                    {mobileNumber
+                      ? detail.user.phoneVerifiedAt
+                        ? "Verified"
+                        : "Not verified"
+                      : "Not added"}
+                  </span>
+                </p>
+                <p className="text-slate-400">
+                  Industry{" "}
+                  <span className="ml-2 text-white">
+                    {detail.user.industry ?? clientProfile?.industry ?? "—"}
+                  </span>
+                </p>
+                <p className="text-slate-400">
+                  Work mode <span className="ml-2 text-white">{detail.user.workMode}</span>
+                </p>
+                <p className="text-slate-400">
+                  Availability{" "}
+                  <span className="ml-2 text-white">{detail.user.availabilityStatus}</span>
+                </p>
+                <p className="text-slate-400">
+                  Experience{" "}
+                  <span className="ml-2 text-white">
+                    {detail.user.experienceYears ?? "—"} years
+                  </span>
+                </p>
+                <p className="text-slate-400">
+                  Skills <span className="ml-2 text-white">{skills}</span>
+                </p>
+                <p className="text-slate-400 sm:col-span-2">
+                  Address{" "}
+                  <span className="ml-2 text-white">
+                    {clientProfile?.address ?? detail.user.address ?? "—"}
+                  </span>
+                </p>
+                <p className="text-slate-400 sm:col-span-2">
+                  Saved locations{" "}
+                  <span className="ml-2 text-white">
+                    {clientProfile?.savedLocations
+                      .map((location) => `${location.label}: ${location.address}`)
+                      .join(" · ") || "—"}
+                  </span>
+                </p>
                 <p className="text-slate-400">
                   Role <span className="ml-2 text-white">{detail.user.role}</span>
                 </p>

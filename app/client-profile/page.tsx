@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { verifySession, sessionCookie } from "@/lib/auth";
 import { ClientProfilePage as ClientProfile } from "@/components/ClientProfilePage";
+import { db } from "@/lib/db";
 
 async function getCookieValue(name: string) {
   const cookieHeader = (await headers()).get("cookie");
@@ -31,6 +32,12 @@ export default async function ClientProfilePage() {
     if (session.role === "ADMIN") return redirect("/admin");
     return redirect("/login");
   }
+
+  const user = await db.user.findUnique({
+    where: { id: session.userId },
+    select: { emailVerifiedAt: true },
+  });
+  if (!user?.emailVerifiedAt) return redirect("/verify");
 
   return <ClientProfile />;
 }

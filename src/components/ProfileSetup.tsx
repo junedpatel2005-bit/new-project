@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PhoneVerification } from "@/components/PhoneVerification";
 
-type SavedLocation = { id: number; label: string; address: string };
+type SavedLocation = { id: number; label: string; address: string; isPrimary: boolean };
 type ClientProfile = {
   fullName: string;
   phone: string;
@@ -201,12 +201,29 @@ function SavedLocations({ initialLocations }: { initialLocations: SavedLocation[
     else setError("Unable to delete the location.");
   }
 
+  async function makePrimary(id: number) {
+    setError(null);
+    const location = locations.find((item) => item.id === id);
+    if (!location || location.isPrimary) return;
+    const response = await fetch(`/api/v1/profile/locations/${id}`, {
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ label: location.label, address: location.address, isPrimary: true }),
+    });
+    const result = (await response.json()) as { error?: string; location?: SavedLocation };
+    if (!response.ok || !result.location) {
+      setError(result.error ?? "Unable to select the primary location.");
+      return;
+    }
+    setLocations((current) => current.map((item) => ({ ...item, isPrimary: item.id === id })));
+  }
+
   return (
     <section className="mt-8 space-y-4 border-t pt-6">
       <div>
         <h2 className="font-semibold">Saved locations</h2>
         <p className="text-sm text-muted-foreground">
-          Add addresses for future jobs. Default locations are not part of Phase 1.
+          Save up to 3 addresses for future jobs and choose one as your primary location.
         </p>
       </div>
       <div className="space-y-3 rounded-xl border p-4">
@@ -253,10 +270,23 @@ function SavedLocations({ initialLocations }: { initialLocations: SavedLocation[
             className="flex items-center justify-between gap-3 rounded-lg border p-3"
           >
             <div>
-              <p className="font-medium">{location.label}</p>
+              <p className="font-medium">
+                {location.label}{" "}
+                {location.isPrimary && <span className="text-primary">(Primary)</span>}
+              </p>
               <p className="text-sm text-muted-foreground">{location.address}</p>
             </div>
             <div className="flex gap-2">
+              {!location.isPrimary && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => void makePrimary(location.id)}
+                >
+                  Make primary
+                </Button>
+              )}
               <Button
                 type="button"
                 variant="outline"

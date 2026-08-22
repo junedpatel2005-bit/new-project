@@ -123,17 +123,35 @@ export async function POST(request: NextRequest) {
     const sameAddress = await tx.clientSavedLocation.findFirst({
       where: { clientProfileId: profile.id, address: data.address },
     });
-    if (sameAddress) return sameAddress;
+    if (sameAddress) {
+      await tx.clientSavedLocation.updateMany({
+        where: { clientProfileId: profile.id },
+        data: { isPrimary: false },
+      });
+      return tx.clientSavedLocation.update({
+        where: { id: sameAddress.id },
+        data: { isPrimary: true },
+      });
+    }
     const existingPrimary = await tx.clientSavedLocation.findFirst({
       where: { clientProfileId: profile.id, label: "Primary Address" },
+    });
+    await tx.clientSavedLocation.updateMany({
+      where: { clientProfileId: profile.id },
+      data: { isPrimary: false },
     });
     return existingPrimary
       ? tx.clientSavedLocation.update({
           where: { id: existingPrimary.id },
-          data: { address: data.address },
+          data: { address: data.address, isPrimary: true },
         })
       : tx.clientSavedLocation.create({
-          data: { clientProfileId: profile.id, label: "Primary Address", address: data.address },
+          data: {
+            clientProfileId: profile.id,
+            label: "Primary Address",
+            address: data.address,
+            isPrimary: true,
+          },
         });
   });
   return NextResponse.json({ success: true, primaryLocation });

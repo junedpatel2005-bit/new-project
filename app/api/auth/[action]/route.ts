@@ -485,6 +485,112 @@ export async function POST(
     );
     return response;
   }
+  if (action === "send-phone-login-otp") {
+    const parsed = z
+      .object({ phone: z.string().min(7).max(25) })
+      .refine((value) => isValidInternationalPhoneNumber(value.phone), {
+        path: ["phone"],
+        message: "Enter a valid phone number.",
+      })
+      .safeParse(body);
+    if (!parsed.success) return safe("Enter a valid phone number.");
+    const user = await db.user.findFirst({
+      where: { phone: parsed.data.phone.trim(), isActive: true },
+      select: { role: true },
+    });
+    if (!user || (user.role !== "CLIENT" && user.role !== "PROFESSIONAL"))
+      return safe("No active account was found with this phone number.", 404);
+    const result = await requestPhoneOtp(parsed.data.phone, user.role);
+    if (!result.ok) return safe(result.error, result.status);
+    return NextResponse.json({ success: true });
+  }
+  if (action === "login-phone") {
+    const parsed = z
+      .object({ phone: z.string().min(7).max(25), code: z.string().min(1).max(20) })
+      .refine((value) => isValidInternationalPhoneNumber(value.phone), {
+        path: ["phone"],
+        message: "Enter a valid phone number.",
+      })
+      .safeParse(body);
+    if (!parsed.success) return safe("Enter a valid phone number and code.", 401);
+    const user = await db.user.findFirst({
+      where: { phone: parsed.data.phone.trim(), isActive: true },
+    });
+    if (!user || (user.role !== "CLIENT" && user.role !== "PROFESSIONAL"))
+      return safe("Invalid phone number or verification code.", 401);
+    const result = await verifyPhoneOtp(parsed.data.phone, parsed.data.code, user.role);
+    if (!result.ok) return safe(result.error, result.status);
+    const nextRedirect = !user.emailVerifiedAt
+      ? "/verify"
+      : user.role === "PROFESSIONAL"
+        ? user.professionalCategory &&
+          user.professionalLatitude !== null &&
+          user.professionalLongitude !== null
+          ? "/professional-home"
+          : "/professional/setup"
+        : "/dashboard";
+    const response = NextResponse.json(
+      !user.emailVerifiedAt
+        ? {
+            error:
+              "You are registered, but your email is not confirmed. Please confirm your email before continuing.",
+            redirect: nextRedirect,
+          }
+        : { success: true, redirect: nextRedirect },
+      !user.emailVerifiedAt ? { status: 403 } : undefined,
+    );
+    response.cookies.set(
+      sessionCookie,
+      await createSession({ userId: user.id, role: user.role }),
+      sessionOptions,
+    );
+    return response;
+  }
+  if (action === "login-phone-password") {
+    const parsed = z
+      .object({ phone: z.string().min(7).max(25), password: z.string().min(1) })
+      .refine((value) => isValidInternationalPhoneNumber(value.phone), {
+        path: ["phone"],
+        message: "Enter a valid phone number.",
+      })
+      .safeParse(body);
+    if (!parsed.success) return safe("Enter a valid phone number and password.", 401);
+    const user = await db.user.findFirst({
+      where: { phone: parsed.data.phone.trim(), isActive: true },
+    });
+    if (
+      !user ||
+      (user.role !== "CLIENT" && user.role !== "PROFESSIONAL") ||
+      !user.passwordHash ||
+      !(await bcrypt.compare(parsed.data.password, user.passwordHash))
+    )
+      return safe("Invalid phone number or password.", 401);
+    const nextRedirect = !user.emailVerifiedAt
+      ? "/verify"
+      : user.role === "PROFESSIONAL"
+        ? user.professionalCategory &&
+          user.professionalLatitude !== null &&
+          user.professionalLongitude !== null
+          ? "/professional-home"
+          : "/professional/setup"
+        : "/dashboard";
+    const response = NextResponse.json(
+      !user.emailVerifiedAt
+        ? {
+            error:
+              "You are registered, but your email is not confirmed. Please confirm your email before continuing.",
+            redirect: nextRedirect,
+          }
+        : { success: true, redirect: nextRedirect },
+      !user.emailVerifiedAt ? { status: 403 } : undefined,
+    );
+    response.cookies.set(
+      sessionCookie,
+      await createSession({ userId: user.id, role: user.role }),
+      sessionOptions,
+    );
+    return response;
+  }
   if (action === "logout") {
     const response = NextResponse.json({ success: true });
     response.cookies.set(sessionCookie, "", { ...sessionOptions, maxAge: 0 });

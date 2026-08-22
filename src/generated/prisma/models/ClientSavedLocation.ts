@@ -41,6 +41,7 @@ export type ClientSavedLocationMinAggregateOutputType = {
   clientProfileId: number | null
   label: string | null
   address: string | null
+  isPrimary: boolean | null
   createdAt: Date | null
 }
 
@@ -49,6 +50,7 @@ export type ClientSavedLocationMaxAggregateOutputType = {
   clientProfileId: number | null
   label: string | null
   address: string | null
+  isPrimary: boolean | null
   createdAt: Date | null
 }
 
@@ -57,6 +59,7 @@ export type ClientSavedLocationCountAggregateOutputType = {
   clientProfileId: number
   label: number
   address: number
+  isPrimary: number
   createdAt: number
   _all: number
 }
@@ -77,6 +80,7 @@ export type ClientSavedLocationMinAggregateInputType = {
   clientProfileId?: true
   label?: true
   address?: true
+  isPrimary?: true
   createdAt?: true
 }
 
@@ -85,6 +89,7 @@ export type ClientSavedLocationMaxAggregateInputType = {
   clientProfileId?: true
   label?: true
   address?: true
+  isPrimary?: true
   createdAt?: true
 }
 
@@ -93,6 +98,7 @@ export type ClientSavedLocationCountAggregateInputType = {
   clientProfileId?: true
   label?: true
   address?: true
+  isPrimary?: true
   createdAt?: true
   _all?: true
 }
@@ -188,6 +194,7 @@ export type ClientSavedLocationGroupByOutputType = {
   clientProfileId: number
   label: string
   address: string
+  isPrimary: boolean
   createdAt: Date
   _count: ClientSavedLocationCountAggregateOutputType | null
   _avg: ClientSavedLocationAvgAggregateOutputType | null
@@ -219,6 +226,7 @@ export type ClientSavedLocationWhereInput = {
   clientProfileId?: Prisma.IntFilter<"ClientSavedLocation"> | number
   label?: Prisma.StringFilter<"ClientSavedLocation"> | string
   address?: Prisma.StringFilter<"ClientSavedLocation"> | string
+  isPrimary?: Prisma.BoolFilter<"ClientSavedLocation"> | boolean
   createdAt?: Prisma.DateTimeFilter<"ClientSavedLocation"> | Date | string
   clientProfile?: Prisma.XOR<Prisma.ClientProfileScalarRelationFilter, Prisma.ClientProfileWhereInput>
 }
@@ -228,6 +236,7 @@ export type ClientSavedLocationOrderByWithRelationInput = {
   clientProfileId?: Prisma.SortOrder
   label?: Prisma.SortOrder
   address?: Prisma.SortOrder
+  isPrimary?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   clientProfile?: Prisma.ClientProfileOrderByWithRelationInput
 }
@@ -240,6 +249,7 @@ export type ClientSavedLocationWhereUniqueInput = Prisma.AtLeast<{
   clientProfileId?: Prisma.IntFilter<"ClientSavedLocation"> | number
   label?: Prisma.StringFilter<"ClientSavedLocation"> | string
   address?: Prisma.StringFilter<"ClientSavedLocation"> | string
+  isPrimary?: Prisma.BoolFilter<"ClientSavedLocation"> | boolean
   createdAt?: Prisma.DateTimeFilter<"ClientSavedLocation"> | Date | string
   clientProfile?: Prisma.XOR<Prisma.ClientProfileScalarRelationFilter, Prisma.ClientProfileWhereInput>
 }, "id">
@@ -249,6 +259,7 @@ export type ClientSavedLocationOrderByWithAggregationInput = {
   clientProfileId?: Prisma.SortOrder
   label?: Prisma.SortOrder
   address?: Prisma.SortOrder
+  isPrimary?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.ClientSavedLocationCountOrderByAggregateInput
   _avg?: Prisma.ClientSavedLocationAvgOrderByAggregateInput
@@ -265,12 +276,14 @@ export type ClientSavedLocationScalarWhereWithAggregatesInput = {
   clientProfileId?: Prisma.IntWithAggregatesFilter<"ClientSavedLocation"> | number
   label?: Prisma.StringWithAggregatesFilter<"ClientSavedLocation"> | string
   address?: Prisma.StringWithAggregatesFilter<"ClientSavedLocation"> | string
+  isPrimary?: Prisma.BoolWithAggregatesFilter<"ClientSavedLocation"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ClientSavedLocation"> | Date | string
 }
 
 export type ClientSavedLocationCreateInput = {
   label: string
   address: string
+  isPrimary?: boolean
   createdAt?: Date | string
   clientProfile: Prisma.ClientProfileCreateNestedOneWithoutSavedLocationsInput
 }
@@ -280,12 +293,14 @@ export type ClientSavedLocationUncheckedCreateInput = {
   clientProfileId: number
   label: string
   address: string
+  isPrimary?: boolean
   createdAt?: Date | string
 }
 
 export type ClientSavedLocationUpdateInput = {
   label?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
+  isPrimary?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clientProfile?: Prisma.ClientProfileUpdateOneRequiredWithoutSavedLocationsNestedInput
 }
@@ -295,6 +310,7 @@ export type ClientSavedLocationUncheckedUpdateInput = {
   clientProfileId?: Prisma.IntFieldUpdateOperationsInput | number
   label?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
+  isPrimary?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -303,12 +319,14 @@ export type ClientSavedLocationCreateManyInput = {
   clientProfileId: number
   label: string
   address: string
+  isPrimary?: boolean
   createdAt?: Date | string
 }
 
 export type ClientSavedLocationUpdateManyMutationInput = {
   label?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
+  isPrimary?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -317,6 +335,7 @@ export type ClientSavedLocationUncheckedUpdateManyInput = {
   clientProfileId?: Prisma.IntFieldUpdateOperationsInput | number
   label?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
+  isPrimary?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -335,6 +354,7 @@ export type ClientSavedLocationCountOrderByAggregateInput = {
   clientProfileId?: Prisma.SortOrder
   label?: Prisma.SortOrder
   address?: Prisma.SortOrder
+  isPrimary?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -348,6 +368,7 @@ export type ClientSavedLocationMaxOrderByAggregateInput = {
   clientProfileId?: Prisma.SortOrder
   label?: Prisma.SortOrder
   address?: Prisma.SortOrder
+  isPrimary?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -356,6 +377,7 @@ export type ClientSavedLocationMinOrderByAggregateInput = {
   clientProfileId?: Prisma.SortOrder
   label?: Prisma.SortOrder
   address?: Prisma.SortOrder
+  isPrimary?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -409,6 +431,7 @@ export type ClientSavedLocationUncheckedUpdateManyWithoutClientProfileNestedInpu
 export type ClientSavedLocationCreateWithoutClientProfileInput = {
   label: string
   address: string
+  isPrimary?: boolean
   createdAt?: Date | string
 }
 
@@ -416,6 +439,7 @@ export type ClientSavedLocationUncheckedCreateWithoutClientProfileInput = {
   id?: number
   label: string
   address: string
+  isPrimary?: boolean
   createdAt?: Date | string
 }
 
@@ -453,6 +477,7 @@ export type ClientSavedLocationScalarWhereInput = {
   clientProfileId?: Prisma.IntFilter<"ClientSavedLocation"> | number
   label?: Prisma.StringFilter<"ClientSavedLocation"> | string
   address?: Prisma.StringFilter<"ClientSavedLocation"> | string
+  isPrimary?: Prisma.BoolFilter<"ClientSavedLocation"> | boolean
   createdAt?: Prisma.DateTimeFilter<"ClientSavedLocation"> | Date | string
 }
 
@@ -460,12 +485,14 @@ export type ClientSavedLocationCreateManyClientProfileInput = {
   id?: number
   label: string
   address: string
+  isPrimary?: boolean
   createdAt?: Date | string
 }
 
 export type ClientSavedLocationUpdateWithoutClientProfileInput = {
   label?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
+  isPrimary?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -473,6 +500,7 @@ export type ClientSavedLocationUncheckedUpdateWithoutClientProfileInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   label?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
+  isPrimary?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -480,6 +508,7 @@ export type ClientSavedLocationUncheckedUpdateManyWithoutClientProfileInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   label?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
+  isPrimary?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -490,6 +519,7 @@ export type ClientSavedLocationSelect<ExtArgs extends runtime.Types.Extensions.I
   clientProfileId?: boolean
   label?: boolean
   address?: boolean
+  isPrimary?: boolean
   createdAt?: boolean
   clientProfile?: boolean | Prisma.ClientProfileDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["clientSavedLocation"]>
@@ -499,6 +529,7 @@ export type ClientSavedLocationSelectCreateManyAndReturn<ExtArgs extends runtime
   clientProfileId?: boolean
   label?: boolean
   address?: boolean
+  isPrimary?: boolean
   createdAt?: boolean
   clientProfile?: boolean | Prisma.ClientProfileDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["clientSavedLocation"]>
@@ -508,6 +539,7 @@ export type ClientSavedLocationSelectUpdateManyAndReturn<ExtArgs extends runtime
   clientProfileId?: boolean
   label?: boolean
   address?: boolean
+  isPrimary?: boolean
   createdAt?: boolean
   clientProfile?: boolean | Prisma.ClientProfileDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["clientSavedLocation"]>
@@ -517,10 +549,11 @@ export type ClientSavedLocationSelectScalar = {
   clientProfileId?: boolean
   label?: boolean
   address?: boolean
+  isPrimary?: boolean
   createdAt?: boolean
 }
 
-export type ClientSavedLocationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clientProfileId" | "label" | "address" | "createdAt", ExtArgs["result"]["clientSavedLocation"]>
+export type ClientSavedLocationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clientProfileId" | "label" | "address" | "isPrimary" | "createdAt", ExtArgs["result"]["clientSavedLocation"]>
 export type ClientSavedLocationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   clientProfile?: boolean | Prisma.ClientProfileDefaultArgs<ExtArgs>
 }
@@ -541,6 +574,7 @@ export type $ClientSavedLocationPayload<ExtArgs extends runtime.Types.Extensions
     clientProfileId: number
     label: string
     address: string
+    isPrimary: boolean
     createdAt: Date
   }, ExtArgs["result"]["clientSavedLocation"]>
   composites: {}
@@ -970,6 +1004,7 @@ export interface ClientSavedLocationFieldRefs {
   readonly clientProfileId: Prisma.FieldRef<"ClientSavedLocation", 'Int'>
   readonly label: Prisma.FieldRef<"ClientSavedLocation", 'String'>
   readonly address: Prisma.FieldRef<"ClientSavedLocation", 'String'>
+  readonly isPrimary: Prisma.FieldRef<"ClientSavedLocation", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"ClientSavedLocation", 'DateTime'>
 }
     

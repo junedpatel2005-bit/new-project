@@ -4,11 +4,11 @@ import { AuthLayout } from "@/components/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { CheckCircle2, Mail, Pencil, ArrowRight } from "lucide-react";
 
 export default function Verify() {
-  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
@@ -17,15 +17,27 @@ export default function Verify() {
   const [emailError, setEmailError] = useState<string | null>(null);
   const [emailMessage, setEmailMessage] = useState<string | null>(null);
   const [resending, setResending] = useState(false);
+  const [emailVerified, setEmailVerified] = useState(false);
 
   useEffect(() => {
-    void fetch("/api/v1/auth/me")
-      .then(async (response) => {
-        if (!response.ok) return;
+    let active = true;
+    const checkStatus = async () => {
+      try {
+        const response = await fetch("/api/v1/auth/me", { cache: "no-store" });
+        if (!response.ok || !active) return;
         const result = await response.json();
         setUserEmail(result.user?.email ?? null);
-      })
-      .catch(() => null);
+        setEmailVerified(Boolean(result.user?.emailVerifiedAt));
+      } catch {
+        // Keep the verification page usable while the status check retries.
+      }
+    };
+    void checkStatus();
+    const interval = window.setInterval(() => void checkStatus(), 2000);
+    return () => {
+      active = false;
+      window.clearInterval(interval);
+    };
   }, []);
 
   async function resend() {
@@ -70,28 +82,91 @@ export default function Verify() {
 
   return (
     <AuthLayout
-      title="Registration successful"
-      subtitle="Your account was created, but your email is not verified yet."
-      footer={
-        <button
-          type="button"
-          disabled={resending}
-          onClick={() => void resend()}
-          className="text-primary hover:underline disabled:opacity-60"
-        >
-          {resending ? "Sending…" : "Resend confirmation link"}
-        </button>
+      hideAside
+      title={emailVerified ? "Email verified successfully" : "Registration successful"}
+      subtitle={
+        emailVerified
+          ? "Your account is now verified."
+          : "Your account was created, but your email is not verified yet."
       }
+      footer={<>Need help? Check your spam or promotions folder.</>}
     >
-      <div className="space-y-4">
-        <p className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
-          Your Gmail/email is not verified. Please open the confirmation link sent to{" "}
-          {userEmail ? userEmail : "your email"} to activate your account. The link expires in 24
-          hours.
-        </p>
-        <Button type="button" onClick={() => void resend()} disabled={resending} className="w-full">
-          {resending ? "Sending confirmation link…" : "Send confirmation link again"}
-        </Button>
+      <div className="space-y-5">
+        <div className="flex justify-center">
+          <div className="grid h-16 w-16 place-items-center rounded-full bg-primary/10 text-primary ring-8 ring-primary/5">
+            <Mail className="h-8 w-8" strokeWidth={1.8} />
+          </div>
+        </div>
+        <div className="rounded-2xl border border-border bg-card p-5 shadow-soft sm:p-6">
+          <div className="mb-5 flex items-start gap-3">
+            <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+            <div>
+              <p className="font-semibold text-foreground">
+                {emailVerified ? "Email verified" : "One last step"}
+              </p>
+              <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                {emailVerified
+                  ? "Your confirmation link was accepted successfully."
+                  : "Open the confirmation link we sent to "}
+                {!emailVerified && (
+                  <span className="font-medium text-foreground">{userEmail || "your email"}.</span>
+                )}
+              </p>
+            </div>
+          </div>
+          <div
+            className={`rounded-xl border p-4 text-sm leading-6 ${emailVerified ? "border-emerald-300 bg-emerald-50 text-emerald-900" : "border-amber-300 bg-amber-50 text-amber-950"}`}
+          >
+            {emailVerified
+              ? "Your Gmail/email has been verified. You can now access your account."
+              : "Your Gmail/email is not verified yet. The link expires in 24 hours."}
+          </div>
+          <Button
+            type="button"
+            onClick={() => void resend()}
+            disabled={resending}
+            className="mt-5 w-full"
+          >
+            {resending ? "Sending confirmation link…" : "Send confirmation link again"}
+            {!resending && <ArrowRight className="ml-2 h-4 w-4" />}
+          </Button>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              className="flex-1"
+              onClick={() => {
+                setEditingEmail((current) => !current);
+                setNewEmail(userEmail ?? "");
+                setEmailError(null);
+                setEmailMessage(null);
+              }}
+            >
+              <Pencil className="mr-2 h-4 w-4" />
+              Change email
+            </Button>
+          </div>
+          {emailVerified && (
+            <div className="mt-5 grid gap-2">
+              <Button asChild>
+                <Link href="/client-profile">Continue to your account</Link>
+              </Button>
+              <Button type="button" variant="outline" onClick={() => window.close()}>
+                Close this tab
+              </Button>
+            </div>
+          )}
+          {!editingEmail && emailMessage && (
+            <p className="mt-4 rounded-lg bg-emerald-50 px-3 py-2 text-center text-sm text-emerald-700">
+              {emailMessage}
+            </p>
+          )}
+          {message && (
+            <p className="mt-4 rounded-lg bg-emerald-50 px-3 py-2 text-center text-sm text-emerald-700">
+              {message}
+            </p>
+          )}
+        </div>
         {editingEmail ? (
           <div className="space-y-3 rounded-2xl border border-border bg-muted p-4">
             <Label htmlFor="new-email">Edit email</Label>
@@ -119,30 +194,7 @@ export default function Verify() {
           </div>
         ) : null}
       </div>
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="space-y-2">
-          <div className="flex flex-wrap items-center gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                setEditingEmail((current) => !current);
-                setNewEmail(userEmail ?? "");
-                setEmailError(null);
-                setEmailMessage(null);
-              }}
-            >
-              Change email
-            </Button>
-            <Button type="button" variant="ghost" onClick={() => router.push("/")}>
-              Later
-            </Button>
-          </div>
-          {!editingEmail && emailMessage && <p className="text-sm text-success">{emailMessage}</p>}
-        </div>
-      </div>
       {error && <p className="text-sm text-destructive">{error}</p>}
-      {message && <p className="text-sm text-success">{message}</p>}
     </AuthLayout>
   );
 }

@@ -34,7 +34,7 @@ export async function getClientAccountSummary(userId: number) {
         where: { clientProfileId: profile.id },
         orderBy: { createdAt: "desc" },
         take: 3,
-        select: { id: true, label: true, address: true },
+        select: { id: true, label: true, address: true, isPrimary: true },
       })
     : [];
 

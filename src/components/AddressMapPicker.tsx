@@ -14,11 +14,13 @@ export function AddressMapPicker({
   value,
   onChange,
   onCoordinatesChange,
+  onCurrentLocation,
 }: {
   id: string;
   value: string;
   onChange: (value: string) => void;
   onCoordinatesChange?: (latitude: number, longitude: number) => void;
+  onCurrentLocation?: () => void;
 }) {
   const [results, setResults] = useState<Result[]>([]);
   const [point, setPoint] = useState<[number, number]>([20.5937, 78.9629]);
@@ -124,12 +126,13 @@ export function AddressMapPicker({
         <Button
           type="button"
           variant="outline"
-          onClick={() =>
+          onClick={() => {
+            onCurrentLocation?.();
             navigator.geolocation?.getCurrentPosition(
               (p) => void resolve(p.coords.latitude, p.coords.longitude),
               () => setPinStatus("Location permission was not granted."),
-            )
-          }
+            );
+          }}
         >
           Use my current location
         </Button>

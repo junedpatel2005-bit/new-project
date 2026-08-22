@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { verifySession, sessionCookie } from "@/lib/auth";
 import { getClientAccountSummary } from "@/lib/services/client-account-service";
 import { ClientMyInfoPage } from "@/components/ClientMyInfoPage";
+import { db } from "@/lib/db";
 
 async function getCookieValue(name: string) {
   const cookieHeader = (await headers()).get("cookie");
@@ -32,6 +33,12 @@ export default async function MyInfoPage() {
     if (session.role === "ADMIN") return redirect("/admin");
     return redirect("/login");
   }
+
+  const user = await db.user.findUnique({
+    where: { id: session.userId },
+    select: { emailVerifiedAt: true },
+  });
+  if (!user?.emailVerifiedAt) return redirect("/verify");
 
   const data = await getClientAccountSummary(session.userId);
   if (!data) return redirect("/login");

@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { sessionCookie, verifySession } from "@/lib/auth";
+import { db } from "@/lib/db";
 
 function isTrustedStateChangingRequest(request: NextRequest) {
   if (!["POST", "PUT", "PATCH", "DELETE"].includes(request.method)) return true;
@@ -40,6 +41,36 @@ export async function proxy(request: NextRequest) {
       }
     }
     if (!authorized) return NextResponse.redirect(new URL("/admin/login", request.url));
+  }
+
+  // Keep authenticated but unverified clients/professionals in the email
+  // verification flow, including when they open a page in a new tab.
+  const pathname = request.nextUrl.pathname;
+  const verificationExempt = [
+    "/login",
+    "/signup",
+    "/verify",
+    "/verify-email",
+    "/forgot-password",
+    "/reset-password",
+  ].some((path) => pathname === path || pathname.startsWith(`${path}/`));
+  if (!pathname.startsWith("/api/") && !verificationExempt && !pathname.startsWith("/admin")) {
+    const token = request.cookies.get(sessionCookie)?.value;
+    if (token) {
+      try {
+        const session = await verifySession(token);
+        if (session.role !== "ADMIN") {
+          const user = await db.user.findUnique({
+            where: { id: session.userId },
+            select: { emailVerifiedAt: true, isActive: true },
+          });
+          if (!user?.isActive) return NextResponse.redirect(new URL("/login", request.url));
+          if (!user.emailVerifiedAt) return NextResponse.redirect(new URL("/verify", request.url));
+        }
+      } catch {
+        // Invalid sessions are handled by the destination page/API.
+      }
+    }
   }
 
   const requestId = request.headers.get("x-request-id") ?? crypto.randomUUID();

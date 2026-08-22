@@ -62,8 +62,8 @@ export function PortalShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background pb-16 lg:pb-0">
-      <AppSidebar items={items} pathname={pathname} />
-      <div className="lg:pl-64">
+      {user && <AppSidebar items={items} pathname={pathname} />}
+      <div className={user ? "lg:pl-64" : ""}>
         <AppHeader role={user?.role} />
         <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           {title && (
@@ -72,7 +72,7 @@ export function PortalShell({ children }: { children: React.ReactNode }) {
           {children}
         </main>
       </div>
-      <AppMobileNavigation items={mobileItems} pathname={pathname} />
+      {user && <AppMobileNavigation items={mobileItems} pathname={pathname} />}
     </div>
   );
 }

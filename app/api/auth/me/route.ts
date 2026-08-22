@@ -21,6 +21,7 @@ export async function GET(request: Request) {
         lastName: true,
         avatarUrl: true,
         email: true,
+        emailVerifiedAt: true,
         isActive: true,
       },
     });
@@ -34,6 +35,7 @@ export async function GET(request: Request) {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
+        emailVerifiedAt: user.emailVerifiedAt,
         avatarUrl: user.avatarUrl,
       },
     });

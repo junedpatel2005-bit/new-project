@@ -11,6 +11,7 @@ function VerifyEmailContent() {
   const params = useSearchParams();
   const [status, setStatus] = useState<"verifying" | "success" | "error">("verifying");
   const [error, setError] = useState<string | null>(null);
+  const [nextPath, setNextPath] = useState("/dashboard");
   const attempted = useRef(false);
 
   useEffect(() => {
@@ -41,7 +42,7 @@ function VerifyEmailContent() {
           return;
         }
         setStatus("success");
-        setTimeout(() => router.push(result.redirect ?? "/dashboard"), 1200);
+        setNextPath(result.redirect ?? "/dashboard");
       })
       .catch(() => {
         setStatus("error");
@@ -69,7 +70,12 @@ function VerifyEmailContent() {
         <p className="text-sm text-muted-foreground">Please wait a moment…</p>
       )}
       {status === "success" && (
-        <p className="text-sm text-success">Email confirmed. Redirecting you now…</p>
+        <div className="space-y-4">
+          <p className="text-sm text-success">Your account is verified successfully.</p>
+          <Button className="w-full" onClick={() => router.push(nextPath)}>
+            Continue to your account
+          </Button>
+        </div>
       )}
       {status === "error" && (
         <div className="space-y-4">

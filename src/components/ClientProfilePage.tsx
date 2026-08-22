@@ -26,6 +26,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AddressMapPicker } from "@/components/AddressMapPicker";
+import { PhoneVerification } from "@/components/PhoneVerification";
 
 type Location = { id: number; label: string; address: string };
 type Data = {
@@ -63,6 +64,7 @@ export function ClientProfilePage() {
   const [location, setLocation] = useState<Location | typeof emptyLocation | null>(null);
   const [deleting, setDeleting] = useState<Location | null>(null);
   const [locationSaving, setLocationSaving] = useState(false);
+  const [saveCurrentLocation, setSaveCurrentLocation] = useState(false);
 
   const initials = useMemo(
     () => `${form.firstName[0] ?? ""}${form.lastName[0] ?? ""}`.toUpperCase() || "C",
@@ -110,6 +112,25 @@ export function ClientProfilePage() {
       setMessage(error instanceof Error ? error.message : "Unable to save profile.");
     } finally {
       setSaving(false);
+    }
+  }
+  async function saveDetectedAddress(address: string) {
+    setForm((current) => ({ ...current, address }));
+    if (!saveCurrentLocation) return;
+    setSaveCurrentLocation(false);
+    setMessage(null);
+    try {
+      const response = await fetch("/api/v1/profile", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ ...form, address }),
+      });
+      const result = (await response.json()) as { error?: string };
+      if (!response.ok) throw new Error(result.error ?? "Unable to save your location.");
+      setMessage("Your current location was saved automatically.");
+      await load();
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Unable to save your location.");
     }
   }
   async function saveLocation(event: FormEvent<HTMLFormElement>) {
@@ -230,10 +251,10 @@ export function ClientProfilePage() {
         >
           <div className="grid gap-4 sm:grid-cols-2">
             <ReadOnly label="Email" value={data.account.email} />
-            <ReadOnly label="Phone number" value={data.account.phone ?? "Not provided"} />
-            <ReadOnly
-              label="Phone verification"
-              value={data.account.phoneVerifiedAt ? "✓ Verified" : "Not verified"}
+            <PhoneVerification
+              role="CLIENT"
+              initialPhone={data.account.phone}
+              onVerified={() => void load()}
             />
           </div>
         </Section>
@@ -244,7 +265,8 @@ export function ClientProfilePage() {
           <AddressMapPicker
             id="primary-address"
             value={form.address}
-            onChange={(address) => setForm({ ...form, address })}
+            onChange={(address) => void saveDetectedAddress(address)}
+            onCurrentLocation={() => setSaveCurrentLocation(true)}
           />
         </Section>
         <div className="flex flex-wrap gap-3">
@@ -311,7 +333,7 @@ export function ClientProfilePage() {
         )}
       </Section>
       <Dialog open={location !== null} onOpenChange={(open) => !open && setLocation(null)}>
-        <DialogContent>
+        <DialogContent className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {location && "id" in location ? "Edit saved location" : "Add saved location"}
@@ -333,6 +355,13 @@ export function ClientProfilePage() {
                   id="saved-location-address"
                   value={location.address}
                   onChange={(address) => setLocation({ ...location, address })}
+                  onCurrentLocation={() =>
+                    setLocation((current) =>
+                      current && !current.label.trim()
+                        ? { ...current, label: "Current location" }
+                        : current,
+                    )
+                  }
                 />
               </>
             )}

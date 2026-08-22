@@ -79,6 +79,17 @@ export default function AdminLogin() {
                   placeholder="Password"
                 />
               </label>
+              <button
+                type="button"
+                onClick={() => {
+                  setUsername("seed-admin");
+                  setPassword("ServioSeed#2026");
+                  setError("");
+                }}
+                className="text-left text-xs font-medium text-indigo-300 hover:text-indigo-200"
+              >
+                Use demo admin credentials
+              </button>
               {error && <p className="text-sm text-rose-400">{error}</p>}
               <button
                 disabled={pending}

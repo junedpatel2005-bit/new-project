@@ -1,7 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowDown, ArrowUp, ImagePlus, Plus, Table2, Text, Trash2 } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  GripVertical,
+  ImagePlus,
+  Plus,
+  Table2,
+  Text,
+  Trash2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type Block = {
@@ -26,6 +35,7 @@ export function CmsBlockBuilder({ page }: { page: Page }) {
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
+  const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
 
   useEffect(() => {
     try {
@@ -101,6 +111,17 @@ export function CmsBlockBuilder({ page }: { page: Page }) {
       [next[index], next[target]] = [next[target]!, next[index]!];
       return next;
     });
+  const dropAt = (targetIndex: number) => {
+    if (draggingIndex === null || draggingIndex === targetIndex) return;
+    setBlocks((current) => {
+      const next = [...current];
+      const [dragged] = next.splice(draggingIndex, 1);
+      if (!dragged) return current;
+      next.splice(targetIndex, 0, dragged);
+      return next;
+    });
+    setDraggingIndex(null);
+  };
   const remove = async (index: number) => {
     const previous = blocks;
     const next = previous.filter((_, itemIndex) => itemIndex !== index);
@@ -150,8 +171,26 @@ export function CmsBlockBuilder({ page }: { page: Page }) {
       </div>
       <div className="mt-5 space-y-4">
         {blocks.map((block, index) => (
-          <article key={block.id} className="rounded-xl border border-white/10 bg-[#0b1020] p-4">
+          <article
+            key={block.id}
+            draggable
+            onDragStart={(event) => {
+              event.dataTransfer.effectAllowed = "move";
+              setDraggingIndex(index);
+            }}
+            onDragEnd={() => setDraggingIndex(null)}
+            onDragOver={(event) => event.preventDefault()}
+            onDrop={(event) => {
+              event.preventDefault();
+              dropAt(index);
+            }}
+            className={`rounded-xl border border-white/10 bg-[#0b1020] p-4 transition-opacity ${draggingIndex === index ? "opacity-40" : ""}`}
+          >
             <div className="flex items-center justify-between">
+              <GripVertical
+                className="mr-auto h-5 w-5 cursor-grab text-slate-500 active:cursor-grabbing"
+                aria-label="Drag to reorder block"
+              />
               <p className="text-xs font-bold uppercase tracking-wider text-indigo-300">
                 Block {index + 1} · {block.type}
               </p>

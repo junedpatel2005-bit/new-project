@@ -192,6 +192,7 @@ model ClientSavedLocation {
   clientProfileId Int
   label           String
   address         String
+  isPrimary       Boolean       @default(false)
   createdAt       DateTime      @default(now())
   clientProfile   ClientProfile @relation(fields: [clientProfileId], references: [id], onDelete: Cascade)
 

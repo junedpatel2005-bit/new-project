@@ -102,6 +102,13 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   });
   if (!job) return NextResponse.json({ error: "Not found." }, { status: 404 });
 
+  const category = job.category
+    ? await db.serviceCategory.findFirst({
+        where: { name: job.category },
+        select: { segment: true, parent: { select: { name: true } } },
+      })
+    : null;
+
   const project = await db.projectTracking.findFirst({
     where: { jobId: id, clientId: userId },
     select: { id: true },
@@ -151,7 +158,12 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     attachLastActorRole(hireRequests),
   ]);
   return NextResponse.json({
-    job: { ...job, projectId: project?.id ?? null },
+    job: {
+      ...job,
+      projectId: project?.id ?? null,
+      mainCategory: category?.parent?.name ?? null,
+      categorySegment: category?.segment ?? null,
+    },
     proposals: proposalsWithActor.map((proposal) => ({
       ...proposal,
       professional: professionalById.get(proposal.professionalId) ?? null,

@@ -21,19 +21,52 @@ export type ProfessionalDiscoveryFilter = {
 
 const MAX_RESULTS_PER_PAGE = 50;
 const DEFAULT_RESULTS_PER_PAGE = 20;
+const CITY_COORDINATES: Record<string, { lat: number; lng: number }> = {
+  Ahmedabad: { lat: 23.0225, lng: 72.5714 },
+  Bengaluru: { lat: 12.9716, lng: 77.5946 },
+  Chandigarh: { lat: 30.7333, lng: 76.7794 },
+  Chennai: { lat: 13.0827, lng: 80.2707 },
+  Delhi: { lat: 28.7041, lng: 77.1025 },
+  Hyderabad: { lat: 17.385, lng: 78.4867 },
+  Jaipur: { lat: 26.9124, lng: 75.7873 },
+  Kolkata: { lat: 22.5726, lng: 88.3639 },
+  Lucknow: { lat: 26.8467, lng: 80.9462 },
+  Mumbai: { lat: 19.076, lng: 72.8777 },
+  Pune: { lat: 18.5204, lng: 73.8567 },
+  Surat: { lat: 21.1702, lng: 72.8311 },
+};
 
 async function buildSearchWhere(filter: ProfessionalDiscoveryFilter) {
   const where: Prisma.UserWhereInput = {
     role: "PROFESSIONAL",
     isActive: true,
   };
+  let categoryNames: string[] | undefined;
 
   if (filter.verified) {
     where.isVerified = true;
   }
 
   if (filter.category) {
-    where.professionalCategory = filter.category;
+    const category = await db.serviceCategory.findFirst({
+      where: { name: filter.category },
+      select: {
+        name: true,
+        parentId: true,
+        parent: { select: { name: true } },
+        children: { select: { name: true } },
+      },
+    });
+
+    // A job can target either a main category or a subcategory. A main
+    // category includes its children; a subcategory also accepts a pro who
+    // selected the parent category as a general service.
+    categoryNames = category
+      ? category.parentId === null
+        ? [category.name, ...category.children.map((child) => child.name)]
+        : [category.name, category.parent?.name].filter((name): name is string => Boolean(name))
+      : [filter.category];
+    where.professionalCategory = { in: categoryNames };
   }
 
   if (filter.segment) {
@@ -41,9 +74,11 @@ async function buildSearchWhere(filter: ProfessionalDiscoveryFilter) {
       where: { segment: filter.segment },
       select: { name: true },
     });
-    where.professionalCategory = filter.category
-      ? filter.category
-      : { in: segmentCategories.map((category) => category.name) };
+    const segmentNames = segmentCategories.map((category) => category.name);
+    categoryNames = categoryNames
+      ? categoryNames.filter((name) => segmentNames.includes(name))
+      : segmentNames;
+    where.professionalCategory = { in: categoryNames };
   }
 
   if (filter.city) {
@@ -120,6 +155,13 @@ function toPublicProfessional(
   },
   distanceKm: number | null,
 ): ProfessionalDiscoveryResult {
+  const cityPoint = professional.professionalCity
+    ? CITY_COORDINATES[professional.professionalCity.trim()]
+    : undefined;
+  const basePoint =
+    professional.professionalLatitude !== null && professional.professionalLongitude !== null
+      ? { lat: professional.professionalLatitude, lng: professional.professionalLongitude }
+      : cityPoint;
   return {
     id: String(professional.id),
     name: `${professional.firstName} ${professional.lastName}`.trim(),
@@ -134,14 +176,9 @@ function toPublicProfessional(
     availabilityStatus: professional.availabilityStatus,
     skills: parseSkills(professional.professionalSkillsJson),
     bio: professional.companyDescription,
-    displayPoint:
-      professional.professionalLatitude !== null && professional.professionalLongitude !== null
-        ? (createDisplayPoint(
-            professional.id,
-            professional.professionalLatitude,
-            professional.professionalLongitude,
-          ) ?? undefined)
-        : undefined,
+    displayPoint: basePoint
+      ? (createDisplayPoint(professional.id, basePoint.lat, basePoint.lng) ?? undefined)
+      : undefined,
   };
 }
 
