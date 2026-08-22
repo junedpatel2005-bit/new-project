@@ -2,23 +2,27 @@ import "server-only";
 import crypto from "node:crypto";
 
 const config = {
-  enabled: process.env.RAZORPAY_ENABLED === "true",
   keyId: process.env.RAZORPAY_KEY_ID?.trim() ?? "",
   keySecret: process.env.RAZORPAY_KEY_SECRET?.trim() ?? "",
   webhookSecret: process.env.RAZORPAY_WEBHOOK_SECRET?.trim() ?? "",
   routeEnabled: process.env.RAZORPAY_ROUTE_ENABLED === "true",
 };
 
+// Credentials are the source of truth for Razorpay availability. Keep the
+// flag as an explicit opt-out so deployments that only define the credentials
+// do not incorrectly return "funding is not configured".
+const enabled = process.env.RAZORPAY_ENABLED !== "false";
+
 export function razorpayConfig() {
-  return { enabled: config.enabled, keyId: config.keyId };
+  return { enabled, keyId: config.keyId };
 }
 
 export function isRazorpayConfigured() {
-  return config.enabled && Boolean(config.keyId && config.keySecret);
+  return enabled && Boolean(config.keyId && config.keySecret);
 }
 
 export function isRazorpayWebhookConfigured() {
-  return config.enabled && Boolean(config.webhookSecret);
+  return enabled && Boolean(config.webhookSecret);
 }
 
 export function isRazorpayRouteConfigured() {
