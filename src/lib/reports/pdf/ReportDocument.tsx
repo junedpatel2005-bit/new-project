@@ -111,7 +111,7 @@ export function ReportHeader({
 }) {
   return (
     <View style={styles.header} fixed>
-      <Text style={styles.brand}>Servio report</Text>
+      <Text style={styles.brand}>Klick-Pro report</Text>
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.meta}>
         {subtitle} · Generated {formatGeneratedAt()}
@@ -125,7 +125,7 @@ export function ReportHeader({
 export function ReportFooter() {
   return (
     <View style={styles.footer} fixed>
-      <Text style={styles.footerText}>Servio · Confidential report</Text>
+      <Text style={styles.footerText}>Klick-Pro · Confidential report</Text>
       <Text
         style={styles.footerText}
         render={({ pageNumber, totalPages }) => `Page ${pageNumber} of ${totalPages}`}

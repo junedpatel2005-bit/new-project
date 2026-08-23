@@ -16,7 +16,7 @@ export default function ForPros() {
                 Find quality jobs. Get paid safely. Grow your business.
               </h1>
               <p className="mt-4 max-w-lg text-white/70">
-                No more chasing leads or waiting on payments. Servio brings nearby and remote jobs
+                No more chasing leads or waiting on payments. Klick-Pro brings nearby and remote jobs
                 straight to you.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">

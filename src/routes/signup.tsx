@@ -128,7 +128,7 @@ function SignupContent() {
   return (
     <AuthLayout
       title="Create your account"
-      subtitle="Join 50,000+ clients and pros on Servio."
+      subtitle="Join 50,000+ clients and pros on Klick-Pro."
       footer={
         <>
           Already have an account?{" "}

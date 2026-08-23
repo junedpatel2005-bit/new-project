@@ -48,7 +48,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     disputeId,
     trackingId: dispute.trackingId,
     recipientId,
-    senderName: `${sender?.firstName ?? "Servio"} ${sender?.lastName ?? "Support"}`.trim(),
+    senderName: `${sender?.firstName ?? "Klick-Pro"} ${sender?.lastName ?? "Support"}`.trim(),
     message: record.message,
   });
   return NextResponse.json({ message: record }, { status: 201 });

@@ -40,7 +40,7 @@ export function AdminSidebar() {
           <BarChart3 className="h-5 w-5" />
         </div>
         <div>
-          <p className="font-display font-bold">Servio Admin</p>
+          <p className="font-display font-bold">Klick-Pro Admin</p>
           <p className="text-xs text-slate-400">Control center</p>
         </div>
       </div>

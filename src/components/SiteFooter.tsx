@@ -17,7 +17,7 @@ export function SiteFooter() {
               <span className="grid h-9 w-9 place-items-center rounded-lg bg-cta text-cta-foreground">
                 S
               </span>
-              Servio
+              Klick-Pro
             </Link>
             <p className="mt-4 max-w-sm text-sm text-white/65">
               The trusted marketplace where clients meet vetted professionals. Post jobs, hire
@@ -89,7 +89,7 @@ export function SiteFooter() {
         </div>
         <div className="border-t border-white/10">
           <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-5 text-xs text-white/50 sm:flex-row sm:px-6 lg:px-8">
-            <span>© 2026 Servio, Inc. All rights reserved.</span>
+            <span>© 2026 Klick-Pro, Inc. All rights reserved.</span>
             <span>Made for trusted local & remote work.</span>
           </div>
         </div>

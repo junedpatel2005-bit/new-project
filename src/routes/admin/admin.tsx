@@ -76,7 +76,7 @@ export default function Admin() {
     <div>
       <p className="text-xs font-bold uppercase tracking-[.2em] text-indigo-400">Administration</p>
       <h1 className="mt-2 font-display text-3xl font-bold">Platform command center</h1>
-      <p className="mt-2 text-slate-400">Live operational data across Servio’s marketplace.</p>
+      <p className="mt-2 text-slate-400">Live operational data across Klick-Pro’s marketplace.</p>
       <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {cards.map((card) => (
           <Link

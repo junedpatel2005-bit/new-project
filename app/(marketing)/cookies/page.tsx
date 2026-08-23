@@ -5,7 +5,7 @@ export default function CookiesPage() {
     <LegalPage
       eyebrow="Legal"
       title="Cookie Policy"
-      description="How cookies help Servio provide a reliable website experience."
+      description="How cookies help Klick-Pro provide a reliable website experience."
       sections={[
         {
           title: "Essential cookies",

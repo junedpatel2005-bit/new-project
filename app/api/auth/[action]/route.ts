@@ -77,7 +77,7 @@ async function createEmailVerificationToken(userId: number) {
 async function sendEmailVerificationLink(email: string, raw: string, appOrigin: string) {
   await sendAuthEmail(
     email,
-    "Verify your Servio email",
+    "Verify your Klick-Pro email",
     "Verify your email",
     `${appOrigin}/verify-email?token=${encodeURIComponent(raw)}`,
     "Verify email",
@@ -461,7 +461,7 @@ export async function POST(
                 title:
                   user.role === "PROFESSIONAL"
                     ? "Welcome to your professional dashboard"
-                    : "Welcome to Servio",
+                    : "Welcome to Klick-Pro",
                 description:
                   user.role === "PROFESSIONAL"
                     ? "Your profile is ready. Update your setup and start getting matched with clients."
@@ -681,7 +681,7 @@ export async function POST(
         () =>
           sendAuthEmail(
             user.email,
-            "Reset your Servio password",
+            "Reset your Klick-Pro password",
             "Reset your password",
             `${publicAppOrigin(request)}/reset-password?token=${encodeURIComponent(raw)}`,
             "Reset password",

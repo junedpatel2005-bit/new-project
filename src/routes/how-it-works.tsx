@@ -47,7 +47,7 @@ const stepsPro = [
   {
     icon: Star,
     title: "Win, deliver, get paid",
-    desc: "Deliver milestones, get reviews, and grow your business with Servio.",
+    desc: "Deliver milestones, get reviews, and grow your business with Klick-Pro.",
   },
 ];
 
@@ -119,7 +119,7 @@ function Hero() {
           A simpler way to hire & get hired
         </h1>
         <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
-          Servio handles the busywork — discovery, vetting, payments, and tracking — so you can
+            Klick-Pro handles the busywork — discovery, vetting, payments, and tracking — so you can
           focus on the work.
         </p>
       </div>

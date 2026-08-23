@@ -5,11 +5,11 @@ export default function PrivacyPolicyPage() {
     <LegalPage
       eyebrow="Legal"
       title="Privacy Policy"
-      description="How Servio handles your account and marketplace information."
+      description="How Klick-Pro handles your account and marketplace information."
       sections={[
         {
           title: "Information we use",
-          body: "We use account, profile, job, proposal, project, and payment information only to operate and improve the Servio marketplace.",
+          body: "We use account, profile, job, proposal, project, and payment information only to operate and improve the Klick-Pro marketplace.",
         },
         {
           title: "Your choices",

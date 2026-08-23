@@ -81,7 +81,7 @@ export default function ForClients() {
 
         <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
           <h2 className="font-display text-3xl font-bold tracking-tight">
-            Why clients choose Servio
+            Why clients choose Klick-Pro
           </h2>
           <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {benefits.map((b) => (

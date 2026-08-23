@@ -27,7 +27,7 @@ export function AuthLayout({
           <div className="mt-8">{children}</div>
           {footer && <div className="mt-6 text-center text-sm text-muted-foreground">{footer}</div>}
         </div>
-        <p className="text-center text-xs text-muted-foreground">© 2026 Servio, Inc.</p>
+        <p className="text-center text-xs text-muted-foreground">© 2026 Klick-Pro, Inc.</p>
       </div>
       {!hideAside && (
         <div className="relative hidden gradient-hero lg:block">
@@ -42,7 +42,7 @@ export function AuthLayout({
                 ))}
               </div>
               <p className="mt-3 text-lg leading-snug text-foreground">
-                "Servio is the only marketplace I trust. The pros are exceptional and the process is
+                "Klick-Pro is the only marketplace I trust. The pros are exceptional and the process is
                 effortless."
               </p>
               <div className="mt-5 flex items-center gap-3">

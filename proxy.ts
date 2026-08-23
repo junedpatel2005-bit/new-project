@@ -14,6 +14,29 @@ function isTrustedStateChangingRequest(request: NextRequest) {
   return appUrl ? origin === appUrl : false;
 }
 
+function isAuthenticatedPage(pathname: string) {
+  const protectedPrefixes = [
+    "/dashboard",
+    "/discover",
+    "/messages",
+    "/my-jobs",
+    "/post-job",
+    "/reports",
+    "/earnings",
+    "/notifications",
+    "/professional",
+    "/professional-profile",
+    "/professional-home/dashboard",
+    "/client-profile",
+    "/my-info",
+    "/project",
+  ];
+
+  return protectedPrefixes.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+  );
+}
+
 /**
  * Adds a correlation id that API handlers can include in structured server logs
  * and clients can provide when reporting a failed request.
@@ -43,9 +66,26 @@ export async function proxy(request: NextRequest) {
     if (!authorized) return NextResponse.redirect(new URL("/admin/login", request.url));
   }
 
+  // Do this check at the edge before protected pages render. This prevents a
+  // copied authenticated URL from loading a client shell in a browser that has
+  // no valid session cookie.
+  const pathname = request.nextUrl.pathname;
+  if (!request.nextUrl.pathname.startsWith("/api/") && isAuthenticatedPage(pathname)) {
+    const token = request.cookies.get(sessionCookie)?.value;
+    let authorized = false;
+    if (token) {
+      try {
+        await verifySession(token);
+        authorized = true;
+      } catch {
+        authorized = false;
+      }
+    }
+    if (!authorized) return NextResponse.redirect(new URL("/login", request.url));
+  }
+
   // Keep authenticated but unverified clients/professionals in the email
   // verification flow, including when they open a page in a new tab.
-  const pathname = request.nextUrl.pathname;
   const verificationExempt = [
     "/login",
     "/signup",

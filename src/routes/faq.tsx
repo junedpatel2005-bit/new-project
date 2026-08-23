@@ -13,15 +13,15 @@ const fallbackGroups = [
     title: "General",
     items: [
       {
-        q: "What is Servio?",
-        a: "Servio is a marketplace that connects clients with verified professionals — from plumbers to product designers — for both local and remote work.",
+        q: "What is Klick-Pro?",
+        a: "Klick-Pro is a marketplace that connects clients with verified professionals — from plumbers to product designers — for both local and remote work.",
       },
       {
         q: "Is it free to use?",
         a: "Yes. Posting jobs and creating a profile are free. Clients pay only the agreed price; pros pay a small platform fee on completed jobs.",
       },
       {
-        q: "Where is Servio available?",
+        q: "Where is Klick-Pro available?",
         a: "We're live in 200+ cities across North America, Europe, and parts of Asia. New cities launch every month.",
       },
     ],

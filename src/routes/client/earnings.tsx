@@ -155,7 +155,7 @@ export default function ClientEarnings() {
         key: result.keyId,
         amount: result.amount,
         currency: result.currency,
-        name: "Servio",
+        name: "Klick-Pro",
         description: "Wallet top-up",
         order_id: result.orderId,
         handler: async (payment: {

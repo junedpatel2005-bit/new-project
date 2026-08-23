@@ -27,13 +27,13 @@ export default function About() {
         <section className="gradient-hero">
           <div className="mx-auto max-w-4xl px-4 py-20 text-center sm:px-6">
             <p className="text-xs font-semibold uppercase tracking-wider text-primary">
-              About Servio
+              About Klick-Pro
             </p>
             <h1 className="mt-3 font-display text-4xl font-bold tracking-tight md:text-5xl">
               Better work starts with trust.
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground">
-              Servio brings clients and skilled professionals together in one safe, simple
+              Klick-Pro brings clients and skilled professionals together in one safe, simple
               marketplace.
             </p>
           </div>

@@ -78,7 +78,7 @@ export function notifyClientsOfNewProfessional(professional: {
   const name = `${professional.firstName} ${professional.lastName}`.trim() || "A new professional";
   return notifyRole("CLIENT", {
     type: "NEW_PROFESSIONAL",
-    title: "New professional joined Servio",
+    title: "New professional joined Klick-Pro",
     description: `${name} has joined the marketplace. View their profile and see if they are a fit for your next project.`,
     href: `/pro/${professional.id}`,
   });
@@ -203,8 +203,8 @@ export async function notifyDisputeResolved(input: {
     title: input.status === "RESOLVED" ? "Dispute resolved" : "Dispute reopened",
     description:
       input.status === "RESOLVED"
-        ? `Servio support marked the dispute on ${jobLabel} as resolved.`
-        : `Servio support reopened the dispute on ${jobLabel} for further review.`,
+        ? `Klick-Pro support marked the dispute on ${jobLabel} as resolved.`
+        : `Klick-Pro support reopened the dispute on ${jobLabel} for further review.`,
     href: `/project/${input.trackingId}/tracking`,
   });
 }
@@ -218,7 +218,7 @@ export function notifyDisputeMessage(input: {
 }) {
   return notifyUsers([input.recipientId], {
     type: "DISPUTE_MESSAGE",
-    title: `Message from Servio support about dispute #${input.disputeId}`,
+    title: `Message from Klick-Pro support about dispute #${input.disputeId}`,
     description: `${input.senderName}: ${input.message.slice(0, 180)}`,
     href: `/project/${input.trackingId}/tracking`,
   });

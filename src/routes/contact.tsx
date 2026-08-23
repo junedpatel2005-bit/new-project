@@ -31,7 +31,7 @@ export default function Contact() {
         <section className="gradient-hero">
           <div className="mx-auto max-w-3xl px-4 py-20 text-center sm:px-6 lg:px-8">
             <p className="text-xs font-semibold uppercase tracking-wider text-primary">
-              Contact Servio
+              Contact Klick-Pro
             </p>
             <h1 className="mt-3 font-display text-4xl font-bold tracking-tight md:text-5xl">
               How can we help?
@@ -54,7 +54,7 @@ export default function Contact() {
               <ShieldCheck className="h-6 w-6 text-success" />
               <h2 className="mt-4 font-display text-xl font-semibold">Safe & private</h2>
               <p className="mt-2 text-sm text-muted-foreground">
-                Your request is only visible to the Servio support team.
+                Your request is only visible to the Klick-Pro support team.
               </p>
             </div>
           </div>

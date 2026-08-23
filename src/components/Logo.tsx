@@ -21,7 +21,7 @@ export function Logo({ className = "" }: { className?: string }) {
       <span className="grid h-9 w-9 place-items-center rounded-lg bg-primary text-primary-foreground shadow-soft">
         <Briefcase className="h-4 w-4" />
       </span>
-      <span className="text-xl tracking-tight">Servio</span>
+      <span className="text-xl tracking-tight">Klick-Pro</span>
     </Link>
   );
 }

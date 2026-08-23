@@ -32,7 +32,7 @@ export default function AdminLogin() {
         <section className="hidden bg-[radial-gradient(circle_at_top_right,#4f46e5,transparent_45%),linear-gradient(145deg,#111c39,#0d1325)] p-10 lg:block">
           <ShieldCheck className="h-10 w-10 text-indigo-300" />
           <p className="mt-24 text-xs font-bold uppercase tracking-[.25em] text-indigo-300">
-            Servio internal
+            Klick-Pro internal
           </p>
           <h1 className="mt-4 font-display text-4xl font-bold leading-tight">
             Marketplace

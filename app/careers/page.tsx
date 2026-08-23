@@ -9,7 +9,7 @@ export default function CareersPage() {
         <section className="gradient-hero">
           <div className="mx-auto max-w-4xl px-4 py-24 text-center sm:px-6">
             <p className="text-xs font-semibold uppercase tracking-wider text-primary">
-              Careers at Servio
+              Careers at Klick-Pro
             </p>
             <h1 className="mt-3 font-display text-4xl font-bold tracking-tight md:text-5xl">
               Build a better way to work.

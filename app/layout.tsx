@@ -5,7 +5,7 @@ import { Providers } from "@/components/providers";
 import { CmsLiveEditor } from "@/components/CmsLiveEditor";
 
 export const metadata: Metadata = {
-  title: { default: "Servio — Hire trusted professionals near you", template: "%s | Servio" },
+  title: { default: "Klick-Pro — Hire trusted professionals near you", template: "%s | Klick-Pro" },
   description: "Post jobs, hire experts, track work, and manage Projects in one platform.",
 };
 

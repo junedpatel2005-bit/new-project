@@ -57,7 +57,7 @@ export async function GET(
     <ReportDocument
       title="Payment invoice"
       subtitle={invoice.invoiceNumber}
-      generatedFor={client?.email ?? "Servio account"}
+      generatedFor={client?.email ?? "Klick-Pro account"}
       columns={[
         {
           key: "item",
