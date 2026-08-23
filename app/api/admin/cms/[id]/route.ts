@@ -4,11 +4,15 @@ import { db } from "@/lib/db";
 import { sessionCookie, verifySession } from "@/lib/auth";
 const block = z.object({
   id: z.string().min(1).max(100),
-  type: z.enum(["text", "image", "table"]),
+  type: z.enum(["text", "image", "table", "button", "video", "spacer", "divider"]),
   heading: z.string().max(200).optional(),
   body: z.string().max(10000).optional(),
   imageUrl: z.string().max(1000).optional(),
   imageAlt: z.string().max(300).optional(),
+  buttonLabel: z.string().max(100).optional(),
+  buttonUrl: z.string().max(1000).optional(),
+  videoUrl: z.string().max(1000).optional(),
+  height: z.number().int().min(8).max(800).optional(),
   rows: z
     .array(z.array(z.string().max(500)))
     .max(30)

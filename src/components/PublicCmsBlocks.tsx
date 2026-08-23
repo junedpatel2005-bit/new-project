@@ -3,11 +3,15 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 type Block = {
   id: string;
-  type: "text" | "image" | "table";
+  type: "text" | "image" | "table" | "button" | "video" | "spacer" | "divider";
   heading?: string;
   body?: string;
   imageUrl?: string;
   imageAlt?: string;
+  buttonLabel?: string;
+  buttonUrl?: string;
+  videoUrl?: string;
+  height?: number;
   rows?: string[][];
 };
 export function PublicCmsBlocks() {
@@ -65,6 +69,29 @@ export function PublicCmsBlocks() {
                 </table>
               </div>
             )}
+            {block.type === "button" && block.buttonLabel && block.buttonUrl && (
+              <a
+                href={block.buttonUrl}
+                className="mt-5 inline-flex rounded-xl bg-primary px-5 py-3 font-semibold text-primary-foreground shadow-soft transition hover:opacity-90"
+              >
+                {block.buttonLabel}
+              </a>
+            )}
+            {block.type === "video" && block.videoUrl && (
+              <div className="mt-5 aspect-video overflow-hidden rounded-xl bg-muted">
+                <iframe
+                  src={block.videoUrl}
+                  title={block.heading ?? "Video"}
+                  className="h-full w-full"
+                  loading="lazy"
+                  allowFullScreen
+                />
+              </div>
+            )}
+            {block.type === "spacer" && (
+              <div aria-hidden="true" style={{ height: `${block.height ?? 48}px` }} />
+            )}
+            {block.type === "divider" && <hr className="mt-5 border-border" />}
           </article>
         ))}
       </div>

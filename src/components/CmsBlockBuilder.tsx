@@ -4,22 +4,30 @@ import { useEffect, useState } from "react";
 import {
   ArrowDown,
   ArrowUp,
+  Copy,
   GripVertical,
   ImagePlus,
+  Link,
+  Minus,
   Plus,
   Table2,
   Text,
   Trash2,
+  Video,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type Block = {
   id: string;
-  type: "text" | "image" | "table";
+  type: "text" | "image" | "table" | "button" | "video" | "spacer" | "divider";
   heading?: string;
   body?: string;
   imageUrl?: string;
   imageAlt?: string;
+  buttonLabel?: string;
+  buttonUrl?: string;
+  videoUrl?: string;
+  height?: number;
   rows?: string[][];
 };
 type Page = {
@@ -76,9 +84,9 @@ export function CmsBlockBuilder({ page }: { page: Page }) {
     }
   };
 
-  const add = (type: Block["type"]) =>
+  const add = (type: Block["type"], at?: number) =>
     setBlocks((current) => [
-      ...current,
+      ...current.slice(0, at ?? current.length),
       type === "text"
         ? { id: makeId(), type, heading: "New content block", body: "Write your content here." }
         : type === "image"
@@ -89,15 +97,30 @@ export function CmsBlockBuilder({ page }: { page: Page }) {
               imageUrl: "",
               imageAlt: "Image description",
             }
-          : {
-              id: makeId(),
-              type,
-              heading: "Data table",
-              rows: [
-                ["Column 1", "Column 2"],
-                ["Value 1", "Value 2"],
-              ],
-            },
+          : type === "table"
+            ? {
+                id: makeId(),
+                type,
+                heading: "Data table",
+                rows: [
+                  ["Column 1", "Column 2"],
+                  ["Value 1", "Value 2"],
+                ],
+              }
+            : type === "button"
+              ? {
+                  id: makeId(),
+                  type,
+                  heading: "Call to action",
+                  buttonLabel: "Learn more",
+                  buttonUrl: "/",
+                }
+              : type === "video"
+                ? { id: makeId(), type, heading: "Video", videoUrl: "" }
+                : type === "spacer"
+                  ? { id: makeId(), type, heading: "Spacing", height: 48 }
+                  : { id: makeId(), type, heading: "Divider" },
+      ...current.slice(at ?? current.length),
     ]);
   const update = (index: number, patch: Partial<Block>) =>
     setBlocks((current) =>
@@ -129,6 +152,13 @@ export function CmsBlockBuilder({ page }: { page: Page }) {
     const saved = await saveBlocks(next, "Block deleted from the public page.");
     if (!saved) setBlocks(previous);
   };
+  const duplicate = (index: number) =>
+    setBlocks((current) => {
+      const source = current[index];
+      if (!source) return current;
+      const copy = { ...source, id: makeId() };
+      return [...current.slice(0, index + 1), copy, ...current.slice(index + 1)];
+    });
 
   return (
     <section className="mt-6 rounded-2xl border border-white/10 bg-white/[.035] p-5">
@@ -167,6 +197,38 @@ export function CmsBlockBuilder({ page }: { page: Page }) {
             <Table2 className="mr-2 h-4 w-4" />
             Table
           </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            className="border-white/15 bg-transparent text-white hover:bg-white/10 hover:text-white"
+            onClick={() => add("button")}
+          >
+            <Link className="mr-2 h-4 w-4" /> Button
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            className="border-white/15 bg-transparent text-white hover:bg-white/10 hover:text-white"
+            onClick={() => add("video")}
+          >
+            <Video className="mr-2 h-4 w-4" /> Video
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            className="border-white/15 bg-transparent text-white hover:bg-white/10 hover:text-white"
+            onClick={() => add("spacer")}
+          >
+            <Minus className="mr-2 h-4 w-4" /> Spacer
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            className="border-white/15 bg-transparent text-white hover:bg-white/10 hover:text-white"
+            onClick={() => add("divider")}
+          >
+            Divider
+          </Button>
         </div>
       </div>
       <div className="mt-5 space-y-4">
@@ -195,6 +257,14 @@ export function CmsBlockBuilder({ page }: { page: Page }) {
                 Block {index + 1} · {block.type}
               </p>
               <div className="flex gap-1">
+                <button
+                  type="button"
+                  onClick={() => duplicate(index)}
+                  className="rounded p-1.5 text-slate-400 hover:bg-white/10"
+                  aria-label="Duplicate block"
+                >
+                  <Copy className="h-4 w-4" />
+                </button>
                 <button
                   type="button"
                   onClick={() => move(index, -1)}
@@ -252,6 +322,41 @@ export function CmsBlockBuilder({ page }: { page: Page }) {
                   placeholder="Image description"
                 />
               </>
+            )}
+            {block.type === "button" && (
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                <input
+                  value={block.buttonLabel ?? ""}
+                  onChange={(event) => update(index, { buttonLabel: event.target.value })}
+                  className="h-10 rounded-lg border border-white/10 bg-white/5 px-3 text-sm text-white"
+                  placeholder="Button label"
+                />
+                <input
+                  value={block.buttonUrl ?? ""}
+                  onChange={(event) => update(index, { buttonUrl: event.target.value })}
+                  className="h-10 rounded-lg border border-white/10 bg-white/5 px-3 text-sm text-white"
+                  placeholder="Button URL"
+                />
+              </div>
+            )}
+            {block.type === "video" && (
+              <input
+                value={block.videoUrl ?? ""}
+                onChange={(event) => update(index, { videoUrl: event.target.value })}
+                className="mt-3 h-10 w-full rounded-lg border border-white/10 bg-white/5 px-3 text-sm text-white"
+                placeholder="Embed URL (YouTube/Vimeo)"
+              />
+            )}
+            {block.type === "spacer" && (
+              <input
+                type="number"
+                min={8}
+                max={800}
+                value={block.height ?? 48}
+                onChange={(event) => update(index, { height: Number(event.target.value) || 48 })}
+                className="mt-3 h-10 w-full rounded-lg border border-white/10 bg-white/5 px-3 text-sm text-white"
+                placeholder="Height in pixels"
+              />
             )}
             {block.type === "table" && (
               <textarea
