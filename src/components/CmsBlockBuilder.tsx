@@ -28,6 +28,7 @@ type Block = {
   buttonUrl?: string;
   videoUrl?: string;
   height?: number;
+  placement?: "top" | "after-1" | "after-2" | "after-3" | "bottom" | "footer";
   rows?: string[][];
 };
 type Page = {
@@ -88,11 +89,12 @@ export function CmsBlockBuilder({ page }: { page: Page }) {
     setBlocks((current) => [
       ...current.slice(0, at ?? current.length),
       type === "text"
-        ? { id: makeId(), type, heading: "New content block", body: "Write your content here." }
+        ? { id: makeId(), type, placement: "footer", heading: "New content block", body: "Write your content here." }
         : type === "image"
           ? {
               id: makeId(),
               type,
+              placement: "footer",
               heading: "Image block",
               imageUrl: "",
               imageAlt: "Image description",
@@ -101,6 +103,7 @@ export function CmsBlockBuilder({ page }: { page: Page }) {
             ? {
                 id: makeId(),
                 type,
+                placement: "footer",
                 heading: "Data table",
                 rows: [
                   ["Column 1", "Column 2"],
@@ -111,15 +114,16 @@ export function CmsBlockBuilder({ page }: { page: Page }) {
               ? {
                   id: makeId(),
                   type,
+                  placement: "footer",
                   heading: "Call to action",
                   buttonLabel: "Learn more",
                   buttonUrl: "/",
                 }
               : type === "video"
-                ? { id: makeId(), type, heading: "Video", videoUrl: "" }
+                ? { id: makeId(), type, placement: "footer", heading: "Video", videoUrl: "" }
                 : type === "spacer"
-                  ? { id: makeId(), type, heading: "Spacing", height: 48 }
-                  : { id: makeId(), type, heading: "Divider" },
+                  ? { id: makeId(), type, placement: "footer", heading: "Spacing", height: 48 }
+                  : { id: makeId(), type, placement: "footer", heading: "Divider" },
       ...current.slice(at ?? current.length),
     ]);
   const update = (index: number, patch: Partial<Block>) =>
@@ -298,6 +302,21 @@ export function CmsBlockBuilder({ page }: { page: Page }) {
               className="mt-3 h-10 w-full rounded-lg border border-white/10 bg-white/5 px-3 text-sm text-white"
               placeholder="Block heading"
             />
+            <select
+              value={block.placement ?? "footer"}
+              onChange={(event) =>
+                update(index, { placement: event.target.value as Block["placement"] })
+              }
+              className="mt-2 h-10 w-full rounded-lg border border-white/10 bg-white/5 px-3 text-sm text-white"
+              aria-label="Block page position"
+            >
+              <option value="top">Place at top of page</option>
+              <option value="after-1">After section 1</option>
+              <option value="after-2">After section 2</option>
+              <option value="after-3">After section 3</option>
+              <option value="bottom">Before footer</option>
+              <option value="footer">In footer content area</option>
+            </select>
             {block.type === "text" && (
               <textarea
                 value={block.body ?? ""}

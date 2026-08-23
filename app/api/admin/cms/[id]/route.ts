@@ -13,6 +13,7 @@ const block = z.object({
   buttonUrl: z.string().max(1000).optional(),
   videoUrl: z.string().max(1000).optional(),
   height: z.number().int().min(8).max(800).optional(),
+  placement: z.enum(["top", "after-1", "after-2", "after-3", "bottom", "footer"]).optional(),
   rows: z
     .array(z.array(z.string().max(500)))
     .max(30)

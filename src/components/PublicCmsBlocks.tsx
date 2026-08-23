@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import { createPortal } from "react-dom";
 type Block = {
   id: string;
   type: "text" | "image" | "table" | "button" | "video" | "spacer" | "divider";
@@ -12,11 +13,13 @@ type Block = {
   buttonUrl?: string;
   videoUrl?: string;
   height?: number;
+  placement?: "top" | "after-1" | "after-2" | "after-3" | "bottom" | "footer";
   rows?: string[][];
 };
 export function PublicCmsBlocks() {
   const path = usePathname();
   const [blocks, setBlocks] = useState<Block[]>([]);
+  const [placements, setPlacements] = useState<Record<string, HTMLElement>>({});
   useEffect(() => {
     if (path.startsWith("/admin")) {
       setBlocks([]);
@@ -27,8 +30,36 @@ export function PublicCmsBlocks() {
       .then((d) => setBlocks(Array.isArray(d.blocks) ? d.blocks : []))
       .catch(() => setBlocks([]));
   }, [path]);
+  useEffect(() => {
+    if (!blocks.length) return;
+    const main = document.querySelector("main");
+    if (!main) return;
+    const sections = Array.from(main.children).filter(
+      (element): element is HTMLElement => element instanceof HTMLElement,
+    );
+    const next: Record<string, HTMLElement> = {};
+    for (const placement of ["top", "after-1", "after-2", "after-3", "bottom"] as const) {
+      const target = document.createElement("div");
+      target.dataset.cmsPlacement = placement;
+      if (placement === "top") main.prepend(target);
+      else if (placement === "bottom") main.append(target);
+      else {
+        const section = sections[Number(placement.slice(-1)) - 1];
+        if (section) section.after(target);
+        else main.append(target);
+      }
+      next[placement] = target;
+    }
+    setPlacements(next);
+    return () => Object.values(next).forEach((target) => target.remove());
+  }, [blocks]);
   if (!blocks.length) return null;
-  return (
+  const grouped = (placement: Block["placement"]) =>
+    blocks.filter((block) => (block.placement ?? "footer") === placement);
+  const renderBlocks = (items: Block[]) => (
+    <section className="border-t border-border bg-surface">
+      <div className="mx-auto max-w-7xl space-y-8 px-4 py-16 sm:px-6 lg:px-8">
+        {items.map((block) => (
     <section className="border-t border-border bg-surface">
       <div className="mx-auto max-w-7xl space-y-8 px-4 py-16 sm:px-6 lg:px-8">
         {blocks.map((block) => (
