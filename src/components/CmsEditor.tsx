@@ -13,6 +13,11 @@ export function CmsEditor({
       <CKEditor
         editor={ClassicEditor as never}
         data={value}
+        config={{
+          // CKEditor 5 v44+ requires an explicit license configuration.
+          // This project uses the GPL-compatible open-source build.
+          licenseKey: "GPL",
+        }}
         onChange={(_, editor) => onChange(editor.getData())}
       />
     </div>
