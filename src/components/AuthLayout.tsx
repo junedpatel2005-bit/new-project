@@ -16,12 +16,26 @@ export function AuthLayout({
   hideAside?: boolean;
 }) {
   return (
-    <div className={hideAside ? "min-h-screen" : "min-h-screen lg:grid lg:grid-cols-2"}>
+    <div
+      className={
+        hideAside
+          ? "min-h-screen bg-[radial-gradient(circle_at_top,_oklch(0.98_0.02_263),_var(--color-background)_52%)] px-4 sm:px-6"
+          : "min-h-screen lg:grid lg:grid-cols-2"
+      }
+    >
       <div
-        className={`flex min-h-screen flex-col px-6 py-8 lg:px-12 ${hideAside ? "mx-auto max-w-3xl" : ""}`}
+        className={`flex min-h-screen flex-col py-6 sm:py-8 lg:px-12 ${hideAside ? "mx-auto max-w-3xl" : "px-6"}`}
       >
-        <Logo />
-        <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center py-10">
+        <div className={hideAside ? "flex justify-center" : ""}>
+          <Logo />
+        </div>
+        <div
+          className={`mx-auto flex w-full max-w-md flex-1 flex-col justify-center py-8 sm:py-10 ${
+            hideAside
+              ? "my-4 rounded-3xl border border-border/80 bg-card/95 p-6 shadow-elevated backdrop-blur sm:p-8"
+              : ""
+          }`}
+        >
           <h1 className="text-3xl font-semibold tracking-tight">{title}</h1>
           {subtitle && <p className="mt-2 text-sm text-muted-foreground">{subtitle}</p>}
           <div className="mt-8">{children}</div>
@@ -42,8 +56,8 @@ export function AuthLayout({
                 ))}
               </div>
               <p className="mt-3 text-lg leading-snug text-foreground">
-                "Klick-Pro is the only marketplace I trust. The pros are exceptional and the process is
-                effortless."
+                "Klick-Pro is the only marketplace I trust. The pros are exceptional and the process
+                is effortless."
               </p>
               <div className="mt-5 flex items-center gap-3">
                 <img

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
+import { AlertCircle, CheckCircle2 } from "lucide-react";
 import { AuthLayout } from "@/components/AuthLayout";
 import { Button } from "@/components/ui/button";
 
@@ -60,6 +61,7 @@ function VerifyEmailContent() {
             ? "Your email is confirmed."
             : "We couldn't confirm your email."
       }
+      hideAside
       footer={
         <Link href="/login" className="text-primary hover:underline">
           Back to log in
@@ -70,17 +72,25 @@ function VerifyEmailContent() {
         <p className="text-sm text-muted-foreground">Please wait a moment…</p>
       )}
       {status === "success" && (
-        <div className="space-y-4">
-          <p className="text-sm text-success">Your account is verified successfully.</p>
-          <Button className="w-full" onClick={() => router.push(nextPath)}>
+        <div className="space-y-5">
+          <div className="flex items-center gap-3 rounded-xl border border-success/20 bg-success/10 p-4">
+            <CheckCircle2 className="h-5 w-5 shrink-0 text-success" />
+            <p className="text-sm font-medium text-success">
+              Your account is verified successfully.
+            </p>
+          </div>
+          <Button className="h-11 w-full" onClick={() => router.push(nextPath)}>
             Continue to your account
           </Button>
         </div>
       )}
       {status === "error" && (
-        <div className="space-y-4">
-          <p className="text-sm text-destructive">{error}</p>
-          <Button asChild className="w-full">
+        <div className="space-y-5">
+          <div className="flex items-start gap-3 rounded-xl border border-destructive/20 bg-destructive/10 p-4">
+            <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-destructive" />
+            <p className="text-sm text-destructive">{error}</p>
+          </div>
+          <Button asChild className="h-11 w-full">
             <Link href="/verify">Resend confirmation link</Link>
           </Button>
         </div>

@@ -344,15 +344,27 @@ export function CmsBlockBuilder({ page }: { page: Page }) {
               onChange={(event) =>
                 update(index, { placement: event.target.value as Block["placement"] })
               }
-              className="mt-2 h-10 w-full rounded-lg border border-white/10 bg-white/5 px-3 text-sm text-white"
+              className="mt-2 h-10 w-full rounded-lg border border-white/10 bg-[#0b1020] px-3 text-sm text-white"
               aria-label="Block page position"
             >
-              <option value="top">Place at top of page</option>
-              <option value="after-1">After section 1</option>
-              <option value="after-2">After section 2</option>
-              <option value="after-3">After section 3</option>
-              <option value="bottom">Before footer</option>
-              <option value="footer">In footer content area</option>
+              <option className="bg-[#0b1020] text-white" value="top">
+                Place at top of page
+              </option>
+              <option className="bg-[#0b1020] text-white" value="after-1">
+                After section 1
+              </option>
+              <option className="bg-[#0b1020] text-white" value="after-2">
+                After section 2
+              </option>
+              <option className="bg-[#0b1020] text-white" value="after-3">
+                After section 3
+              </option>
+              <option className="bg-[#0b1020] text-white" value="bottom">
+                Before footer
+              </option>
+              <option className="bg-[#0b1020] text-white" value="footer">
+                In footer content area
+              </option>
             </select>
             {block.type === "text" && (
               <textarea

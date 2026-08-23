@@ -129,6 +129,7 @@ function SignupContent() {
     <AuthLayout
       title="Create your account"
       subtitle="Join 50,000+ clients and pros on Klick-Pro."
+      hideAside
       footer={
         <>
           Already have an account?{" "}
@@ -138,13 +139,13 @@ function SignupContent() {
         </>
       }
     >
-      <div className="mb-5 grid grid-cols-2 gap-2 rounded-xl bg-muted p-1">
+      <div className="mb-5 grid grid-cols-2 gap-1 rounded-xl border border-border/70 bg-muted/70 p-1">
         {(["client", "pro"] as const).map((choice) => (
           <button
             key={choice}
             type="button"
             onClick={() => chooseRole(choice)}
-            className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${role === choice ? "bg-card text-foreground shadow-soft" : "text-muted-foreground"}`}
+            className={`rounded-lg px-3 py-2.5 text-sm font-semibold transition-all ${role === choice ? "bg-card text-foreground shadow-soft" : "text-muted-foreground"}`}
           >
             I&apos;m a {choice === "client" ? "client" : "professional"}
           </button>
@@ -158,7 +159,7 @@ function SignupContent() {
       <Button
         type="button"
         variant="outline"
-        className="mb-4 w-full"
+        className="mb-5 h-11 w-full"
         onClick={() => {
           window.location.href = `/api/v1/auth/google?role=${role === "pro" ? "PROFESSIONAL" : "CLIENT"}`;
         }}
@@ -166,7 +167,7 @@ function SignupContent() {
         Continue with Google
       </Button>
 
-      <form onSubmit={handleSubmit} noValidate className="space-y-4">
+      <form onSubmit={handleSubmit} noValidate className="space-y-5">
         <div className="grid grid-cols-2 gap-3">
           <Field
             id="first"
@@ -251,7 +252,7 @@ function SignupContent() {
         </label>
         {fieldErrors.terms && <p className="text-sm text-destructive">{fieldErrors.terms}</p>}
         {error && <p className="text-sm text-destructive">{error}</p>}
-        <Button type="submit" className="w-full" disabled={pending}>
+        <Button type="submit" className="h-11 w-full" disabled={pending}>
           {pending ? (
             <span className="flex items-center justify-center gap-2">
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -314,7 +315,7 @@ function Field({
           onBlur={onBlur}
           aria-invalid={Boolean(error)}
           aria-describedby={error ? `${name}-error` : undefined}
-          className={`${trailingAction ? "pr-16" : ""} ${error ? "border-destructive placeholder:text-destructive focus-visible:ring-destructive" : ""}`}
+          className={`h-11 ${trailingAction ? "pr-16" : ""} ${error ? "border-destructive placeholder:text-destructive focus-visible:ring-destructive" : ""}`}
         />
         {trailingAction && (
           <button

@@ -417,6 +417,11 @@ export async function POST(
       return safe("Invalid email or password.", 401);
 
     const isFirstLogin = !user.lastLoginAt;
+    const hasClientProfile =
+      user.role !== "CLIENT" ||
+      Boolean(
+        await db.clientProfile.findFirst({ where: { userId: user.id }, select: { id: true } }),
+      );
     const nextRedirect =
       user.role === "ADMIN"
         ? "/admin"
@@ -427,8 +432,10 @@ export async function POST(
               user.professionalLatitude !== null &&
               user.professionalLongitude !== null
               ? "/professional-home"
-              : "/professional/setup"
-            : "/dashboard";
+              : "/professional/setup?profileSetup=1"
+            : hasClientProfile
+              ? "/dashboard"
+              : "/client-profile?profileSetup=1";
 
     if (!user.emailVerifiedAt) {
       const response = NextResponse.json(
@@ -520,6 +527,11 @@ export async function POST(
       return safe("Invalid phone number or verification code.", 401);
     const result = await verifyPhoneOtp(parsed.data.phone, parsed.data.code, user.role);
     if (!result.ok) return safe(result.error, result.status);
+    const hasClientProfile =
+      user.role !== "CLIENT" ||
+      Boolean(
+        await db.clientProfile.findFirst({ where: { userId: user.id }, select: { id: true } }),
+      );
     const nextRedirect = !user.emailVerifiedAt
       ? "/verify"
       : user.role === "PROFESSIONAL"
@@ -527,8 +539,10 @@ export async function POST(
           user.professionalLatitude !== null &&
           user.professionalLongitude !== null
           ? "/professional-home"
-          : "/professional/setup"
-        : "/dashboard";
+          : "/professional/setup?profileSetup=1"
+        : hasClientProfile
+          ? "/dashboard"
+          : "/client-profile?profileSetup=1";
     const response = NextResponse.json(
       !user.emailVerifiedAt
         ? {
@@ -565,6 +579,11 @@ export async function POST(
       !(await bcrypt.compare(parsed.data.password, user.passwordHash))
     )
       return safe("Invalid phone number or password.", 401);
+    const hasClientProfile =
+      user.role !== "CLIENT" ||
+      Boolean(
+        await db.clientProfile.findFirst({ where: { userId: user.id }, select: { id: true } }),
+      );
     const nextRedirect = !user.emailVerifiedAt
       ? "/verify"
       : user.role === "PROFESSIONAL"
@@ -572,8 +591,10 @@ export async function POST(
           user.professionalLatitude !== null &&
           user.professionalLongitude !== null
           ? "/professional-home"
-          : "/professional/setup"
-        : "/dashboard";
+          : "/professional/setup?profileSetup=1"
+        : hasClientProfile
+          ? "/dashboard"
+          : "/client-profile?profileSetup=1";
     const response = NextResponse.json(
       !user.emailVerifiedAt
         ? {
@@ -750,7 +771,14 @@ export async function POST(
       ]);
       const response = NextResponse.json({
         success: true,
-        redirect: user.role === "CLIENT" ? "/client-profile" : "/professional-home",
+        redirect:
+          user.role === "CLIENT"
+            ? "/client-profile"
+            : user.professionalCategory &&
+                user.professionalLatitude !== null &&
+                user.professionalLongitude !== null
+              ? "/professional-home"
+              : "/professional/setup?profileSetup=1",
       });
       response.cookies.set(
         sessionCookie,

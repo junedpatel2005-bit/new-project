@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     );
   if (parsed.data.parentId !== null) {
     const parent = await db.serviceCategory.findUnique({ where: { id: parsed.data.parentId } });
-    if (!parent || parent.parentId !== null)
+    if (!parent || parent.parentId !== null || parent.segment !== parsed.data.segment)
       return NextResponse.json(
         { error: "Choose a valid top-level category as the parent." },
         { status: 400 },

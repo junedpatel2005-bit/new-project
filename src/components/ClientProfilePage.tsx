@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -50,6 +50,7 @@ const emptyLocation = { label: "", address: "" };
 
 export function ClientProfilePage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [data, setData] = useState<Data | null>(null);
   const [form, setForm] = useState({
     firstName: "",
@@ -65,6 +66,14 @@ export function ClientProfilePage() {
   const [deleting, setDeleting] = useState<Location | null>(null);
   const [locationSaving, setLocationSaving] = useState(false);
   const [saveCurrentLocation, setSaveCurrentLocation] = useState(false);
+  const [showSetupReminder, setShowSetupReminder] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get("profileSetup") !== "1") return;
+    setShowSetupReminder(true);
+    const timeout = window.setTimeout(() => setShowSetupReminder(false), 10_000);
+    return () => window.clearTimeout(timeout);
+  }, [searchParams]);
 
   const initials = useMemo(
     () => `${form.firstName[0] ?? ""}${form.lastName[0] ?? ""}`.toUpperCase() || "C",
@@ -190,11 +199,27 @@ export function ClientProfilePage() {
     );
   return (
     <main className="mx-auto max-w-5xl space-y-6 p-4 sm:p-6">
+      {showSetupReminder ? (
+        <div
+          role="status"
+          className="fixed right-5 top-5 z-50 w-[min(360px,calc(100vw-2.5rem))] rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950 shadow-lg"
+        >
+          <p className="font-semibold">Your profile setup is remaining.</p>
+          <p className="mt-1 text-amber-800">Complete your profile to continue.</p>
+        </div>
+      ) : null}
       <header>
-        <h1 className="text-3xl font-bold tracking-tight">My Profile</h1>
-        <p className="mt-1 text-muted-foreground">
-          Manage your personal information, addresses and account details.
-        </p>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">My Profile</h1>
+            <p className="mt-1 text-muted-foreground">
+              Manage your personal information, addresses and account details.
+            </p>
+          </div>
+          <Button type="button" variant="ghost" asChild>
+            <Link href="/login?next=/client-profile&profileSetup=1">Back to login</Link>
+          </Button>
+        </div>
       </header>
       {message && (
         <p role="status" className="rounded-md border px-3 py-2 text-sm">

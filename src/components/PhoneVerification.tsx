@@ -68,14 +68,16 @@ export function PhoneVerification({
   }
 
   return (
-    <div className="space-y-2 rounded-lg border border-border p-3">
-      <Label htmlFor="profile-phone">Phone verification</Label>
-      <div className="flex gap-2">
+    <div className="space-y-3 rounded-xl border border-border/80 bg-muted/20 p-4">
+      <Label htmlFor="profile-phone" className="font-semibold">
+        Phone verification
+      </Label>
+      <div className="grid grid-cols-[104px_minmax(0,1fr)_auto] gap-2">
         <select
           value={countryCode}
           onChange={(event) => setCountryCode(event.target.value)}
           disabled={verified}
-          className="h-10 w-[104px] rounded-md border border-input bg-background px-2 text-sm"
+          className="h-11 w-[104px] rounded-lg border border-input bg-background px-2 text-sm shadow-sm outline-none transition focus:border-ring focus:ring-1 focus:ring-ring"
         >
           {countryCodes.map((country) => (
             <option key={country.code} value={country.code}>
@@ -94,6 +96,7 @@ export function PhoneVerification({
           inputMode="numeric"
           placeholder="98765 43210"
           disabled={verified}
+          className="h-11"
         />
         {!verified && (
           <Button type="button" variant="outline" onClick={sendCode} disabled={pending}>
@@ -104,13 +107,14 @@ export function PhoneVerification({
       {verified ? (
         <p className="text-sm text-primary">✓ Phone number verified</p>
       ) : sent ? (
-        <div className="flex gap-2">
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-2">
           <Input
             ref={inputRef}
             value={code}
             onChange={(event) => setCode(event.target.value.replace(/\D/g, "").slice(0, 4))}
             inputMode="numeric"
             placeholder="4-digit code"
+            className="h-11 tracking-[0.3em]"
           />
           <Button type="button" onClick={verify} disabled={pending}>
             Confirm

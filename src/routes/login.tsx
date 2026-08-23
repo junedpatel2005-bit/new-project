@@ -22,13 +22,13 @@ export default function Login() {
   const [pending, setPending] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({ email: "", password: "" });
   const [buttonScale, setButtonScale] = useState(1);
+  const [nextPath, setNextPath] = useState<string | null>(null);
+  const [profileSetupReminder, setProfileSetupReminder] = useState(false);
   const [loginMode, setLoginMode] = useState<"email" | "phone">("email");
   const [countryCode, setCountryCode] = useState("+91");
   const [phone, setPhone] = useState("");
   const [phoneCode, setPhoneCode] = useState("");
   const [phoneCodeSent, setPhoneCodeSent] = useState(false);
-  const [phoneLoginMode, setPhoneLoginMode] = useState<"otp" | "password">("otp");
-  const [phonePassword, setPhonePassword] = useState("");
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
 
@@ -43,8 +43,30 @@ export default function Login() {
   }
 
   useEffect(() => {
-    setOauthError(new URLSearchParams(window.location.search).get("oauthError"));
+    const params = new URLSearchParams(window.location.search);
+    setOauthError(params.get("oauthError"));
+    const requestedPath = params.get("next");
+    let reminderTimeout: number | undefined;
+    if (
+      params.get("profileSetup") === "1" ||
+      requestedPath === "/professional/setup" ||
+      requestedPath === "/client-profile"
+    ) {
+      setProfileSetupReminder(true);
+      reminderTimeout = window.setTimeout(() => setProfileSetupReminder(false), 10_000);
+    }
+    if (requestedPath?.startsWith("/") && !requestedPath.startsWith("//")) {
+      setNextPath(requestedPath);
+    }
+    return () => {
+      if (reminderTimeout) window.clearTimeout(reminderTimeout);
+    };
   }, []);
+
+  function getPostLoginRedirect(resultRedirect?: string) {
+    if (resultRedirect === "/verify") return resultRedirect;
+    return nextPath ?? resultRedirect ?? "/dashboard";
+  }
 
   async function submit(formData: FormData) {
     if (pending) return;
@@ -86,7 +108,7 @@ export default function Login() {
           window.setTimeout(() => window.location.assign("/verify"), 900);
         return;
       }
-      window.location.assign(result.redirect ?? "/dashboard");
+      window.location.assign(getPostLoginRedirect(result.redirect));
     } catch (caught) {
       setError(
         caught instanceof DOMException && caught.name === "AbortError"
@@ -128,31 +150,6 @@ export default function Login() {
       setError(phoneValidationMessage(countryCode));
       return;
     }
-    if (phoneLoginMode === "password") {
-      if (!phonePassword) {
-        setError("Enter your password.");
-        return;
-      }
-      setPending(true);
-      const response = await fetch("/api/v1/auth/login-phone-password", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          phone: `${countryCode}${phone.replace(/\D/g, "")}`,
-          password: phonePassword,
-        }),
-      });
-      const result = (await response.json()) as { error?: string; redirect?: string };
-      setPending(false);
-      if (!response.ok) {
-        setError(result.error ?? "Unable to sign in with your phone.");
-        if (result.redirect === "/verify")
-          window.setTimeout(() => window.location.assign("/verify"), 900);
-        return;
-      }
-      window.location.assign(result.redirect ?? "/dashboard");
-      return;
-    }
     if (!phoneCodeSent) {
       await sendPhoneCode();
       return;
@@ -178,13 +175,14 @@ export default function Login() {
         window.setTimeout(() => window.location.assign("/verify"), 900);
       return;
     }
-    window.location.assign(result.redirect ?? "/dashboard");
+    window.location.assign(getPostLoginRedirect(result.redirect));
   }
 
   return (
     <AuthLayout
       title="Welcome back"
       subtitle="Log in to continue to your dashboard."
+      hideAside
       footer={
         <>
           Don&apos;t have an account?{" "}
@@ -194,7 +192,16 @@ export default function Login() {
         </>
       }
     >
-      <div className="mb-5 grid grid-cols-2 gap-1 rounded-2xl bg-muted p-1">
+      {profileSetupReminder ? (
+        <div
+          role="status"
+          className="mb-5 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950"
+        >
+          <p className="font-semibold">Your profile setup is remaining.</p>
+          <p className="mt-1 text-amber-800">Sign in to continue setting up your profile.</p>
+        </div>
+      ) : null}
+      <div className="mb-6 grid grid-cols-2 gap-1 rounded-xl border border-border/70 bg-muted/70 p-1">
         <button
           type="button"
           onClick={() => {
@@ -202,7 +209,7 @@ export default function Login() {
             setError(null);
           }}
           className={cn(
-            "rounded-xl px-4 py-3 text-sm font-medium",
+            "rounded-lg px-4 py-2.5 text-sm font-semibold transition-all",
             loginMode === "email" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground",
           )}
         >
@@ -215,7 +222,7 @@ export default function Login() {
             setError(null);
           }}
           className={cn(
-            "rounded-xl px-4 py-3 text-sm font-medium",
+            "rounded-lg px-4 py-2.5 text-sm font-semibold transition-all",
             loginMode === "phone" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground",
           )}
         >
@@ -223,11 +230,11 @@ export default function Login() {
         </button>
       </div>
       {loginMode === "email" ? (
-        <form action={submit} className="space-y-4">
+        <form action={submit} className="space-y-5">
           <Button
             type="button"
             variant="outline"
-            className="w-full"
+            className="h-11 w-full"
             onClick={() => {
               window.location.href = "/api/v1/auth/google";
             }}
@@ -277,7 +284,7 @@ export default function Login() {
               ref={emailRef}
               placeholder="you@example.com"
               aria-invalid={Boolean(fieldErrors.email)}
-              className={fieldErrors.email ? "border-destructive" : ""}
+              className={cn("h-11", fieldErrors.email ? "border-destructive" : "")}
             />
             {fieldErrors.email ? (
               <p className="text-xs text-destructive">{fieldErrors.email}</p>
@@ -298,7 +305,7 @@ export default function Login() {
               ref={passwordRef}
               placeholder="••••••••"
               aria-invalid={Boolean(fieldErrors.password)}
-              className={fieldErrors.password ? "border-destructive" : ""}
+              className={cn("h-11", fieldErrors.password ? "border-destructive" : "")}
             />
             {fieldErrors.password ? (
               <p className="text-xs text-destructive">{fieldErrors.password}</p>
@@ -338,35 +345,7 @@ export default function Login() {
           </Button>
         </form>
       ) : (
-        <form action={() => void submitPhone()} className="space-y-4">
-          <div className="grid grid-cols-2 gap-1 rounded-xl bg-muted p-1">
-            <button
-              type="button"
-              onClick={() => {
-                setPhoneLoginMode("otp");
-                setError(null);
-              }}
-              className={cn(
-                "rounded-lg py-2 text-sm font-medium",
-                phoneLoginMode === "otp" ? "bg-card shadow-sm" : "text-muted-foreground",
-              )}
-            >
-              OTP
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setPhoneLoginMode("password");
-                setError(null);
-              }}
-              className={cn(
-                "rounded-lg py-2 text-sm font-medium",
-                phoneLoginMode === "password" ? "bg-card shadow-sm" : "text-muted-foreground",
-              )}
-            >
-              Password
-            </button>
-          </div>
+        <form action={() => void submitPhone()} className="space-y-5">
           <div className="space-y-1.5">
             <Label htmlFor="login-phone">Phone number</Label>
             <div className="flex gap-2">
@@ -376,7 +355,7 @@ export default function Login() {
                   setCountryCode(event.target.value);
                   setPhoneCodeSent(false);
                 }}
-                className="h-10 w-[104px] rounded-md border border-input bg-background px-2 text-sm"
+                className="h-11 w-[108px] rounded-lg border border-input bg-background px-2.5 text-sm shadow-sm outline-none transition focus:border-ring focus:ring-1 focus:ring-ring"
               >
                 {countryCodes.map((country) => (
                   <option key={country.code} value={country.code}>
@@ -394,11 +373,12 @@ export default function Login() {
                 type="tel"
                 inputMode="numeric"
                 placeholder="98765 43210"
+                className="h-11"
                 required
               />
             </div>
           </div>
-          {phoneLoginMode === "otp" && phoneCodeSent && (
+          {phoneCodeSent && (
             <div className="space-y-1.5">
               <Label htmlFor="phone-code">Verification code</Label>
               <Input
@@ -409,19 +389,7 @@ export default function Login() {
                 }
                 inputMode="numeric"
                 placeholder="Enter 4-digit OTP"
-                required
-              />
-            </div>
-          )}
-          {phoneLoginMode === "password" && (
-            <div className="space-y-1.5">
-              <Label htmlFor="phone-password">Password</Label>
-              <Input
-                id="phone-password"
-                value={phonePassword}
-                onChange={(event) => setPhonePassword(event.target.value)}
-                type="password"
-                placeholder="Enter your password"
+                className="h-11 tracking-[0.35em]"
                 required
               />
             </div>
@@ -436,14 +404,8 @@ export default function Login() {
               {error}
             </p>
           ) : null}
-          <Button type="submit" disabled={pending} className="w-full">
-            {pending
-              ? "Please wait…"
-              : phoneLoginMode === "password"
-                ? "Log in with password"
-                : phoneCodeSent
-                  ? "Log in with phone"
-                  : "Send OTP"}
+          <Button type="submit" disabled={pending} className="h-11 w-full">
+            {pending ? "Please wait…" : phoneCodeSent ? "Log in with OTP" : "Send OTP"}
           </Button>
         </form>
       )}

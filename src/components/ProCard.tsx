@@ -8,13 +8,17 @@ export function ProCard({
   onShowLocation,
   onCardClick,
   profileHref,
+  requireLogin = false,
 }: {
   pro: MarketplaceProfessional;
   onShowLocation?: () => void;
   onCardClick?: () => void;
   profileHref?: string;
+  requireLogin?: boolean;
 }) {
   const initial = pro.name.slice(0, 1).toUpperCase();
+  const destination = profileHref ?? `/pro/${pro.id}`;
+  const hireHref = requireLogin ? `/login?next=${encodeURIComponent(destination)}` : destination;
   return (
     <div
       className={`group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-soft transition-all hover:-translate-y-1 hover:border-primary/30 hover:shadow-elevated ${onCardClick ? "cursor-pointer" : ""}`}
@@ -125,10 +129,7 @@ export function ProCard({
             </Button>
           )}
           <Button asChild size="sm" className="bg-cta text-cta-foreground hover:bg-cta/90">
-            <Link
-              href={profileHref ?? `/pro/${pro.id}`}
-              onClick={(event) => event.stopPropagation()}
-            >
+            <Link href={hireHref} onClick={(event) => event.stopPropagation()}>
               Hire
             </Link>
           </Button>

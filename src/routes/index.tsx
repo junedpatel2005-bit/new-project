@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import type { MarketplaceProfessional } from "@/lib/types/marketplace";
 import { sanitizeInlineHtml } from "@/lib/sanitizeInlineHtml";
 
-export default function Landing() {
+export default function Landing({ isAuthenticated = false }: { isAuthenticated?: boolean }) {
   const [professionals, setProfessionals] = useState<MarketplaceProfessional[]>([]);
   const [failed, setFailed] = useState(false);
   const [pageText, setPageText] = useState<Record<string, string>>({});
@@ -236,7 +236,11 @@ export default function Landing() {
                 className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4"
               >
                 {professionals.slice(0, 4).map((professional) => (
-                  <ProCard key={professional.id} pro={professional} />
+                  <ProCard
+                    key={professional.id}
+                    pro={professional}
+                    requireLogin={!isAuthenticated}
+                  />
                 ))}
               </div>
             )}
