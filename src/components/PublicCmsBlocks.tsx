@@ -1,7 +1,9 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { createPortal } from "react-dom";
+
 type Block = {
   id: string;
   type: "text" | "image" | "table" | "button" | "video" | "spacer" | "divider";
@@ -16,20 +18,23 @@ type Block = {
   placement?: "top" | "after-1" | "after-2" | "after-3" | "bottom" | "footer";
   rows?: string[][];
 };
+
 export function PublicCmsBlocks() {
   const path = usePathname();
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [placements, setPlacements] = useState<Record<string, HTMLElement>>({});
+
   useEffect(() => {
     if (path.startsWith("/admin")) {
       setBlocks([]);
       return;
     }
     void fetch(`/api/v1/website/blocks?path=${encodeURIComponent(path)}`)
-      .then((r) => r.json())
-      .then((d) => setBlocks(Array.isArray(d.blocks) ? d.blocks : []))
+      .then((response) => response.json())
+      .then((data) => setBlocks(Array.isArray(data.blocks) ? data.blocks : []))
       .catch(() => setBlocks([]));
   }, [path]);
+
   useEffect(() => {
     if (!blocks.length) return;
     const main = document.querySelector("main");
@@ -53,16 +58,15 @@ export function PublicCmsBlocks() {
     setPlacements(next);
     return () => Object.values(next).forEach((target) => target.remove());
   }, [blocks]);
+
   if (!blocks.length) return null;
+
   const grouped = (placement: Block["placement"]) =>
     blocks.filter((block) => (block.placement ?? "footer") === placement);
   const renderBlocks = (items: Block[]) => (
     <section className="border-t border-border bg-surface">
       <div className="mx-auto max-w-7xl space-y-8 px-4 py-16 sm:px-6 lg:px-8">
         {items.map((block) => (
-    <section className="border-t border-border bg-surface">
-      <div className="mx-auto max-w-7xl space-y-8 px-4 py-16 sm:px-6 lg:px-8">
-        {blocks.map((block) => (
           <article
             key={block.id}
             className="rounded-2xl border border-border bg-card p-6 shadow-soft"
@@ -127,5 +131,17 @@ export function PublicCmsBlocks() {
         ))}
       </div>
     </section>
+  );
+
+  return (
+    <>
+      {(["top", "after-1", "after-2", "after-3", "bottom"] as const).map((placement) => {
+        const items = grouped(placement);
+        return items.length && placements[placement]
+          ? createPortal(renderBlocks(items), placements[placement], placement)
+          : null;
+      })}
+      {grouped("footer").length ? renderBlocks(grouped("footer")) : null}
+    </>
   );
 }

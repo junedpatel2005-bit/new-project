@@ -89,7 +89,13 @@ export function CmsBlockBuilder({ page }: { page: Page }) {
     setBlocks((current) => [
       ...current.slice(0, at ?? current.length),
       type === "text"
-        ? { id: makeId(), type, placement: "footer", heading: "New content block", body: "Write your content here." }
+        ? {
+            id: makeId(),
+            type,
+            placement: "footer",
+            heading: "New content block",
+            body: "Write your content here.",
+          }
         : type === "image"
           ? {
               id: makeId(),
@@ -147,6 +153,13 @@ export function CmsBlockBuilder({ page }: { page: Page }) {
       next.splice(targetIndex, 0, dragged);
       return next;
     });
+    setDraggingIndex(null);
+  };
+  const placeAt = (placement: NonNullable<Block["placement"]>) => {
+    if (draggingIndex === null) return;
+    setBlocks((current) =>
+      current.map((block, index) => (index === draggingIndex ? { ...block, placement } : block)),
+    );
     setDraggingIndex(null);
   };
   const remove = async (index: number) => {
@@ -234,6 +247,30 @@ export function CmsBlockBuilder({ page }: { page: Page }) {
             Divider
           </Button>
         </div>
+      </div>
+      <div className="mt-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+        {(
+          [
+            ["top", "Top of page"],
+            ["after-1", "After section 1"],
+            ["after-2", "After section 2"],
+            ["after-3", "After section 3"],
+            ["bottom", "Before footer"],
+            ["footer", "Footer content"],
+          ] as const
+        ).map(([placement, label]) => (
+          <div
+            key={placement}
+            onDragOver={(event) => event.preventDefault()}
+            onDrop={(event) => {
+              event.preventDefault();
+              placeAt(placement);
+            }}
+            className={`rounded-xl border border-dashed px-3 py-3 text-center text-xs font-semibold transition-colors ${draggingIndex !== null ? "border-indigo-400 bg-indigo-500/10 text-indigo-200" : "border-white/15 text-slate-500"}`}
+          >
+            Drop here: {label}
+          </div>
+        ))}
       </div>
       <div className="mt-5 space-y-4">
         {blocks.map((block, index) => (
