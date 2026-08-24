@@ -110,8 +110,15 @@ export function MessagesWorkspace({ admin = false }: { admin?: boolean }) {
       method: "PATCH",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ conversationId: selected.conversationId }),
-    }).then(() => window.dispatchEvent(new CustomEvent("servio:message-read")));
-  }, [selected?.conversationId]);
+    }).then(() => {
+      setContacts((current) =>
+        current.map((contact) =>
+          contact.id === selected.id ? { ...contact, unreadCount: 0 } : contact,
+        ),
+      );
+      window.dispatchEvent(new CustomEvent("servio:message-read"));
+    });
+  }, [selected?.conversationId, selected?.id]);
 
   async function send(event: FormEvent) {
     event.preventDefault();
