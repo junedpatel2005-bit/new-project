@@ -524,6 +524,7 @@ export async function GET(
             budgetMax: true,
             hourlyRate: true,
             timingType: true,
+            paymentMethod: true,
           },
         }),
         db.user.findUnique({
