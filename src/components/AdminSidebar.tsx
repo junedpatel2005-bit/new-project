@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useDatabaseStatus } from "@/hooks/use-database-status";
 import {
   BarChart3,
@@ -20,21 +21,51 @@ import {
 
 const links = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard },
-  { href: "/admin/users", label: "Users", icon: UsersRound },
-  { href: "/admin/verifications", label: "Verification", icon: ShieldCheck },
-  { href: "/admin/operations", label: "Jobs & disputes", icon: BriefcaseBusiness },
+  { href: "/admin/users", label: "Users", icon: UsersRound, badge: "newUsers" },
+  { href: "/admin/verifications", label: "Verification", icon: ShieldCheck, badge: "verification" },
+  { href: "/admin/operations", label: "Jobs & disputes", icon: BriefcaseBusiness, badge: "jobs" },
   { href: "/admin/services", label: "Services", icon: Wrench },
   { href: "/admin/finance", label: "Finance & payouts", icon: CircleDollarSign },
   { href: "/admin/reports", label: "Reports", icon: FileBarChart },
   { href: "/admin/support", label: "Support", icon: FileText },
-  { href: "/admin/notifications", label: "Notifications", icon: Bell },
-  { href: "/admin/messages", label: "Messages", icon: MessageSquare },
+  { href: "/admin/notifications", label: "Notifications", icon: Bell, badge: "notifications" },
+  { href: "/admin/messages", label: "Messages", icon: MessageSquare, badge: "messages" },
   { href: "/admin/cms", label: "CMS", icon: FileText },
 ];
 
 export function AdminSidebar() {
   const pathname = usePathname();
   const dbStatus = useDatabaseStatus();
+  const [counts, setCounts] = useState<Record<string, number>>({});
+  useEffect(() => {
+    const load = () => {
+      void fetch("/api/admin/sidebar-counts", { cache: "no-store" })
+        .then((response) => (response.ok ? response.json() : null))
+        .then((data: Record<string, number> | null) => setCounts(data ?? {}))
+        .catch(() => setCounts({}));
+    };
+    load();
+    window.addEventListener("servio:notification", load);
+    window.addEventListener("servio:message", load);
+    window.addEventListener("servio:message-read", load);
+    window.addEventListener("servio:notifications-read", load);
+    window.addEventListener("focus", load);
+    return () => {
+      window.removeEventListener("servio:notification", load);
+      window.removeEventListener("servio:message", load);
+      window.removeEventListener("servio:message-read", load);
+      window.removeEventListener("servio:notifications-read", load);
+      window.removeEventListener("focus", load);
+    };
+  }, []);
+  useEffect(() => {
+    if (pathname !== "/admin/users") return;
+    void fetch("/api/admin/sidebar-counts", {
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ section: "users" }),
+    }).then(() => window.dispatchEvent(new Event("servio:notifications-read")));
+  }, [pathname]);
   return (
     <aside className="fixed inset-y-0 hidden w-64 border-r border-white/10 bg-[#11182b] p-5 lg:block">
       <div className="flex items-center gap-3 px-2">
@@ -49,6 +80,7 @@ export function AdminSidebar() {
       <nav className="mt-10 space-y-1">
         {links.map((link) => {
           const active = pathname === link.href;
+          const badgeCount = link.badge ? (counts[link.badge] ?? 0) : 0;
           return (
             <Link
               key={link.href}
@@ -57,7 +89,14 @@ export function AdminSidebar() {
             >
               <link.icon className="h-4 w-4" />
               {link.label}
-              {active && <ChevronRight className="ml-auto h-4 w-4" />}
+              {badgeCount > 0 && !active && (
+                <span
+                  className={`ml-auto grid h-5 min-w-5 place-items-center rounded-full px-1 text-[10px] font-bold ${active ? "bg-white text-indigo-600" : "bg-indigo-500 text-white"}`}
+                >
+                  {badgeCount > 99 ? "99+" : badgeCount}
+                </span>
+              )}
+              {active && <ChevronRight className="ml-2 h-4 w-4" />}
             </Link>
           );
         })}

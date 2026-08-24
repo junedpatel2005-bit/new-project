@@ -115,29 +115,68 @@ export async function GET(request: NextRequest) {
     _count: { _all: true },
   });
   const unreadCounts = new Map(unreadBySender.map((item) => [item.senderId, item._count._all]));
-  return NextResponse.json({
-    role: session.role,
-    contacts: contacts.map((contact) => {
-      const conversation = conversations.find(
-        (item) =>
-          (item.userAId === session.userId && item.userBId === contact.id) ||
-          (item.userAId === contact.id && item.userBId === session.userId),
-      );
-      return {
-        ...contact,
-        name: `${contact.firstName} ${contact.lastName}`.trim(),
-        conversationId: conversation?.id ?? null,
-        lastMessage: conversation?.messages[0] ?? null,
-        unreadCount: unreadCounts.get(contact.id) ?? 0,
-      };
-    }),
+  const contactRows = contacts.map((contact) => {
+    const conversation = conversations.find(
+      (item) =>
+        (item.userAId === session.userId && item.userBId === contact.id) ||
+        (item.userAId === contact.id && item.userBId === session.userId),
+    );
+    return {
+      ...contact,
+      name: `${contact.firstName} ${contact.lastName}`.trim(),
+      conversationId: conversation?.id ?? null,
+      lastMessage: conversation?.messages[0] ?? null,
+      unreadCount: unreadCounts.get(contact.id) ?? 0,
+    };
   });
+  contactRows.sort((first, second) => {
+    const firstTime = first.lastMessage?.createdAt
+      ? new Date(first.lastMessage.createdAt).getTime()
+      : 0;
+    const secondTime = second.lastMessage?.createdAt
+      ? new Date(second.lastMessage.createdAt).getTime()
+      : 0;
+    if (firstTime !== secondTime) return secondTime - firstTime;
+    return first.name.localeCompare(second.name);
+  });
+  return NextResponse.json({ role: session.role, contacts: contactRows });
 }
 
 export async function PATCH(request: NextRequest) {
   const session = await getSession(request);
   if (!session) return NextResponse.json({ error: "Sign-in required." }, { status: 401 });
-  const body = (await request.json()) as { conversationId?: string };
+  const body = (await request.json()) as { conversationId?: string; all?: boolean };
+  if (body.all === true) {
+    const unreadMessages = await db.socketMessage.findMany({
+      where: { receiverId: session.userId, readAt: null },
+      select: { id: true, senderId: true, conversationId: true },
+    });
+    await db.socketMessage.updateMany({
+      where: { receiverId: session.userId, readAt: null },
+      data: { readAt: new Date() },
+    });
+    const readAt = new Date().toISOString();
+    const bySender = new Map<number, { messageIds: string[]; conversationIds: Set<string> }>();
+    for (const message of unreadMessages) {
+      const entry = bySender.get(message.senderId) ?? {
+        messageIds: [],
+        conversationIds: new Set<string>(),
+      };
+      entry.messageIds.push(message.id);
+      entry.conversationIds.add(message.conversationId);
+      bySender.set(message.senderId, entry);
+    }
+    for (const [senderId, entry] of bySender) {
+      for (const conversationId of entry.conversationIds) {
+        emitRealtimeMessageRead([senderId], {
+          conversationId,
+          messageIds: entry.messageIds,
+          readAt,
+        });
+      }
+    }
+    return NextResponse.json({ success: true });
+  }
   if (!body.conversationId)
     return NextResponse.json({ error: "Conversation is required." }, { status: 400 });
   const conversation = await db.socketConversation.findUnique({
@@ -239,7 +278,12 @@ export async function POST(request: NextRequest) {
     type: "NEW_MESSAGE",
     title: `New message from ${senderName}`,
     description: text.length > 120 ? `${text.slice(0, 117)}…` : text,
-    href: recipient.role === "ADMIN" ? "/admin/messages" : recipient.role === "PROFESSIONAL" ? "/professional/messages" : "/messages",
+    href:
+      recipient.role === "ADMIN"
+        ? "/admin/messages"
+        : recipient.role === "PROFESSIONAL"
+          ? "/professional/messages"
+          : "/messages",
   };
   await db.userNotification.create({ data: { userId: recipientId, ...notification } });
   emitRealtimeNotification([recipientId], notification);

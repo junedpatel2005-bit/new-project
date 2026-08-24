@@ -66,7 +66,17 @@ export function MessagesWorkspace({ admin = false }: { admin?: boolean }) {
       .catch((reason: unknown) =>
         setError(reason instanceof Error ? reason.message : "Unable to load messages."),
       )
-      .finally(() => setLoading(false));
+      .finally(() => {
+        setLoading(false);
+        void fetch("/api/v1/messages", {
+          method: "PATCH",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ all: true }),
+        }).then(() => {
+          setContacts((current) => current.map((contact) => ({ ...contact, unreadCount: 0 })));
+          window.dispatchEvent(new CustomEvent("servio:message-read"));
+        });
+      });
     const socket = io({ path: "/api/realtime", withCredentials: true });
     socket.on("message:new", (message: ChatMessage) => {
       setMessages((current) =>
@@ -332,10 +342,12 @@ export function MessagesWorkspace({ admin = false }: { admin?: boolean }) {
                             })}
                           </span>
                           {message.senderId === myUserId && (
-                            <CheckCheck
-                              className={`ml-1 inline-block h-3.5 w-3.5 align-[-3px] ${message.readAt ? "text-sky-300" : admin ? "text-white/70" : "text-primary-foreground/70"}`}
-                              aria-label={message.readAt ? "Seen" : "Sent"}
-                            />
+                            <span title={message.readAt ? "Seen" : "Sent"}>
+                              <CheckCheck
+                                className={`ml-1 inline-block h-4 w-4 align-[-3px] stroke-[3] ${message.readAt ? "text-[#55e6ff] drop-shadow-[0_0_3px_rgba(85,230,255,.75)]" : "text-white"}`}
+                                aria-label={message.readAt ? "Seen" : "Sent"}
+                              />
+                            </span>
                           )}
                         </p>
                       </div>

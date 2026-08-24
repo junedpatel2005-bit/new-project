@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { Bell, Search } from "lucide-react";
 import { ClientAccountMenu } from "@/components/ClientAccountMenu";
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,7 @@ type DashboardNotification = {
 };
 
 export function AppHeader({ role }: { role?: string }) {
+  const pathname = usePathname();
   const [unreadNotifications, setUnreadNotifications] = useState(0);
 
   const loadNotifications = useCallback(async () => {
@@ -33,9 +35,11 @@ export function AppHeader({ role }: { role?: string }) {
     void loadNotifications();
     window.addEventListener("servio:notification", loadNotifications);
     window.addEventListener("servio:message-read", loadNotifications);
+    window.addEventListener("servio:notifications-read", loadNotifications);
     return () => {
       window.removeEventListener("servio:message-read", loadNotifications);
       window.removeEventListener("servio:notification", loadNotifications);
+      window.removeEventListener("servio:notifications-read", loadNotifications);
     };
   }, [loadNotifications]);
 
@@ -63,7 +67,7 @@ export function AppHeader({ role }: { role?: string }) {
         aria-label="Notifications"
       >
         <Bell className="h-4 w-4" />
-        {unreadNotifications > 0 && (
+        {unreadNotifications > 0 && !pathname.startsWith("/notifications") && (
           <span className="absolute right-2 top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-cta px-1 text-[10px] font-bold text-cta-foreground">
             {unreadNotifications > 9 ? "9+" : unreadNotifications}
           </span>
