@@ -51,6 +51,7 @@ body:has(.cms-live-editable) button {
 .cms-format-toolbar {
   position: absolute;
   z-index: 9999;
+  display: none !important;
   gap: 2px;
   padding: 4px;
   border-radius: 8px;
