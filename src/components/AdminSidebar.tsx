@@ -12,6 +12,7 @@ import {
   FileBarChart,
   FileText,
   LayoutDashboard,
+  MessageSquare,
   ShieldCheck,
   UsersRound,
   Wrench,
@@ -27,6 +28,7 @@ const links = [
   { href: "/admin/reports", label: "Reports", icon: FileBarChart },
   { href: "/admin/support", label: "Support", icon: FileText },
   { href: "/admin/notifications", label: "Notifications", icon: Bell },
+  { href: "/admin/messages", label: "Messages", icon: MessageSquare },
   { href: "/admin/cms", label: "CMS", icon: FileText },
 ];
 

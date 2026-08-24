@@ -1,0 +1,173 @@
+import { randomUUID } from "node:crypto";
+import { NextRequest, NextResponse } from "next/server";
+import { db } from "@/lib/db";
+import { sessionCookie, verifySession } from "@/lib/auth";
+import { emitRealtimeMessage } from "@/lib/realtime";
+
+async function getSession(request: NextRequest) {
+  const token = request.cookies.get(sessionCookie)?.value;
+  if (!token) return null;
+  try {
+    return await verifySession(token);
+  } catch {
+    return null;
+  }
+}
+
+function pairWhere(firstId: number, secondId: number) {
+  return {
+    OR: [
+      { userAId: firstId, userBId: secondId },
+      { userAId: secondId, userBId: firstId },
+    ],
+  };
+}
+
+export async function GET(request: NextRequest) {
+  const session = await getSession(request);
+  if (!session) return NextResponse.json({ error: "Sign-in required." }, { status: 401 });
+
+  const conversationId = request.nextUrl.searchParams.get("conversationId");
+  if (conversationId) {
+    const conversation = await db.socketConversation.findUnique({
+      where: { id: conversationId },
+      include: { messages: { orderBy: { createdAt: "asc" }, take: 100 } },
+    });
+    if (!conversation)
+      return NextResponse.json({ error: "Conversation not found." }, { status: 404 });
+    const allowed =
+      session.role === "ADMIN" ||
+      conversation.userAId === session.userId ||
+      conversation.userBId === session.userId;
+    if (!allowed)
+      return NextResponse.json({ error: "Conversation access denied." }, { status: 403 });
+    return NextResponse.json({ conversation });
+  }
+
+  const activeProjects =
+    session.role === "ADMIN"
+      ? []
+      : await db.projectTracking.findMany({
+          where: {
+            ...(session.role === "CLIENT"
+              ? { clientId: session.userId }
+              : { professionalId: session.userId }),
+            status: { not: "COMPLETED" },
+          },
+          select: { clientId: true, professionalId: true },
+        });
+
+  const contactIds =
+    session.role === "ADMIN"
+      ? undefined
+      : [
+          ...new Set(
+            activeProjects.map((project) =>
+              session.role === "CLIENT" ? project.professionalId : project.clientId,
+            ),
+          ),
+        ];
+  const contacts = await db.user.findMany({
+    where: {
+      ...(session.role === "ADMIN"
+        ? { role: { in: ["CLIENT", "PROFESSIONAL"] } }
+        : { id: { in: contactIds ?? [] } }),
+      isActive: true,
+    },
+    select: { id: true, firstName: true, lastName: true, avatarUrl: true, role: true },
+    orderBy: { firstName: "asc" },
+  });
+
+  const conversations = await db.socketConversation.findMany({
+    where:
+      session.role === "ADMIN"
+        ? {}
+        : { OR: [{ userAId: session.userId }, { userBId: session.userId }] },
+    orderBy: { updatedAt: "desc" },
+    include: { messages: { orderBy: { createdAt: "desc" }, take: 1 } },
+  });
+  return NextResponse.json({
+    role: session.role,
+    contacts: contacts.map((contact) => {
+      const conversation = conversations.find(
+        (item) =>
+          (item.userAId === session.userId && item.userBId === contact.id) ||
+          (item.userAId === contact.id && item.userBId === session.userId),
+      );
+      return {
+        ...contact,
+        name: `${contact.firstName} ${contact.lastName}`.trim(),
+        conversationId: conversation?.id ?? null,
+        lastMessage: conversation?.messages[0] ?? null,
+      };
+    }),
+  });
+}
+
+export async function POST(request: NextRequest) {
+  const session = await getSession(request);
+  if (!session) return NextResponse.json({ error: "Sign-in required." }, { status: 401 });
+  const body = (await request.json()) as { recipientId?: number; text?: string; job?: string };
+  const recipientId = Number(body.recipientId);
+  const text = body.text?.trim() ?? "";
+  if (!Number.isSafeInteger(recipientId) || !text) {
+    return NextResponse.json({ error: "Recipient and message are required." }, { status: 400 });
+  }
+  const recipient = await db.user.findUnique({
+    where: { id: recipientId },
+    select: { id: true, role: true, firstName: true, lastName: true, avatarUrl: true },
+  });
+  if (!recipient || recipient.role === "ADMIN") {
+    return NextResponse.json({ error: "Recipient is unavailable." }, { status: 404 });
+  }
+  if (session.role !== "ADMIN") {
+    const activeProject = await db.projectTracking.findFirst({
+      where: {
+        status: { not: "COMPLETED" },
+        ...(session.role === "CLIENT"
+          ? { clientId: session.userId, professionalId: recipientId }
+          : { professionalId: session.userId, clientId: recipientId }),
+      },
+    });
+    if (!activeProject) {
+      return NextResponse.json(
+        { error: "Messaging is available for running projects only." },
+        { status: 403 },
+      );
+    }
+  }
+  const existing = await db.socketConversation.findFirst({
+    where: pairWhere(session.userId, recipientId),
+  });
+  const conversation =
+    existing ??
+    (await db.socketConversation.create({
+      data: {
+        id: randomUUID(),
+        userAId: session.userId,
+        userBId: recipientId,
+        userAName: "User",
+        userBName: `${recipient.firstName} ${recipient.lastName}`.trim(),
+        userBAvatarUrl: recipient.avatarUrl,
+        job: body.job?.trim() || "Project conversation",
+      },
+    }));
+  const message = await db.socketMessage.create({
+    data: {
+      id: randomUUID(),
+      conversationId: conversation.id,
+      senderId: session.userId,
+      receiverId: recipientId,
+      body: text,
+    },
+  });
+  await db.socketConversation.update({
+    where: { id: conversation.id },
+    data: { updatedAt: new Date() },
+  });
+  emitRealtimeMessage([session.userId, recipientId], {
+    ...message,
+    conversationId: conversation.id,
+  });
+  return NextResponse.json({ conversationId: conversation.id, message });
+}

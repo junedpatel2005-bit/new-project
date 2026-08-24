@@ -1,5 +1,5 @@
 import { MessagesWorkspace } from "@/components/MessagesWorkspace";
 
-export default function ClientMessagesPage() {
+export default function ProfessionalMessagesPage() {
   return <MessagesWorkspace />;
 }

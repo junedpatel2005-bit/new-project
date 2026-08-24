@@ -9,7 +9,7 @@ export type RealtimeNotification = {
 };
 
 type RealtimeServer = {
-  to(room: string): { emit(event: "notification:new", payload: RealtimeNotification): void };
+  to(room: string): { emit(event: string, payload: unknown): void };
 };
 
 declare global {
@@ -24,4 +24,10 @@ export function emitRealtimeNotification(
   if (!io) return;
   const payload = { ...notification, createdAt: new Date().toISOString() };
   for (const userId of userIds) io.to(`user:${userId}`).emit("notification:new", payload);
+}
+
+export function emitRealtimeMessage(userIds: number[], payload: unknown) {
+  const io = globalThis.__servioIo;
+  if (!io) return;
+  for (const userId of userIds) io.to(`user:${userId}`).emit("message:new", payload);
 }
