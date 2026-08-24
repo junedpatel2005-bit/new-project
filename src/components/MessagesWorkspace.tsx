@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { io } from "socket.io-client";
-import { MessageCircle, Send, Search, ShieldCheck } from "lucide-react";
+import { CheckCheck, MessageCircle, Send, Search, ShieldCheck } from "lucide-react";
 
 type Contact = {
   id: number;
@@ -22,6 +22,7 @@ type ChatMessage = {
   receiverId: number;
   body: string;
   createdAt: string;
+  readAt: string | null;
 };
 
 function initials(name: string) {
@@ -73,6 +74,19 @@ export function MessagesWorkspace({ admin = false }: { admin?: boolean }) {
       );
       void loadContacts().catch(() => undefined);
     });
+    socket.on(
+      "message:read",
+      (receipt: { conversationId: string; messageIds: string[]; readAt: string }) => {
+        setMessages((current) =>
+          current.map((message) =>
+            receipt.conversationId === message.conversationId &&
+            receipt.messageIds.includes(message.id)
+              ? { ...message, readAt: receipt.readAt }
+              : message,
+          ),
+        );
+      },
+    );
     return () => {
       socket.disconnect();
     };
@@ -311,10 +325,18 @@ export function MessagesWorkspace({ admin = false }: { admin?: boolean }) {
                         <p
                           className={`mt-1 text-[10px] ${message.senderId === myUserId ? (admin ? "text-white/70" : "text-primary-foreground/70") : admin ? "text-slate-400" : "text-muted-foreground"}`}
                         >
-                          {new Date(message.createdAt).toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
+                          <span>
+                            {new Date(message.createdAt).toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </span>
+                          {message.senderId === myUserId && (
+                            <CheckCheck
+                              className={`ml-1 inline-block h-3.5 w-3.5 align-[-3px] ${message.readAt ? "text-sky-300" : admin ? "text-white/70" : "text-primary-foreground/70"}`}
+                              aria-label={message.readAt ? "Seen" : "Sent"}
+                            />
+                          )}
                         </p>
                       </div>
                     </div>

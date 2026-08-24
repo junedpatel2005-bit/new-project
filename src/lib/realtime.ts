@@ -31,3 +31,9 @@ export function emitRealtimeMessage(userIds: number[], payload: unknown) {
   if (!io) return;
   for (const userId of userIds) io.to(`user:${userId}`).emit("message:new", payload);
 }
+
+export function emitRealtimeMessageRead(userIds: number[], payload: unknown) {
+  const io = globalThis.__servioIo;
+  if (!io) return;
+  for (const userId of userIds) io.to(`user:${userId}`).emit("message:read", payload);
+}

@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { sessionCookie, verifySession } from "@/lib/auth";
-import { emitRealtimeMessage } from "@/lib/realtime";
+import { emitRealtimeMessage, emitRealtimeMessageRead } from "@/lib/realtime";
 
 async function getSession(request: NextRequest) {
   const token = request.cookies.get(sessionCookie)?.value;
@@ -148,9 +148,19 @@ export async function PATCH(request: NextRequest) {
   ) {
     return NextResponse.json({ error: "Conversation access denied." }, { status: 403 });
   }
+  const unreadMessages = await db.socketMessage.findMany({
+    where: { conversationId: body.conversationId, receiverId: session.userId, readAt: null },
+    select: { id: true, senderId: true },
+  });
   await db.socketMessage.updateMany({
     where: { conversationId: body.conversationId, receiverId: session.userId, readAt: null },
     data: { readAt: new Date() },
+  });
+  const readAt = new Date().toISOString();
+  emitRealtimeMessageRead([...new Set(unreadMessages.map((message) => message.senderId))], {
+    conversationId: body.conversationId,
+    messageIds: unreadMessages.map((message) => message.id),
+    readAt,
   });
   return NextResponse.json({ success: true });
 }
