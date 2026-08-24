@@ -1,13 +1,38 @@
 "use client";
 
 import Link from "next/link";
-import type { ElementType } from "react";
+import { useEffect, useState, type ElementType } from "react";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 
 export type NavigationItem = { to: string; icon: ElementType; label: string };
 
+function useUnreadMessages() {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    const load = () => {
+      void fetch("/api/v1/messages", { cache: "no-store" })
+        .then((response) => (response.ok ? response.json() : null))
+        .then((data: { contacts?: { unreadCount?: number }[] } | null) =>
+          setCount(
+            data?.contacts?.reduce((total, contact) => total + (contact.unreadCount ?? 0), 0) ?? 0,
+          ),
+        )
+        .catch(() => setCount(0));
+    };
+    load();
+    window.addEventListener("servio:message", load);
+    window.addEventListener("servio:message-read", load);
+    return () => {
+      window.removeEventListener("servio:message", load);
+      window.removeEventListener("servio:message-read", load);
+    };
+  }, []);
+  return count;
+}
+
 export function AppSidebar({ items, pathname }: { items: NavigationItem[]; pathname: string }) {
+  const unreadMessages = useUnreadMessages();
   return (
     <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-border bg-surface lg:block">
       <div className="flex h-16 items-center px-5">
@@ -24,6 +49,11 @@ export function AppSidebar({ items, pathname }: { items: NavigationItem[]; pathn
             >
               <item.icon className="h-4 w-4" />
               {item.label}
+              {item.label === "Messages" && unreadMessages > 0 && (
+                <span className="ml-auto grid h-5 min-w-5 place-items-center rounded-full bg-cta px-1 text-[10px] font-bold text-cta-foreground">
+                  {unreadMessages > 99 ? "99+" : unreadMessages}
+                </span>
+              )}
             </Link>
           );
         })}
@@ -39,6 +69,7 @@ export function AppMobileNavigation({
   items: NavigationItem[];
   pathname: string;
 }) {
+  const unreadMessages = useUnreadMessages();
   return (
     <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface/95 backdrop-blur-md lg:hidden">
       <div className="grid grid-cols-6">
@@ -51,6 +82,11 @@ export function AppMobileNavigation({
               className={`flex flex-col items-center justify-center gap-0.5 py-2.5 text-[11px] transition-colors ${active ? "text-primary" : "text-muted-foreground"}`}
             >
               <item.icon className="h-5 w-5" />
+              {item.label === "Messages" && unreadMessages > 0 && (
+                <span className="absolute ml-5 mt-[-18px] grid h-4 min-w-4 place-items-center rounded-full bg-cta px-1 text-[9px] font-bold text-cta-foreground">
+                  {unreadMessages > 99 ? "99+" : unreadMessages}
+                </span>
+              )}
               {item.label}
             </Link>
           );

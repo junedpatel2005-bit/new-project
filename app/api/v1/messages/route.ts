@@ -86,6 +86,12 @@ export async function GET(request: NextRequest) {
     orderBy: { updatedAt: "desc" },
     include: { messages: { orderBy: { createdAt: "desc" }, take: 1 } },
   });
+  const unreadBySender = await db.socketMessage.groupBy({
+    by: ["senderId"],
+    where: { receiverId: session.userId, readAt: null },
+    _count: { _all: true },
+  });
+  const unreadCounts = new Map(unreadBySender.map((item) => [item.senderId, item._count._all]));
   return NextResponse.json({
     role: session.role,
     contacts: contacts.map((contact) => {
@@ -99,9 +105,35 @@ export async function GET(request: NextRequest) {
         name: `${contact.firstName} ${contact.lastName}`.trim(),
         conversationId: conversation?.id ?? null,
         lastMessage: conversation?.messages[0] ?? null,
+        unreadCount: unreadCounts.get(contact.id) ?? 0,
       };
     }),
   });
+}
+
+export async function PATCH(request: NextRequest) {
+  const session = await getSession(request);
+  if (!session) return NextResponse.json({ error: "Sign-in required." }, { status: 401 });
+  const body = (await request.json()) as { conversationId?: string };
+  if (!body.conversationId)
+    return NextResponse.json({ error: "Conversation is required." }, { status: 400 });
+  const conversation = await db.socketConversation.findUnique({
+    where: { id: body.conversationId },
+  });
+  if (!conversation)
+    return NextResponse.json({ error: "Conversation not found." }, { status: 404 });
+  if (
+    session.role !== "ADMIN" &&
+    conversation.userAId !== session.userId &&
+    conversation.userBId !== session.userId
+  ) {
+    return NextResponse.json({ error: "Conversation access denied." }, { status: 403 });
+  }
+  await db.socketMessage.updateMany({
+    where: { conversationId: body.conversationId, receiverId: session.userId, readAt: null },
+    data: { readAt: new Date() },
+  });
+  return NextResponse.json({ success: true });
 }
 
 export async function POST(request: NextRequest) {

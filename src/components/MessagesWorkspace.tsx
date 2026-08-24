@@ -13,6 +13,7 @@ type Contact = {
   role: "CLIENT" | "PROFESSIONAL";
   conversationId: string | null;
   lastMessage: { body: string; createdAt: string } | null;
+  unreadCount: number;
 };
 type ChatMessage = {
   id: string;
@@ -99,6 +100,11 @@ export function MessagesWorkspace({ admin = false }: { admin?: boolean }) {
         setMessages(data.conversation?.messages ?? []),
       )
       .catch(() => setError("Unable to open this conversation."));
+    void fetch("/api/v1/messages", {
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ conversationId: selected.conversationId }),
+    }).then(() => window.dispatchEvent(new CustomEvent("servio:message-read")));
   }, [selected?.conversationId]);
 
   async function send(event: FormEvent) {
@@ -199,11 +205,18 @@ export function MessagesWorkspace({ admin = false }: { admin?: boolean }) {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2">
                       <p className="truncate text-sm font-semibold">{contact.name}</p>
-                      {contact.lastMessage && (
-                        <span className="text-[10px] text-muted-foreground">
-                          {new Date(contact.lastMessage.createdAt).toLocaleDateString()}
-                        </span>
-                      )}
+                      <div className="flex items-center gap-2">
+                        {contact.lastMessage && (
+                          <span className="text-[10px] text-muted-foreground">
+                            {new Date(contact.lastMessage.createdAt).toLocaleDateString()}
+                          </span>
+                        )}
+                        {contact.unreadCount > 0 && (
+                          <span className="grid h-5 min-w-5 place-items-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
+                            {contact.unreadCount > 99 ? "99+" : contact.unreadCount}
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <p className="truncate text-xs text-muted-foreground">
                       {contact.lastMessage?.body ?? "Start a conversation"}

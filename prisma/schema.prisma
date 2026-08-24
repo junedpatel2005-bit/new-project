@@ -533,6 +533,7 @@ model SocketMessage {
   body           String
   kind           String             @default("text")
   createdAt      DateTime           @default(now())
+  readAt         DateTime?
   conversation   SocketConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
   @@index([conversationId])

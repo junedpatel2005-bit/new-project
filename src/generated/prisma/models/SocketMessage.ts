@@ -44,6 +44,7 @@ export type SocketMessageMinAggregateOutputType = {
   body: string | null
   kind: string | null
   createdAt: Date | null
+  readAt: Date | null
 }
 
 export type SocketMessageMaxAggregateOutputType = {
@@ -54,6 +55,7 @@ export type SocketMessageMaxAggregateOutputType = {
   body: string | null
   kind: string | null
   createdAt: Date | null
+  readAt: Date | null
 }
 
 export type SocketMessageCountAggregateOutputType = {
@@ -64,6 +66,7 @@ export type SocketMessageCountAggregateOutputType = {
   body: number
   kind: number
   createdAt: number
+  readAt: number
   _all: number
 }
 
@@ -86,6 +89,7 @@ export type SocketMessageMinAggregateInputType = {
   body?: true
   kind?: true
   createdAt?: true
+  readAt?: true
 }
 
 export type SocketMessageMaxAggregateInputType = {
@@ -96,6 +100,7 @@ export type SocketMessageMaxAggregateInputType = {
   body?: true
   kind?: true
   createdAt?: true
+  readAt?: true
 }
 
 export type SocketMessageCountAggregateInputType = {
@@ -106,6 +111,7 @@ export type SocketMessageCountAggregateInputType = {
   body?: true
   kind?: true
   createdAt?: true
+  readAt?: true
   _all?: true
 }
 
@@ -203,6 +209,7 @@ export type SocketMessageGroupByOutputType = {
   body: string
   kind: string
   createdAt: Date
+  readAt: Date | null
   _count: SocketMessageCountAggregateOutputType | null
   _avg: SocketMessageAvgAggregateOutputType | null
   _sum: SocketMessageSumAggregateOutputType | null
@@ -236,6 +243,7 @@ export type SocketMessageWhereInput = {
   body?: Prisma.StringFilter<"SocketMessage"> | string
   kind?: Prisma.StringFilter<"SocketMessage"> | string
   createdAt?: Prisma.DateTimeFilter<"SocketMessage"> | Date | string
+  readAt?: Prisma.DateTimeNullableFilter<"SocketMessage"> | Date | string | null
   conversation?: Prisma.XOR<Prisma.SocketConversationScalarRelationFilter, Prisma.SocketConversationWhereInput>
 }
 
@@ -247,6 +255,7 @@ export type SocketMessageOrderByWithRelationInput = {
   body?: Prisma.SortOrder
   kind?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  readAt?: Prisma.SortOrderInput | Prisma.SortOrder
   conversation?: Prisma.SocketConversationOrderByWithRelationInput
 }
 
@@ -261,6 +270,7 @@ export type SocketMessageWhereUniqueInput = Prisma.AtLeast<{
   body?: Prisma.StringFilter<"SocketMessage"> | string
   kind?: Prisma.StringFilter<"SocketMessage"> | string
   createdAt?: Prisma.DateTimeFilter<"SocketMessage"> | Date | string
+  readAt?: Prisma.DateTimeNullableFilter<"SocketMessage"> | Date | string | null
   conversation?: Prisma.XOR<Prisma.SocketConversationScalarRelationFilter, Prisma.SocketConversationWhereInput>
 }, "id">
 
@@ -272,6 +282,7 @@ export type SocketMessageOrderByWithAggregationInput = {
   body?: Prisma.SortOrder
   kind?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  readAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.SocketMessageCountOrderByAggregateInput
   _avg?: Prisma.SocketMessageAvgOrderByAggregateInput
   _max?: Prisma.SocketMessageMaxOrderByAggregateInput
@@ -290,6 +301,7 @@ export type SocketMessageScalarWhereWithAggregatesInput = {
   body?: Prisma.StringWithAggregatesFilter<"SocketMessage"> | string
   kind?: Prisma.StringWithAggregatesFilter<"SocketMessage"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"SocketMessage"> | Date | string
+  readAt?: Prisma.DateTimeNullableWithAggregatesFilter<"SocketMessage"> | Date | string | null
 }
 
 export type SocketMessageCreateInput = {
@@ -299,6 +311,7 @@ export type SocketMessageCreateInput = {
   body: string
   kind?: string
   createdAt?: Date | string
+  readAt?: Date | string | null
   conversation: Prisma.SocketConversationCreateNestedOneWithoutMessagesInput
 }
 
@@ -310,6 +323,7 @@ export type SocketMessageUncheckedCreateInput = {
   body: string
   kind?: string
   createdAt?: Date | string
+  readAt?: Date | string | null
 }
 
 export type SocketMessageUpdateInput = {
@@ -319,6 +333,7 @@ export type SocketMessageUpdateInput = {
   body?: Prisma.StringFieldUpdateOperationsInput | string
   kind?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   conversation?: Prisma.SocketConversationUpdateOneRequiredWithoutMessagesNestedInput
 }
 
@@ -330,6 +345,7 @@ export type SocketMessageUncheckedUpdateInput = {
   body?: Prisma.StringFieldUpdateOperationsInput | string
   kind?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type SocketMessageCreateManyInput = {
@@ -340,6 +356,7 @@ export type SocketMessageCreateManyInput = {
   body: string
   kind?: string
   createdAt?: Date | string
+  readAt?: Date | string | null
 }
 
 export type SocketMessageUpdateManyMutationInput = {
@@ -349,6 +366,7 @@ export type SocketMessageUpdateManyMutationInput = {
   body?: Prisma.StringFieldUpdateOperationsInput | string
   kind?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type SocketMessageUncheckedUpdateManyInput = {
@@ -359,6 +377,7 @@ export type SocketMessageUncheckedUpdateManyInput = {
   body?: Prisma.StringFieldUpdateOperationsInput | string
   kind?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type SocketMessageListRelationFilter = {
@@ -379,6 +398,7 @@ export type SocketMessageCountOrderByAggregateInput = {
   body?: Prisma.SortOrder
   kind?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  readAt?: Prisma.SortOrder
 }
 
 export type SocketMessageAvgOrderByAggregateInput = {
@@ -394,6 +414,7 @@ export type SocketMessageMaxOrderByAggregateInput = {
   body?: Prisma.SortOrder
   kind?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  readAt?: Prisma.SortOrder
 }
 
 export type SocketMessageMinOrderByAggregateInput = {
@@ -404,6 +425,7 @@ export type SocketMessageMinOrderByAggregateInput = {
   body?: Prisma.SortOrder
   kind?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  readAt?: Prisma.SortOrder
 }
 
 export type SocketMessageSumOrderByAggregateInput = {
@@ -460,6 +482,7 @@ export type SocketMessageCreateWithoutConversationInput = {
   body: string
   kind?: string
   createdAt?: Date | string
+  readAt?: Date | string | null
 }
 
 export type SocketMessageUncheckedCreateWithoutConversationInput = {
@@ -469,6 +492,7 @@ export type SocketMessageUncheckedCreateWithoutConversationInput = {
   body: string
   kind?: string
   createdAt?: Date | string
+  readAt?: Date | string | null
 }
 
 export type SocketMessageCreateOrConnectWithoutConversationInput = {
@@ -508,6 +532,7 @@ export type SocketMessageScalarWhereInput = {
   body?: Prisma.StringFilter<"SocketMessage"> | string
   kind?: Prisma.StringFilter<"SocketMessage"> | string
   createdAt?: Prisma.DateTimeFilter<"SocketMessage"> | Date | string
+  readAt?: Prisma.DateTimeNullableFilter<"SocketMessage"> | Date | string | null
 }
 
 export type SocketMessageCreateManyConversationInput = {
@@ -517,6 +542,7 @@ export type SocketMessageCreateManyConversationInput = {
   body: string
   kind?: string
   createdAt?: Date | string
+  readAt?: Date | string | null
 }
 
 export type SocketMessageUpdateWithoutConversationInput = {
@@ -526,6 +552,7 @@ export type SocketMessageUpdateWithoutConversationInput = {
   body?: Prisma.StringFieldUpdateOperationsInput | string
   kind?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type SocketMessageUncheckedUpdateWithoutConversationInput = {
@@ -535,6 +562,7 @@ export type SocketMessageUncheckedUpdateWithoutConversationInput = {
   body?: Prisma.StringFieldUpdateOperationsInput | string
   kind?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type SocketMessageUncheckedUpdateManyWithoutConversationInput = {
@@ -544,6 +572,7 @@ export type SocketMessageUncheckedUpdateManyWithoutConversationInput = {
   body?: Prisma.StringFieldUpdateOperationsInput | string
   kind?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -556,6 +585,7 @@ export type SocketMessageSelect<ExtArgs extends runtime.Types.Extensions.Interna
   body?: boolean
   kind?: boolean
   createdAt?: boolean
+  readAt?: boolean
   conversation?: boolean | Prisma.SocketConversationDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["socketMessage"]>
 
@@ -567,6 +597,7 @@ export type SocketMessageSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   body?: boolean
   kind?: boolean
   createdAt?: boolean
+  readAt?: boolean
   conversation?: boolean | Prisma.SocketConversationDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["socketMessage"]>
 
@@ -578,6 +609,7 @@ export type SocketMessageSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   body?: boolean
   kind?: boolean
   createdAt?: boolean
+  readAt?: boolean
   conversation?: boolean | Prisma.SocketConversationDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["socketMessage"]>
 
@@ -589,9 +621,10 @@ export type SocketMessageSelectScalar = {
   body?: boolean
   kind?: boolean
   createdAt?: boolean
+  readAt?: boolean
 }
 
-export type SocketMessageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "senderId" | "receiverId" | "body" | "kind" | "createdAt", ExtArgs["result"]["socketMessage"]>
+export type SocketMessageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "senderId" | "receiverId" | "body" | "kind" | "createdAt" | "readAt", ExtArgs["result"]["socketMessage"]>
 export type SocketMessageInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   conversation?: boolean | Prisma.SocketConversationDefaultArgs<ExtArgs>
 }
@@ -615,6 +648,7 @@ export type $SocketMessagePayload<ExtArgs extends runtime.Types.Extensions.Inter
     body: string
     kind: string
     createdAt: Date
+    readAt: Date | null
   }, ExtArgs["result"]["socketMessage"]>
   composites: {}
 }
@@ -1046,6 +1080,7 @@ export interface SocketMessageFieldRefs {
   readonly body: Prisma.FieldRef<"SocketMessage", 'String'>
   readonly kind: Prisma.FieldRef<"SocketMessage", 'String'>
   readonly createdAt: Prisma.FieldRef<"SocketMessage", 'DateTime'>
+  readonly readAt: Prisma.FieldRef<"SocketMessage", 'DateTime'>
 }
     
 

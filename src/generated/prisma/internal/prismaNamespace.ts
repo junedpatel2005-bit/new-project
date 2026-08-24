@@ -5982,7 +5982,8 @@ export const SocketMessageScalarFieldEnum = {
   receiverId: 'receiverId',
   body: 'body',
   kind: 'kind',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  readAt: 'readAt'
 } as const
 
 export type SocketMessageScalarFieldEnum = (typeof SocketMessageScalarFieldEnum)[keyof typeof SocketMessageScalarFieldEnum]
