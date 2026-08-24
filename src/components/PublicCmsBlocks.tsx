@@ -19,6 +19,10 @@ type Block = {
   rows?: string[][];
 };
 
+function isDirectVideoSource(source: string) {
+  return source.startsWith("data:video/") || /\.(mp4|webm|ogg)(?:[?#].*)?$/i.test(source);
+}
+
 export function PublicCmsBlocks() {
   const path = usePathname();
   const [blocks, setBlocks] = useState<Block[]>([]);
@@ -114,13 +118,17 @@ export function PublicCmsBlocks() {
             )}
             {block.type === "video" && block.videoUrl && (
               <div className="mt-5 aspect-video overflow-hidden rounded-xl bg-muted">
-                <iframe
-                  src={block.videoUrl}
-                  title={block.heading ?? "Video"}
-                  className="h-full w-full"
-                  loading="lazy"
-                  allowFullScreen
-                />
+                {isDirectVideoSource(block.videoUrl) ? (
+                  <video src={block.videoUrl} controls className="h-full w-full" />
+                ) : (
+                  <iframe
+                    src={block.videoUrl}
+                    title={block.heading ?? "Video"}
+                    className="h-full w-full"
+                    loading="lazy"
+                    allowFullScreen
+                  />
+                )}
               </div>
             )}
             {block.type === "spacer" && (

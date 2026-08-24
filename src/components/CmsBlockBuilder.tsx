@@ -40,6 +40,15 @@ type Page = {
 };
 const makeId = () => `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
+function fileToDataUrl(file: File) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(new Error("Unable to read file"));
+    reader.readAsDataURL(file);
+  });
+}
+
 export function CmsBlockBuilder({
   page,
   onSaved,
@@ -353,12 +362,34 @@ export function CmsBlockBuilder({
               )}
               {block.type === "image" && (
                 <>
-                  <input
-                    value={block.imageUrl ?? ""}
-                    onChange={(event) => update(index, { imageUrl: event.target.value })}
-                    className="mt-3 h-10 w-full rounded-lg border border-white/10 bg-white/5 px-3 text-sm text-white"
-                    placeholder="Image URL"
-                  />
+                  <div className="mt-3 grid gap-2 sm:grid-cols-[auto_1fr]">
+                    <label className="inline-flex h-10 cursor-pointer items-center justify-center rounded-lg bg-indigo-500 px-4 text-sm font-semibold text-white transition hover:bg-indigo-400">
+                      <ImagePlus className="mr-2 h-4 w-4" />
+                      Browse image
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="sr-only"
+                        onChange={async (event) => {
+                          const file = event.target.files?.[0];
+                          if (!file) return;
+                          try {
+                            update(index, { imageUrl: await fileToDataUrl(file) });
+                            setMessage("Image selected. Save blocks to publish it.");
+                          } catch {
+                            setMessage("Unable to read that image.");
+                          }
+                          event.target.value = "";
+                        }}
+                      />
+                    </label>
+                    <input
+                      value={block.imageUrl?.startsWith("data:") ? "" : (block.imageUrl ?? "")}
+                      onChange={(event) => update(index, { imageUrl: event.target.value })}
+                      className="h-10 rounded-lg border border-white/10 bg-white/5 px-3 text-sm text-white"
+                      placeholder="Or paste an image URL"
+                    />
+                  </div>
                   <input
                     value={block.imageAlt ?? ""}
                     onChange={(event) => update(index, { imageAlt: event.target.value })}
@@ -384,12 +415,34 @@ export function CmsBlockBuilder({
                 </div>
               )}
               {block.type === "video" && (
-                <input
-                  value={block.videoUrl ?? ""}
-                  onChange={(event) => update(index, { videoUrl: event.target.value })}
-                  className="mt-3 h-10 w-full rounded-lg border border-white/10 bg-white/5 px-3 text-sm text-white"
-                  placeholder="Embed URL (YouTube/Vimeo)"
-                />
+                <div className="mt-3 grid gap-2 sm:grid-cols-[auto_1fr]">
+                  <label className="inline-flex h-10 cursor-pointer items-center justify-center rounded-lg bg-indigo-500 px-4 text-sm font-semibold text-white transition hover:bg-indigo-400">
+                    <Video className="mr-2 h-4 w-4" />
+                    Browse video
+                    <input
+                      type="file"
+                      accept="video/*"
+                      className="sr-only"
+                      onChange={async (event) => {
+                        const file = event.target.files?.[0];
+                        if (!file) return;
+                        try {
+                          update(index, { videoUrl: await fileToDataUrl(file) });
+                          setMessage("Video selected. Save blocks to publish it.");
+                        } catch {
+                          setMessage("Unable to read that video.");
+                        }
+                        event.target.value = "";
+                      }}
+                    />
+                  </label>
+                  <input
+                    value={block.videoUrl?.startsWith("data:") ? "" : (block.videoUrl ?? "")}
+                    onChange={(event) => update(index, { videoUrl: event.target.value })}
+                    className="h-10 rounded-lg border border-white/10 bg-white/5 px-3 text-sm text-white"
+                    placeholder="Or paste a video URL (YouTube/Vimeo/MP4)"
+                  />
+                </div>
               )}
               {block.type === "spacer" && (
                 <input
