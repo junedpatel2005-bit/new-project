@@ -42,6 +42,9 @@ const FORMAT_COMMANDS = [
   { command: "bold", label: "B", title: "Bold" },
   { command: "italic", label: "I", title: "Italic" },
   { command: "underline", label: "U", title: "Underline" },
+  { command: "insertUnorderedList", label: "• List", title: "Bulleted list" },
+  { command: "insertOrderedList", label: "1. List", title: "Numbered list" },
+  { command: "removeFormat", label: "Clear", title: "Clear formatting" },
 ] as const;
 
 function createFormatToolbar() {
@@ -71,6 +74,17 @@ function createFormatToolbar() {
       }
     });
   };
+  const linkButton = document.createElement("button");
+  linkButton.type = "button";
+  linkButton.textContent = "Link";
+  linkButton.title = "Insert link";
+  linkButton.className = "cms-format-btn cms-format-btn-link";
+  linkButton.addEventListener("mousedown", (event) => {
+    event.preventDefault();
+    const url = window.prompt("Enter the link URL");
+    if (url) document.execCommand("createLink", false, url);
+  });
+  toolbar.appendChild(linkButton);
   document.body.appendChild(toolbar);
   return { toolbar, updateActiveStates };
 }
@@ -189,10 +203,11 @@ export function CmsLiveEditor() {
     if (editing) {
       const { toolbar, updateActiveStates } = createFormatToolbar();
       const hide = () => {
-        toolbar.style.display = "none";
+        toolbar.style.display = "flex";
       };
       const showAt = (rect: DOMRect) => {
         toolbar.style.display = "flex";
+        toolbar.style.transform = "none";
         toolbar.style.top = `${window.scrollY + rect.top - toolbar.offsetHeight - 8}px`;
         toolbar.style.left = `${window.scrollX + rect.left + rect.width / 2 - toolbar.offsetWidth / 2}px`;
         updateActiveStates();
@@ -205,6 +220,10 @@ export function CmsLiveEditor() {
         if (!anchorElement?.closest('[contenteditable="true"]')) return hide();
         showAt(selection.getRangeAt(0).getBoundingClientRect());
       };
+      toolbar.style.display = "flex";
+      toolbar.style.top = "14px";
+      toolbar.style.left = "50%";
+      toolbar.style.transform = "translateX(-50%)";
       document.addEventListener("selectionchange", onSelectionChange);
       removeToolbarListeners = () => {
         document.removeEventListener("selectionchange", onSelectionChange);

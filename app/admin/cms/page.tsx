@@ -75,6 +75,7 @@ export default function CmsPage() {
     setMessage("Page changes saved.");
   }
   const url = selected ? `/${selected.slug.replace(/^\//, "")}` : "/";
+  const editablePreviewUrl = `${url}${url.includes("?") ? "&" : "?"}cmsPreview=1&cmsEdit=1`;
   const isHome = selected?.slug === "" || selected?.slug === "/";
   const isProHome = selected?.slug === "professional-home";
   const isServices = selected?.slug === "services";
@@ -208,7 +209,7 @@ export default function CmsPage() {
             </header>
             <iframe
               className="min-h-0 w-full flex-1 bg-white"
-              src={url}
+              src={editablePreviewUrl}
               title="Website page preview"
             />
           </div>

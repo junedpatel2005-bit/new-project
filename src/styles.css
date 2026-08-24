@@ -43,13 +43,15 @@ body:has(.cms-live-editable) button {
 .cms-format-btn {
   display: grid;
   place-items: center;
-  width: 28px;
+  min-width: 28px;
   height: 28px;
+  padding: 0 7px;
   border-radius: 5px;
   color: #fff;
   font-size: 13px;
   font-weight: 700;
   background: transparent;
+  white-space: nowrap;
 }
 
 .cms-format-btn-italic {
