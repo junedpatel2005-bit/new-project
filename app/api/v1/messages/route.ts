@@ -70,9 +70,9 @@ export async function GET(request: NextRequest) {
   const contacts = await db.user.findMany({
     where: {
       ...(session.role === "ADMIN"
-        ? { role: { in: ["CLIENT", "PROFESSIONAL"] } }
+        ? { id: { not: session.userId } }
         : { id: { in: contactIds ?? [] } }),
-      isActive: true,
+      ...(session.role === "ADMIN" ? {} : { isActive: true }),
     },
     select: { id: true, firstName: true, lastName: true, avatarUrl: true, role: true },
     orderBy: { firstName: "asc" },

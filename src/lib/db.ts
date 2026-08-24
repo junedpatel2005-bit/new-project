@@ -12,6 +12,7 @@ type PrismaWithSharedTracking = PrismaClient & {
 const globalForPrisma = global as unknown as {
   prisma?: PrismaWithSharedTracking;
   pgPool?: Pool;
+  prismaSchemaVersion?: string;
 };
 
 const connectionString = process.env.DATABASE_URL;
@@ -29,6 +30,7 @@ const pgPool =
     connectionTimeoutMillis: 10_000,
   });
 const adapter = new PrismaPg(pgPool);
+const prismaSchemaVersion = "20260824-message-read-state";
 // Regenerate the development singleton after a Prisma schema change. Without this
 // guard, Next's hot-reload can retain a client created before a new model existed.
 export const db =
@@ -36,10 +38,12 @@ export const db =
   globalForPrisma.prisma?.verificationDocumentReview &&
   globalForPrisma.prisma?.pageTextOverride &&
   globalForPrisma.prisma?.projectDisputeMessage &&
+  globalForPrisma.prismaSchemaVersion === prismaSchemaVersion &&
   globalForPrisma.pgPool
     ? globalForPrisma.prisma
     : new PrismaClient({ adapter });
 if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = db;
   globalForPrisma.pgPool = pgPool;
+  globalForPrisma.prismaSchemaVersion = prismaSchemaVersion;
 }
