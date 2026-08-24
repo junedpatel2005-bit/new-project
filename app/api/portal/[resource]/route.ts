@@ -9,6 +9,7 @@ import {
   getDistanceKm,
 } from "@/lib/geo";
 import { attachLastActorRole } from "@/lib/project-request-actions";
+import { inferLocationFromAddress } from "@/lib/india-locations";
 
 async function sessionFromRequest(request: NextRequest) {
   const token = request.cookies.get(sessionCookie)?.value;
@@ -348,6 +349,7 @@ export async function GET(
               job.locationLat !== null && job.locationLng !== null
                 ? createDisplayPoint(job.id, job.locationLat, job.locationLng)
                 : null;
+            const inferredLocation = inferLocationFromAddress(job.locationAddress);
             return {
               id: job.id,
               title: job.title,
@@ -358,8 +360,8 @@ export async function GET(
               hourlyRate: job.hourlyRate,
               timingType: job.timingType,
               locationAddress: approximateAddress(job.locationAddress),
-              locationState: job.locationState,
-              locationDistrict: job.locationDistrict,
+              locationState: job.locationState ?? inferredLocation.state,
+              locationDistrict: job.locationDistrict ?? inferredLocation.district,
               locationLat: displayPoint?.lat ?? null,
               locationLng: displayPoint?.lng ?? null,
               distanceKm: job.distanceKm,
@@ -382,6 +384,7 @@ export async function GET(
                     favorite.job.locationLng,
                   )
                 : null;
+            const inferredLocation = inferLocationFromAddress(favorite.job.locationAddress);
             return {
               id: favorite.job.id,
               title: favorite.job.title,
@@ -392,6 +395,8 @@ export async function GET(
               hourlyRate: favorite.job.hourlyRate,
               timingType: favorite.job.timingType,
               locationAddress: approximateAddress(favorite.job.locationAddress),
+              locationState: favorite.job.locationState ?? inferredLocation.state,
+              locationDistrict: favorite.job.locationDistrict ?? inferredLocation.district,
               locationLat: displayPoint?.lat ?? null,
               locationLng: displayPoint?.lng ?? null,
               distanceKm: favorite.distanceKm,

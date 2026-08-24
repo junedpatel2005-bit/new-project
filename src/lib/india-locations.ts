@@ -878,3 +878,29 @@ export const getAllStates = (): string[] => locationGroups.map((item) => item.na
 export const getDistrictsByState = (stateName: string): string[] => [
   ...(locationGroups.find((item) => item.name === stateName)?.districts ?? []),
 ];
+
+/**
+ * Older jobs may have an address but no structured location fields because
+ * those fields were added after the jobs were created. Keep marketplace
+ * filters useful for those records until they are edited or backfilled.
+ */
+export function inferLocationFromAddress(address: string | null | undefined): {
+  state: string | null;
+  district: string | null;
+} {
+  if (!address) return { state: null, district: null };
+
+  const parts = address
+    .split(",")
+    .map((part) => part.trim().toLocaleLowerCase())
+    .filter(Boolean);
+  const stateEntry = locationGroups.find((item) =>
+    parts.some((part) => part === item.name.toLocaleLowerCase()),
+  );
+  if (!stateEntry) return { state: null, district: null };
+
+  const district = stateEntry.districts.find((item) =>
+    parts.some((part) => part === item.toLocaleLowerCase()),
+  );
+  return { state: stateEntry.name, district: district ?? null };
+}
