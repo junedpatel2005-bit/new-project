@@ -2,6 +2,24 @@
 @source "../src";
 @source "../app";
 
+/* Keep the CMS CKEditor toolbar visible when the admin panel is narrow. */
+.cms-editor .ck.ck-editor {
+  width: 100%;
+}
+
+.cms-editor .ck.ck-toolbar {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  overflow-x: auto;
+  flex-wrap: nowrap;
+}
+
+.cms-editor .ck.ck-toolbar .ck-toolbar__items {
+  flex-wrap: nowrap;
+  min-width: max-content;
+}
+
 .cms-live-editable {
   cursor: text !important;
   outline: 2px dashed color-mix(in srgb, var(--color-primary) 45%, transparent);
