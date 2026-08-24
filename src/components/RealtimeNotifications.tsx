@@ -71,10 +71,6 @@ export function RealtimeNotifications() {
     };
     const onMessage = (message: { receiverId?: number }) => {
       if (message.receiverId !== userId) return;
-      toast("New message", {
-        description: "You have received a new message.",
-        action: { label: "Open", onClick: () => window.location.assign("/messages") },
-      });
       window.dispatchEvent(new CustomEvent("servio:message"));
     };
     socket.on("notification:new", onNotification);

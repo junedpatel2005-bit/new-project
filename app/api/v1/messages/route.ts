@@ -2,7 +2,11 @@ import { randomUUID } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { sessionCookie, verifySession } from "@/lib/auth";
-import { emitRealtimeMessage, emitRealtimeMessageRead } from "@/lib/realtime";
+import {
+  emitRealtimeMessage,
+  emitRealtimeMessageRead,
+  emitRealtimeNotification,
+} from "@/lib/realtime";
 
 async function getSession(request: NextRequest) {
   const token = request.cookies.get(sessionCookie)?.value;
@@ -197,6 +201,10 @@ export async function POST(request: NextRequest) {
       );
     }
   }
+  const sender = await db.user.findUnique({
+    where: { id: session.userId },
+    select: { firstName: true, lastName: true },
+  });
   const existing = await db.socketConversation.findFirst({
     where: pairWhere(session.userId, recipientId),
   });
@@ -226,6 +234,15 @@ export async function POST(request: NextRequest) {
     where: { id: conversation.id },
     data: { updatedAt: new Date() },
   });
+  const senderName = `${sender?.firstName ?? ""} ${sender?.lastName ?? ""}`.trim() || "A user";
+  const notification = {
+    type: "NEW_MESSAGE",
+    title: `New message from ${senderName}`,
+    description: text.length > 120 ? `${text.slice(0, 117)}…` : text,
+    href: recipient.role === "ADMIN" ? "/admin/messages" : recipient.role === "PROFESSIONAL" ? "/professional/messages" : "/messages",
+  };
+  await db.userNotification.create({ data: { userId: recipientId, ...notification } });
+  emitRealtimeNotification([recipientId], notification);
   emitRealtimeMessage([session.userId, recipientId], {
     ...message,
     conversationId: conversation.id,
