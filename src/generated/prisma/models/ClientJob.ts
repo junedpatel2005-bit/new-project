@@ -60,6 +60,8 @@ export type ClientJobMinAggregateOutputType = {
   workMode: $Enums.JobWorkMode | null
   locationLabel: string | null
   locationAddress: string | null
+  locationState: string | null
+  locationDistrict: string | null
   locationLat: number | null
   locationLng: number | null
   status: $Enums.JobStatus | null
@@ -67,6 +69,7 @@ export type ClientJobMinAggregateOutputType = {
   updatedAt: Date | null
   hourlyRate: number | null
   timingType: string | null
+  paymentMethod: string | null
 }
 
 export type ClientJobMaxAggregateOutputType = {
@@ -83,6 +86,8 @@ export type ClientJobMaxAggregateOutputType = {
   workMode: $Enums.JobWorkMode | null
   locationLabel: string | null
   locationAddress: string | null
+  locationState: string | null
+  locationDistrict: string | null
   locationLat: number | null
   locationLng: number | null
   status: $Enums.JobStatus | null
@@ -90,6 +95,7 @@ export type ClientJobMaxAggregateOutputType = {
   updatedAt: Date | null
   hourlyRate: number | null
   timingType: string | null
+  paymentMethod: string | null
 }
 
 export type ClientJobCountAggregateOutputType = {
@@ -106,6 +112,8 @@ export type ClientJobCountAggregateOutputType = {
   workMode: number
   locationLabel: number
   locationAddress: number
+  locationState: number
+  locationDistrict: number
   locationLat: number
   locationLng: number
   status: number
@@ -113,6 +121,7 @@ export type ClientJobCountAggregateOutputType = {
   updatedAt: number
   hourlyRate: number
   timingType: number
+  paymentMethod: number
   _all: number
 }
 
@@ -151,6 +160,8 @@ export type ClientJobMinAggregateInputType = {
   workMode?: true
   locationLabel?: true
   locationAddress?: true
+  locationState?: true
+  locationDistrict?: true
   locationLat?: true
   locationLng?: true
   status?: true
@@ -158,6 +169,7 @@ export type ClientJobMinAggregateInputType = {
   updatedAt?: true
   hourlyRate?: true
   timingType?: true
+  paymentMethod?: true
 }
 
 export type ClientJobMaxAggregateInputType = {
@@ -174,6 +186,8 @@ export type ClientJobMaxAggregateInputType = {
   workMode?: true
   locationLabel?: true
   locationAddress?: true
+  locationState?: true
+  locationDistrict?: true
   locationLat?: true
   locationLng?: true
   status?: true
@@ -181,6 +195,7 @@ export type ClientJobMaxAggregateInputType = {
   updatedAt?: true
   hourlyRate?: true
   timingType?: true
+  paymentMethod?: true
 }
 
 export type ClientJobCountAggregateInputType = {
@@ -197,6 +212,8 @@ export type ClientJobCountAggregateInputType = {
   workMode?: true
   locationLabel?: true
   locationAddress?: true
+  locationState?: true
+  locationDistrict?: true
   locationLat?: true
   locationLng?: true
   status?: true
@@ -204,6 +221,7 @@ export type ClientJobCountAggregateInputType = {
   updatedAt?: true
   hourlyRate?: true
   timingType?: true
+  paymentMethod?: true
   _all?: true
 }
 
@@ -307,6 +325,8 @@ export type ClientJobGroupByOutputType = {
   workMode: $Enums.JobWorkMode
   locationLabel: string | null
   locationAddress: string | null
+  locationState: string | null
+  locationDistrict: string | null
   locationLat: number | null
   locationLng: number | null
   status: $Enums.JobStatus
@@ -314,6 +334,7 @@ export type ClientJobGroupByOutputType = {
   updatedAt: Date
   hourlyRate: number | null
   timingType: string
+  paymentMethod: string
   _count: ClientJobCountAggregateOutputType | null
   _avg: ClientJobAvgAggregateOutputType | null
   _sum: ClientJobSumAggregateOutputType | null
@@ -353,6 +374,8 @@ export type ClientJobWhereInput = {
   workMode?: Prisma.EnumJobWorkModeFilter<"ClientJob"> | $Enums.JobWorkMode
   locationLabel?: Prisma.StringNullableFilter<"ClientJob"> | string | null
   locationAddress?: Prisma.StringNullableFilter<"ClientJob"> | string | null
+  locationState?: Prisma.StringNullableFilter<"ClientJob"> | string | null
+  locationDistrict?: Prisma.StringNullableFilter<"ClientJob"> | string | null
   locationLat?: Prisma.FloatNullableFilter<"ClientJob"> | number | null
   locationLng?: Prisma.FloatNullableFilter<"ClientJob"> | number | null
   status?: Prisma.EnumJobStatusFilter<"ClientJob"> | $Enums.JobStatus
@@ -360,6 +383,7 @@ export type ClientJobWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"ClientJob"> | Date | string
   hourlyRate?: Prisma.IntNullableFilter<"ClientJob"> | number | null
   timingType?: Prisma.StringFilter<"ClientJob"> | string
+  paymentMethod?: Prisma.StringFilter<"ClientJob"> | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   attachments?: Prisma.ClientJobAttachmentListRelationFilter
   favoriteJobs?: Prisma.FavoriteJobListRelationFilter
@@ -379,6 +403,8 @@ export type ClientJobOrderByWithRelationInput = {
   workMode?: Prisma.SortOrder
   locationLabel?: Prisma.SortOrderInput | Prisma.SortOrder
   locationAddress?: Prisma.SortOrderInput | Prisma.SortOrder
+  locationState?: Prisma.SortOrderInput | Prisma.SortOrder
+  locationDistrict?: Prisma.SortOrderInput | Prisma.SortOrder
   locationLat?: Prisma.SortOrderInput | Prisma.SortOrder
   locationLng?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -386,6 +412,7 @@ export type ClientJobOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   hourlyRate?: Prisma.SortOrderInput | Prisma.SortOrder
   timingType?: Prisma.SortOrder
+  paymentMethod?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   attachments?: Prisma.ClientJobAttachmentOrderByRelationAggregateInput
   favoriteJobs?: Prisma.FavoriteJobOrderByRelationAggregateInput
@@ -408,6 +435,8 @@ export type ClientJobWhereUniqueInput = Prisma.AtLeast<{
   workMode?: Prisma.EnumJobWorkModeFilter<"ClientJob"> | $Enums.JobWorkMode
   locationLabel?: Prisma.StringNullableFilter<"ClientJob"> | string | null
   locationAddress?: Prisma.StringNullableFilter<"ClientJob"> | string | null
+  locationState?: Prisma.StringNullableFilter<"ClientJob"> | string | null
+  locationDistrict?: Prisma.StringNullableFilter<"ClientJob"> | string | null
   locationLat?: Prisma.FloatNullableFilter<"ClientJob"> | number | null
   locationLng?: Prisma.FloatNullableFilter<"ClientJob"> | number | null
   status?: Prisma.EnumJobStatusFilter<"ClientJob"> | $Enums.JobStatus
@@ -415,6 +444,7 @@ export type ClientJobWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"ClientJob"> | Date | string
   hourlyRate?: Prisma.IntNullableFilter<"ClientJob"> | number | null
   timingType?: Prisma.StringFilter<"ClientJob"> | string
+  paymentMethod?: Prisma.StringFilter<"ClientJob"> | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   attachments?: Prisma.ClientJobAttachmentListRelationFilter
   favoriteJobs?: Prisma.FavoriteJobListRelationFilter
@@ -434,6 +464,8 @@ export type ClientJobOrderByWithAggregationInput = {
   workMode?: Prisma.SortOrder
   locationLabel?: Prisma.SortOrderInput | Prisma.SortOrder
   locationAddress?: Prisma.SortOrderInput | Prisma.SortOrder
+  locationState?: Prisma.SortOrderInput | Prisma.SortOrder
+  locationDistrict?: Prisma.SortOrderInput | Prisma.SortOrder
   locationLat?: Prisma.SortOrderInput | Prisma.SortOrder
   locationLng?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -441,6 +473,7 @@ export type ClientJobOrderByWithAggregationInput = {
   updatedAt?: Prisma.SortOrder
   hourlyRate?: Prisma.SortOrderInput | Prisma.SortOrder
   timingType?: Prisma.SortOrder
+  paymentMethod?: Prisma.SortOrder
   _count?: Prisma.ClientJobCountOrderByAggregateInput
   _avg?: Prisma.ClientJobAvgOrderByAggregateInput
   _max?: Prisma.ClientJobMaxOrderByAggregateInput
@@ -465,6 +498,8 @@ export type ClientJobScalarWhereWithAggregatesInput = {
   workMode?: Prisma.EnumJobWorkModeWithAggregatesFilter<"ClientJob"> | $Enums.JobWorkMode
   locationLabel?: Prisma.StringNullableWithAggregatesFilter<"ClientJob"> | string | null
   locationAddress?: Prisma.StringNullableWithAggregatesFilter<"ClientJob"> | string | null
+  locationState?: Prisma.StringNullableWithAggregatesFilter<"ClientJob"> | string | null
+  locationDistrict?: Prisma.StringNullableWithAggregatesFilter<"ClientJob"> | string | null
   locationLat?: Prisma.FloatNullableWithAggregatesFilter<"ClientJob"> | number | null
   locationLng?: Prisma.FloatNullableWithAggregatesFilter<"ClientJob"> | number | null
   status?: Prisma.EnumJobStatusWithAggregatesFilter<"ClientJob"> | $Enums.JobStatus
@@ -472,6 +507,7 @@ export type ClientJobScalarWhereWithAggregatesInput = {
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"ClientJob"> | Date | string
   hourlyRate?: Prisma.IntNullableWithAggregatesFilter<"ClientJob"> | number | null
   timingType?: Prisma.StringWithAggregatesFilter<"ClientJob"> | string
+  paymentMethod?: Prisma.StringWithAggregatesFilter<"ClientJob"> | string
 }
 
 export type ClientJobCreateInput = {
@@ -486,6 +522,8 @@ export type ClientJobCreateInput = {
   workMode?: $Enums.JobWorkMode
   locationLabel?: string | null
   locationAddress?: string | null
+  locationState?: string | null
+  locationDistrict?: string | null
   locationLat?: number | null
   locationLng?: number | null
   status?: $Enums.JobStatus
@@ -493,6 +531,7 @@ export type ClientJobCreateInput = {
   updatedAt?: Date | string
   hourlyRate?: number | null
   timingType?: string
+  paymentMethod?: string
   user: Prisma.UserCreateNestedOneWithoutClientJobsInput
   attachments?: Prisma.ClientJobAttachmentCreateNestedManyWithoutJobInput
   favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutJobInput
@@ -512,6 +551,8 @@ export type ClientJobUncheckedCreateInput = {
   workMode?: $Enums.JobWorkMode
   locationLabel?: string | null
   locationAddress?: string | null
+  locationState?: string | null
+  locationDistrict?: string | null
   locationLat?: number | null
   locationLng?: number | null
   status?: $Enums.JobStatus
@@ -519,6 +560,7 @@ export type ClientJobUncheckedCreateInput = {
   updatedAt?: Date | string
   hourlyRate?: number | null
   timingType?: string
+  paymentMethod?: string
   attachments?: Prisma.ClientJobAttachmentUncheckedCreateNestedManyWithoutJobInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedCreateNestedManyWithoutJobInput
 }
@@ -535,6 +577,8 @@ export type ClientJobUpdateInput = {
   workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
   locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   locationLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
@@ -542,6 +586,7 @@ export type ClientJobUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   timingType?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   user?: Prisma.UserUpdateOneRequiredWithoutClientJobsNestedInput
   attachments?: Prisma.ClientJobAttachmentUpdateManyWithoutJobNestedInput
   favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutJobNestedInput
@@ -561,6 +606,8 @@ export type ClientJobUncheckedUpdateInput = {
   workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
   locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   locationLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
@@ -568,6 +615,7 @@ export type ClientJobUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   timingType?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   attachments?: Prisma.ClientJobAttachmentUncheckedUpdateManyWithoutJobNestedInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedUpdateManyWithoutJobNestedInput
 }
@@ -586,6 +634,8 @@ export type ClientJobCreateManyInput = {
   workMode?: $Enums.JobWorkMode
   locationLabel?: string | null
   locationAddress?: string | null
+  locationState?: string | null
+  locationDistrict?: string | null
   locationLat?: number | null
   locationLng?: number | null
   status?: $Enums.JobStatus
@@ -593,6 +643,7 @@ export type ClientJobCreateManyInput = {
   updatedAt?: Date | string
   hourlyRate?: number | null
   timingType?: string
+  paymentMethod?: string
 }
 
 export type ClientJobUpdateManyMutationInput = {
@@ -607,6 +658,8 @@ export type ClientJobUpdateManyMutationInput = {
   workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
   locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   locationLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
@@ -614,6 +667,7 @@ export type ClientJobUpdateManyMutationInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   timingType?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type ClientJobUncheckedUpdateManyInput = {
@@ -630,6 +684,8 @@ export type ClientJobUncheckedUpdateManyInput = {
   workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
   locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   locationLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
@@ -637,6 +693,7 @@ export type ClientJobUncheckedUpdateManyInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   timingType?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type ClientJobListRelationFilter = {
@@ -663,6 +720,8 @@ export type ClientJobCountOrderByAggregateInput = {
   workMode?: Prisma.SortOrder
   locationLabel?: Prisma.SortOrder
   locationAddress?: Prisma.SortOrder
+  locationState?: Prisma.SortOrder
+  locationDistrict?: Prisma.SortOrder
   locationLat?: Prisma.SortOrder
   locationLng?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -670,6 +729,7 @@ export type ClientJobCountOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
   hourlyRate?: Prisma.SortOrder
   timingType?: Prisma.SortOrder
+  paymentMethod?: Prisma.SortOrder
 }
 
 export type ClientJobAvgOrderByAggregateInput = {
@@ -696,6 +756,8 @@ export type ClientJobMaxOrderByAggregateInput = {
   workMode?: Prisma.SortOrder
   locationLabel?: Prisma.SortOrder
   locationAddress?: Prisma.SortOrder
+  locationState?: Prisma.SortOrder
+  locationDistrict?: Prisma.SortOrder
   locationLat?: Prisma.SortOrder
   locationLng?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -703,6 +765,7 @@ export type ClientJobMaxOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
   hourlyRate?: Prisma.SortOrder
   timingType?: Prisma.SortOrder
+  paymentMethod?: Prisma.SortOrder
 }
 
 export type ClientJobMinOrderByAggregateInput = {
@@ -719,6 +782,8 @@ export type ClientJobMinOrderByAggregateInput = {
   workMode?: Prisma.SortOrder
   locationLabel?: Prisma.SortOrder
   locationAddress?: Prisma.SortOrder
+  locationState?: Prisma.SortOrder
+  locationDistrict?: Prisma.SortOrder
   locationLat?: Prisma.SortOrder
   locationLng?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -726,6 +791,7 @@ export type ClientJobMinOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
   hourlyRate?: Prisma.SortOrder
   timingType?: Prisma.SortOrder
+  paymentMethod?: Prisma.SortOrder
 }
 
 export type ClientJobSumOrderByAggregateInput = {
@@ -837,6 +903,8 @@ export type ClientJobCreateWithoutUserInput = {
   workMode?: $Enums.JobWorkMode
   locationLabel?: string | null
   locationAddress?: string | null
+  locationState?: string | null
+  locationDistrict?: string | null
   locationLat?: number | null
   locationLng?: number | null
   status?: $Enums.JobStatus
@@ -844,6 +912,7 @@ export type ClientJobCreateWithoutUserInput = {
   updatedAt?: Date | string
   hourlyRate?: number | null
   timingType?: string
+  paymentMethod?: string
   attachments?: Prisma.ClientJobAttachmentCreateNestedManyWithoutJobInput
   favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutJobInput
 }
@@ -861,6 +930,8 @@ export type ClientJobUncheckedCreateWithoutUserInput = {
   workMode?: $Enums.JobWorkMode
   locationLabel?: string | null
   locationAddress?: string | null
+  locationState?: string | null
+  locationDistrict?: string | null
   locationLat?: number | null
   locationLng?: number | null
   status?: $Enums.JobStatus
@@ -868,6 +939,7 @@ export type ClientJobUncheckedCreateWithoutUserInput = {
   updatedAt?: Date | string
   hourlyRate?: number | null
   timingType?: string
+  paymentMethod?: string
   attachments?: Prisma.ClientJobAttachmentUncheckedCreateNestedManyWithoutJobInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedCreateNestedManyWithoutJobInput
 }
@@ -915,6 +987,8 @@ export type ClientJobScalarWhereInput = {
   workMode?: Prisma.EnumJobWorkModeFilter<"ClientJob"> | $Enums.JobWorkMode
   locationLabel?: Prisma.StringNullableFilter<"ClientJob"> | string | null
   locationAddress?: Prisma.StringNullableFilter<"ClientJob"> | string | null
+  locationState?: Prisma.StringNullableFilter<"ClientJob"> | string | null
+  locationDistrict?: Prisma.StringNullableFilter<"ClientJob"> | string | null
   locationLat?: Prisma.FloatNullableFilter<"ClientJob"> | number | null
   locationLng?: Prisma.FloatNullableFilter<"ClientJob"> | number | null
   status?: Prisma.EnumJobStatusFilter<"ClientJob"> | $Enums.JobStatus
@@ -922,6 +996,7 @@ export type ClientJobScalarWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"ClientJob"> | Date | string
   hourlyRate?: Prisma.IntNullableFilter<"ClientJob"> | number | null
   timingType?: Prisma.StringFilter<"ClientJob"> | string
+  paymentMethod?: Prisma.StringFilter<"ClientJob"> | string
 }
 
 export type ClientJobCreateWithoutFavoriteJobsInput = {
@@ -936,6 +1011,8 @@ export type ClientJobCreateWithoutFavoriteJobsInput = {
   workMode?: $Enums.JobWorkMode
   locationLabel?: string | null
   locationAddress?: string | null
+  locationState?: string | null
+  locationDistrict?: string | null
   locationLat?: number | null
   locationLng?: number | null
   status?: $Enums.JobStatus
@@ -943,6 +1020,7 @@ export type ClientJobCreateWithoutFavoriteJobsInput = {
   updatedAt?: Date | string
   hourlyRate?: number | null
   timingType?: string
+  paymentMethod?: string
   user: Prisma.UserCreateNestedOneWithoutClientJobsInput
   attachments?: Prisma.ClientJobAttachmentCreateNestedManyWithoutJobInput
 }
@@ -961,6 +1039,8 @@ export type ClientJobUncheckedCreateWithoutFavoriteJobsInput = {
   workMode?: $Enums.JobWorkMode
   locationLabel?: string | null
   locationAddress?: string | null
+  locationState?: string | null
+  locationDistrict?: string | null
   locationLat?: number | null
   locationLng?: number | null
   status?: $Enums.JobStatus
@@ -968,6 +1048,7 @@ export type ClientJobUncheckedCreateWithoutFavoriteJobsInput = {
   updatedAt?: Date | string
   hourlyRate?: number | null
   timingType?: string
+  paymentMethod?: string
   attachments?: Prisma.ClientJobAttachmentUncheckedCreateNestedManyWithoutJobInput
 }
 
@@ -999,6 +1080,8 @@ export type ClientJobUpdateWithoutFavoriteJobsInput = {
   workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
   locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   locationLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
@@ -1006,6 +1089,7 @@ export type ClientJobUpdateWithoutFavoriteJobsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   timingType?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   user?: Prisma.UserUpdateOneRequiredWithoutClientJobsNestedInput
   attachments?: Prisma.ClientJobAttachmentUpdateManyWithoutJobNestedInput
 }
@@ -1024,6 +1108,8 @@ export type ClientJobUncheckedUpdateWithoutFavoriteJobsInput = {
   workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
   locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   locationLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
@@ -1031,6 +1117,7 @@ export type ClientJobUncheckedUpdateWithoutFavoriteJobsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   timingType?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   attachments?: Prisma.ClientJobAttachmentUncheckedUpdateManyWithoutJobNestedInput
 }
 
@@ -1046,6 +1133,8 @@ export type ClientJobCreateWithoutAttachmentsInput = {
   workMode?: $Enums.JobWorkMode
   locationLabel?: string | null
   locationAddress?: string | null
+  locationState?: string | null
+  locationDistrict?: string | null
   locationLat?: number | null
   locationLng?: number | null
   status?: $Enums.JobStatus
@@ -1053,6 +1142,7 @@ export type ClientJobCreateWithoutAttachmentsInput = {
   updatedAt?: Date | string
   hourlyRate?: number | null
   timingType?: string
+  paymentMethod?: string
   user: Prisma.UserCreateNestedOneWithoutClientJobsInput
   favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutJobInput
 }
@@ -1071,6 +1161,8 @@ export type ClientJobUncheckedCreateWithoutAttachmentsInput = {
   workMode?: $Enums.JobWorkMode
   locationLabel?: string | null
   locationAddress?: string | null
+  locationState?: string | null
+  locationDistrict?: string | null
   locationLat?: number | null
   locationLng?: number | null
   status?: $Enums.JobStatus
@@ -1078,6 +1170,7 @@ export type ClientJobUncheckedCreateWithoutAttachmentsInput = {
   updatedAt?: Date | string
   hourlyRate?: number | null
   timingType?: string
+  paymentMethod?: string
   favoriteJobs?: Prisma.FavoriteJobUncheckedCreateNestedManyWithoutJobInput
 }
 
@@ -1109,6 +1202,8 @@ export type ClientJobUpdateWithoutAttachmentsInput = {
   workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
   locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   locationLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
@@ -1116,6 +1211,7 @@ export type ClientJobUpdateWithoutAttachmentsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   timingType?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   user?: Prisma.UserUpdateOneRequiredWithoutClientJobsNestedInput
   favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutJobNestedInput
 }
@@ -1134,6 +1230,8 @@ export type ClientJobUncheckedUpdateWithoutAttachmentsInput = {
   workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
   locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   locationLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
@@ -1141,6 +1239,7 @@ export type ClientJobUncheckedUpdateWithoutAttachmentsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   timingType?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   favoriteJobs?: Prisma.FavoriteJobUncheckedUpdateManyWithoutJobNestedInput
 }
 
@@ -1157,6 +1256,8 @@ export type ClientJobCreateManyUserInput = {
   workMode?: $Enums.JobWorkMode
   locationLabel?: string | null
   locationAddress?: string | null
+  locationState?: string | null
+  locationDistrict?: string | null
   locationLat?: number | null
   locationLng?: number | null
   status?: $Enums.JobStatus
@@ -1164,6 +1265,7 @@ export type ClientJobCreateManyUserInput = {
   updatedAt?: Date | string
   hourlyRate?: number | null
   timingType?: string
+  paymentMethod?: string
 }
 
 export type ClientJobUpdateWithoutUserInput = {
@@ -1178,6 +1280,8 @@ export type ClientJobUpdateWithoutUserInput = {
   workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
   locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   locationLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
@@ -1185,6 +1289,7 @@ export type ClientJobUpdateWithoutUserInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   timingType?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   attachments?: Prisma.ClientJobAttachmentUpdateManyWithoutJobNestedInput
   favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutJobNestedInput
 }
@@ -1202,6 +1307,8 @@ export type ClientJobUncheckedUpdateWithoutUserInput = {
   workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
   locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   locationLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
@@ -1209,6 +1316,7 @@ export type ClientJobUncheckedUpdateWithoutUserInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   timingType?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   attachments?: Prisma.ClientJobAttachmentUncheckedUpdateManyWithoutJobNestedInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedUpdateManyWithoutJobNestedInput
 }
@@ -1226,6 +1334,8 @@ export type ClientJobUncheckedUpdateManyWithoutUserInput = {
   workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
   locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   locationLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
@@ -1233,6 +1343,7 @@ export type ClientJobUncheckedUpdateManyWithoutUserInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   timingType?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 
@@ -1289,6 +1400,8 @@ export type ClientJobSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   workMode?: boolean
   locationLabel?: boolean
   locationAddress?: boolean
+  locationState?: boolean
+  locationDistrict?: boolean
   locationLat?: boolean
   locationLng?: boolean
   status?: boolean
@@ -1296,6 +1409,7 @@ export type ClientJobSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   updatedAt?: boolean
   hourlyRate?: boolean
   timingType?: boolean
+  paymentMethod?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   attachments?: boolean | Prisma.ClientJob$attachmentsArgs<ExtArgs>
   favoriteJobs?: boolean | Prisma.ClientJob$favoriteJobsArgs<ExtArgs>
@@ -1316,6 +1430,8 @@ export type ClientJobSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   workMode?: boolean
   locationLabel?: boolean
   locationAddress?: boolean
+  locationState?: boolean
+  locationDistrict?: boolean
   locationLat?: boolean
   locationLng?: boolean
   status?: boolean
@@ -1323,6 +1439,7 @@ export type ClientJobSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   updatedAt?: boolean
   hourlyRate?: boolean
   timingType?: boolean
+  paymentMethod?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["clientJob"]>
 
@@ -1340,6 +1457,8 @@ export type ClientJobSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   workMode?: boolean
   locationLabel?: boolean
   locationAddress?: boolean
+  locationState?: boolean
+  locationDistrict?: boolean
   locationLat?: boolean
   locationLng?: boolean
   status?: boolean
@@ -1347,6 +1466,7 @@ export type ClientJobSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   updatedAt?: boolean
   hourlyRate?: boolean
   timingType?: boolean
+  paymentMethod?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["clientJob"]>
 
@@ -1364,6 +1484,8 @@ export type ClientJobSelectScalar = {
   workMode?: boolean
   locationLabel?: boolean
   locationAddress?: boolean
+  locationState?: boolean
+  locationDistrict?: boolean
   locationLat?: boolean
   locationLng?: boolean
   status?: boolean
@@ -1371,9 +1493,10 @@ export type ClientJobSelectScalar = {
   updatedAt?: boolean
   hourlyRate?: boolean
   timingType?: boolean
+  paymentMethod?: boolean
 }
 
-export type ClientJobOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "category" | "title" | "description" | "budgetMin" | "budgetMax" | "urgency" | "jobDate" | "deadline" | "workMode" | "locationLabel" | "locationAddress" | "locationLat" | "locationLng" | "status" | "createdAt" | "updatedAt" | "hourlyRate" | "timingType", ExtArgs["result"]["clientJob"]>
+export type ClientJobOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "category" | "title" | "description" | "budgetMin" | "budgetMax" | "urgency" | "jobDate" | "deadline" | "workMode" | "locationLabel" | "locationAddress" | "locationState" | "locationDistrict" | "locationLat" | "locationLng" | "status" | "createdAt" | "updatedAt" | "hourlyRate" | "timingType" | "paymentMethod", ExtArgs["result"]["clientJob"]>
 export type ClientJobInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   attachments?: boolean | Prisma.ClientJob$attachmentsArgs<ExtArgs>
@@ -1408,6 +1531,8 @@ export type $ClientJobPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     workMode: $Enums.JobWorkMode
     locationLabel: string | null
     locationAddress: string | null
+    locationState: string | null
+    locationDistrict: string | null
     locationLat: number | null
     locationLng: number | null
     status: $Enums.JobStatus
@@ -1415,6 +1540,7 @@ export type $ClientJobPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     updatedAt: Date
     hourlyRate: number | null
     timingType: string
+    paymentMethod: string
   }, ExtArgs["result"]["clientJob"]>
   composites: {}
 }
@@ -1854,6 +1980,8 @@ export interface ClientJobFieldRefs {
   readonly workMode: Prisma.FieldRef<"ClientJob", 'JobWorkMode'>
   readonly locationLabel: Prisma.FieldRef<"ClientJob", 'String'>
   readonly locationAddress: Prisma.FieldRef<"ClientJob", 'String'>
+  readonly locationState: Prisma.FieldRef<"ClientJob", 'String'>
+  readonly locationDistrict: Prisma.FieldRef<"ClientJob", 'String'>
   readonly locationLat: Prisma.FieldRef<"ClientJob", 'Float'>
   readonly locationLng: Prisma.FieldRef<"ClientJob", 'Float'>
   readonly status: Prisma.FieldRef<"ClientJob", 'JobStatus'>
@@ -1861,6 +1989,7 @@ export interface ClientJobFieldRefs {
   readonly updatedAt: Prisma.FieldRef<"ClientJob", 'DateTime'>
   readonly hourlyRate: Prisma.FieldRef<"ClientJob", 'Int'>
   readonly timingType: Prisma.FieldRef<"ClientJob", 'String'>
+  readonly paymentMethod: Prisma.FieldRef<"ClientJob", 'String'>
 }
     
 

@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { PhoneVerification } from "@/components/PhoneVerification";
 import { Textarea } from "@/components/ui/textarea";
 import type { MarketplaceCategory } from "@/lib/types/marketplace";
+import { getAllStates, getDistrictsByState } from "@/lib/india-locations";
 
 const LeafletMap = dynamic(() => import("@/components/LeafletAddressMap"), {
   ssr: false,
@@ -47,6 +48,8 @@ type Profile = {
   serviceRadiusKm: number | null;
   professionalLatitude: number | null;
   professionalLongitude: number | null;
+  professionalState: string | null;
+  professionalDistrict: string | null;
   workMode: string;
   companyDescription: string | null;
   professionalSkillsJson: string | null;
@@ -63,6 +66,8 @@ export function ProfessionalProfileSetup() {
   const [skillDraft, setSkillDraft] = useState("");
   const [location, setLocation] = useState<[number, number]>([20.5937, 78.9629]);
   const [serviceRadiusKm, setServiceRadiusKm] = useState<string>("25");
+  const [state, setState] = useState("");
+  const [district, setDistrict] = useState("");
   const [categories, setCategories] = useState<MarketplaceCategory[]>([]);
   const [segment, setSegment] = useState("RESIDENTIAL");
   const [workMode, setWorkMode] = useState("both");
@@ -74,6 +79,31 @@ export function ProfessionalProfileSetup() {
       item.segment === segment &&
       (item.parentId !== null || !categories.some((child) => child.parentId === item.id)),
   );
+
+  async function fillAreaFromLocation(latitude: number, longitude: number) {
+    try {
+      const response = await fetch(`/api/geocode?lat=${latitude}&lon=${longitude}`);
+      if (!response.ok) return;
+      const data = (await response.json()) as {
+        results?: Array<{ state?: string | null; district?: string | null }>;
+      };
+      const result = data.results?.[0];
+      const matchedState = result?.state?.trim();
+      const matchedDistrict = result?.district?.trim();
+      if (!matchedState || !getAllStates().includes(matchedState)) return;
+      setState(matchedState);
+      const normalizedDistrict = matchedDistrict
+        ?.replace(/\s+district$/i, "")
+        .trim()
+        .toLowerCase();
+      const districtMatch = getDistrictsByState(matchedState).find(
+        (item) => item.toLowerCase() === normalizedDistrict,
+      );
+      setDistrict(districtMatch ?? "");
+    } catch {
+      // The map location is still saved even when reverse geocoding is unavailable.
+    }
+  }
 
   useEffect(() => {
     if (searchParams.get("profileSetup") !== "1") return;
@@ -96,6 +126,8 @@ export function ProfessionalProfileSetup() {
         if (!data?.profile) return;
         setProfile(data.profile);
         setCategory(data.profile.professionalCategory ?? "");
+        setState(data.profile.professionalState ?? "");
+        setDistrict(data.profile.professionalDistrict ?? "");
         const savedWorkMode = data.profile.workMode?.toLowerCase();
         setWorkMode(
           savedWorkMode === "remote" || savedWorkMode === "on_site" ? savedWorkMode : "both",
@@ -156,6 +188,8 @@ export function ProfessionalProfileSetup() {
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
         category,
+        state,
+        district,
         experienceYears: form.get("experienceYears") ? Number(form.get("experienceYears")) : null,
         hourlyRate: form.get("hourlyRate") ? Number(form.get("hourlyRate")) : null,
         serviceRadiusKm:
@@ -279,6 +313,48 @@ export function ProfessionalProfileSetup() {
               />
             </div>
             <div className="space-y-3">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-1.5">
+                  <Label htmlFor="professional-state">State</Label>
+                  <select
+                    id="professional-state"
+                    value={state}
+                    onChange={(event) => {
+                      setState(event.target.value);
+                      setDistrict("");
+                    }}
+                    className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm shadow-sm outline-none transition focus:border-ring focus:ring-1 focus:ring-ring"
+                    required
+                  >
+                    <option value="">Select state...</option>
+                    {getAllStates().map((item) => (
+                      <option key={item} value={item}>
+                        {item}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="professional-district">District</Label>
+                  <select
+                    id="professional-district"
+                    value={district}
+                    onChange={(event) => setDistrict(event.target.value)}
+                    className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm shadow-sm outline-none transition focus:border-ring focus:ring-1 focus:ring-ring"
+                    required
+                    disabled={!state}
+                  >
+                    <option value="">
+                      {state ? "Select district..." : "Select a state first"}
+                    </option>
+                    {(getDistrictsByState(state) ?? []).map((item) => (
+                      <option key={item} value={item}>
+                        {item}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
               <div className="space-y-1.5">
                 <Label>Service location</Label>
                 <p className="text-sm text-muted-foreground">
@@ -288,17 +364,26 @@ export function ProfessionalProfileSetup() {
               <div className="overflow-hidden rounded-xl border border-border shadow-sm">
                 <LeafletMap
                   point={location}
-                  onPointChange={(latitude, longitude) => setLocation([latitude, longitude])}
+                  onPointChange={(latitude, longitude) => {
+                    setLocation([latitude, longitude]);
+                    void fillAreaFromLocation(latitude, longitude);
+                  }}
                 />
               </div>
               <Button
                 type="button"
                 variant="outline"
-                onClick={() =>
-                  navigator.geolocation?.getCurrentPosition((position) =>
-                    setLocation([position.coords.latitude, position.coords.longitude]),
-                  )
-                }
+                onClick={() => {
+                  if (!navigator.geolocation) return;
+                  navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                      const { latitude, longitude } = position.coords;
+                      setLocation([latitude, longitude]);
+                      void fillAreaFromLocation(latitude, longitude);
+                    },
+                    () => setError("Location permission was not granted."),
+                  );
+                }}
               >
                 Use my current location
               </Button>

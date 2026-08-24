@@ -8,6 +8,8 @@ export type ProfessionalDiscoveryFilter = {
   segment?: string;
   category?: string;
   city?: string;
+  state?: string;
+  district?: string;
   minRating?: number;
   verified?: boolean;
   availability?: string;
@@ -34,6 +36,12 @@ const CITY_COORDINATES: Record<string, { lat: number; lng: number }> = {
   Mumbai: { lat: 19.076, lng: 72.8777 },
   Pune: { lat: 18.5204, lng: 73.8567 },
   Surat: { lat: 21.1702, lng: 72.8311 },
+};
+const STATE_COORDINATE_BOUNDS: Record<
+  string,
+  { minLat: number; maxLat: number; minLng: number; maxLng: number }
+> = {
+  Gujarat: { minLat: 20.0, maxLat: 24.8, minLng: 68.0, maxLng: 74.5 },
 };
 
 async function buildSearchWhere(filter: ProfessionalDiscoveryFilter) {
@@ -83,6 +91,46 @@ async function buildSearchWhere(filter: ProfessionalDiscoveryFilter) {
 
   if (filter.city) {
     where.professionalCity = filter.city;
+  }
+
+  if (filter.state) {
+    const bounds = STATE_COORDINATE_BOUNDS[filter.state];
+    if (bounds && !filter.district) {
+      where.AND = [
+        ...(Array.isArray(where.AND) ? where.AND : []),
+        {
+          OR: [
+            { professionalState: filter.state },
+            {
+              AND: [
+                { professionalLatitude: { gte: bounds.minLat, lte: bounds.maxLat } },
+                { professionalLongitude: { gte: bounds.minLng, lte: bounds.maxLng } },
+              ],
+            },
+          ],
+        },
+      ];
+    } else if (filter.district) {
+      where.AND = [
+        ...(Array.isArray(where.AND) ? where.AND : []),
+        {
+          OR: [
+            {
+              AND: [{ professionalState: filter.state }, { professionalDistrict: filter.district }],
+            },
+            // Keep existing profiles discoverable until they save the new
+            // structured state/district fields in Profile Setup.
+            { professionalCity: filter.district },
+          ],
+        },
+      ];
+    } else {
+      where.professionalState = filter.state;
+    }
+  }
+
+  if (filter.district && !(filter.state && STATE_COORDINATE_BOUNDS[filter.state])) {
+    where.professionalDistrict = filter.district;
   }
 
   if (filter.availability) {
@@ -143,6 +191,8 @@ function toPublicProfessional(
     avatarUrl: string | null;
     professionalCategory: string | null;
     professionalCity: string | null;
+    professionalState: string | null;
+    professionalDistrict: string | null;
     hourlyRate: number | null;
     averageRating: number;
     reviewCount: number;
@@ -171,7 +221,12 @@ function toPublicProfessional(
     rating: professional.averageRating,
     reviewCount: professional.reviewCount,
     hourlyRate: professional.hourlyRate,
-    location: professional.professionalCity,
+    location: professional.professionalDistrict
+      ? `${professional.professionalDistrict}, ${professional.professionalState ?? ""}`.replace(
+          /, $/,
+          "",
+        )
+      : professional.professionalCity,
     approximateDistanceKm: distanceKm,
     availabilityStatus: professional.availabilityStatus,
     skills: parseSkills(professional.professionalSkillsJson),
@@ -189,6 +244,8 @@ type UserProfessionalRecord = {
   avatarUrl: string | null;
   professionalCategory: string | null;
   professionalCity: string | null;
+  professionalState: string | null;
+  professionalDistrict: string | null;
   hourlyRate: number | null;
   averageRating: number;
   reviewCount: number;
@@ -283,6 +340,8 @@ export async function searchProfessionals(filter: ProfessionalDiscoveryFilter) {
       avatarUrl: true,
       professionalCategory: true,
       professionalCity: true,
+      professionalState: true,
+      professionalDistrict: true,
       hourlyRate: true,
       averageRating: true,
       reviewCount: true,

@@ -80,6 +80,7 @@ type Data = {
     title: string | null;
     deadline: string | null;
     budgetMax: number | null;
+    paymentMethod: "WALLET" | "OFFLINE";
     locationAddress: string | null;
     locationLat: number | null;
     locationLng: number | null;
@@ -304,11 +305,19 @@ export default function SharedProjectTrackingPage() {
     actionInFlight.current = true;
     setBusy("approve-milestone");
     try {
-      const response = await fetch("/api/wallet/milestone", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ projectId: Number(projectId), milestoneId }),
-      });
+      const offlinePayment = data?.job?.paymentMethod === "OFFLINE";
+      const response = await fetch(
+        offlinePayment ? "/api/v1/portal/project-actions" : "/api/wallet/milestone",
+        {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(
+            offlinePayment
+              ? { action: "approve-milestone", projectId: Number(projectId), milestoneId }
+              : { projectId: Number(projectId), milestoneId },
+          ),
+        },
+      );
       const result = (await response.json().catch(() => null)) as {
         error?: string;
         charged?: number;
@@ -318,7 +327,12 @@ export default function SharedProjectTrackingPage() {
         remainingBalance?: number;
       } | null;
       if (!response.ok) {
-        setApprovalError(result?.error ?? "Unable to complete wallet payment.");
+        setApprovalError(
+          result?.error ??
+            (offlinePayment
+              ? "Unable to record offline payment."
+              : "Unable to complete wallet payment."),
+        );
         return false;
       }
       await refresh().catch(() => undefined);
@@ -1492,17 +1506,28 @@ export default function SharedProjectTrackingPage() {
       >
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Approve milestone payment</DialogTitle>
+            <DialogTitle>
+              {data.job?.paymentMethod === "OFFLINE"
+                ? "Confirm offline payment"
+                : "Approve milestone payment"}
+            </DialogTitle>
             <DialogDescription>
-              Review the wallet payment breakdown before approving this milestone.
+              {data.job?.paymentMethod === "OFFLINE"
+                ? "Confirm that you paid the professional directly for this milestone."
+                : "Review the wallet payment breakdown before approving this milestone."}
             </DialogDescription>
           </DialogHeader>
           {approvalMilestone ? (
             <div className="mt-4 space-y-3">
               {(() => {
-                const clientFee = Math.ceil(approvalMilestone.amount * 0.1);
-                const clientCharge = approvalMilestone.amount + clientFee;
-                const professionalPayout = Math.max(0, approvalMilestone.amount - clientFee);
+                const offlinePayment = data.job?.paymentMethod === "OFFLINE";
+                const clientFee = offlinePayment ? 0 : Math.ceil(approvalMilestone.amount * 0.1);
+                const clientCharge = offlinePayment
+                  ? approvalMilestone.amount
+                  : approvalMilestone.amount + clientFee;
+                const professionalPayout = offlinePayment
+                  ? approvalMilestone.amount
+                  : Math.max(0, approvalMilestone.amount - clientFee);
                 return (
                   <>
                     {approvalSuccess ? (
@@ -1513,8 +1538,9 @@ export default function SharedProjectTrackingPage() {
                             ₹{approvalSuccess.charged.toLocaleString("en-IN")} charged
                           </p>
                           <p className="mt-1 text-sm text-muted-foreground">
-                            Client payment received. Professional payout is waiting for admin
-                            approval.
+                            {offlinePayment
+                              ? "Offline payment recorded. The professional was marked as paid."
+                              : "Client payment received. Professional payout is waiting for admin approval."}
                           </p>
                         </div>
                         <div className="space-y-3 rounded-2xl border border-border p-4 text-sm">
@@ -1527,7 +1553,9 @@ export default function SharedProjectTrackingPage() {
                             </span>
                           </div>
                           <div className="flex justify-between gap-4">
-                            <span className="text-muted-foreground">Admin wallet receives</span>
+                            <span className="text-muted-foreground">
+                              {offlinePayment ? "Platform earnings" : "Admin wallet receives"}
+                            </span>
                             <span className="font-semibold">
                               ₹{approvalSuccess.adminReceives.toLocaleString("en-IN")}
                             </span>
@@ -1540,12 +1568,14 @@ export default function SharedProjectTrackingPage() {
                               ₹{approvalSuccess.platformEarnings.toLocaleString("en-IN")}
                             </span>
                           </div>
-                          <div className="flex justify-between gap-4 border-t border-border pt-3">
-                            <span className="font-semibold">Wallet balance after payment</span>
-                            <span className="font-bold text-primary">
-                              ₹{approvalSuccess.remainingBalance.toLocaleString("en-IN")}
-                            </span>
-                          </div>
+                          {!offlinePayment && (
+                            <div className="flex justify-between gap-4 border-t border-border pt-3">
+                              <span className="font-semibold">Wallet balance after payment</span>
+                              <span className="font-bold text-primary">
+                                ₹{approvalSuccess.remainingBalance.toLocaleString("en-IN")}
+                              </span>
+                            </div>
+                          )}
                         </div>
                         <DialogFooter className="pt-2">
                           <Button onClick={() => setApprovalMilestone(null)}>Done</Button>
@@ -1569,13 +1599,17 @@ export default function SharedProjectTrackingPage() {
                             </span>
                           </div>
                           <div className="flex justify-between gap-4">
-                            <span className="text-muted-foreground">Client wallet fee (10%)</span>
+                            <span className="text-muted-foreground">
+                              {offlinePayment ? "Payment method" : "Client wallet fee (10%)"}
+                            </span>
                             <span className="font-semibold">
                               +₹{clientFee.toLocaleString("en-IN")}
                             </span>
                           </div>
                           <div className="flex justify-between gap-4 border-t border-border pt-3">
-                            <span className="font-semibold">Client wallet debit</span>
+                            <span className="font-semibold">
+                              {offlinePayment ? "Amount paid offline" : "Client wallet debit"}
+                            </span>
                             <span className="font-bold text-primary">
                               ₹{clientCharge.toLocaleString("en-IN")}
                             </span>
@@ -1587,20 +1621,24 @@ export default function SharedProjectTrackingPage() {
                             </span>
                           </div>
                         </div>
-                        <p className="rounded-xl bg-muted p-3 text-xs text-muted-foreground">
-                          Approval will debit ₹{clientCharge.toLocaleString("en-IN")} from your
-                          wallet. Make sure your wallet has enough balance.
-                        </p>
-                        <div className="flex items-center justify-between rounded-xl border border-border px-3 py-2 text-sm">
-                          <span className="text-muted-foreground">Current wallet balance</span>
-                          <span
-                            className={`font-bold ${approvalWalletBalance !== null && approvalWalletBalance < clientCharge ? "text-destructive" : "text-success"}`}
-                          >
-                            {approvalWalletBalance === null
-                              ? "Loading…"
-                              : `₹${approvalWalletBalance.toLocaleString("en-IN")}`}
-                          </span>
-                        </div>
+                        {offlinePayment ? null : (
+                          <p className="rounded-xl bg-muted p-3 text-xs text-muted-foreground">
+                            Approval will debit ₹{clientCharge.toLocaleString("en-IN")} from your
+                            wallet. Make sure your wallet has enough balance.
+                          </p>
+                        )}
+                        {!offlinePayment && (
+                          <div className="flex items-center justify-between rounded-xl border border-border px-3 py-2 text-sm">
+                            <span className="text-muted-foreground">Current wallet balance</span>
+                            <span
+                              className={`font-bold ${approvalWalletBalance !== null && approvalWalletBalance < clientCharge ? "text-destructive" : "text-success"}`}
+                            >
+                              {approvalWalletBalance === null
+                                ? "Loading…"
+                                : `₹${approvalWalletBalance.toLocaleString("en-IN")}`}
+                            </span>
+                          </div>
+                        )}
                         {approvalError ? (
                           <p className="rounded-xl bg-destructive/10 p-3 text-sm font-medium text-destructive">
                             {approvalError}
@@ -1613,7 +1651,8 @@ export default function SharedProjectTrackingPage() {
                           <Button
                             disabled={
                               busy === "approve-milestone" ||
-                              (approvalWalletBalance !== null &&
+                              (!offlinePayment &&
+                                approvalWalletBalance !== null &&
                                 approvalWalletBalance < clientCharge)
                             }
                             onClick={async () => {

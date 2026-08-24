@@ -15,6 +15,7 @@ import {
 import { Search, Map, MapPin, SlidersHorizontal, Star, ShieldCheck, Heart } from "lucide-react";
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { MarketplaceCategory } from "@/lib/types/marketplace";
+import { getAllStates, getDistrictsByState } from "@/lib/india-locations";
 
 const ProfessionalJobsMap = dynamic(() => import("@/components/ProfessionalJobsMap"), {
   ssr: false,
@@ -57,6 +58,8 @@ type JobListItem = {
   hourlyRate: number | null;
   timingType: string | null;
   locationAddress: string | null;
+  locationState: string | null;
+  locationDistrict: string | null;
   locationLat: number | null;
   locationLng: number | null;
   distanceKm: number | null;
@@ -130,6 +133,8 @@ function ProfessionalJobsContent() {
   const [segment, setSegment] = useState("");
   const [category, setCategory] = useState("");
   const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [district, setDistrict] = useState("");
   const [minRating, setMinRating] = useState<number | "">("");
   const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [nearMe, setNearMe] = useState(false);
@@ -380,6 +385,8 @@ function ProfessionalJobsContent() {
       const matchesCategory = !category || job.category === category;
       const matchesCity =
         !city || (job.locationAddress ?? "").toLowerCase().includes(city.toLowerCase());
+      const matchesState = !state || job.locationState === state;
+      const matchesDistrict = !district || job.locationDistrict === district;
       const matchesRating = minRating === "" || (job.clientRating ?? 0) >= Number(minRating);
       const matchesVerified = !verifiedOnly || job.clientVerified;
       const matchesNearMe = !nearMe || (job.distanceKm !== null && job.distanceKm <= radiusKm);
@@ -388,6 +395,8 @@ function ProfessionalJobsContent() {
         matchesSegment &&
         matchesCategory &&
         matchesCity &&
+        matchesState &&
+        matchesDistrict &&
         matchesRating &&
         matchesVerified &&
         matchesNearMe
@@ -400,6 +409,8 @@ function ProfessionalJobsContent() {
     segmentCategoryNames,
     category,
     city,
+    state,
+    district,
     minRating,
     verifiedOnly,
     nearMe,
@@ -595,6 +606,8 @@ function ProfessionalJobsContent() {
                     setSegment("");
                     setCategory("");
                     setCity("");
+                    setState("");
+                    setDistrict("");
                     setMinRating("");
                     setVerifiedOnly(false);
                     setNearMe(false);
@@ -607,6 +620,42 @@ function ProfessionalJobsContent() {
               </div>
 
               <div className="space-y-6">
+                <div>
+                  <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                    State and district
+                  </p>
+                  <div className="space-y-2">
+                    <select
+                      value={state}
+                      onChange={(event) => {
+                        setState(event.target.value);
+                        setDistrict("");
+                      }}
+                      className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                    >
+                      <option value="">All states</option>
+                      {getAllStates().map((item) => (
+                        <option key={item} value={item}>
+                          {item}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      value={district}
+                      onChange={(event) => setDistrict(event.target.value)}
+                      disabled={!state}
+                      className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      <option value="">All districts</option>
+                      {(getDistrictsByState(state) ?? []).map((item) => (
+                        <option key={item} value={item}>
+                          {item}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
                 <div>
                   <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
                     Category

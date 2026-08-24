@@ -5605,6 +5605,8 @@ export const UserScalarFieldEnum = {
   address: 'address',
   professionalCategory: 'professionalCategory',
   professionalCity: 'professionalCity',
+  professionalState: 'professionalState',
+  professionalDistrict: 'professionalDistrict',
   professionalSkillsJson: 'professionalSkillsJson',
   experienceYears: 'experienceYears',
   hourlyRate: 'hourlyRate',
@@ -5698,13 +5700,16 @@ export const ClientJobScalarFieldEnum = {
   workMode: 'workMode',
   locationLabel: 'locationLabel',
   locationAddress: 'locationAddress',
+  locationState: 'locationState',
+  locationDistrict: 'locationDistrict',
   locationLat: 'locationLat',
   locationLng: 'locationLng',
   status: 'status',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   hourlyRate: 'hourlyRate',
-  timingType: 'timingType'
+  timingType: 'timingType',
+  paymentMethod: 'paymentMethod'
 } as const
 
 export type ClientJobScalarFieldEnum = (typeof ClientJobScalarFieldEnum)[keyof typeof ClientJobScalarFieldEnum]

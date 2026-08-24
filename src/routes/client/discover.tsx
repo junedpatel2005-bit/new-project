@@ -17,6 +17,7 @@ import { Map, SlidersHorizontal, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { getAllStates, getDistrictsByState } from "@/lib/india-locations";
 
 const PAGE_SIZE = 50;
 const segmentOptions: [string, string][] = [
@@ -56,6 +57,8 @@ function DiscoverContent() {
   const [segment, setSegment] = useState("");
   const [category, setCategory] = useState("");
   const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [district, setDistrict] = useState("");
   const [minRating, setMinRating] = useState<number | "">("");
   const [availability, setAvailability] = useState("");
   const [distanceKm, setDistanceKm] = useState<number | "">("");
@@ -125,6 +128,8 @@ function DiscoverContent() {
     if (segment) params.set("segment", segment);
     if (category) params.set("category", category);
     if (city) params.set("city", city);
+    if (state) params.set("state", state);
+    if (district) params.set("district", district);
     if (minRating !== "") params.set("minRating", String(minRating));
     if (availability) params.set("availability", availability);
     if (distanceKm !== "" && originLat !== null && originLng !== null) {
@@ -160,6 +165,8 @@ function DiscoverContent() {
     segment,
     category,
     city,
+    state,
+    district,
     minRating,
     availability,
     distanceKm,
@@ -232,6 +239,8 @@ function DiscoverContent() {
                 setSegment("");
                 setCategory("");
                 setCity("");
+                setState("");
+                setDistrict("");
                 setMinRating("");
                 setAvailability("");
                 setDistanceKm("");
@@ -366,6 +375,43 @@ function DiscoverContent() {
               }}
               placeholder="e.g., Toronto, Vancouver"
             />
+          </FilterSection>
+
+          <FilterSection title="State and district">
+            <div className="space-y-2">
+              <select
+                value={state}
+                onChange={(event) => {
+                  setState(event.target.value);
+                  setDistrict("");
+                  setPage(1);
+                }}
+                className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+              >
+                <option value="">All states</option>
+                {getAllStates().map((item) => (
+                  <option key={item} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={district}
+                onChange={(event) => {
+                  setDistrict(event.target.value);
+                  setPage(1);
+                }}
+                disabled={!state}
+                className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm disabled:opacity-50"
+              >
+                <option value="">All districts</option>
+                {(getDistrictsByState(state) ?? []).map((item) => (
+                  <option key={item} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </select>
+            </div>
           </FilterSection>
 
           <FilterSection title="Distance">

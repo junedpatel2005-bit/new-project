@@ -19,6 +19,8 @@ const bodySchema = z.object({
   workMode: z.enum(["ON_SITE", "REMOTE", "BOTH"]).optional(),
   locationLabel: z.string().trim().max(100).nullable().optional(),
   locationAddress: z.string().trim().max(300).nullable().optional(),
+  locationState: z.string().trim().max(100).nullable().optional(),
+  locationDistrict: z.string().trim().max(100).nullable().optional(),
   locationLat: z.coerce.number().min(-90).max(90).nullable().optional(),
   locationLng: z.coerce.number().min(-180).max(180).nullable().optional(),
   status: z.enum(["OPEN", "CLOSED"]).optional(),
@@ -55,6 +57,8 @@ function dataOf(d: z.infer<typeof bodySchema>) {
     deadline: d.deadline ? new Date(`${d.deadline}T00:00:00.000Z`) : null,
     locationLabel: d.locationLabel || null,
     locationAddress: d.locationAddress || null,
+    locationState: d.locationState || null,
+    locationDistrict: d.locationDistrict || null,
     locationLat: d.locationLat ?? null,
     locationLng: d.locationLng ?? null,
   };

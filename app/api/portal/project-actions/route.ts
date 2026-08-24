@@ -4,7 +4,6 @@ import { db } from "@/lib/db";
 import { sessionCookie, verifySession } from "@/lib/auth";
 import { notifyDisputeRaised } from "@/lib/marketplace-notifications";
 import { enqueueBackgroundJob } from "@/lib/background-jobs";
-import { calculateMilestoneMoney } from "@/lib/wallet-ledger";
 
 const attachmentIds = z.array(z.number().int().positive()).min(1).max(10);
 
@@ -334,6 +333,121 @@ export async function POST(request: NextRequest) {
       });
     }
     if (input.action === "approve-milestone") {
+      const job = await db.clientJob.findUnique({
+        where: { id: project.jobId },
+        select: { paymentMethod: true },
+      });
+      if (job?.paymentMethod === "OFFLINE") {
+        const milestone = await db.projectMilestone.findFirst({
+          where: {
+            id: input.milestoneId,
+            trackingId: project.id,
+            status: "AWAITING_CLIENT_REVIEW",
+          },
+        });
+        if (!milestone)
+          return NextResponse.json(
+            { error: "This milestone is not awaiting review." },
+            { status: 409 },
+          );
+        try {
+          const payment = await db.$transaction(async (tx) => {
+            const claim = await tx.projectMilestone.updateMany({
+              where: {
+                id: milestone.id,
+                trackingId: project.id,
+                status: "AWAITING_CLIENT_REVIEW",
+              },
+              data: { status: "PAYMENT_PROCESSING" },
+            });
+            if (claim.count !== 1) throw new Error("This milestone is already being processed.");
+            const payment = await tx.payment.upsert({
+              where: { milestoneId: milestone.id },
+              create: {
+                clientId: project.clientId,
+                professionalId: project.professionalId,
+                jobId: project.jobId,
+                amount: milestone.amount,
+                baseAmount: milestone.amount,
+                professionalPayoutAmount: milestone.amount,
+                currency: "INR",
+                provider: "offline",
+                projectTrackingId: project.id,
+                milestoneId: milestone.id,
+                status: "COMPLETED",
+                capturedAt: new Date(),
+                idempotencyKey: `offline-milestone-${milestone.id}`,
+              },
+              update: {
+                amount: milestone.amount,
+                baseAmount: milestone.amount,
+                clientFeeAmount: 0,
+                professionalPayoutAmount: milestone.amount,
+                adminNetAmount: 0,
+                commissionAmount: 0,
+                provider: "offline",
+                status: "COMPLETED",
+                capturedAt: new Date(),
+              },
+            });
+            await tx.projectMilestone.update({
+              where: { id: milestone.id },
+              data: { status: "APPROVED", approvedAt: new Date() },
+            });
+            await tx.projectTransaction.create({
+              data: {
+                trackingId: project.id,
+                milestoneId: milestone.id,
+                clientId: project.clientId,
+                professionalId: project.professionalId,
+                amount: milestone.amount,
+                currency: "INR",
+                type: "OFFLINE_MILESTONE_PAYMENT",
+                status: "COMPLETED",
+                description: `Offline milestone payment confirmed: ${milestone.title}`,
+              },
+            });
+            const next = await tx.projectMilestone.findFirst({
+              where: { trackingId: project.id, status: "UPCOMING" },
+              orderBy: { createdAt: "asc" },
+            });
+            if (next) {
+              await tx.projectMilestone.update({
+                where: { id: next.id },
+                data: { status: "IN_PROGRESS" },
+              });
+              await tx.projectTracking.update({
+                where: { id: project.id },
+                data: { status: "IN_PROGRESS", currentStage: next.title },
+              });
+            } else {
+              await tx.projectTracking.update({
+                where: { id: project.id },
+                data: { status: "IN_PROGRESS", currentStage: null },
+              });
+            }
+            return payment;
+          });
+          return NextResponse.json({
+            ok: true,
+            paymentMethod: "OFFLINE",
+            charged: payment.amount,
+            professionalReceives: payment.professionalPayoutAmount,
+            adminReceives: 0,
+            platformEarnings: 0,
+            status: "COMPLETED",
+            message: "Offline payment recorded. The professional was marked as paid.",
+          });
+        } catch (error) {
+          if (error instanceof Error && error.message.includes("already being processed"))
+            return NextResponse.json({ error: error.message }, { status: 409 });
+          console.error("Offline milestone approval failed", error);
+          return NextResponse.json(
+            { error: "Offline milestone payment could not be recorded." },
+            { status: 500 },
+          );
+        }
+      }
       return NextResponse.json(
         { error: "Milestones must be paid from the client wallet.", paymentRequired: true },
         { status: 402 },

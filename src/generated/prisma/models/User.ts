@@ -69,6 +69,8 @@ export type UserMinAggregateOutputType = {
   address: string | null
   professionalCategory: string | null
   professionalCity: string | null
+  professionalState: string | null
+  professionalDistrict: string | null
   professionalSkillsJson: string | null
   experienceYears: number | null
   hourlyRate: number | null
@@ -122,6 +124,8 @@ export type UserMaxAggregateOutputType = {
   address: string | null
   professionalCategory: string | null
   professionalCity: string | null
+  professionalState: string | null
+  professionalDistrict: string | null
   professionalSkillsJson: string | null
   experienceYears: number | null
   hourlyRate: number | null
@@ -175,6 +179,8 @@ export type UserCountAggregateOutputType = {
   address: number
   professionalCategory: number
   professionalCity: number
+  professionalState: number
+  professionalDistrict: number
   professionalSkillsJson: number
   experienceYears: number
   hourlyRate: number
@@ -254,6 +260,8 @@ export type UserMinAggregateInputType = {
   address?: true
   professionalCategory?: true
   professionalCity?: true
+  professionalState?: true
+  professionalDistrict?: true
   professionalSkillsJson?: true
   experienceYears?: true
   hourlyRate?: true
@@ -307,6 +315,8 @@ export type UserMaxAggregateInputType = {
   address?: true
   professionalCategory?: true
   professionalCity?: true
+  professionalState?: true
+  professionalDistrict?: true
   professionalSkillsJson?: true
   experienceYears?: true
   hourlyRate?: true
@@ -360,6 +370,8 @@ export type UserCountAggregateInputType = {
   address?: true
   professionalCategory?: true
   professionalCity?: true
+  professionalState?: true
+  professionalDistrict?: true
   professionalSkillsJson?: true
   experienceYears?: true
   hourlyRate?: true
@@ -500,6 +512,8 @@ export type UserGroupByOutputType = {
   address: string | null
   professionalCategory: string | null
   professionalCity: string | null
+  professionalState: string | null
+  professionalDistrict: string | null
   professionalSkillsJson: string | null
   experienceYears: number | null
   hourlyRate: number | null
@@ -576,6 +590,8 @@ export type UserWhereInput = {
   address?: Prisma.StringNullableFilter<"User"> | string | null
   professionalCategory?: Prisma.StringNullableFilter<"User"> | string | null
   professionalCity?: Prisma.StringNullableFilter<"User"> | string | null
+  professionalState?: Prisma.StringNullableFilter<"User"> | string | null
+  professionalDistrict?: Prisma.StringNullableFilter<"User"> | string | null
   professionalSkillsJson?: Prisma.StringNullableFilter<"User"> | string | null
   experienceYears?: Prisma.IntNullableFilter<"User"> | number | null
   hourlyRate?: Prisma.IntNullableFilter<"User"> | number | null
@@ -637,6 +653,8 @@ export type UserOrderByWithRelationInput = {
   address?: Prisma.SortOrderInput | Prisma.SortOrder
   professionalCategory?: Prisma.SortOrderInput | Prisma.SortOrder
   professionalCity?: Prisma.SortOrderInput | Prisma.SortOrder
+  professionalState?: Prisma.SortOrderInput | Prisma.SortOrder
+  professionalDistrict?: Prisma.SortOrderInput | Prisma.SortOrder
   professionalSkillsJson?: Prisma.SortOrderInput | Prisma.SortOrder
   experienceYears?: Prisma.SortOrderInput | Prisma.SortOrder
   hourlyRate?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -702,6 +720,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   address?: Prisma.StringNullableFilter<"User"> | string | null
   professionalCategory?: Prisma.StringNullableFilter<"User"> | string | null
   professionalCity?: Prisma.StringNullableFilter<"User"> | string | null
+  professionalState?: Prisma.StringNullableFilter<"User"> | string | null
+  professionalDistrict?: Prisma.StringNullableFilter<"User"> | string | null
   professionalSkillsJson?: Prisma.StringNullableFilter<"User"> | string | null
   experienceYears?: Prisma.IntNullableFilter<"User"> | number | null
   hourlyRate?: Prisma.IntNullableFilter<"User"> | number | null
@@ -762,6 +782,8 @@ export type UserOrderByWithAggregationInput = {
   address?: Prisma.SortOrderInput | Prisma.SortOrder
   professionalCategory?: Prisma.SortOrderInput | Prisma.SortOrder
   professionalCity?: Prisma.SortOrderInput | Prisma.SortOrder
+  professionalState?: Prisma.SortOrderInput | Prisma.SortOrder
+  professionalDistrict?: Prisma.SortOrderInput | Prisma.SortOrder
   professionalSkillsJson?: Prisma.SortOrderInput | Prisma.SortOrder
   experienceYears?: Prisma.SortOrderInput | Prisma.SortOrder
   hourlyRate?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -823,6 +845,8 @@ export type UserScalarWhereWithAggregatesInput = {
   address?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   professionalCategory?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   professionalCity?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  professionalState?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  professionalDistrict?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   professionalSkillsJson?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   experienceYears?: Prisma.IntNullableWithAggregatesFilter<"User"> | number | null
   hourlyRate?: Prisma.IntNullableWithAggregatesFilter<"User"> | number | null
@@ -875,6 +899,8 @@ export type UserCreateInput = {
   address?: string | null
   professionalCategory?: string | null
   professionalCity?: string | null
+  professionalState?: string | null
+  professionalDistrict?: string | null
   professionalSkillsJson?: string | null
   experienceYears?: number | null
   hourlyRate?: number | null
@@ -936,6 +962,8 @@ export type UserUncheckedCreateInput = {
   address?: string | null
   professionalCategory?: string | null
   professionalCity?: string | null
+  professionalState?: string | null
+  professionalDistrict?: string | null
   professionalSkillsJson?: string | null
   experienceYears?: number | null
   hourlyRate?: number | null
@@ -996,6 +1024,8 @@ export type UserUpdateInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalSkillsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1057,6 +1087,8 @@ export type UserUncheckedUpdateInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalSkillsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1118,6 +1150,8 @@ export type UserCreateManyInput = {
   address?: string | null
   professionalCategory?: string | null
   professionalCity?: string | null
+  professionalState?: string | null
+  professionalDistrict?: string | null
   professionalSkillsJson?: string | null
   experienceYears?: number | null
   hourlyRate?: number | null
@@ -1170,6 +1204,8 @@ export type UserUpdateManyMutationInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalSkillsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1223,6 +1259,8 @@ export type UserUncheckedUpdateManyInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalSkillsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1276,6 +1314,8 @@ export type UserCountOrderByAggregateInput = {
   address?: Prisma.SortOrder
   professionalCategory?: Prisma.SortOrder
   professionalCity?: Prisma.SortOrder
+  professionalState?: Prisma.SortOrder
+  professionalDistrict?: Prisma.SortOrder
   professionalSkillsJson?: Prisma.SortOrder
   experienceYears?: Prisma.SortOrder
   hourlyRate?: Prisma.SortOrder
@@ -1341,6 +1381,8 @@ export type UserMaxOrderByAggregateInput = {
   address?: Prisma.SortOrder
   professionalCategory?: Prisma.SortOrder
   professionalCity?: Prisma.SortOrder
+  professionalState?: Prisma.SortOrder
+  professionalDistrict?: Prisma.SortOrder
   professionalSkillsJson?: Prisma.SortOrder
   experienceYears?: Prisma.SortOrder
   hourlyRate?: Prisma.SortOrder
@@ -1394,6 +1436,8 @@ export type UserMinOrderByAggregateInput = {
   address?: Prisma.SortOrder
   professionalCategory?: Prisma.SortOrder
   professionalCity?: Prisma.SortOrder
+  professionalState?: Prisma.SortOrder
+  professionalDistrict?: Prisma.SortOrder
   professionalSkillsJson?: Prisma.SortOrder
   experienceYears?: Prisma.SortOrder
   hourlyRate?: Prisma.SortOrder
@@ -1614,6 +1658,8 @@ export type UserCreateWithoutClientProfilesInput = {
   address?: string | null
   professionalCategory?: string | null
   professionalCity?: string | null
+  professionalState?: string | null
+  professionalDistrict?: string | null
   professionalSkillsJson?: string | null
   experienceYears?: number | null
   hourlyRate?: number | null
@@ -1674,6 +1720,8 @@ export type UserUncheckedCreateWithoutClientProfilesInput = {
   address?: string | null
   professionalCategory?: string | null
   professionalCity?: string | null
+  professionalState?: string | null
+  professionalDistrict?: string | null
   professionalSkillsJson?: string | null
   experienceYears?: number | null
   hourlyRate?: number | null
@@ -1749,6 +1797,8 @@ export type UserUpdateWithoutClientProfilesInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalSkillsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1809,6 +1859,8 @@ export type UserUncheckedUpdateWithoutClientProfilesInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalSkillsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1868,6 +1920,8 @@ export type UserCreateWithoutClientJobsInput = {
   address?: string | null
   professionalCategory?: string | null
   professionalCity?: string | null
+  professionalState?: string | null
+  professionalDistrict?: string | null
   professionalSkillsJson?: string | null
   experienceYears?: number | null
   hourlyRate?: number | null
@@ -1928,6 +1982,8 @@ export type UserUncheckedCreateWithoutClientJobsInput = {
   address?: string | null
   professionalCategory?: string | null
   professionalCity?: string | null
+  professionalState?: string | null
+  professionalDistrict?: string | null
   professionalSkillsJson?: string | null
   experienceYears?: number | null
   hourlyRate?: number | null
@@ -2003,6 +2059,8 @@ export type UserUpdateWithoutClientJobsInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalSkillsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -2063,6 +2121,8 @@ export type UserUncheckedUpdateWithoutClientJobsInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalSkillsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -2122,6 +2182,8 @@ export type UserCreateWithoutFavoriteJobsInput = {
   address?: string | null
   professionalCategory?: string | null
   professionalCity?: string | null
+  professionalState?: string | null
+  professionalDistrict?: string | null
   professionalSkillsJson?: string | null
   experienceYears?: number | null
   hourlyRate?: number | null
@@ -2182,6 +2244,8 @@ export type UserUncheckedCreateWithoutFavoriteJobsInput = {
   address?: string | null
   professionalCategory?: string | null
   professionalCity?: string | null
+  professionalState?: string | null
+  professionalDistrict?: string | null
   professionalSkillsJson?: string | null
   experienceYears?: number | null
   hourlyRate?: number | null
@@ -2257,6 +2321,8 @@ export type UserUpdateWithoutFavoriteJobsInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalSkillsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -2317,6 +2383,8 @@ export type UserUncheckedUpdateWithoutFavoriteJobsInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalSkillsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -2376,6 +2444,8 @@ export type UserCreateWithoutWalletInput = {
   address?: string | null
   professionalCategory?: string | null
   professionalCity?: string | null
+  professionalState?: string | null
+  professionalDistrict?: string | null
   professionalSkillsJson?: string | null
   experienceYears?: number | null
   hourlyRate?: number | null
@@ -2436,6 +2506,8 @@ export type UserUncheckedCreateWithoutWalletInput = {
   address?: string | null
   professionalCategory?: string | null
   professionalCity?: string | null
+  professionalState?: string | null
+  professionalDistrict?: string | null
   professionalSkillsJson?: string | null
   experienceYears?: number | null
   hourlyRate?: number | null
@@ -2511,6 +2583,8 @@ export type UserUpdateWithoutWalletInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalSkillsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -2571,6 +2645,8 @@ export type UserUncheckedUpdateWithoutWalletInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalSkillsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -2630,6 +2706,8 @@ export type UserCreateWithoutVerificationInput = {
   address?: string | null
   professionalCategory?: string | null
   professionalCity?: string | null
+  professionalState?: string | null
+  professionalDistrict?: string | null
   professionalSkillsJson?: string | null
   experienceYears?: number | null
   hourlyRate?: number | null
@@ -2690,6 +2768,8 @@ export type UserUncheckedCreateWithoutVerificationInput = {
   address?: string | null
   professionalCategory?: string | null
   professionalCity?: string | null
+  professionalState?: string | null
+  professionalDistrict?: string | null
   professionalSkillsJson?: string | null
   experienceYears?: number | null
   hourlyRate?: number | null
@@ -2765,6 +2845,8 @@ export type UserUpdateWithoutVerificationInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalSkillsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -2825,6 +2907,8 @@ export type UserUncheckedUpdateWithoutVerificationInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalSkillsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -2884,6 +2968,8 @@ export type UserCreateWithoutPersonaVerificationsInput = {
   address?: string | null
   professionalCategory?: string | null
   professionalCity?: string | null
+  professionalState?: string | null
+  professionalDistrict?: string | null
   professionalSkillsJson?: string | null
   experienceYears?: number | null
   hourlyRate?: number | null
@@ -2944,6 +3030,8 @@ export type UserUncheckedCreateWithoutPersonaVerificationsInput = {
   address?: string | null
   professionalCategory?: string | null
   professionalCity?: string | null
+  professionalState?: string | null
+  professionalDistrict?: string | null
   professionalSkillsJson?: string | null
   experienceYears?: number | null
   hourlyRate?: number | null
@@ -3019,6 +3107,8 @@ export type UserUpdateWithoutPersonaVerificationsInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalSkillsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -3079,6 +3169,8 @@ export type UserUncheckedUpdateWithoutPersonaVerificationsInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalSkillsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -3138,6 +3230,8 @@ export type UserCreateWithoutAuditLogsInput = {
   address?: string | null
   professionalCategory?: string | null
   professionalCity?: string | null
+  professionalState?: string | null
+  professionalDistrict?: string | null
   professionalSkillsJson?: string | null
   experienceYears?: number | null
   hourlyRate?: number | null
@@ -3198,6 +3292,8 @@ export type UserUncheckedCreateWithoutAuditLogsInput = {
   address?: string | null
   professionalCategory?: string | null
   professionalCity?: string | null
+  professionalState?: string | null
+  professionalDistrict?: string | null
   professionalSkillsJson?: string | null
   experienceYears?: number | null
   hourlyRate?: number | null
@@ -3273,6 +3369,8 @@ export type UserUpdateWithoutAuditLogsInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalSkillsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -3333,6 +3431,8 @@ export type UserUncheckedUpdateWithoutAuditLogsInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalSkillsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -3392,6 +3492,8 @@ export type UserCreateWithoutServicesInput = {
   address?: string | null
   professionalCategory?: string | null
   professionalCity?: string | null
+  professionalState?: string | null
+  professionalDistrict?: string | null
   professionalSkillsJson?: string | null
   experienceYears?: number | null
   hourlyRate?: number | null
@@ -3452,6 +3554,8 @@ export type UserUncheckedCreateWithoutServicesInput = {
   address?: string | null
   professionalCategory?: string | null
   professionalCity?: string | null
+  professionalState?: string | null
+  professionalDistrict?: string | null
   professionalSkillsJson?: string | null
   experienceYears?: number | null
   hourlyRate?: number | null
@@ -3527,6 +3631,8 @@ export type UserUpdateWithoutServicesInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalSkillsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -3587,6 +3693,8 @@ export type UserUncheckedUpdateWithoutServicesInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalSkillsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -3723,6 +3831,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   address?: boolean
   professionalCategory?: boolean
   professionalCity?: boolean
+  professionalState?: boolean
+  professionalDistrict?: boolean
   professionalSkillsJson?: boolean
   experienceYears?: boolean
   hourlyRate?: boolean
@@ -3785,6 +3895,8 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   address?: boolean
   professionalCategory?: boolean
   professionalCity?: boolean
+  professionalState?: boolean
+  professionalDistrict?: boolean
   professionalSkillsJson?: boolean
   experienceYears?: boolean
   hourlyRate?: boolean
@@ -3838,6 +3950,8 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   address?: boolean
   professionalCategory?: boolean
   professionalCity?: boolean
+  professionalState?: boolean
+  professionalDistrict?: boolean
   professionalSkillsJson?: boolean
   experienceYears?: boolean
   hourlyRate?: boolean
@@ -3891,6 +4005,8 @@ export type UserSelectScalar = {
   address?: boolean
   professionalCategory?: boolean
   professionalCity?: boolean
+  professionalState?: boolean
+  professionalDistrict?: boolean
   professionalSkillsJson?: boolean
   experienceYears?: boolean
   hourlyRate?: boolean
@@ -3925,7 +4041,7 @@ export type UserSelectScalar = {
   projectActivityNotificationsEnabled?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "role" | "firstName" | "lastName" | "email" | "username" | "phone" | "passwordHash" | "googleId" | "avatarUrl" | "companyName" | "companyWebsite" | "industry" | "teamSize" | "companyDescription" | "address" | "professionalCategory" | "professionalCity" | "professionalSkillsJson" | "experienceYears" | "hourlyRate" | "fixedRate" | "portfolioUrl" | "workPhotosJson" | "certificationsJson" | "tradeLicenseUrl" | "serviceArea" | "workMode" | "serviceRadiusKm" | "averageRating" | "reviewCount" | "isVerified" | "availabilityStatus" | "savedLocationsJson" | "hiringNeedsJson" | "authProvider" | "isActive" | "lastLoginAt" | "createdAt" | "updatedAt" | "professionalLatitude" | "professionalLongitude" | "biometricEnabled" | "biometricType" | "browserNotificationsEnabled" | "emailNotificationsEnabled" | "razorpayAccountId" | "emailVerifiedAt" | "phoneVerifiedAt" | "projectActivityNotificationsEnabled", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "role" | "firstName" | "lastName" | "email" | "username" | "phone" | "passwordHash" | "googleId" | "avatarUrl" | "companyName" | "companyWebsite" | "industry" | "teamSize" | "companyDescription" | "address" | "professionalCategory" | "professionalCity" | "professionalState" | "professionalDistrict" | "professionalSkillsJson" | "experienceYears" | "hourlyRate" | "fixedRate" | "portfolioUrl" | "workPhotosJson" | "certificationsJson" | "tradeLicenseUrl" | "serviceArea" | "workMode" | "serviceRadiusKm" | "averageRating" | "reviewCount" | "isVerified" | "availabilityStatus" | "savedLocationsJson" | "hiringNeedsJson" | "authProvider" | "isActive" | "lastLoginAt" | "createdAt" | "updatedAt" | "professionalLatitude" | "professionalLongitude" | "biometricEnabled" | "biometricType" | "browserNotificationsEnabled" | "emailNotificationsEnabled" | "razorpayAccountId" | "emailVerifiedAt" | "phoneVerifiedAt" | "projectActivityNotificationsEnabled", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   clientJobs?: boolean | Prisma.User$clientJobsArgs<ExtArgs>
   wallet?: boolean | Prisma.User$walletArgs<ExtArgs>
@@ -3971,6 +4087,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     address: string | null
     professionalCategory: string | null
     professionalCity: string | null
+    professionalState: string | null
+    professionalDistrict: string | null
     professionalSkillsJson: string | null
     experienceYears: number | null
     hourlyRate: number | null
@@ -4452,6 +4570,8 @@ export interface UserFieldRefs {
   readonly address: Prisma.FieldRef<"User", 'String'>
   readonly professionalCategory: Prisma.FieldRef<"User", 'String'>
   readonly professionalCity: Prisma.FieldRef<"User", 'String'>
+  readonly professionalState: Prisma.FieldRef<"User", 'String'>
+  readonly professionalDistrict: Prisma.FieldRef<"User", 'String'>
   readonly professionalSkillsJson: Prisma.FieldRef<"User", 'String'>
   readonly experienceYears: Prisma.FieldRef<"User", 'Int'>
   readonly hourlyRate: Prisma.FieldRef<"User", 'Int'>

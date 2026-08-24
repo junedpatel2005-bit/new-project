@@ -42,6 +42,8 @@ export type ProfessionalDiscoveryFilters = {
   segment?: string;
   category?: string;
   city?: string;
+  state?: string;
+  district?: string;
   minRating?: number;
   verified?: boolean;
   availability?: string;

@@ -24,14 +24,21 @@ export async function GET(request: NextRequest) {
     });
     if (!response.ok) throw new Error("Geocoding service unavailable");
     const data = (await response.json()) as
-      | Array<{ display_name: string; lat: string; lon: string }>
-      | { display_name: string; lat: string; lon: string };
+      | Array<{
+          display_name: string;
+          lat: string;
+          lon: string;
+          address?: Record<string, string>;
+        }>
+      | { display_name: string; lat: string; lon: string; address?: Record<string, string> };
     const results = Array.isArray(data) ? data : [data];
     return NextResponse.json({
       results: results.map((item) => ({
         address: item.display_name,
         lat: Number(item.lat),
         lon: Number(item.lon),
+        state: item.address?.state ?? null,
+        district: item.address?.state_district ?? item.address?.district ?? null,
       })),
     });
   } catch (error) {

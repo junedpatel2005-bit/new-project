@@ -123,6 +123,8 @@ model User {
   address                             String?
   professionalCategory                String?
   professionalCity                    String?
+  professionalState                   String?
+  professionalDistrict                String?
   professionalSkillsJson              String?
   experienceYears                     Int?
   hourlyRate                          Int?
@@ -223,6 +225,8 @@ model ClientJob {
   workMode        JobWorkMode           @default(BOTH)
   locationLabel   String?
   locationAddress String?
+  locationState   String?
+  locationDistrict String?
   locationLat     Float?
   locationLng     Float?
   status          JobStatus             @default(OPEN)

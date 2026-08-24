@@ -6,6 +6,7 @@ import { AddressMapPicker } from "@/components/AddressMapPicker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { MarketplaceCategory } from "@/lib/types/marketplace";
+import { getAllStates, getDistrictsByState } from "@/lib/india-locations";
 
 type Form = {
   title: string;
@@ -22,6 +23,8 @@ type Form = {
   workMode: "ON_SITE" | "REMOTE" | "BOTH";
   locationLabel: string;
   locationAddress: string;
+  locationState: string;
+  locationDistrict: string;
   locationLat: number | null;
   locationLng: number | null;
 };
@@ -40,6 +43,8 @@ const empty: Form = {
   workMode: "ON_SITE",
   locationLabel: "",
   locationAddress: "",
+  locationState: "",
+  locationDistrict: "",
   locationLat: null,
   locationLng: null,
 };
@@ -133,6 +138,8 @@ export default function PostJob() {
             workMode: job.workMode,
             locationLabel: job.locationLabel ?? "",
             locationAddress: job.locationAddress ?? "",
+            locationState: job.locationState ?? "",
+            locationDistrict: job.locationDistrict ?? "",
             locationLat: job.locationLat,
             locationLng: job.locationLng,
           });
@@ -512,6 +519,40 @@ export default function PostJob() {
                 placeholder="e.g. Home or job site"
               />
             </Field>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="State">
+                <select
+                  value={form.locationState}
+                  onChange={(event) => {
+                    update("locationState", event.target.value);
+                    update("locationDistrict", "");
+                  }}
+                  className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                >
+                  <option value="">Select state</option>
+                  {getAllStates().map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+              <Field label="District">
+                <select
+                  value={form.locationDistrict}
+                  onChange={(event) => update("locationDistrict", event.target.value)}
+                  disabled={!form.locationState}
+                  className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <option value="">Select district</option>
+                  {(getDistrictsByState(form.locationState) ?? []).map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+            </div>
             <div
               className={errors.locationAddress ? "rounded-lg border border-destructive p-2" : ""}
             >

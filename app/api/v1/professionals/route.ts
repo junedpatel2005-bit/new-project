@@ -7,6 +7,8 @@ const querySchema = z.object({
   segment: z.string().trim().max(50).optional(),
   category: z.string().trim().max(100).optional(),
   city: z.string().trim().max(100).optional(),
+  state: z.string().trim().max(100).optional(),
+  district: z.string().trim().max(100).optional(),
   minRating: z.coerce.number().min(0).max(5).optional(),
   verified: z.coerce.boolean().optional(),
   availability: z.string().trim().max(60).optional(),
