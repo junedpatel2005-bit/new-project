@@ -17,21 +17,29 @@ export function CmsEditor({
           // CKEditor 5 v44+ requires an explicit license configuration.
           // This project uses the GPL-compatible open-source build.
           licenseKey: "GPL",
-          toolbar: [
-            "heading",
-            "|",
-            "bold",
-            "italic",
-            "link",
-            "bulletedList",
-            "numberedList",
-            "blockQuote",
-            "insertTable",
-            "mediaEmbed",
-            "|",
-            "undo",
-            "redo",
-          ],
+          toolbar: {
+            items: [
+              "undo",
+              "redo",
+              "|",
+              "heading",
+              "|",
+              "bold",
+              "italic",
+              "|",
+              "link",
+              "uploadImage",
+              "insertTable",
+              "blockQuote",
+              "mediaEmbed",
+              "|",
+              "bulletedList",
+              "numberedList",
+              "outdent",
+              "indent",
+            ],
+            shouldNotGroupWhenFull: true,
+          },
         }}
         onChange={(_, editor) => onChange(editor.getData())}
       />

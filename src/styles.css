@@ -51,12 +51,15 @@ body:has(.cms-live-editable) button {
 .cms-format-toolbar {
   position: absolute;
   z-index: 9999;
-  display: none !important;
   gap: 2px;
   padding: 4px;
   border-radius: 8px;
   background: #11182b;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.cms-visual-editor-actions-moved > div:first-child {
+  display: none;
 }
 
 .cms-format-btn {

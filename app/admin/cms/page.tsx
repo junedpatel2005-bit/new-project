@@ -1,19 +1,11 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { useCallback, useEffect, useState } from "react";
-import { Eye, Save, X } from "lucide-react";
+import { Blocks, ChevronDown, ExternalLink, Eye, Pencil, Save, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { HomeVisualEditor } from "@/components/HomeVisualEditor";
 import { CmsBlockBuilder } from "@/components/CmsBlockBuilder";
-
-const CmsEditor = dynamic(
-  () => import("@/components/CmsEditor").then((module) => module.CmsEditor),
-  {
-    ssr: false,
-    loading: () => <div className="h-80 animate-pulse rounded-xl bg-white/10" />,
-  },
-);
+import { VisualPageEditor } from "@/components/VisualPageEditor";
 
 type Page = {
   id: number;
@@ -24,6 +16,24 @@ type Page = {
   status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
 };
 
+function normalizeCmsContent(value: string) {
+  const cssEnd = value.lastIndexOf("}");
+  const prefix = value.slice(0, cssEnd + 1);
+  if (cssEnd < 0 || !prefix.includes("{") || !/\.cms-[\w-]+/.test(prefix)) return value;
+  return value.slice(cssEnd + 1).trimStart();
+}
+
+function defaultCmsContent(page: Page | null) {
+  if (page?.slug !== "terms" || page.content.trim())
+    return normalizeCmsContent(page?.content ?? "");
+  return [
+    "<h2>Using Klick-Pro</h2>",
+    "<p>Clients and professionals must provide accurate information and use the marketplace respectfully and lawfully.</p>",
+    "<h2>Marketplace projects</h2>",
+    "<p>Project payments, milestones, reviews, disputes, and communications should be managed through Klick-Pro where available.</p>",
+  ].join("");
+}
+
 export default function CmsPage() {
   const [pages, setPages] = useState<Page[]>([]);
   const [selected, setSelected] = useState<Page | null>(null);
@@ -32,20 +42,42 @@ export default function CmsPage() {
   const [status, setStatus] = useState<Page["status"]>("DRAFT");
   const [message, setMessage] = useState("");
   const [preview, setPreview] = useState(false);
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [editorTab, setEditorTab] = useState<"canvas" | "blocks">("canvas");
+  const [blocksOpen, setBlocksOpen] = useState(false);
+  const [pageMenuOpen, setPageMenuOpen] = useState(false);
 
-  const pick = useCallback((page: Page | null, list?: Page[]) => {
+  const pick = useCallback((page: Page | null, list?: Page[], keepEditorOpen = false) => {
     if (list) setPages(list);
     setSelected(page);
     setTitle(page?.title ?? "");
-    setContent(page?.content ?? "");
+    setContent(defaultCmsContent(page));
     setStatus(page?.status ?? "DRAFT");
     setPreview(false);
+    if (!keepEditorOpen) setEditorOpen(false);
+    setEditorTab("canvas");
+    setBlocksOpen(false);
+    setPageMenuOpen(false);
+  }, []);
+  const updatePageSections = useCallback((pageId: number, sections: string) => {
+    setPages((current) =>
+      current.map((page) => (page.id === pageId ? { ...page, sections } : page)),
+    );
+    setSelected((current) => (current?.id === pageId ? { ...current, sections } : current));
   }, []);
   useEffect(() => {
     void fetch("/api/v1/admin/data/cms", { cache: "no-store" })
       .then((response) => response.json())
       .then((data) => pick(data.pages?.[0] ?? null, data.pages ?? []));
   }, [pick]);
+  useEffect(() => {
+    if (!editorOpen && !blocksOpen && !preview) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [blocksOpen, editorOpen, preview]);
   async function publish() {
     if (!selected) return;
     const nextStatus = status === "PUBLISHED" ? "DRAFT" : "PUBLISHED";
@@ -75,6 +107,7 @@ export default function CmsPage() {
     setMessage("Page changes saved.");
   }
   const url = selected ? `/${selected.slug.replace(/^\//, "")}` : "/";
+  const previewUrl = `${url}${url.includes("?") ? "&" : "?"}cmsPreview=1`;
   const editablePreviewUrl = `${url}${url.includes("?") ? "&" : "?"}cmsPreview=1&cmsEdit=1`;
   const isHome = selected?.slug === "" || selected?.slug === "/";
   const isProHome = selected?.slug === "professional-home";
@@ -85,7 +118,7 @@ export default function CmsPage() {
       ? "Edit the professional homepage layout directly. Click text in the page to change it. Job cards are live database data and cannot be edited."
       : isServices
         ? "Edit the services page header text. Job cards are live database data and cannot be edited."
-        : "Edit content with CKEditor and preview the actual website page using its original CSS.";
+        : "Edit the actual website page directly. Click highlighted text to change it, then upload your changes.";
 
   return (
     <div className="space-y-6">
@@ -164,34 +197,171 @@ export default function CmsPage() {
           ))}
         </aside>
         <div>
-          {isHome || isProHome || isServices ? (
-            <HomeVisualEditor
-              path={isProHome ? "/professional-home" : isServices ? "/services" : "/"}
-            />
-          ) : (
-            <section className="overflow-hidden rounded-2xl border border-white/10 bg-[#11182b] shadow-2xl">
-              <div className="border-b border-white/10 px-5 py-4 text-white">
-                <p className="text-sm font-semibold">Page content editor</p>
+          <section className="overflow-hidden rounded-3xl border border-white/10 bg-[#11182b] shadow-2xl">
+            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 px-5 py-4">
+              <div>
+                <p className="text-sm font-semibold text-white">Page preview</p>
                 <p className="mt-1 text-xs text-slate-400">
-                  Use the full toolbar to format text, headings, links, lists, tables, and media.
+                  Review the real page, then use the pencil to edit its content.
                 </p>
               </div>
-              <div className="bg-white p-4 sm:p-6">
-                <label className="mb-4 block text-sm font-semibold text-slate-700">
-                  Page title
-                  <input
-                    value={title}
-                    onChange={(event) => setTitle(event.target.value)}
-                    className="mt-2 h-11 w-full rounded-lg border border-slate-200 px-3 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
-                  />
-                </label>
-                <CmsEditor value={content} onChange={setContent} />
-              </div>
-            </section>
-          )}
-          {selected && <CmsBlockBuilder page={selected} />}
+              {selected && (
+                <div className="flex items-center gap-2">
+                  <a
+                    href={url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex h-9 items-center gap-2 rounded-lg border border-white/15 px-3 text-xs font-semibold text-slate-200 transition hover:bg-white/10"
+                  >
+                    <ExternalLink className="h-4 w-4" /> Open page
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditorTab("canvas");
+                      setEditorOpen(true);
+                    }}
+                    className="inline-flex h-9 items-center gap-2 rounded-lg bg-indigo-500 px-3 text-xs font-bold text-white transition hover:bg-indigo-400"
+                  >
+                    <Pencil className="h-4 w-4" /> Edit page
+                  </button>
+                </div>
+              )}
+            </div>
+            <iframe
+              className="h-[calc(100vh-285px)] min-h-[620px] w-full bg-white"
+              src={selected ? previewUrl : "about:blank"}
+              title="Website page preview"
+            />
+          </section>
         </div>
       </div>
+      {editorOpen && selected && (
+        <div className="fixed inset-0 z-40 bg-[#060913]/90 p-0 backdrop-blur-sm sm:p-2">
+          <div className="mx-auto flex h-full max-w-none flex-col overflow-hidden rounded-none border border-white/10 bg-[#11182b] shadow-2xl sm:rounded-2xl">
+            <header className="relative flex items-center justify-between border-b border-white/10 px-5 py-4 text-white">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[.18em] text-indigo-300">
+                  Edit page
+                </p>
+                <div className="relative mt-1">
+                  <button
+                    type="button"
+                    onClick={() => setPageMenuOpen((open) => !open)}
+                    className="inline-flex items-center gap-2 text-lg font-bold text-white transition hover:text-indigo-200"
+                  >
+                    {selected.title}
+                    <ChevronDown className="h-4 w-4" />
+                  </button>
+                  {pageMenuOpen && (
+                    <div className="absolute left-0 top-full z-50 mt-3 max-h-[min(28rem,70vh)] w-72 overflow-auto rounded-xl border border-white/15 bg-[#11182b] p-2 shadow-2xl">
+                      {pages.map((page) => (
+                        <button
+                          key={page.id}
+                          type="button"
+                          onClick={() => pick(page, undefined, true)}
+                          className={`w-full rounded-lg px-3 py-2.5 text-left transition ${
+                            selected.id === page.id
+                              ? "bg-indigo-500 text-white"
+                              : "text-slate-300 hover:bg-white/10 hover:text-white"
+                          }`}
+                        >
+                          <span className="block truncate text-sm font-semibold">{page.title}</span>
+                          <span className="mt-0.5 block truncate text-xs opacity-70">
+                            /{page.slug || "home"} · {page.status}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div id="cms-editor-message" className="absolute left-28 top-1/2 -translate-y-1/2" />
+              <div id="cms-editor-actions" className="ml-auto mr-3" />
+              <div className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-1 rounded-xl border border-white/10 bg-black/10 p-1 md:flex">
+                <button
+                  type="button"
+                  onClick={() => setEditorTab("canvas")}
+                  className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold transition ${
+                    editorTab === "canvas"
+                      ? "bg-indigo-500 text-white shadow-lg"
+                      : "text-slate-400 hover:bg-white/5 hover:text-white"
+                  }`}
+                >
+                  <Pencil className="h-3.5 w-3.5" /> Page editor
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setBlocksOpen(true)}
+                  className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold text-slate-400 transition hover:bg-white/5 hover:text-white"
+                >
+                  <Blocks className="h-3.5 w-3.5" /> Content blocks
+                </button>
+              </div>
+              <button
+                type="button"
+                className="rounded-lg p-2 text-slate-300 transition hover:bg-white/10 hover:text-white"
+                onClick={() => {
+                  setEditorOpen(false);
+                  setBlocksOpen(false);
+                }}
+                aria-label="Close editor"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </header>
+            <div
+              className={`min-h-0 flex-1 p-4 sm:p-6 ${
+                isHome || isProHome || isServices ? "overflow-hidden" : "overflow-auto"
+              }`}
+            >
+              {isHome || isProHome || isServices ? (
+                <HomeVisualEditor
+                  path={isProHome ? "/professional-home" : isServices ? "/services" : "/"}
+                  actionsTargetId="cms-editor-actions"
+                  messageTargetId="cms-editor-message"
+                />
+              ) : (
+                <VisualPageEditor
+                  path={url}
+                  title={selected.title}
+                  actionsTargetId="cms-editor-actions"
+                  messageTargetId="cms-editor-message"
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+      {blocksOpen && selected && (
+        <div className="fixed inset-0 z-50 bg-[#060913]/90 p-0 backdrop-blur-sm sm:p-4">
+          <div className="mx-auto flex h-full max-w-6xl flex-col overflow-hidden rounded-none border border-white/10 bg-[#11182b] shadow-2xl sm:rounded-2xl">
+            <header className="flex items-center justify-between border-b border-white/10 px-5 py-4 text-white">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[.18em] text-indigo-300">
+                  Content blocks
+                </p>
+                <h2 className="mt-1 text-lg font-bold">Build page sections</h2>
+              </div>
+              <button
+                type="button"
+                className="rounded-lg p-2 text-slate-300 transition hover:bg-white/10 hover:text-white"
+                onClick={() => setBlocksOpen(false)}
+                aria-label="Close content blocks"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </header>
+            <div className="min-h-0 flex-1 overflow-auto p-4 sm:p-6">
+              <CmsBlockBuilder
+                key={selected.id}
+                page={selected}
+                onSaved={(sections) => updatePageSections(selected.id, sections)}
+              />
+            </div>
+          </div>
+        </div>
+      )}
       {preview && (
         <div className="fixed inset-0 z-50 bg-[#060913] p-4 sm:p-8">
           <div className="mx-auto flex h-full max-w-7xl flex-col overflow-hidden rounded-2xl border border-white/10 bg-white">
