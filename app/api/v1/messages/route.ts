@@ -67,11 +67,30 @@ export async function GET(request: NextRequest) {
             ),
           ),
         ];
+  const existingUserConversations =
+    session.role === "ADMIN"
+      ? []
+      : await db.socketConversation.findMany({
+          where: { OR: [{ userAId: session.userId }, { userBId: session.userId }] },
+          select: { userAId: true, userBId: true },
+        });
+  const conversationPartnerIds = existingUserConversations.map((conversation) =>
+    conversation.userAId === session.userId ? conversation.userBId : conversation.userAId,
+  );
+  const adminConversationUsers =
+    session.role === "ADMIN"
+      ? []
+      : await db.user.findMany({
+          where: { id: { in: conversationPartnerIds }, role: "ADMIN" },
+          select: { id: true },
+        });
+  const adminConversationContactIds = adminConversationUsers.map((user) => user.id);
+  const allowedContactIds = [...new Set([...(contactIds ?? []), ...adminConversationContactIds])];
   const contacts = await db.user.findMany({
     where: {
       ...(session.role === "ADMIN"
         ? { id: { not: session.userId } }
-        : { id: { in: contactIds ?? [] } }),
+        : { id: { in: allowedContactIds } }),
       ...(session.role === "ADMIN" ? {} : { isActive: true }),
     },
     select: { id: true, firstName: true, lastName: true, avatarUrl: true, role: true },
@@ -149,10 +168,10 @@ export async function POST(request: NextRequest) {
     where: { id: recipientId },
     select: { id: true, role: true, firstName: true, lastName: true, avatarUrl: true },
   });
-  if (!recipient || recipient.role === "ADMIN") {
+  if (!recipient || (recipient.role === "ADMIN" && session.role === "ADMIN")) {
     return NextResponse.json({ error: "Recipient is unavailable." }, { status: 404 });
   }
-  if (session.role !== "ADMIN") {
+  if (session.role !== "ADMIN" && recipient.role !== "ADMIN") {
     const activeProject = await db.projectTracking.findFirst({
       where: {
         status: { not: "COMPLETED" },

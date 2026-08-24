@@ -210,7 +210,7 @@ export function MessagesWorkspace({ admin = false }: { admin?: boolean }) {
                   className={`flex w-full items-center gap-3 rounded-2xl p-3 text-left transition ${selectedId === contact.id ? (admin ? "bg-indigo-500/20" : "bg-primary/10") : admin ? "hover:bg-white/5" : "hover:bg-muted"}`}
                 >
                   <div
-                    className={`relative grid h-11 w-11 shrink-0 place-items-center rounded-full font-semibold ${admin ? "bg-indigo-400/20 text-indigo-200" : "bg-primary/15 text-primary"}`}
+                    className={`relative grid h-11 w-11 shrink-0 place-items-center rounded-full font-semibold ${admin ? "bg-indigo-400/20 text-indigo-200" : contact.role === "ADMIN" ? "bg-red-500/15 text-red-500" : "bg-primary/15 text-primary"}`}
                   >
                     {initials(contact.name)}
                     {contact.avatarUrl && (
@@ -224,7 +224,11 @@ export function MessagesWorkspace({ admin = false }: { admin?: boolean }) {
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2">
-                      <p className="truncate text-sm font-semibold">{contact.name}</p>
+                      <p
+                        className={`truncate text-sm font-semibold ${!admin && contact.role === "ADMIN" ? "text-red-500" : ""}`}
+                      >
+                        {contact.name}
+                      </p>
                       <div className="flex items-center gap-2">
                         {contact.lastMessage && (
                           <span
@@ -264,14 +268,22 @@ export function MessagesWorkspace({ admin = false }: { admin?: boolean }) {
                 className={`flex items-center gap-3 border-b p-4 ${admin ? "border-white/10" : "border-border"}`}
               >
                 <div
-                  className={`grid h-11 w-11 place-items-center rounded-full font-semibold ${admin ? "bg-indigo-400/20 text-indigo-200" : "bg-primary/15 text-primary"}`}
+                  className={`grid h-11 w-11 place-items-center rounded-full font-semibold ${admin ? "bg-indigo-400/20 text-indigo-200" : selected.role === "ADMIN" ? "bg-red-500/15 text-red-500" : "bg-primary/15 text-primary"}`}
                 >
                   {initials(selected.name)}
                 </div>
                 <div>
-                  <p className="font-semibold">{selected.name}</p>
+                  <p
+                    className={`font-semibold ${!admin && selected.role === "ADMIN" ? "text-red-500" : ""}`}
+                  >
+                    {selected.name}
+                  </p>
                   <p className={`text-xs ${admin ? "text-slate-400" : "text-muted-foreground"}`}>
-                    {selected.role === "PROFESSIONAL" ? "Professional" : "Client"}
+                    {selected.role === "ADMIN"
+                      ? "Admin support"
+                      : selected.role === "PROFESSIONAL"
+                        ? "Professional"
+                        : "Client"}
                   </p>
                 </div>
                 {admin && <ShieldCheck className="ml-auto h-5 w-5 text-indigo-300" />}
@@ -286,7 +298,7 @@ export function MessagesWorkspace({ admin = false }: { admin?: boolean }) {
                       className={`flex ${message.senderId === myUserId ? "justify-end" : "justify-start"}`}
                     >
                       <div
-                        className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm shadow-sm ${message.senderId === myUserId ? (admin ? "rounded-br-md bg-indigo-500 text-white" : "rounded-br-md bg-primary text-primary-foreground") : admin ? "rounded-bl-md bg-[#18233b] text-slate-100" : "rounded-bl-md bg-card"}`}
+                        className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm shadow-sm ${message.senderId === myUserId ? (admin ? "rounded-br-md bg-indigo-500 text-white" : "rounded-br-md bg-primary text-primary-foreground") : admin ? "rounded-bl-md bg-[#18233b] text-slate-100" : selected.role === "ADMIN" ? "rounded-bl-md bg-red-500 text-white" : "rounded-bl-md bg-card"}`}
                       >
                         <p className="whitespace-pre-wrap">{message.body}</p>
                         <p
