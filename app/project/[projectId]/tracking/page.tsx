@@ -1430,12 +1430,15 @@ export default function SharedProjectTrackingPage() {
                             ₹{approvalSuccess.charged.toLocaleString("en-IN")} charged
                           </p>
                           <p className="mt-1 text-sm text-muted-foreground">
-                            Client payment received. Professional payout is waiting for admin approval.
+                            Client payment received. Professional payout is waiting for admin
+                            approval.
                           </p>
                         </div>
                         <div className="space-y-3 rounded-2xl border border-border p-4 text-sm">
                           <div className="flex justify-between gap-4">
-                            <span className="text-muted-foreground">Professional payout pending</span>
+                            <span className="text-muted-foreground">
+                              Professional payout pending
+                            </span>
                             <span className="font-semibold text-success">
                               ₹{approvalSuccess.professionalReceives.toLocaleString("en-IN")}
                             </span>
@@ -1447,7 +1450,9 @@ export default function SharedProjectTrackingPage() {
                             </span>
                           </div>
                           <div className="flex justify-between gap-4">
-                            <span className="text-muted-foreground">Platform earnings after payout</span>
+                            <span className="text-muted-foreground">
+                              Platform earnings after payout
+                            </span>
                             <span className="font-semibold">
                               ₹{approvalSuccess.platformEarnings.toLocaleString("en-IN")}
                             </span>
@@ -1465,74 +1470,77 @@ export default function SharedProjectTrackingPage() {
                       </div>
                     ) : null}
                     {!approvalSuccess ? (
-                    <div className="space-y-3">
-                    <div className="rounded-2xl bg-primary/5 p-4">
-                      <p className="text-sm text-muted-foreground">{approvalMilestone.title}</p>
-                      <p className="mt-1 text-2xl font-bold">
-                        ₹{approvalMilestone.amount.toLocaleString("en-IN")}
-                      </p>
-                      <p className="mt-1 text-xs text-muted-foreground">Milestone value</p>
-                    </div>
-                    <div className="space-y-3 rounded-2xl border border-border p-4 text-sm">
-                      <div className="flex justify-between gap-4">
-                        <span className="text-muted-foreground">Milestone amount</span>
-                        <span className="font-semibold">
-                          ₹{approvalMilestone.amount.toLocaleString("en-IN")}
-                        </span>
+                      <div className="space-y-3">
+                        <div className="rounded-2xl bg-primary/5 p-4">
+                          <p className="text-sm text-muted-foreground">{approvalMilestone.title}</p>
+                          <p className="mt-1 text-2xl font-bold">
+                            ₹{approvalMilestone.amount.toLocaleString("en-IN")}
+                          </p>
+                          <p className="mt-1 text-xs text-muted-foreground">Milestone value</p>
+                        </div>
+                        <div className="space-y-3 rounded-2xl border border-border p-4 text-sm">
+                          <div className="flex justify-between gap-4">
+                            <span className="text-muted-foreground">Milestone amount</span>
+                            <span className="font-semibold">
+                              ₹{approvalMilestone.amount.toLocaleString("en-IN")}
+                            </span>
+                          </div>
+                          <div className="flex justify-between gap-4">
+                            <span className="text-muted-foreground">Client wallet fee (10%)</span>
+                            <span className="font-semibold">
+                              +₹{clientFee.toLocaleString("en-IN")}
+                            </span>
+                          </div>
+                          <div className="flex justify-between gap-4 border-t border-border pt-3">
+                            <span className="font-semibold">Client wallet debit</span>
+                            <span className="font-bold text-primary">
+                              ₹{clientCharge.toLocaleString("en-IN")}
+                            </span>
+                          </div>
+                          <div className="flex justify-between gap-4">
+                            <span className="text-muted-foreground">Professional receives</span>
+                            <span className="font-semibold text-success">
+                              ₹{professionalPayout.toLocaleString("en-IN")}
+                            </span>
+                          </div>
+                        </div>
+                        <p className="rounded-xl bg-muted p-3 text-xs text-muted-foreground">
+                          Approval will debit ₹{clientCharge.toLocaleString("en-IN")} from your
+                          wallet. Make sure your wallet has enough balance.
+                        </p>
+                        <div className="flex items-center justify-between rounded-xl border border-border px-3 py-2 text-sm">
+                          <span className="text-muted-foreground">Current wallet balance</span>
+                          <span
+                            className={`font-bold ${approvalWalletBalance !== null && approvalWalletBalance < clientCharge ? "text-destructive" : "text-success"}`}
+                          >
+                            {approvalWalletBalance === null
+                              ? "Loading…"
+                              : `₹${approvalWalletBalance.toLocaleString("en-IN")}`}
+                          </span>
+                        </div>
+                        {approvalError ? (
+                          <p className="rounded-xl bg-destructive/10 p-3 text-sm font-medium text-destructive">
+                            {approvalError}
+                          </p>
+                        ) : null}
+                        <DialogFooter className="pt-2">
+                          <Button variant="outline" onClick={() => setApprovalMilestone(null)}>
+                            Cancel
+                          </Button>
+                          <Button
+                            disabled={
+                              busy === "approve-milestone" ||
+                              (approvalWalletBalance !== null &&
+                                approvalWalletBalance < clientCharge)
+                            }
+                            onClick={async () => {
+                              await approveMilestoneWithPayment(approvalMilestone.id);
+                            }}
+                          >
+                            {busy === "approve-milestone" ? "Processing…" : "Approve & pay"}
+                          </Button>
+                        </DialogFooter>
                       </div>
-                      <div className="flex justify-between gap-4">
-                        <span className="text-muted-foreground">Client wallet fee (10%)</span>
-                        <span className="font-semibold">+₹{clientFee.toLocaleString("en-IN")}</span>
-                      </div>
-                      <div className="flex justify-between gap-4 border-t border-border pt-3">
-                        <span className="font-semibold">Client wallet debit</span>
-                        <span className="font-bold text-primary">
-                          ₹{clientCharge.toLocaleString("en-IN")}
-                        </span>
-                      </div>
-                      <div className="flex justify-between gap-4">
-                        <span className="text-muted-foreground">Professional receives</span>
-                        <span className="font-semibold text-success">
-                          ₹{professionalPayout.toLocaleString("en-IN")}
-                        </span>
-                      </div>
-                    </div>
-                    <p className="rounded-xl bg-muted p-3 text-xs text-muted-foreground">
-                      Approval will debit ₹{clientCharge.toLocaleString("en-IN")} from your wallet.
-                      Make sure your wallet has enough balance.
-                    </p>
-                    <div className="flex items-center justify-between rounded-xl border border-border px-3 py-2 text-sm">
-                      <span className="text-muted-foreground">Current wallet balance</span>
-                      <span
-                        className={`font-bold ${approvalWalletBalance !== null && approvalWalletBalance < clientCharge ? "text-destructive" : "text-success"}`}
-                      >
-                        {approvalWalletBalance === null
-                          ? "Loading…"
-                          : `₹${approvalWalletBalance.toLocaleString("en-IN")}`}
-                      </span>
-                    </div>
-                    {approvalError ? (
-                      <p className="rounded-xl bg-destructive/10 p-3 text-sm font-medium text-destructive">
-                        {approvalError}
-                      </p>
-                    ) : null}
-                    <DialogFooter className="pt-2">
-                      <Button variant="outline" onClick={() => setApprovalMilestone(null)}>
-                        Cancel
-                      </Button>
-                      <Button
-                        disabled={
-                          busy === "approve-milestone" ||
-                          (approvalWalletBalance !== null && approvalWalletBalance < clientCharge)
-                        }
-                        onClick={async () => {
-                          await approveMilestoneWithPayment(approvalMilestone.id);
-                        }}
-                      >
-                        {busy === "approve-milestone" ? "Processing…" : "Approve & pay"}
-                      </Button>
-                    </DialogFooter>
-                    </div>
                     ) : null}
                   </>
                 );

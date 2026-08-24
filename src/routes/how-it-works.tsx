@@ -119,7 +119,7 @@ function Hero() {
           A simpler way to hire & get hired
         </h1>
         <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
-            Klick-Pro handles the busywork — discovery, vetting, payments, and tracking — so you can
+          Klick-Pro handles the busywork — discovery, vetting, payments, and tracking — so you can
           focus on the work.
         </p>
       </div>

@@ -79,7 +79,10 @@ export async function POST(request: NextRequest) {
             milestoneId: milestone.id,
             type: "WALLET_MILESTONE_FUNDED",
           },
-          data: { status: "COMPLETED", description: `Milestone payout approved: ${milestone.title}` },
+          data: {
+            status: "COMPLETED",
+            description: `Milestone payout approved: ${milestone.title}`,
+          },
         });
 
         const approvedCount = await tx.projectMilestone.count({
@@ -95,7 +98,12 @@ export async function POST(request: NextRequest) {
         if (approvedCount === totalCount && totalCount === 5) {
           await tx.projectTracking.update({
             where: { id: payment.projectTrackingId! },
-            data: { status: "COMPLETED", progress: 100, completedAt: new Date(), currentStage: null },
+            data: {
+              status: "COMPLETED",
+              progress: 100,
+              completedAt: new Date(),
+              currentStage: null,
+            },
           });
           const project = await tx.projectTracking.findUnique({
             where: { id: payment.projectTrackingId! },
@@ -144,7 +152,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 409 });
     console.error("Admin milestone payout failed", error);
     return NextResponse.json(
-      { error: process.env.NODE_ENV === "development" && error instanceof Error ? error.message : "Payout could not be completed." },
+      {
+        error:
+          process.env.NODE_ENV === "development" && error instanceof Error
+            ? error.message
+            : "Payout could not be completed.",
+      },
       { status: 500 },
     );
   }

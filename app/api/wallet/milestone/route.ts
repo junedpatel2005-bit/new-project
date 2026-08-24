@@ -43,91 +43,95 @@ export async function POST(request: NextRequest) {
     );
   const money = calculateMilestoneMoney(milestone.amount);
   try {
-    const result = await db.$transaction(async (tx) => {
-      // Claim the review state inside the transaction so two approval clicks
-      // cannot settle the same milestone twice.
-      const claim = await tx.projectMilestone.updateMany({
-        where: {
-          id: milestone.id,
-          trackingId: project.id,
-          status: "AWAITING_CLIENT_REVIEW",
-        },
-        data: { status: "PAYMENT_PROCESSING" },
-      });
-      if (claim.count !== 1)
-        throw new Error("This milestone is already being paid or is no longer payable.");
+    const result = await db.$transaction(
+      async (tx) => {
+        // Claim the review state inside the transaction so two approval clicks
+        // cannot settle the same milestone twice.
+        const claim = await tx.projectMilestone.updateMany({
+          where: {
+            id: milestone.id,
+            trackingId: project.id,
+            status: "AWAITING_CLIENT_REVIEW",
+          },
+          data: { status: "PAYMENT_PROCESSING" },
+        });
+        if (claim.count !== 1)
+          throw new Error("This milestone is already being paid or is no longer payable.");
 
-      const payment = await tx.payment.upsert({
-        where: { milestoneId: milestone.id },
-        create: {
-          clientId: project.clientId,
-          professionalId: project.professionalId,
-          jobId: project.jobId,
-          amount: money.clientChargeAmount,
-          baseAmount: money.baseAmount,
-          clientFeeAmount: money.clientFeeAmount,
-          professionalPayoutAmount: money.professionalPayoutAmount,
-          adminNetAmount: money.adminNetAmount,
-          commissionAmount: money.baseAmount - money.professionalPayoutAmount,
-          currency: "INR",
-          provider: "wallet",
-          projectTrackingId: project.id,
-          milestoneId: milestone.id,
-          status: "PENDING",
-          capturedAt: new Date(),
-          idempotencyKey: `wallet-milestone-${milestone.id}`,
-        },
-        update: {},
-      });
-      if (payment.status === "COMPLETED") throw new Error("This milestone has already been paid.");
-      await fundMilestoneFromWallet(tx, {
-        paymentId: payment.id,
-        clientId: project.clientId,
-        professionalId: project.professionalId,
-        baseAmount: milestone.amount,
-        milestoneId: milestone.id,
-      });
-      await tx.payment.update({
-        where: { id: payment.id },
-        data: { status: "FUNDED", capturedAt: new Date() },
-      });
-      await tx.invoice.upsert({
-        where: { paymentId: payment.id },
-        create: {
-          invoiceNumber: `INV-${new Date().getFullYear()}-${String(payment.id).padStart(6, "0")}`,
+        const payment = await tx.payment.upsert({
+          where: { milestoneId: milestone.id },
+          create: {
+            clientId: project.clientId,
+            professionalId: project.professionalId,
+            jobId: project.jobId,
+            amount: money.clientChargeAmount,
+            baseAmount: money.baseAmount,
+            clientFeeAmount: money.clientFeeAmount,
+            professionalPayoutAmount: money.professionalPayoutAmount,
+            adminNetAmount: money.adminNetAmount,
+            commissionAmount: money.baseAmount - money.professionalPayoutAmount,
+            currency: "INR",
+            provider: "wallet",
+            projectTrackingId: project.id,
+            milestoneId: milestone.id,
+            status: "PENDING",
+            capturedAt: new Date(),
+            idempotencyKey: `wallet-milestone-${milestone.id}`,
+          },
+          update: {},
+        });
+        if (payment.status === "COMPLETED")
+          throw new Error("This milestone has already been paid.");
+        await fundMilestoneFromWallet(tx, {
           paymentId: payment.id,
           clientId: project.clientId,
           professionalId: project.professionalId,
-          amount: money.clientChargeAmount,
-          commissionAmount: money.adminNetAmount,
-          netAmount: money.professionalPayoutAmount,
-          currency: "INR",
-        },
-        update: {},
-      });
-      await tx.projectMilestone.update({
-        where: { id: milestone.id },
-        data: { status: "AWAITING_ADMIN_APPROVAL" },
-      });
-      await tx.projectTransaction.create({
-        data: {
-          trackingId: project.id,
+          baseAmount: milestone.amount,
           milestoneId: milestone.id,
-          clientId: project.clientId,
-          professionalId: project.professionalId,
-          amount: milestone.amount,
-          currency: "INR",
-          type: "WALLET_MILESTONE_FUNDED",
-          status: "PENDING_ADMIN_PAYOUT",
-          description: `Client-funded milestone awaiting admin payout approval: ${milestone.title}`,
-        },
-      });
-      const clientWallet = await tx.wallet.findUnique({
-        where: { userId: project.clientId },
-        select: { balance: true },
-      });
-      return { remainingBalance: clientWallet?.balance ?? 0 };
-    }, { maxWait: 10000, timeout: 30000 });
+        });
+        await tx.payment.update({
+          where: { id: payment.id },
+          data: { status: "FUNDED", capturedAt: new Date() },
+        });
+        await tx.invoice.upsert({
+          where: { paymentId: payment.id },
+          create: {
+            invoiceNumber: `INV-${new Date().getFullYear()}-${String(payment.id).padStart(6, "0")}`,
+            paymentId: payment.id,
+            clientId: project.clientId,
+            professionalId: project.professionalId,
+            amount: money.clientChargeAmount,
+            commissionAmount: money.adminNetAmount,
+            netAmount: money.professionalPayoutAmount,
+            currency: "INR",
+          },
+          update: {},
+        });
+        await tx.projectMilestone.update({
+          where: { id: milestone.id },
+          data: { status: "AWAITING_ADMIN_APPROVAL" },
+        });
+        await tx.projectTransaction.create({
+          data: {
+            trackingId: project.id,
+            milestoneId: milestone.id,
+            clientId: project.clientId,
+            professionalId: project.professionalId,
+            amount: milestone.amount,
+            currency: "INR",
+            type: "WALLET_MILESTONE_FUNDED",
+            status: "PENDING_ADMIN_PAYOUT",
+            description: `Client-funded milestone awaiting admin payout approval: ${milestone.title}`,
+          },
+        });
+        const clientWallet = await tx.wallet.findUnique({
+          where: { userId: project.clientId },
+          select: { balance: true },
+        });
+        return { remainingBalance: clientWallet?.balance ?? 0 };
+      },
+      { maxWait: 10000, timeout: 30000 },
+    );
     await notifyMilestoneFunded({
       projectId: project.id,
       milestoneId: milestone.id,

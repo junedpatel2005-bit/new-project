@@ -135,7 +135,10 @@ export default function FinancePage() {
             : item.status === "FUNDED"
               ? ("payouts" as const)
               : ("payments" as const),
-        title: item.status === "FUNDED" ? `Milestone payout #${item.id}` : `Milestone payment #${item.id}`,
+        title:
+          item.status === "FUNDED"
+            ? `Milestone payout #${item.id}`
+            : `Milestone payment #${item.id}`,
         person: data.names[item.clientId] ?? `Client #${item.clientId}`,
         amount: item.amount,
         currency: item.currency,
