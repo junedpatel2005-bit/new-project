@@ -12,6 +12,7 @@ type Form = {
   category: string;
   description: string;
   timingType: "FIXED" | "HOURLY";
+  paymentMethod: "WALLET" | "OFFLINE";
   budgetMin: string;
   budgetMax: string;
   hourlyRate: string;
@@ -29,6 +30,7 @@ const empty: Form = {
   category: "",
   description: "",
   timingType: "FIXED",
+  paymentMethod: "WALLET",
   budgetMin: "",
   budgetMax: "",
   hourlyRate: "",
@@ -121,6 +123,7 @@ export default function PostJob() {
             category: job.category ?? "",
             description: job.description ?? "",
             timingType: job.timingType === "HOURLY" ? "HOURLY" : "FIXED",
+            paymentMethod: job.paymentMethod === "OFFLINE" ? "OFFLINE" : "WALLET",
             budgetMin: job.budgetMin?.toString() ?? "",
             budgetMax: job.budgetMax?.toString() ?? "",
             hourlyRate: job.hourlyRate?.toString() ?? "",
@@ -412,6 +415,22 @@ export default function PostJob() {
                 <option value="LOW">Flexible — timing is flexible</option>
               </select>
             </Field>
+            <Field label="Payment method">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <Mode
+                  checked={form.paymentMethod === "WALLET"}
+                  onClick={() => update("paymentMethod", "WALLET")}
+                  title="Wallet payment"
+                  text="Pay milestone amounts through the platform wallet."
+                />
+                <Mode
+                  checked={form.paymentMethod === "OFFLINE"}
+                  onClick={() => update("paymentMethod", "OFFLINE")}
+                  title="Offline payment"
+                  text="Pay the professional directly outside the platform."
+                />
+              </div>
+            </Field>
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Preferred job date">
                 <Input
@@ -528,6 +547,11 @@ export default function PostJob() {
                   ? `${money(form.hourlyRate === "" ? null : Number(form.hourlyRate))} / hour`
                   : `${money(form.budgetMin === "" ? null : Number(form.budgetMin))} – ${money(form.budgetMax === "" ? null : Number(form.budgetMax))}`
               }
+              onEdit={() => setStep(1)}
+            />
+            <Review
+              label="Payment method"
+              value={form.paymentMethod === "OFFLINE" ? "Offline payment" : "Wallet payment"}
               onEdit={() => setStep(1)}
             />
             <Review

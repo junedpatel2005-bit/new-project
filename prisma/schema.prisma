@@ -230,6 +230,7 @@ model ClientJob {
   updatedAt       DateTime              @updatedAt
   hourlyRate      Int?
   timingType      String                @default("FIXED")
+  paymentMethod   String                @default("WALLET")
   user            User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
   attachments     ClientJobAttachment[]
   favoriteJobs    FavoriteJob[]
