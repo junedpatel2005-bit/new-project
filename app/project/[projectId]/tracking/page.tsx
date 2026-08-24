@@ -14,6 +14,7 @@ import {
   MapPin,
   Sparkles,
   Upload,
+  Wallet,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Badge } from "@/components/ui/badge";
@@ -193,6 +194,7 @@ export default function SharedProjectTrackingPage() {
   const [milestoneDate, setMilestoneDate] = useState("");
   const [showProgress, setShowProgress] = useState(false);
   const [showRequestModal, setShowRequestModal] = useState(false);
+  const [showCompleteModal, setShowCompleteModal] = useState(false);
   const [requestTitle, setRequestTitle] = useState("");
   const [requestMessage, setRequestMessage] = useState("");
   const [showReviewForm, setShowReviewForm] = useState(false);
@@ -363,7 +365,31 @@ export default function SharedProjectTrackingPage() {
     : null;
   const canFinal =
     data.milestones.length > 0 && data.milestones.every((m) => m.status === "APPROVED");
-  const lastActivity = data.timeline[0]?.createdAt ?? data.project.acceptedAt;
+  const totalMilestoneValue = data.milestones.reduce(
+    (total, milestone) => total + milestone.amount,
+    0,
+  );
+  const paidToProfessional = data.milestones.reduce(
+    (total, milestone) =>
+      total +
+      (milestone.payment?.status === "COMPLETED"
+        ? (milestone.payment.professionalPayoutAmount ?? 0)
+        : 0),
+    0,
+  );
+  const remainingProfessionalPayout = Math.max(
+    0,
+    data.milestones.reduce(
+      (total, milestone) =>
+        total +
+        (milestone.payment?.professionalPayoutAmount ??
+          Math.max(0, Math.ceil(milestone.amount * 0.9))),
+      0,
+    ) - paidToProfessional,
+  );
+  const unpaidMilestones = data.milestones.filter(
+    (milestone) => milestone.payment?.status !== "COMPLETED",
+  );
   const attachments = (event: Event): Attachment[] => {
     try {
       const parsed: unknown = JSON.parse(event.attachmentJson ?? "[]");
@@ -470,18 +496,35 @@ export default function SharedProjectTrackingPage() {
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
             <section className="rounded-2xl border bg-card p-5 shadow-soft">
-              <div className="rounded-2xl bg-muted p-4">
-                <div className="flex justify-between text-sm font-medium">
-                  <span>Overall progress</span>
-                  <span className="text-primary">{data.project.progress}%</span>
+              {isClient && data.project.status !== "COMPLETED" ? (
+                <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-muted p-4">
+                  <div>
+                    <p className="font-semibold">Ready to finish this project?</p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Confirm completion after reviewing the final work.
+                    </p>
+                  </div>
+                  <Button
+                    disabled={busy === "complete-project"}
+                    onClick={() => setShowCompleteModal(true)}
+                  >
+                    Complete project
+                  </Button>
                 </div>
-                <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-background">
-                  <div
-                    className="h-full rounded-full bg-[linear-gradient(90deg,var(--color-primary),var(--color-cta))] transition-all duration-700"
-                    style={{ width: `${Math.min(Math.max(data.project.progress, 0), 100)}%` }}
-                  />
+              ) : (
+                <div className="rounded-2xl bg-muted p-4">
+                  <div className="flex justify-between text-sm font-medium">
+                    <span>Overall progress</span>
+                    <span className="text-primary">{data.project.progress}%</span>
+                  </div>
+                  <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-background">
+                    <div
+                      className="h-full rounded-full bg-[linear-gradient(90deg,var(--color-primary),var(--color-cta))] transition-all duration-700"
+                      style={{ width: `${Math.min(Math.max(data.project.progress, 0), 100)}%` }}
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
               <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 <Info icon={Clock3} label="Started" value={date(data.project.startedAt)} />
                 <Info icon={CalendarDays} label="Deadline" value={date(data.job?.deadline)} />
@@ -498,16 +541,21 @@ export default function SharedProjectTrackingPage() {
                   tone={remaining != null && remaining < 0 ? "text-destructive" : undefined}
                 />
                 <Info
-                  icon={LayoutGrid}
-                  label="Current stage"
-                  value={data.project.currentStage ?? current?.title ?? "Not specified"}
+                  icon={Wallet}
+                  label="Total milestone value"
+                  value={`₹${totalMilestoneValue.toLocaleString("en-IN")}`}
                 />
                 <Info
-                  icon={Flag}
-                  label="Current milestone"
-                  value={current?.title ?? "No active milestone"}
+                  icon={CheckCircle2}
+                  label="Paid to professional"
+                  value={`₹${paidToProfessional.toLocaleString("en-IN")}`}
                 />
-                <Info icon={History} label="Last activity" value={date(lastActivity)} />
+                <Info
+                  icon={AlertCircle}
+                  label="Remaining to pay"
+                  value={`₹${remainingProfessionalPayout.toLocaleString("en-IN")}`}
+                  tone={remainingProfessionalPayout > 0 ? "text-amber-700" : "text-emerald-700"}
+                />
               </div>
               {(data.job?.locationAddress ||
                 (data.job?.locationLat !== null && data.job?.locationLng !== null)) && (
@@ -606,17 +654,6 @@ export default function SharedProjectTrackingPage() {
                 {!isClient && data.project.status !== "COMPLETED" && (
                   <Button variant="outline" onClick={() => setShowRequestModal(true)}>
                     Request client
-                  </Button>
-                )}
-                {isClient && data.project.status === "FINAL_WORK_SUBMITTED" && (
-                  <Button
-                    disabled={busy === "complete-project"}
-                    onClick={() => {
-                      if (confirm("Approve final work and complete this project?"))
-                        void action("complete-project");
-                    }}
-                  >
-                    Approve & Complete
                   </Button>
                 )}
               </div>
@@ -1374,6 +1411,75 @@ export default function SharedProjectTrackingPage() {
               }}
             >
               {busy === "request-client" ? "Sending…" : "Send request"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={showCompleteModal} onOpenChange={setShowCompleteModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Complete project?</DialogTitle>
+            <DialogDescription>
+              Please confirm that you reviewed the final work. Completing the project will close it
+              for both you and the professional.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div>
+                <p className="text-xs text-amber-800/70">Professional payout total</p>
+                <p className="font-semibold">
+                  ₹{(paidToProfessional + remainingProfessionalPayout).toLocaleString("en-IN")}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-amber-800/70">Paid to professional</p>
+                <p className="font-semibold">₹{paidToProfessional.toLocaleString("en-IN")}</p>
+              </div>
+              <div>
+                <p className="text-xs text-amber-800/70">Remaining pay</p>
+                <p className="font-semibold">
+                  ₹{remainingProfessionalPayout.toLocaleString("en-IN")}
+                </p>
+              </div>
+            </div>
+            {remainingProfessionalPayout > 0 ? (
+              <div className="mt-3 border-t border-amber-200 pt-3">
+                Pay the remaining amount before completing the project:
+                <ul className="mt-1 list-disc pl-5">
+                  {unpaidMilestones.map((milestone) => (
+                    <li key={milestone.id}>
+                      {milestone.title} — ₹
+                      {(
+                        milestone.payment?.professionalPayoutAmount ??
+                        Math.max(0, Math.ceil(milestone.amount * 0.9))
+                      ).toLocaleString("en-IN")}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <p className="mt-3 border-t border-amber-200 pt-3 text-emerald-700">
+                All professional milestone payments are complete.
+              </p>
+            )}
+          </div>
+          <DialogFooter className="mt-6 gap-2">
+            <Button variant="outline" onClick={() => setShowCompleteModal(false)}>
+              Cancel
+            </Button>
+            <Button
+              disabled={busy === "complete-project" || remainingProfessionalPayout > 0}
+              onClick={() => {
+                setShowCompleteModal(false);
+                void action("complete-project");
+              }}
+            >
+              {busy === "complete-project"
+                ? "Completing…"
+                : remainingProfessionalPayout > 0
+                  ? "Pay remaining first"
+                  : "Confirm & complete"}
             </Button>
           </DialogFooter>
         </DialogContent>

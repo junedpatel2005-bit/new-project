@@ -396,14 +396,26 @@ export async function POST(request: NextRequest) {
       const unpaidMilestones = milestones.filter(
         (milestone) => milestone.payment?.status !== "COMPLETED",
       );
-      if (unpaidMilestones.length > 0) {
-        const remainingProfessionalAmount = unpaidMilestones.reduce(
-          (total, milestone) =>
-            total +
-            (milestone.payment?.professionalPayoutAmount ??
-              Math.max(0, Math.ceil(milestone.amount * 0.9))),
-          0,
-        );
+      const expectedProfessionalAmount = milestones.reduce(
+        (total, milestone) =>
+          total +
+          (milestone.payment?.professionalPayoutAmount ??
+            Math.max(0, Math.ceil(milestone.amount * 0.9))),
+        0,
+      );
+      const paidProfessionalAmount = milestones.reduce(
+        (total, milestone) =>
+          total +
+          (milestone.payment?.status === "COMPLETED"
+            ? (milestone.payment.professionalPayoutAmount ?? 0)
+            : 0),
+        0,
+      );
+      const remainingProfessionalAmount = Math.max(
+        0,
+        expectedProfessionalAmount - paidProfessionalAmount,
+      );
+      if (remainingProfessionalAmount > 0) {
         const unpaidSummary = unpaidMilestones
           .map(
             (milestone) =>
@@ -422,6 +434,8 @@ export async function POST(request: NextRequest) {
               paymentStatus: milestone.payment?.status ?? "NOT_PAID",
             })),
             remainingProfessionalAmount,
+            expectedProfessionalAmount,
+            paidProfessionalAmount,
           },
           { status: 409 },
         );
