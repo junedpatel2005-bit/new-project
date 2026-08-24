@@ -85,36 +85,11 @@ export async function POST(request: NextRequest) {
           },
         });
 
-        const approvedCount = await tx.projectMilestone.count({
-          where: { trackingId: payment.projectTrackingId!, status: "APPROVED" },
-        });
-        const totalCount = await tx.projectMilestone.count({
-          where: { trackingId: payment.projectTrackingId! },
-        });
         const next = await tx.projectMilestone.findFirst({
           where: { trackingId: payment.projectTrackingId!, status: "UPCOMING" },
           orderBy: { createdAt: "asc" },
         });
-        if (approvedCount === totalCount && totalCount === 5) {
-          await tx.projectTracking.update({
-            where: { id: payment.projectTrackingId! },
-            data: {
-              status: "COMPLETED",
-              progress: 100,
-              completedAt: new Date(),
-              currentStage: null,
-            },
-          });
-          const project = await tx.projectTracking.findUnique({
-            where: { id: payment.projectTrackingId! },
-            select: { jobId: true, clientId: true },
-          });
-          if (project)
-            await tx.clientJob.updateMany({
-              where: { id: project.jobId, userId: project.clientId },
-              data: { status: "CLOSED" },
-            });
-        } else if (next) {
+        if (next) {
           await tx.projectMilestone.update({
             where: { id: next.id },
             data: { status: "IN_PROGRESS" },
@@ -122,6 +97,11 @@ export async function POST(request: NextRequest) {
           await tx.projectTracking.update({
             where: { id: payment.projectTrackingId! },
             data: { status: "IN_PROGRESS", currentStage: next.title },
+          });
+        } else {
+          await tx.projectTracking.update({
+            where: { id: payment.projectTrackingId! },
+            data: { status: "IN_PROGRESS", currentStage: null },
           });
         }
         return money;

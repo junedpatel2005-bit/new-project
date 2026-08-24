@@ -38,6 +38,7 @@ type Milestone = {
   status: string;
   submittedAt: string | null;
   approvedAt: string | null;
+  payment: { status: string; professionalPayoutAmount: number } | null;
 };
 type Event = {
   id: number;
@@ -334,20 +335,6 @@ export default function SharedProjectTrackingPage() {
     }
   }
 
-  // This effect must run on every render. Keeping it below the loading return
-  // changes the hook order as soon as project data arrives, which crashes the
-  // production build with React error #310.
-  const defaultMilestoneAmount = data
-    ? (data.agreedAmount ?? data.job?.budgetMax ?? 0)
-      ? Math.floor((data.agreedAmount ?? data.job?.budgetMax ?? 0) / 5)
-      : 0
-    : 0;
-  useEffect(() => {
-    if (showMilestoneModal && milestoneAmount === "") {
-      setMilestoneAmount(defaultMilestoneAmount || "");
-    }
-  }, [showMilestoneModal, milestoneAmount, defaultMilestoneAmount]);
-
   if (!data)
     return (
       <AppShell>
@@ -370,13 +357,12 @@ export default function SharedProjectTrackingPage() {
   const current = data.milestones.find((m) =>
     ["IN_PROGRESS", "REVISION_REQUESTED", "AWAITING_CLIENT_REVIEW"].includes(m.status),
   );
-  const totalBudget = data.agreedAmount ?? data.job?.budgetMax ?? 0;
   const completed = data.milestones.filter((m) => m.status === "APPROVED").length;
   const remaining = data.job?.deadline
     ? Math.ceil((new Date(data.job.deadline).getTime() - Date.now()) / 86400000)
     : null;
   const canFinal =
-    data.milestones.length === 5 && data.milestones.every((m) => m.status === "APPROVED");
+    data.milestones.length > 0 && data.milestones.every((m) => m.status === "APPROVED");
   const lastActivity = data.timeline[0]?.createdAt ?? data.project.acceptedAt;
   const attachments = (event: Event): Attachment[] => {
     try {
@@ -636,23 +622,17 @@ export default function SharedProjectTrackingPage() {
               </div>
             </section>
 
-            {isClient && data.project.status !== "COMPLETED" && data.milestones.length < 5 && (
+            {isClient && data.project.status !== "COMPLETED" && (
               <section className="rounded-2xl border bg-card p-5 shadow-soft">
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div>
                     <h2 className="text-lg font-semibold">Add milestone</h2>
                     <p className="mt-1 text-sm text-muted-foreground">
-                      Create the remaining milestones for this project. The project budget will be
-                      divided into 5 equal milestone amounts.
-                    </p>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {5 - data.milestones.length} milestone
-                      {5 - data.milestones.length === 1 ? "" : "s"} remaining.
+                      Add as many delivery checkpoints as this project needs. Set the amount for
+                      each milestone when you create it.
                     </p>
                   </div>
-                  <Button onClick={() => setShowMilestoneModal(true)}>
-                    Create milestone ({5 - data.milestones.length} remaining)
-                  </Button>
+                  <Button onClick={() => setShowMilestoneModal(true)}>Create milestone</Button>
                 </div>
               </section>
             )}
@@ -977,20 +957,17 @@ export default function SharedProjectTrackingPage() {
                 <h2 className="text-lg font-semibold">Milestones</h2>
                 <div className="flex items-center gap-3">
                   <span className="text-sm text-muted-foreground">
-                    {completed} of {data.milestones.length || 5} completed
+                    {completed} of {data.milestones.length} completed
                   </span>
-                  {isClient &&
-                    data.project.status !== "COMPLETED" &&
-                    data.milestones.length < 5 && (
-                      <Button size="sm" onClick={() => setShowMilestoneModal(true)}>
-                        Add milestone
-                      </Button>
-                    )}
+                  {isClient && data.project.status !== "COMPLETED" && (
+                    <Button size="sm" onClick={() => setShowMilestoneModal(true)}>
+                      Add milestone
+                    </Button>
+                  )}
                 </div>
               </div>
               <div className="mt-4 flex items-center gap-1.5">
-                {Array.from({ length: 5 }, (_, index) => {
-                  const milestone = data.milestones[index];
+                {data.milestones.map((milestone, index) => {
                   const filled = milestone?.status === "APPROVED";
                   const active =
                     milestone &&
@@ -1575,7 +1552,7 @@ export default function SharedProjectTrackingPage() {
                 min="0"
                 value={milestoneAmount}
                 onChange={(event) => setMilestoneAmount(Number(event.target.value) || "")}
-                placeholder={totalBudget > 0 ? `${defaultMilestoneAmount}` : "Amount"}
+                placeholder="Amount"
                 className="rounded-md border border-input bg-background px-3 py-2 text-sm"
               />
             </label>
@@ -1608,7 +1585,7 @@ export default function SharedProjectTrackingPage() {
                 if (!milestoneTitle.trim() || !milestoneAmount) return;
                 await action("create-milestone", {
                   title: milestoneTitle.trim(),
-                  amount: Number(milestoneAmount) || defaultMilestoneAmount,
+                  amount: Number(milestoneAmount),
                   description: milestoneNote.trim() || null,
                   deadline: milestoneDate ? new Date(milestoneDate).toISOString() : null,
                 });

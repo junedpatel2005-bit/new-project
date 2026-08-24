@@ -187,12 +187,6 @@ export async function POST(request: NextRequest) {
       });
     }
     if (input.action === "create-milestone") {
-      const count = await db.projectMilestone.count({ where: { trackingId: project.id } });
-      if (count >= 5)
-        return NextResponse.json(
-          { error: "A project can have a maximum of 5 milestones." },
-          { status: 409 },
-        );
       // A new milestone should start IN_PROGRESS whenever nothing else is currently active —
       // not just when it's the very first milestone ever created. Otherwise a milestone added
       // after all prior ones are already approved gets stuck at UPCOMING with no way for the
@@ -346,9 +340,9 @@ export async function POST(request: NextRequest) {
     }
     if (input.action === "submit-final-work") {
       const milestones = await db.projectMilestone.findMany({ where: { trackingId: project.id } });
-      if (milestones.length < 3 || !milestones.every((item) => item.status === "APPROVED"))
+      if (milestones.length === 0 || !milestones.every((item) => item.status === "APPROVED"))
         return NextResponse.json(
-          { error: "All 3–5 milestones must be approved before final work can be submitted." },
+          { error: "All milestones must be approved before final work can be submitted." },
           { status: 409 },
         );
       const attachments = await attachmentsFor(input.attachmentIds);
@@ -394,6 +388,44 @@ export async function POST(request: NextRequest) {
           { error: "Final work must be submitted before the project can be completed." },
           { status: 409 },
         );
+      const milestones = await db.projectMilestone.findMany({
+        where: { trackingId: project.id },
+        orderBy: { createdAt: "asc" },
+        include: { payment: { select: { status: true, professionalPayoutAmount: true } } },
+      });
+      const unpaidMilestones = milestones.filter(
+        (milestone) => milestone.payment?.status !== "COMPLETED",
+      );
+      if (unpaidMilestones.length > 0) {
+        const remainingProfessionalAmount = unpaidMilestones.reduce(
+          (total, milestone) =>
+            total +
+            (milestone.payment?.professionalPayoutAmount ??
+              Math.max(0, Math.ceil(milestone.amount * 0.9))),
+          0,
+        );
+        const unpaidSummary = unpaidMilestones
+          .map(
+            (milestone) =>
+              `${milestone.title} (₹${(milestone.payment?.professionalPayoutAmount ?? Math.max(0, Math.ceil(milestone.amount * 0.9))).toLocaleString("en-IN")})`,
+          )
+          .join(", ");
+        return NextResponse.json(
+          {
+            error: `The project cannot be completed until the professional is paid. Remaining professional payout: ₹${remainingProfessionalAmount.toLocaleString("en-IN")}. Milestones: ${unpaidSummary}.`,
+            unpaidMilestones: unpaidMilestones.map((milestone) => ({
+              id: milestone.id,
+              title: milestone.title,
+              amount:
+                milestone.payment?.professionalPayoutAmount ??
+                Math.max(0, Math.ceil(milestone.amount * 0.9)),
+              paymentStatus: milestone.payment?.status ?? "NOT_PAID",
+            })),
+            remainingProfessionalAmount,
+          },
+          { status: 409 },
+        );
+      }
       await db.projectTracking.update({
         where: { id: project.id },
         data: { status: "COMPLETED", progress: 100, completedAt: new Date() },

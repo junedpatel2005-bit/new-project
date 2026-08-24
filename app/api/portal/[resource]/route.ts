@@ -494,6 +494,7 @@ export async function GET(
       const milestones = await db.projectMilestone.findMany({
         where: { trackingId: project.id },
         orderBy: { createdAt: "asc" },
+        include: { payment: { select: { status: true, professionalPayoutAmount: true } } },
       });
       const [
         job,
