@@ -30,6 +30,15 @@ type RunningProject = {
   currentStage: string | null;
 };
 
+type CompletedProject = {
+  id: number;
+  jobTitle: string | null;
+  clientName: string | null;
+  completedAt: string;
+  amount: number;
+  currency: string;
+};
+
 function displayStatus(status: string) {
   return status
     .replaceAll("_", " ")
@@ -42,6 +51,7 @@ type StatusFilter =
   | "READY_TO_START"
   | "IN_PROGRESS"
   | "AWAITING_CLIENT_REVIEW"
+  | "AWAITING_PROFESSIONAL_CONFIRMATION"
   | "REVISION_REQUESTED"
   | "FINAL_WORK_SUBMITTED";
 
@@ -50,6 +60,7 @@ const statusFilters: { value: StatusFilter; label: string }[] = [
   { value: "READY_TO_START", label: "Ready to Start" },
   { value: "IN_PROGRESS", label: "In Progress" },
   { value: "AWAITING_CLIENT_REVIEW", label: "Awaiting Review" },
+  { value: "AWAITING_PROFESSIONAL_CONFIRMATION", label: "Confirm Completion" },
   { value: "REVISION_REQUESTED", label: "Needs Revision" },
   { value: "FINAL_WORK_SUBMITTED", label: "Final Submitted" },
 ];
@@ -64,21 +75,30 @@ function money(project: RunningProject) {
 export default function RunningProjectsPage() {
   const router = useRouter();
   const [projects, setProjects] = useState<RunningProject[]>([]);
+  const [completedProjects, setCompletedProjects] = useState<CompletedProject[]>([]);
   const [savedJobsCount, setSavedJobsCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
+  const [view, setView] = useState<"active" | "completed">("active");
 
   useEffect(() => {
     let active = true;
     void fetch("/api/v1/portal/professional-jobs", { cache: "no-store" })
       .then((response) => (response.ok ? response.json() : Promise.reject()))
-      .then((data: { activeProjects?: RunningProject[]; savedJobs?: { id: number }[] }) => {
-        if (!active) return;
-        setProjects(data.activeProjects ?? []);
-        setSavedJobsCount(data.savedJobs?.length ?? 0);
-      })
+      .then(
+        (data: {
+          activeProjects?: RunningProject[];
+          completedProjects?: CompletedProject[];
+          savedJobs?: { id: number }[];
+        }) => {
+          if (!active) return;
+          setProjects(data.activeProjects ?? []);
+          setCompletedProjects(data.completedProjects ?? []);
+          setSavedJobsCount(data.savedJobs?.length ?? 0);
+        },
+      )
       .catch(() => {
         if (active) setError("Your active projects could not be loaded.");
       })
@@ -102,6 +122,17 @@ export default function RunningProjectsPage() {
           ),
       );
   }, [projects, search, statusFilter]);
+
+  const visibleCompletedProjects = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    return completedProjects.filter(
+      (project) =>
+        !term ||
+        [project.jobTitle, project.clientName, "completed"].some((value) =>
+          value?.toLowerCase().includes(term),
+        ),
+    );
+  }, [completedProjects, search]);
 
   const inProgress = projects.filter((project) => project.status === "IN_PROGRESS").length;
   const totalValue = projects.reduce(
@@ -170,10 +201,25 @@ export default function RunningProjectsPage() {
       <section>
         <div className="flex flex-col justify-between gap-4 border-b border-border pb-5 sm:flex-row sm:items-end">
           <div>
-            <h2 className="font-display text-xl font-semibold">Running projects</h2>
+            <div className="flex flex-wrap items-center gap-3">
+              <h2 className="font-display text-xl font-semibold">
+                {view === "active" ? "Running projects" : "Completed projects"}
+              </h2>
+              <Button
+                variant={view === "completed" ? "default" : "outline"}
+                size="sm"
+                onClick={() => {
+                  setView(view === "active" ? "completed" : "active");
+                  setStatusFilter("ALL");
+                }}
+              >
+                {view === "active" ? "Completed projects" : "Back to running projects"}
+              </Button>
+            </div>
             <p className="mt-1 text-sm text-muted-foreground">
-              {visibleProjects.length} active{" "}
-              {visibleProjects.length === 1 ? "project" : "projects"}
+              {view === "active"
+                ? `${visibleProjects.length} active ${visibleProjects.length === 1 ? "project" : "projects"}`
+                : `${visibleCompletedProjects.length} completed ${visibleCompletedProjects.length === 1 ? "project" : "projects"}`}
             </p>
           </div>
           <div className="relative w-full sm:max-w-sm">
@@ -186,18 +232,20 @@ export default function RunningProjectsPage() {
             />
           </div>
         </div>
-        <div className="mt-4 flex max-w-full gap-1 overflow-x-auto rounded-xl border border-border bg-muted/50 p-1">
-          {statusFilters.map((filter) => (
-            <button
-              key={filter.value}
-              type="button"
-              onClick={() => setStatusFilter(filter.value)}
-              className={`whitespace-nowrap rounded-lg px-3 py-2 text-xs font-semibold transition-all sm:text-sm ${statusFilter === filter.value ? "bg-card text-primary shadow-soft" : "text-muted-foreground hover:text-foreground"}`}
-            >
-              {filter.label}
-            </button>
-          ))}
-        </div>
+        {view === "active" && (
+          <div className="mt-4 flex max-w-full gap-1 overflow-x-auto rounded-xl border border-border bg-muted/50 p-1">
+            {statusFilters.map((filter) => (
+              <button
+                key={filter.value}
+                type="button"
+                onClick={() => setStatusFilter(filter.value)}
+                className={`whitespace-nowrap rounded-lg px-3 py-2 text-xs font-semibold transition-all sm:text-sm ${statusFilter === filter.value ? "bg-card text-primary shadow-soft" : "text-muted-foreground hover:text-foreground"}`}
+              >
+                {filter.label}
+              </button>
+            ))}
+          </div>
+        )}
         {error ? (
           <p className="mt-5 rounded-xl border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive">
             {error}
@@ -206,7 +254,7 @@ export default function RunningProjectsPage() {
         <div className="mt-5 space-y-4">
           {loading ? (
             <CardListSkeleton count={2} />
-          ) : (
+          ) : view === "active" ? (
             visibleProjects.map((project) => (
               <article
                 key={project.id}
@@ -257,8 +305,17 @@ export default function RunningProjectsPage() {
                           href={`/project/${project.id}/tracking`}
                           onClick={(event) => event.stopPropagation()}
                         >
-                          <span className="hidden sm:inline">View workspace</span>
-                          <span className="sm:hidden">View</span>
+                          {project.status === "AWAITING_PROFESSIONAL_CONFIRMATION" ? (
+                            <>
+                              <span className="hidden sm:inline">Confirm completion</span>
+                              <span className="sm:hidden">Confirm</span>
+                            </>
+                          ) : (
+                            <>
+                              <span className="hidden sm:inline">View workspace</span>
+                              <span className="sm:hidden">View</span>
+                            </>
+                          )}
                           <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                         </Link>
                       </Button>
@@ -279,23 +336,67 @@ export default function RunningProjectsPage() {
                 </div>
               </article>
             ))
+          ) : (
+            visibleCompletedProjects.map((project) => (
+              <article
+                key={project.id}
+                onClick={() => router.push(`/project/${project.id}/tracking`)}
+                className="group cursor-pointer overflow-hidden rounded-2xl border border-emerald-200 bg-card shadow-soft transition-all hover:border-emerald-400 hover:shadow-card"
+              >
+                <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+                  <div className="flex min-w-0 gap-4">
+                    <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-emerald-500/10 text-emerald-600">
+                      <BriefcaseBusiness className="h-5 w-5" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="truncate text-lg font-semibold">
+                          {project.jobTitle ?? `Project #${project.id}`}
+                        </h3>
+                        <span className="rounded-full bg-emerald-500/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.13em] text-emerald-700">
+                          Completed
+                        </span>
+                      </div>
+                      <p className="mt-2 text-sm text-muted-foreground">
+                        {project.clientName ?? "Client"} · Completed{" "}
+                        {new Date(project.completedAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                  <Button asChild>
+                    <Link
+                      href={`/project/${project.id}/tracking`}
+                      onClick={(event) => event.stopPropagation()}
+                    >
+                      View project <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
+                </div>
+              </article>
+            ))
           )}
-          {!loading && !error && !visibleProjects.length ? (
+          {!loading &&
+          !error &&
+          (view === "active" ? !visibleProjects.length : !visibleCompletedProjects.length) ? (
             <div className="rounded-2xl border border-dashed border-primary/25 bg-primary/[0.025] px-6 py-14 text-center">
               <div className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-primary/10 text-primary">
                 <BriefcaseBusiness className="h-6 w-6" />
               </div>
               <h3 className="mt-4 text-lg font-semibold">
-                {search || statusFilter !== "ALL"
-                  ? "No matching projects"
-                  : "No active projects yet"}
+                {view === "completed"
+                  ? "No completed projects yet"
+                  : search || statusFilter !== "ALL"
+                    ? "No matching projects"
+                    : "No active projects yet"}
               </h3>
               <p className="mt-2 text-sm text-muted-foreground">
-                {search
-                  ? "Try another project or client name."
-                  : statusFilter !== "ALL"
-                    ? "No projects have this status right now."
-                    : "Accepted client work will appear here when it starts."}
+                {view === "completed"
+                  ? "Completed projects will appear here after a project is confirmed."
+                  : search
+                    ? "Try another project or client name."
+                    : statusFilter !== "ALL"
+                      ? "No projects have this status right now."
+                      : "Accepted client work will appear here when it starts."}
               </p>
               {!search && statusFilter === "ALL" && (
                 <Button asChild className="mt-6">

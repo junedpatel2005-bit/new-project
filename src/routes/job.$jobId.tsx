@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import {
@@ -205,6 +205,7 @@ function formatFileSize(bytes: number | null) {
 
 export default function JobDetails() {
   const { jobId } = useParams<{ jobId: string }>();
+  const router = useRouter();
   const [job, setJob] = useState<ViewJob | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "missing" | "error">("loading");
   const [finderOpen, setFinderOpen] = useState(false);
@@ -312,6 +313,12 @@ export default function JobDetails() {
   useEffect(() => {
     void refresh();
   }, [refresh]);
+
+  useEffect(() => {
+    if (job?.projectId && job.status === "CLOSED") {
+      router.replace(`/project/${job.projectId}/tracking`);
+    }
+  }, [job, router]);
 
   async function searchProfessionals(query = finderQuery) {
     setFinderStatus("loading");
@@ -466,6 +473,18 @@ export default function JobDetails() {
         <p className="rounded-xl border border-destructive/30 bg-destructive/5 p-6 text-destructive">
           The job could not be loaded. Please try again.
         </p>
+      </JobShell>
+    );
+
+  if (job.projectId && job.status === "CLOSED")
+    return (
+      <JobShell viewerRole={viewerRole}>
+        <div className="rounded-2xl border border-border bg-card p-8 text-center shadow-soft">
+          <h1 className="text-2xl font-semibold">Opening your completed project…</h1>
+          <p className="mt-2 text-muted-foreground">
+            Project tracking, reviews, and dispute options are available there.
+          </p>
+        </div>
       </JobShell>
     );
 
@@ -1084,18 +1103,50 @@ export default function JobDetails() {
             <>
               <p className="font-medium mb-4">Posted by {job.client.name}</p>
               {job.projectId && (
-                <Button className="w-full sm:w-auto" asChild>
-                  <Link href={`/project/${job.projectId}/tracking`}>Track Project</Link>
-                </Button>
+                <div className="flex flex-wrap gap-2">
+                  <Button className="w-full sm:w-auto" asChild>
+                    <Link href={`/project/${job.projectId}/tracking`}>Track Project</Link>
+                  </Button>
+                  {job.status === "CLOSED" && (
+                    <>
+                      <Button variant="outline" className="w-full sm:w-auto" asChild>
+                        <Link href={`/project/${job.projectId}/tracking#project-feedback`}>
+                          Write Review
+                        </Link>
+                      </Button>
+                      <Button variant="outline" className="w-full sm:w-auto" asChild>
+                        <Link href={`/project/${job.projectId}/tracking#project-dispute`}>
+                          Raise Dispute
+                        </Link>
+                      </Button>
+                    </>
+                  )}
+                </div>
               )}
             </>
           ) : (
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <p className="font-medium text-muted-foreground">This is your job posting.</p>
               {job.projectId ? (
-                <Button className="w-full sm:w-auto" asChild>
-                  <Link href={`/project/${job.projectId}/tracking`}>Track Project</Link>
-                </Button>
+                <div className="flex flex-wrap gap-2">
+                  <Button className="w-full sm:w-auto" asChild>
+                    <Link href={`/project/${job.projectId}/tracking`}>Track Project</Link>
+                  </Button>
+                  {job.status === "CLOSED" && (
+                    <>
+                      <Button variant="outline" className="w-full sm:w-auto" asChild>
+                        <Link href={`/project/${job.projectId}/tracking#project-feedback`}>
+                          Write Review
+                        </Link>
+                      </Button>
+                      <Button variant="outline" className="w-full sm:w-auto" asChild>
+                        <Link href={`/project/${job.projectId}/tracking#project-dispute`}>
+                          Raise Dispute
+                        </Link>
+                      </Button>
+                    </>
+                  )}
+                </div>
               ) : (
                 job.status === "OPEN" && (
                   <>

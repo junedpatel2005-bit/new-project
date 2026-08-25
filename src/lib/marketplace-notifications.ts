@@ -140,7 +140,7 @@ export function notifyAdminsOfNewProposal(input: {
   });
 }
 
-async function notifyUsers(userIds: number[], notification: BroadcastNotification) {
+export async function notifyUsers(userIds: number[], notification: BroadcastNotification) {
   const ids = [...new Set(userIds)];
   if (!ids.length) return;
   try {

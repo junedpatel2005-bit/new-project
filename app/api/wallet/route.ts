@@ -3,6 +3,7 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { sessionCookie, verifySession } from "@/lib/auth";
 import { ensureWallet } from "@/lib/wallet-ledger";
+import { Prisma } from "@/generated/prisma/client";
 
 async function sessionFrom(request: NextRequest) {
   const token = request.cookies.get(sessionCookie)?.value;
@@ -31,12 +32,7 @@ export async function GET(request: NextRequest) {
     _sum: { commissionAmount: true },
   });
   const canWithdraw = session.role === "PROFESSIONAL" || session.role === "CLIENT";
-  const withdrawals = canWithdraw
-    ? await db.projectWithdrawal.aggregate({
-        where: { professionalId: session.userId, status: { in: ["PENDING", "COMPLETED"] } },
-        _sum: { amount: true },
-      })
-    : null;
+  const withdrawals = canWithdraw ? wallet.pendingBalance : 0;
   const withdrawalHistory = canWithdraw
     ? await db.projectWithdrawal.findMany({
         where: { professionalId: session.userId },
@@ -44,16 +40,14 @@ export async function GET(request: NextRequest) {
         take: 10,
       })
     : [];
-  const available = canWithdraw
-    ? Math.max(0, wallet.balance - (withdrawals?._sum.amount ?? 0))
-    : wallet.balance;
+  const available = canWithdraw ? Math.max(0, wallet.balance - withdrawals) : wallet.balance;
   return NextResponse.json({
     wallet,
     total: earned._sum.amount ?? 0,
     grossTotal: earned._sum.amount ?? 0,
     commission: commission?._sum.commissionAmount ?? 0,
     available,
-    reserved: withdrawals?._sum.amount ?? 0,
+    reserved: withdrawals,
     withdrawals: withdrawalHistory,
     transactions,
   });
@@ -75,24 +69,33 @@ export async function POST(request: NextRequest) {
       { status: 400 },
     );
   const wallet = await ensureWallet(session.userId);
-  const reserved = await db.projectWithdrawal.aggregate({
-    where: { professionalId: session.userId, status: { in: ["PENDING", "COMPLETED"] } },
-    _sum: { amount: true },
-  });
-  const available = Math.max(0, wallet.balance - (reserved._sum.amount ?? 0));
-  if (parsed.data.amount > available)
-    return NextResponse.json(
-      { error: "Withdrawal amount exceeds your available balance." },
-      { status: 400 },
-    );
-  const withdrawal = await db.projectWithdrawal.create({
-    data: {
-      professionalId: session.userId,
-      amount: parsed.data.amount,
-      destinationType: parsed.data.destinationType,
-      destinationLabel: parsed.data.destinationLabel,
-      status: "PENDING",
-    },
-  });
+  let withdrawal;
+  try {
+    withdrawal = await db.$transaction(async (tx) => {
+      const reserved = await tx.$executeRaw(
+        Prisma.sql`UPDATE "Wallet"
+          SET "pendingBalance" = "pendingBalance" + ${parsed.data.amount}
+          WHERE "id" = ${wallet.id}
+            AND "balance" - "pendingBalance" >= ${parsed.data.amount}`,
+      );
+      if (reserved !== 1) throw new Error("Withdrawal amount exceeds your available balance.");
+      return tx.projectWithdrawal.create({
+        data: {
+          professionalId: session.userId,
+          amount: parsed.data.amount,
+          destinationType: parsed.data.destinationType,
+          destinationLabel: parsed.data.destinationLabel,
+          status: "PENDING",
+        },
+      });
+    });
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      error.message === "Withdrawal amount exceeds your available balance."
+    )
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    throw error;
+  }
   return NextResponse.json({ withdrawal }, { status: 201 });
 }

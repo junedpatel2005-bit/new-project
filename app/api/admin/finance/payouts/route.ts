@@ -62,22 +62,44 @@ export async function POST(request: NextRequest) {
       amountRupees: withdrawal.amount,
       referenceId: String(withdrawal.id),
     });
-    const updated = await db.projectWithdrawal.update({
-      where: { id: withdrawal.id },
-      data: {
-        paymentId: payment.id,
-        providerTransferId: transferId,
-        status: "COMPLETED",
-        processedAt: new Date(),
-        failureReason: null,
-      },
+    const updated = await db.$transaction(async (tx) => {
+      const wallet = await tx.wallet.findUnique({ where: { userId: withdrawal.professionalId } });
+      if (
+        !wallet ||
+        wallet.balance < withdrawal.amount ||
+        wallet.pendingBalance < withdrawal.amount
+      )
+        throw new Error("Professional wallet reservation is no longer available.");
+      await tx.wallet.update({
+        where: { id: wallet.id },
+        data: {
+          balance: { decrement: withdrawal.amount },
+          pendingBalance: { decrement: withdrawal.amount },
+        },
+      });
+      return tx.projectWithdrawal.update({
+        where: { id: withdrawal.id },
+        data: {
+          paymentId: payment.id,
+          providerTransferId: transferId,
+          status: "COMPLETED",
+          processedAt: new Date(),
+          failureReason: null,
+        },
+      });
     });
     return NextResponse.json({ withdrawal: updated });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Razorpay transfer failed.";
-    await db.projectWithdrawal.update({
-      where: { id: withdrawal.id },
-      data: { paymentId: payment.id, status: "FAILED", failureReason: message },
+    await db.$transaction(async (tx) => {
+      await tx.projectWithdrawal.update({
+        where: { id: withdrawal.id },
+        data: { paymentId: payment.id, status: "FAILED", failureReason: message },
+      });
+      await tx.wallet.updateMany({
+        where: { userId: withdrawal.professionalId, pendingBalance: { gte: withdrawal.amount } },
+        data: { pendingBalance: { decrement: withdrawal.amount } },
+      });
     });
     return NextResponse.json({ error: message }, { status: 502 });
   }

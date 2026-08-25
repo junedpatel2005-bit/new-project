@@ -1,5 +1,6 @@
 import "server-only";
 import { db } from "@/lib/db";
+import { notifyUsers } from "@/lib/marketplace-notifications";
 
 type Actor = { userId: number; role: "CLIENT" | "PROFESSIONAL" };
 type CounterInput = { bidAmount: number; duration: string; message: string };
@@ -31,14 +32,11 @@ export async function respondToProjectRequest(
 
   if (action === "reject") {
     await db.projectRequest.update({ where: { id: requestId }, data: { status: "REJECTED" } });
-    await db.userNotification.create({
-      data: {
-        userId: otherPartyId,
-        type: "REQUEST_DECLINED",
-        title: "Request Declined",
-        description: `Your request for ${job?.title ?? "the job"} was declined.`,
-        href: `/job/${hireRequest.jobId}`,
-      },
+    await notifyUsers([otherPartyId], {
+      type: "REQUEST_DECLINED",
+      title: "Request Declined",
+      description: `Your request for ${job?.title ?? "the job"} was declined.`,
+      href: `/job/${hireRequest.jobId}`,
     });
     return { ok: true, status: "REJECTED" as const };
   }
@@ -70,14 +68,11 @@ export async function respondToProjectRequest(
         coverLetter: counterInput.message,
       },
     });
-    await db.userNotification.create({
-      data: {
-        userId: otherPartyId,
-        type: "REQUEST_COUNTERED",
-        title: "New Counter-Offer",
-        description: `New terms proposed for ${job?.title ?? "the job"}: ₹${counterInput.bidAmount.toLocaleString()}.`,
-        href: `/job/${hireRequest.jobId}`,
-      },
+    await notifyUsers([otherPartyId], {
+      type: "REQUEST_COUNTERED",
+      title: "New Counter-Offer",
+      description: `New terms proposed for ${job?.title ?? "the job"}: ₹${counterInput.bidAmount.toLocaleString()}.`,
+      href: `/job/${hireRequest.jobId}`,
     });
     return { ok: true, request: updated };
   }
@@ -117,14 +112,11 @@ export async function respondToProjectRequest(
       description: `${actor.role === "CLIENT" ? "The client" : "The professional"} accepted the terms.`,
     },
   });
-  await db.userNotification.create({
-    data: {
-      userId: otherPartyId,
-      type: "REQUEST_ACCEPTED",
-      title: "Request Accepted",
-      description: `Your request for ${job.title ?? "the job"} was accepted.`,
-      href: `/project/${tracking.id}/tracking`,
-    },
+  await notifyUsers([otherPartyId], {
+    type: "REQUEST_ACCEPTED",
+    title: "Request Accepted",
+    description: `Your request for ${job.title ?? "the job"} was accepted.`,
+    href: `/project/${tracking.id}/tracking`,
   });
 
   return { ok: true, project: tracking };

@@ -2,11 +2,8 @@ import { randomUUID } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { sessionCookie, verifySession } from "@/lib/auth";
-import {
-  emitRealtimeMessage,
-  emitRealtimeMessageRead,
-  emitRealtimeNotification,
-} from "@/lib/realtime";
+import { emitRealtimeMessage, emitRealtimeMessageRead } from "@/lib/realtime";
+import { notifyUsers } from "@/lib/marketplace-notifications";
 
 async function getSession(request: NextRequest) {
   const token = request.cookies.get(sessionCookie)?.value;
@@ -285,8 +282,7 @@ export async function POST(request: NextRequest) {
           ? "/professional/messages"
           : "/messages",
   };
-  await db.userNotification.create({ data: { userId: recipientId, ...notification } });
-  emitRealtimeNotification([recipientId], notification);
+  await notifyUsers([recipientId], notification);
   emitRealtimeMessage([session.userId, recipientId], {
     ...message,
     conversationId: conversation.id,

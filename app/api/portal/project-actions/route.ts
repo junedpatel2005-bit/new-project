@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { sessionCookie, verifySession } from "@/lib/auth";
-import { notifyDisputeRaised } from "@/lib/marketplace-notifications";
+import { notifyDisputeRaised, notifyUsers } from "@/lib/marketplace-notifications";
 import { enqueueBackgroundJob } from "@/lib/background-jobs";
 
 const attachmentIds = z.array(z.number().int().positive()).min(1).max(10);
@@ -63,6 +63,10 @@ const bodySchema = z.discriminatedUnion("action", [
     note: z.string().trim().min(2).max(2000),
   }),
   z.object({ action: z.literal("complete-project"), projectId: z.number().int().positive() }),
+  z.object({
+    action: z.literal("confirm-project-completion"),
+    projectId: z.number().int().positive(),
+  }),
   z.object({
     action: z.literal("respond-to-review"),
     projectId: z.number().int().positive(),
@@ -131,8 +135,8 @@ export async function POST(request: NextRequest) {
         stage?: string;
         attachmentJson?: string;
       } = {},
-    ) =>
-      db.projectTimelineEvent.create({
+    ) => {
+      const timelineEvent = await db.projectTimelineEvent.create({
         data: {
           trackingId: project.id,
           actorId: session.userId,
@@ -143,6 +147,23 @@ export async function POST(request: NextRequest) {
           ...fields,
         },
       });
+      const dedicatedNotificationTypes = new Set([
+        "PROJECT_COMPLETION_REQUESTED",
+        "PROJECT_COMPLETED",
+        "PROFESSIONAL_REQUEST",
+      ]);
+      if (!dedicatedNotificationTypes.has(type)) {
+        const recipientId =
+          session.userId === project.clientId ? project.professionalId : project.clientId;
+        await notifyUsers([recipientId], {
+          type: `PROJECT_ACTIVITY_${type}`,
+          title,
+          description: description ?? title,
+          href: `/project/${project.id}/tracking`,
+        });
+      }
+      return timelineEvent;
+    };
     const attachmentsFor = async (ids: number[]) => {
       const uniqueIds = [...new Set(ids)];
       const files = await db.storedFile.findMany({
@@ -487,74 +508,41 @@ export async function POST(request: NextRequest) {
     }
     if (input.action === "request-client") {
       await event("PROFESSIONAL_REQUEST", input.title ?? "Request sent to client", input.note);
-      await db.userNotification.create({
-        data: {
-          userId: project.clientId,
-          type: "PROJECT_REQUEST",
-          title: input.title ?? "Request from your professional",
-          description: input.note,
-          href: `/project/${project.id}/tracking`,
-        },
+      await notifyUsers([project.clientId], {
+        type: "PROJECT_REQUEST",
+        title: input.title ?? "Request from your professional",
+        description: input.note,
+        href: `/project/${project.id}/tracking`,
       });
     }
     if (input.action === "complete-project") {
-      if (project.status !== "FINAL_WORK_SUBMITTED")
+      if (project.status === "COMPLETED" || project.status === "AWAITING_PROFESSIONAL_CONFIRMATION")
         return NextResponse.json(
-          { error: "Final work must be submitted before the project can be completed." },
+          { error: "This project is already closed or awaiting confirmation." },
           { status: 409 },
         );
-      const milestones = await db.projectMilestone.findMany({
-        where: { trackingId: project.id },
-        orderBy: { createdAt: "asc" },
-        include: { payment: { select: { status: true, professionalPayoutAmount: true } } },
+      await db.projectTracking.update({
+        where: { id: project.id },
+        data: { status: "AWAITING_PROFESSIONAL_CONFIRMATION" },
       });
-      const unpaidMilestones = milestones.filter(
-        (milestone) => milestone.payment?.status !== "COMPLETED",
+      await event(
+        "PROJECT_COMPLETION_REQUESTED",
+        "Completion confirmation requested",
+        "The client reviewed the final work and asked the professional to confirm project completion.",
       );
-      const expectedProfessionalAmount = milestones.reduce(
-        (total, milestone) =>
-          total +
-          (milestone.payment?.professionalPayoutAmount ??
-            Math.max(0, Math.ceil(milestone.amount * 0.9))),
-        0,
-      );
-      const paidProfessionalAmount = milestones.reduce(
-        (total, milestone) =>
-          total +
-          (milestone.payment?.status === "COMPLETED"
-            ? (milestone.payment.professionalPayoutAmount ?? 0)
-            : 0),
-        0,
-      );
-      const remainingProfessionalAmount = Math.max(
-        0,
-        expectedProfessionalAmount - paidProfessionalAmount,
-      );
-      if (remainingProfessionalAmount > 0) {
-        const unpaidSummary = unpaidMilestones
-          .map(
-            (milestone) =>
-              `${milestone.title} (₹${(milestone.payment?.professionalPayoutAmount ?? Math.max(0, Math.ceil(milestone.amount * 0.9))).toLocaleString("en-IN")})`,
-          )
-          .join(", ");
+      await notifyUsers([project.professionalId], {
+        type: "PROJECT_COMPLETION_REQUESTED",
+        title: "Confirm project completion",
+        description: "The client reviewed the final work and is asking you to confirm completion.",
+        href: `/project/${project.id}/tracking`,
+      });
+    }
+    if (input.action === "confirm-project-completion") {
+      if (project.status !== "AWAITING_PROFESSIONAL_CONFIRMATION")
         return NextResponse.json(
-          {
-            error: `The project cannot be completed until the professional is paid. Remaining professional payout: ₹${remainingProfessionalAmount.toLocaleString("en-IN")}. Milestones: ${unpaidSummary}.`,
-            unpaidMilestones: unpaidMilestones.map((milestone) => ({
-              id: milestone.id,
-              title: milestone.title,
-              amount:
-                milestone.payment?.professionalPayoutAmount ??
-                Math.max(0, Math.ceil(milestone.amount * 0.9)),
-              paymentStatus: milestone.payment?.status ?? "NOT_PAID",
-            })),
-            remainingProfessionalAmount,
-            expectedProfessionalAmount,
-            paidProfessionalAmount,
-          },
+          { error: "This project is not waiting for your completion confirmation." },
           { status: 409 },
         );
-      }
       await db.projectTracking.update({
         where: { id: project.id },
         data: { status: "COMPLETED", progress: 100, completedAt: new Date() },
@@ -566,9 +554,15 @@ export async function POST(request: NextRequest) {
       await event(
         "PROJECT_COMPLETED",
         "Project completed",
-        "The client approved the final work and completed the project.",
+        "The professional confirmed project completion after the client requested confirmation.",
         { progress: 100 },
       );
+      await notifyUsers([project.clientId], {
+        type: "PROJECT_COMPLETED",
+        title: "Project completed",
+        description: "The professional confirmed that your project is complete.",
+        href: `/project/${project.id}/tracking`,
+      });
     }
     if (input.action === "submit-review") {
       if (session.role !== "CLIENT")

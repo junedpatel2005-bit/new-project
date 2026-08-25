@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { sessionCookie, verifySession } from "@/lib/auth";
 import { renderReportPdf, pdfResponse } from "@/lib/reports/pdf/render";
-import { ReportDocument } from "@/lib/reports/pdf/ReportDocument";
+import { InvoiceDocument } from "@/lib/reports/pdf/InvoiceDocument";
 
 export async function GET(
   request: NextRequest,
@@ -19,7 +19,10 @@ export async function GET(
   const paymentId = Number((await params).paymentId);
   if (!Number.isInteger(paymentId) || paymentId < 1)
     return NextResponse.json({ error: "Invalid payment ID." }, { status: 400 });
-  const payment = await db.payment.findUnique({ where: { id: paymentId } });
+  const payment = await db.payment.findUnique({
+    where: { id: paymentId },
+    include: { milestone: { select: { title: true } } },
+  });
   if (!payment || payment.status !== "COMPLETED")
     return NextResponse.json({ error: "Completed payment not found." }, { status: 404 });
   if (
@@ -36,8 +39,8 @@ export async function GET(
       clientId: payment.clientId,
       professionalId: payment.professionalId,
       amount: payment.amount,
-      commissionAmount: payment.commissionAmount,
-      netAmount: Math.max(0, payment.amount - payment.commissionAmount),
+      commissionAmount: payment.adminNetAmount,
+      netAmount: payment.professionalPayoutAmount,
       currency: payment.currency,
     },
     update: {},
@@ -45,54 +48,37 @@ export async function GET(
   const [client, professional] = await Promise.all([
     db.user.findUnique({
       where: { id: payment.clientId },
-      select: { firstName: true, lastName: true, email: true },
+      select: { firstName: true, lastName: true, email: true, phone: true, address: true },
     }),
     db.user.findUnique({
       where: { id: payment.professionalId },
-      select: { firstName: true, lastName: true, email: true },
+      select: { firstName: true, lastName: true, email: true, phone: true, address: true },
     }),
   ]);
-  const money = (amount: number) => `INR ${amount.toLocaleString("en-IN")}`;
   const buffer = await renderReportPdf(
-    <ReportDocument
-      title="Payment invoice"
-      subtitle={invoice.invoiceNumber}
-      generatedFor={client?.email ?? "Klick-Pro account"}
-      columns={[
-        {
-          key: "item",
-          header: "Description",
-          width: 4,
-          format: () => "Marketplace milestone payment",
-        },
-        {
-          key: "client",
-          header: "Client",
-          width: 2,
-          format: () => `${client?.firstName ?? ""} ${client?.lastName ?? ""}`.trim(),
-        },
-        {
-          key: "professional",
-          header: "Professional",
-          width: 2,
-          format: () => `${professional?.firstName ?? ""} ${professional?.lastName ?? ""}`.trim(),
-        },
-        {
-          key: "gross",
-          header: "Gross",
-          width: 1.5,
-          align: "right",
-          format: () => money(invoice.amount),
-        },
-        {
-          key: "net",
-          header: "Professional net",
-          width: 1.5,
-          align: "right",
-          format: () => money(invoice.netAmount),
-        },
-      ]}
-      rows={[invoice]}
+    <InvoiceDocument
+      invoiceNumber={invoice.invoiceNumber}
+      issuedAt={invoice.issuedAt}
+      status={payment.status === "COMPLETED" ? "Paid" : payment.status}
+      description={payment.milestone?.title ?? "Marketplace milestone payment"}
+      from={{ name: "Klick-Pro", tagline: "Trusted local services marketplace" }}
+      billedTo={{
+        name: `${client?.firstName ?? ""} ${client?.lastName ?? ""}`.trim(),
+        email: client?.email,
+        phone: client?.phone,
+        address: client?.address,
+      }}
+      paidTo={{
+        name: `${professional?.firstName ?? ""} ${professional?.lastName ?? ""}`.trim(),
+        email: professional?.email,
+        phone: professional?.phone,
+        address: professional?.address,
+      }}
+      grossAmount={invoice.amount}
+      commissionAmount={invoice.commissionAmount}
+      netAmount={invoice.netAmount}
+      currency={invoice.currency}
+      paymentReference={payment.razorpayPaymentId ?? payment.providerReference}
     />,
   );
   return pdfResponse(buffer, `${invoice.invoiceNumber}.pdf`);

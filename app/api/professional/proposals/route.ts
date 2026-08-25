@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { sessionCookie, verifySession } from "@/lib/auth";
-import { notifyAdminsOfNewProposal } from "@/lib/marketplace-notifications";
+import { notifyAdminsOfNewProposal, notifyUsers } from "@/lib/marketplace-notifications";
 import { enqueueBackgroundJob } from "@/lib/background-jobs";
 import { attachLastActorRole } from "@/lib/project-request-actions";
 
@@ -83,14 +83,11 @@ export async function POST(request: NextRequest) {
           coverLetter: parsed.data.coverLetter,
         },
       });
-      await db.userNotification.create({
-        data: {
-          userId: job.userId,
-          type: "PROPOSAL_UPDATED",
-          title: "Proposal Updated",
-          description: `A professional updated their proposal for ${job.title ?? "your job"}.`,
-          href: `/job/${job.id}`,
-        },
+      await notifyUsers([job.userId], {
+        type: "PROPOSAL_UPDATED",
+        title: "Proposal Updated",
+        description: `A professional updated their proposal for ${job.title ?? "your job"}.`,
+        href: `/job/${job.id}`,
       });
       return NextResponse.json({ proposal: updated });
     }
@@ -111,14 +108,11 @@ export async function POST(request: NextRequest) {
       where: { id: session.userId },
       select: { firstName: true, lastName: true },
     });
-    await db.userNotification.create({
-      data: {
-        userId: job.userId,
-        type: "NEW_PROPOSAL",
-        title: "New Proposal",
-        description: `${professional ? `${professional.firstName} ${professional.lastName}` : "A professional"} sent a proposal for ${job.title ?? "your job"}.`,
-        href: `/job/${job.id}`,
-      },
+    await notifyUsers([job.userId], {
+      type: "NEW_PROPOSAL",
+      title: "New Proposal",
+      description: `${professional ? `${professional.firstName} ${professional.lastName}` : "A professional"} sent a proposal for ${job.title ?? "your job"}.`,
+      href: `/job/${job.id}`,
     });
     enqueueBackgroundJob(
       "proposal.created.notifications",

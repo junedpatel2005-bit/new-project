@@ -104,6 +104,7 @@ type Data = {
   dispute: {
     id: number;
     issueType: string;
+    priority: string;
     message: string;
     status: string;
     reporterRole: string;
@@ -119,6 +120,7 @@ const label = (status: string) =>
     AWAITING_CLIENT_REVIEW: "Awaiting Client Review",
     REVISION_REQUESTED: "Revision Requested",
     FINAL_WORK_SUBMITTED: "Final Work Submitted",
+    AWAITING_PROFESSIONAL_CONFIRMATION: "Awaiting Professional Confirmation",
     COMPLETED: "Completed",
   })[status] ?? status.replaceAll("_", " ");
 const date = (value?: string | null) =>
@@ -154,7 +156,8 @@ function milestoneOverdueDays(milestone: Milestone): number | null {
 const needsAction = (status: string) =>
   status === "REVISION_REQUESTED" ||
   status === "AWAITING_CLIENT_REVIEW" ||
-  status === "FINAL_WORK_SUBMITTED";
+  status === "FINAL_WORK_SUBMITTED" ||
+  status === "AWAITING_PROFESSIONAL_CONFIRMATION";
 const disputeEligibleStatuses = [
   "READY_TO_START",
   "IN_PROGRESS",
@@ -391,6 +394,12 @@ export default function SharedProjectTrackingPage() {
         : 0),
     0,
   );
+  const clientPaidMilestoneTotal = data.milestones.reduce(
+    (total, milestone) =>
+      total + (milestone.payment && milestone.payment.status !== "FAILED" ? milestone.amount : 0),
+    0,
+  );
+  const remainingClientPayment = Math.max(0, totalMilestoneValue - clientPaidMilestoneTotal);
   const remainingProfessionalPayout = Math.max(
     0,
     data.milestones.reduce(
@@ -402,7 +411,7 @@ export default function SharedProjectTrackingPage() {
     ) - paidToProfessional,
   );
   const unpaidMilestones = data.milestones.filter(
-    (milestone) => milestone.payment?.status !== "COMPLETED",
+    (milestone) => !milestone.payment || milestone.payment.status === "FAILED",
   );
   const attachments = (event: Event): Attachment[] => {
     try {
@@ -510,20 +519,46 @@ export default function SharedProjectTrackingPage() {
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
             <section className="rounded-2xl border bg-card p-5 shadow-soft">
-              {isClient && data.project.status !== "COMPLETED" ? (
+              {isClient &&
+              data.project.status !== "COMPLETED" &&
+              data.project.status !== "AWAITING_PROFESSIONAL_CONFIRMATION" ? (
                 <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-muted p-4">
                   <div>
-                    <p className="font-semibold">Ready to finish this project?</p>
+                    <p className="font-semibold">Ready to request project completion?</p>
                     <p className="mt-1 text-sm text-muted-foreground">
-                      Confirm completion after reviewing the final work.
+                      Review the current project work and ask the professional to confirm
+                      completion.
                     </p>
                   </div>
                   <Button
                     disabled={busy === "complete-project"}
                     onClick={() => setShowCompleteModal(true)}
                   >
-                    Complete project
+                    Request completion confirmation
                   </Button>
+                </div>
+              ) : !isClient && data.project.status === "AWAITING_PROFESSIONAL_CONFIRMATION" ? (
+                <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-amber-50 p-4">
+                  <div>
+                    <p className="font-semibold text-amber-950">Client requested completion</p>
+                    <p className="mt-1 text-sm text-amber-800">
+                      Confirm that the final work is complete to close this project.
+                    </p>
+                  </div>
+                  <Button
+                    disabled={busy === "confirm-project-completion"}
+                    onClick={() => void action("confirm-project-completion")}
+                  >
+                    {busy === "confirm-project-completion" ? "Confirming…" : "Confirm completion"}
+                  </Button>
+                </div>
+              ) : data.project.status === "AWAITING_PROFESSIONAL_CONFIRMATION" ? (
+                <div className="rounded-2xl bg-muted p-4">
+                  <p className="font-semibold">Waiting for professional confirmation</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    The professional has been notified and must confirm before the project is
+                    completed.
+                  </p>
                 </div>
               ) : (
                 <div className="rounded-2xl bg-muted p-4">
@@ -752,7 +787,10 @@ export default function SharedProjectTrackingPage() {
             )}
 
             {data.project.status === "COMPLETED" && (
-              <section className="rounded-3xl border border-emerald-200 bg-emerald-50/50 p-5 sm:p-6">
+              <section
+                id="project-feedback"
+                className="scroll-mt-24 rounded-3xl border border-emerald-200 bg-emerald-50/50 p-5 sm:p-6"
+              >
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="flex items-start gap-3">
                     <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-emerald-500/15 text-emerald-600">
@@ -768,6 +806,19 @@ export default function SharedProjectTrackingPage() {
                       </p>
                     </div>
                   </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      if (!data.dispute) setShowDisputeForm(true);
+                      document.getElementById("project-dispute")?.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start",
+                      });
+                    }}
+                  >
+                    Report issue / Raise dispute
+                  </Button>
                 </div>
 
                 <div className="mt-5 rounded-xl border bg-card p-4 shadow-soft">
@@ -900,7 +951,10 @@ export default function SharedProjectTrackingPage() {
             )}
 
             {disputeEligibleStatuses.includes(data.project.status) && (
-              <section className="rounded-2xl border bg-card p-5 shadow-soft">
+              <section
+                id="project-dispute"
+                className="scroll-mt-24 rounded-2xl border bg-card p-5 shadow-soft"
+              >
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <p className="font-medium">Report issue / Raise dispute</p>
@@ -920,13 +974,15 @@ export default function SharedProjectTrackingPage() {
                       </p>
                     )}
                   </div>
-                  {!data.dispute && (
+                  {!data.dispute && data.project.status !== "COMPLETED" && (
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => setShowDisputeForm((value) => !value)}
                     >
-                      {showDisputeForm ? "Hide dispute form" : "Raise dispute"}
+                      {showDisputeForm
+                        ? "Hide report / dispute form"
+                        : "Report issue / Raise dispute"}
                     </Button>
                   )}
                 </div>
@@ -995,6 +1051,22 @@ export default function SharedProjectTrackingPage() {
                         Raise dispute
                       </Button>
                     </div>
+                  </div>
+                )}
+                {data.dispute && (
+                  <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50/60 p-4 text-sm">
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs font-medium uppercase tracking-wide text-amber-800">
+                      <span>Issue: {data.dispute.issueType.replaceAll("_", " ")}</span>
+                      <span>Priority: {data.dispute.priority}</span>
+                      <span>Status: {data.dispute.status}</span>
+                    </div>
+                    <p className="mt-3 whitespace-pre-wrap text-foreground">
+                      {data.dispute.message}
+                    </p>
+                    <p className="mt-3 text-xs text-muted-foreground">
+                      Submitted {date(data.dispute.createdAt)}. The admin dispute team can review
+                      this case.
+                    </p>
                   </div>
                 )}
               </section>
@@ -1434,47 +1506,43 @@ export default function SharedProjectTrackingPage() {
           <DialogHeader>
             <DialogTitle>Complete project?</DialogTitle>
             <DialogDescription>
-              Please confirm that you reviewed the final work. Completing the project will close it
-              for both you and the professional.
+              Review the current project work and request completion. Any unpaid milestone amount
+              will remain visible for the professional to review before confirming.
             </DialogDescription>
           </DialogHeader>
           <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
-            <div className="grid gap-3 sm:grid-cols-3">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <div>
-                <p className="text-xs text-amber-800/70">Professional payout total</p>
-                <p className="font-semibold">
-                  ₹{(paidToProfessional + remainingProfessionalPayout).toLocaleString("en-IN")}
-                </p>
+                <p className="text-xs text-amber-800/70">Milestone total</p>
+                <p className="font-semibold">INR {totalMilestoneValue.toLocaleString("en-IN")}</p>
+              </div>
+              <div>
+                <p className="text-xs text-amber-800/70">Paid by client</p>
+                <p className="font-semibold">₹{clientPaidMilestoneTotal.toLocaleString("en-IN")}</p>
               </div>
               <div>
                 <p className="text-xs text-amber-800/70">Paid to professional</p>
                 <p className="font-semibold">₹{paidToProfessional.toLocaleString("en-IN")}</p>
               </div>
               <div>
-                <p className="text-xs text-amber-800/70">Remaining pay</p>
-                <p className="font-semibold">
-                  ₹{remainingProfessionalPayout.toLocaleString("en-IN")}
-                </p>
+                <p className="text-xs text-amber-800/70">Unpaid milestones</p>
+                <p className="font-semibold">₹{remainingClientPayment.toLocaleString("en-IN")}</p>
               </div>
             </div>
-            {remainingProfessionalPayout > 0 ? (
+            {unpaidMilestones.length > 0 ? (
               <div className="mt-3 border-t border-amber-200 pt-3">
-                Pay the remaining amount before completing the project:
+                Unpaid milestones:
                 <ul className="mt-1 list-disc pl-5">
                   {unpaidMilestones.map((milestone) => (
                     <li key={milestone.id}>
-                      {milestone.title} — ₹
-                      {(
-                        milestone.payment?.professionalPayoutAmount ??
-                        Math.max(0, Math.ceil(milestone.amount * 0.9))
-                      ).toLocaleString("en-IN")}
+                      {milestone.title} — ₹{milestone.amount.toLocaleString("en-IN")}
                     </li>
                   ))}
                 </ul>
               </div>
             ) : (
               <p className="mt-3 border-t border-amber-200 pt-3 text-emerald-700">
-                All professional milestone payments are complete.
+                All milestones are funded by the client.
               </p>
             )}
           </div>
@@ -1483,7 +1551,7 @@ export default function SharedProjectTrackingPage() {
               Cancel
             </Button>
             <Button
-              disabled={busy === "complete-project" || remainingProfessionalPayout > 0}
+              disabled={busy === "complete-project"}
               onClick={() => {
                 setShowCompleteModal(false);
                 void action("complete-project");
@@ -1491,9 +1559,9 @@ export default function SharedProjectTrackingPage() {
             >
               {busy === "complete-project"
                 ? "Completing…"
-                : remainingProfessionalPayout > 0
-                  ? "Pay remaining first"
-                  : "Confirm & complete"}
+                : remainingClientPayment > 0
+                  ? "Request with remaining amount"
+                  : "Request confirmation"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1870,6 +1938,7 @@ function statusHeading(status: string, milestone?: string) {
   if (status === "AWAITING_CLIENT_REVIEW") return `${milestone ?? "Milestone"} submitted`;
   if (status === "REVISION_REQUESTED") return "Revision Requested";
   if (status === "FINAL_WORK_SUBMITTED") return "Final Work Submitted";
+  if (status === "AWAITING_PROFESSIONAL_CONFIRMATION") return "Awaiting Professional Confirmation";
   return label(status);
 }
 function statusText(
@@ -1896,6 +1965,10 @@ function statusText(
     return isClient
       ? `${professional} submitted final work for approval.`
       : "Final work was submitted. Waiting for client approval.";
+  if (status === "AWAITING_PROFESSIONAL_CONFIRMATION")
+    return isClient
+      ? `${professional} has been notified and must confirm project completion.`
+      : "The client requested completion confirmation. Please review and confirm the project.";
   if (status === "COMPLETED") return "This project has been completed.";
   return isClient
     ? `${professional} is working on this project.`

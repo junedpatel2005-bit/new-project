@@ -33,16 +33,49 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       { error: "Only pending withdrawal requests can be updated." },
       { status: 409 },
     );
-  const updated = await db.projectWithdrawal.update({
-    where: { id },
-    data: {
-      status: parsed.data.status,
-      processedAt: new Date(),
-      failureReason:
-        parsed.data.status === "FAILED"
-          ? (parsed.data.failureReason ?? "Rejected by admin.")
-          : null,
-    },
-  });
-  return NextResponse.json({ withdrawal: updated });
+  try {
+    const updated = await db.$transaction(async (tx) => {
+      const wallet = await tx.wallet.findUnique({ where: { userId: withdrawal.professionalId } });
+      if (!wallet) throw new Error("Professional wallet not found.");
+      if (parsed.data.status === "COMPLETED") {
+        const settled = await tx.wallet.updateMany({
+          where: {
+            id: wallet.id,
+            balance: { gte: withdrawal.amount },
+            pendingBalance: { gte: withdrawal.amount },
+          },
+          data: {
+            balance: { decrement: withdrawal.amount },
+            pendingBalance: { decrement: withdrawal.amount },
+          },
+        });
+        if (settled.count !== 1)
+          throw new Error("Professional wallet reservation is no longer available.");
+      } else {
+        await tx.wallet.updateMany({
+          where: { id: wallet.id, pendingBalance: { gte: withdrawal.amount } },
+          data: { pendingBalance: { decrement: withdrawal.amount } },
+        });
+      }
+      return tx.projectWithdrawal.update({
+        where: { id },
+        data: {
+          status: parsed.data.status,
+          processedAt: new Date(),
+          failureReason:
+            parsed.data.status === "FAILED"
+              ? (parsed.data.failureReason ?? "Rejected by admin.")
+              : null,
+        },
+      });
+    });
+    return NextResponse.json({ withdrawal: updated });
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      error.message === "Professional wallet reservation is no longer available."
+    )
+      return NextResponse.json({ error: error.message }, { status: 409 });
+    throw error;
+  }
 }
