@@ -223,9 +223,9 @@ export async function GET(
             orderBy: { acceptedAt: "desc" },
             take: 20,
           }),
-          db.projectTransaction.findMany({
+          db.projectTracking.findMany({
             where: { professionalId: session.userId, status: "COMPLETED" },
-            orderBy: { createdAt: "desc" },
+            orderBy: { completedAt: "desc" },
             take: 20,
           }),
         ]);
@@ -278,6 +278,7 @@ export async function GET(
           ...visibleSavedJobs.map((favorite) => favorite.job.userId),
           ...proposals.map((request) => request.clientId),
           ...activeProjects.map((project) => project.clientId),
+          ...completedProjects.map((project) => project.clientId),
           ...offers.map((request) => request.clientId),
         ]),
       ];
@@ -295,6 +296,7 @@ export async function GET(
           ...visibleSavedJobs.map((favorite) => favorite.jobId),
           ...proposals.map((request) => request.jobId),
           ...activeProjects.map((project) => project.jobId),
+          ...completedProjects.map((project) => project.jobId),
           ...offers.map((request) => request.jobId),
         ]),
       ];
@@ -456,13 +458,27 @@ export async function GET(
           progress: project.progress,
           currentStage: project.currentStage,
         })),
-        completedProjects: completedProjects.map((project) => ({
-          id: project.id,
-          amount: project.amount,
-          currency: project.currency,
-          description: project.description,
-          createdAt: project.createdAt.toISOString(),
-        })),
+        completedProjects: await Promise.all(
+          completedProjects.map(async (project) => {
+            const earnings = await db.projectTransaction.aggregate({
+              where: {
+                trackingId: project.id,
+                professionalId: session.userId,
+                status: "COMPLETED",
+              },
+              _sum: { amount: true },
+            });
+            return {
+              id: project.id,
+              jobId: project.jobId,
+              jobTitle: jobMap.get(project.jobId)?.title ?? `Job #${project.jobId}`,
+              clientName: clientMap.get(project.clientId) ?? "Client",
+              completedAt: project.completedAt?.toISOString() ?? project.updatedAt.toISOString(),
+              amount: earnings._sum.amount ?? 0,
+              currency: "INR",
+            };
+          }),
+        ),
       });
     }
     if (resource === "project") {

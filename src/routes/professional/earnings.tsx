@@ -1,8 +1,11 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
 import {
   ArrowUpRight,
+  BriefcaseBusiness,
+  CheckCircle2,
   CircleDollarSign,
   Clock3,
   Landmark,
@@ -34,8 +37,18 @@ type Wallet = {
   reserved: number;
   withdrawals: Withdrawal[];
 };
+type CompletedJob = {
+  id: number;
+  jobId: number;
+  jobTitle: string;
+  clientName: string;
+  completedAt: string;
+  amount: number;
+  currency: string;
+};
 export default function Earnings() {
   const [items, setItems] = useState<Transaction[] | null>(null);
+  const [completedJobs, setCompletedJobs] = useState<CompletedJob[] | null>(null);
   const [wallet, setWallet] = useState<Wallet | null>(null);
   const [amount, setAmount] = useState("");
   const [destination, setDestination] = useState("");
@@ -45,6 +58,12 @@ export default function Earnings() {
     void fetch("/api/v1/portal/earnings", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : []))
       .then(setItems);
+    void fetch("/api/v1/portal/professional-jobs", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: { completedProjects?: CompletedJob[] } | null) =>
+        setCompletedJobs(d?.completedProjects ?? []),
+      )
+      .catch(() => setCompletedJobs([]));
     void fetch("/api/v1/wallet", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
       .then(setWallet);
@@ -108,7 +127,7 @@ export default function Earnings() {
           Track approved milestone payments, requests, and available withdrawal balance.
         </p>
       </section>
-      {!wallet || !items ? (
+      {!wallet || !items || !completedJobs ? (
         <div className="h-72 animate-pulse rounded-2xl bg-muted" />
       ) : (
         <>
@@ -137,6 +156,50 @@ export default function Earnings() {
               value={`₹${wallet.reserved.toLocaleString()}`}
             />
           </div>
+          <section className="rounded-2xl border border-border bg-card p-5 shadow-soft">
+            <div className="mb-5 flex items-center justify-between gap-4">
+              <div>
+                <h2 className="font-display text-xl font-semibold">Completed jobs</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Finished projects and the earnings recorded against each one.
+                </p>
+              </div>
+              <CheckCircle2 className="h-5 w-5 text-success" />
+            </div>
+            <div className="divide-y divide-border">
+              {completedJobs.map((job) => (
+                <div
+                  key={job.id}
+                  className="flex flex-col gap-3 py-4 first:pt-0 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div className="flex min-w-0 items-center gap-3">
+                    <BriefcaseBusiness className="h-4 w-4 shrink-0 text-success" />
+                    <div className="min-w-0">
+                      <Link
+                        href={`/project/${job.id}/tracking`}
+                        className="truncate font-semibold hover:text-primary"
+                      >
+                        {job.jobTitle}
+                      </Link>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        {job.clientName} · Completed{" "}
+                        {new Date(job.completedAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="shrink-0 font-bold text-success">
+                    +₹{job.amount.toLocaleString("en-IN")}{" "}
+                    <span className="text-xs">{job.currency}</span>
+                  </p>
+                </div>
+              ))}
+              {!completedJobs.length && (
+                <p className="py-4 text-sm text-muted-foreground">
+                  Completed jobs will appear here after a project is marked complete.
+                </p>
+              )}
+            </div>
+          </section>
           <section className="rounded-2xl border border-border bg-card p-5 shadow-soft">
             <h2 className="font-display text-xl font-semibold">Commission deduction breakdown</h2>
             <p className="mt-1 text-sm text-muted-foreground">
