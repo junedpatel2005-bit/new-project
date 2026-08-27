@@ -43,7 +43,7 @@ export function AppShell({ children, title }: { children: React.ReactNode; title
 
   return (
     <div className="min-h-screen bg-background pb-16 lg:pb-0">
-      {user && <AppSidebar items={items} pathname={pathname} />}
+      {user && <AppSidebar items={items} pathname={pathname} user={user} />}
       <div className={user ? "lg:pl-64" : ""}>
         <AppHeader role={user?.role} />
         <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">

@@ -29,10 +29,45 @@ const slugify = (value: string) =>
 export async function GET(request: NextRequest) {
   if (!(await isAdmin(request)))
     return NextResponse.json({ error: "Admin access required." }, { status: 403 });
+  const categoryId = Number(request.nextUrl.searchParams.get("categoryId"));
+  if (Number.isInteger(categoryId) && categoryId > 0) {
+    const category = await db.serviceCategory.findUnique({ where: { id: categoryId } });
+    if (!category) return NextResponse.json({ error: "Category not found." }, { status: 404 });
+    const descendants = await db.serviceCategory.findMany({
+      where: { OR: [{ id: category.id }, { parentId: category.id }] },
+    });
+    const names = descendants.map((item) => item.name);
+    const jobs = await db.clientJob.findMany({
+      where: { category: { in: names } },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        category: true,
+        status: true,
+        budgetMin: true,
+        budgetMax: true,
+        locationLabel: true,
+        createdAt: true,
+      },
+      orderBy: { createdAt: "desc" },
+    });
+    return NextResponse.json({ category, descendants, jobs });
+  }
+  const services = await db.serviceCategory.findMany({
+    orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+  });
+  const jobCounts = await db.clientJob.groupBy({
+    by: ["category"],
+    _count: { _all: true },
+    where: { category: { not: null } },
+  });
+  const countsByCategory = new Map(jobCounts.map((item) => [item.category, item._count._all]));
   return NextResponse.json({
-    services: await db.serviceCategory.findMany({
-      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
-    }),
+    services: services.map((service) => ({
+      ...service,
+      jobCount: countsByCategory.get(service.name) ?? 0,
+    })),
   });
 }
 
@@ -61,6 +96,24 @@ export async function POST(request: NextRequest) {
     data: { ...parsed.data, slug: baseSlug, sortOrder: await db.serviceCategory.count() },
   });
   return NextResponse.json({ service }, { status: 201 });
+}
+
+export async function PATCH(request: NextRequest) {
+  if (!(await isAdmin(request)))
+    return NextResponse.json({ error: "Admin access required." }, { status: 403 });
+  const id = Number(request.nextUrl.searchParams.get("id"));
+  const parsed = z
+    .object({ name: z.string().trim().min(2).max(80), description: z.string().trim().max(300) })
+    .safeParse(await request.json());
+  if (!Number.isInteger(id) || !parsed.success)
+    return NextResponse.json({ error: "Enter a valid category." }, { status: 400 });
+  const current = await db.serviceCategory.findUnique({ where: { id } });
+  if (!current) return NextResponse.json({ error: "Category not found." }, { status: 404 });
+  const updated = await db.serviceCategory.update({
+    where: { id },
+    data: { name: parsed.data.name, description: parsed.data.description },
+  });
+  return NextResponse.json({ service: updated });
 }
 
 export async function DELETE(request: NextRequest) {

@@ -4,8 +4,15 @@ import Link from "next/link";
 import { useEffect, useState, type ElementType } from "react";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export type NavigationItem = { to: string; icon: ElementType; label: string };
+export type NavigationUser = {
+  firstName: string;
+  lastName: string;
+  role: string;
+  avatarUrl: string | null;
+};
 
 function useUnreadMessages() {
   const [count, setCount] = useState(0);
@@ -59,7 +66,15 @@ function useUnreadNotifications() {
   return count;
 }
 
-export function AppSidebar({ items, pathname }: { items: NavigationItem[]; pathname: string }) {
+export function AppSidebar({
+  items,
+  pathname,
+  user,
+}: {
+  items: NavigationItem[];
+  pathname: string;
+  user: NavigationUser;
+}) {
   const unreadMessages = useUnreadMessages();
   const unreadNotifications = useUnreadNotifications();
   return (
@@ -93,6 +108,23 @@ export function AppSidebar({ items, pathname }: { items: NavigationItem[]; pathn
           );
         })}
       </nav>
+      <div className="absolute inset-x-3 bottom-4 flex items-center gap-3 rounded-xl border border-border bg-muted/50 p-3">
+        <Avatar className="h-9 w-9">
+          <AvatarImage
+            src={user.avatarUrl ?? undefined}
+            alt={`${user.firstName} ${user.lastName}`}
+          />
+          <AvatarFallback>
+            {`${user.firstName[0] ?? ""}${user.lastName[0] ?? ""}`.toUpperCase() || "U"}
+          </AvatarFallback>
+        </Avatar>
+        <div className="min-w-0">
+          <p className="truncate text-sm font-semibold text-foreground">
+            {user.firstName} {user.lastName}
+          </p>
+          <p className="text-xs capitalize text-muted-foreground">{user.role.toLowerCase()}</p>
+        </div>
+      </div>
     </aside>
   );
 }

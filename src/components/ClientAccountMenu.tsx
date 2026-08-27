@@ -51,6 +51,12 @@ export function ClientAccountMenu() {
     };
   }, []);
 
+  useEffect(() => {
+    const refresh = () => window.location.reload();
+    window.addEventListener("servio:profile-updated", refresh);
+    return () => window.removeEventListener("servio:profile-updated", refresh);
+  }, []);
+
   async function logout() {
     await fetch("/api/v1/auth/logout", { method: "POST" });
     router.replace("/login");

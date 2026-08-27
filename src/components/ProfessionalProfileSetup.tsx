@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, CheckCircle2, Plus, ShieldCheck, X } from "lucide-react";
 import { Logo } from "@/components/Logo";
@@ -73,6 +73,9 @@ export function ProfessionalProfileSetup() {
   const [workMode, setWorkMode] = useState("both");
   const [category, setCategory] = useState("");
   const [showSetupReminder, setShowSetupReminder] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
   const isEdit = Boolean(profile?.professionalCategory);
   const availableCategories = categories.filter(
     (item) =>
@@ -102,6 +105,35 @@ export function ProfessionalProfileSetup() {
       setDistrict(districtMatch ?? "");
     } catch {
       // The map location is still saved even when reverse geocoding is unavailable.
+    }
+  }
+
+  useEffect(() => {
+    void fetch("/api/v1/auth/me")
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data: { user?: { avatarUrl?: string | null } } | null) =>
+        setAvatarUrl(data?.user?.avatarUrl ?? null),
+      )
+      .catch(() => setAvatarUrl(null));
+  }, []);
+
+  async function uploadAvatar(file: File) {
+    setAvatarUploading(true);
+    setError(null);
+    try {
+      const body = new FormData();
+      body.append("file", file);
+      const response = await fetch("/api/profile/avatar", { method: "POST", body });
+      const result = (await response.json()) as { avatarUrl?: string; error?: string };
+      if (!response.ok || !result.avatarUrl)
+        throw new Error(result.error ?? "Unable to upload photo.");
+      setAvatarUrl(result.avatarUrl);
+      window.dispatchEvent(new Event("servio:profile-updated"));
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Unable to upload photo.");
+    } finally {
+      setAvatarUploading(false);
+      if (avatarInputRef.current) avatarInputRef.current.value = "";
     }
   }
 
@@ -248,6 +280,33 @@ export function ProfessionalProfileSetup() {
               ? "Update your service details, location, and service radius."
               : "Add the essentials clients need before they can hire you."}
           </p>
+          <div className="mt-5 flex items-center gap-3">
+            <div className="grid h-12 w-12 place-items-center overflow-hidden rounded-full border border-border bg-muted font-semibold text-primary">
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="Profile" className="h-full w-full object-cover" />
+              ) : (
+                "P"
+              )}
+            </div>
+            <input
+              ref={avatarInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="sr-only"
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                if (file) void uploadAvatar(file);
+              }}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              disabled={avatarUploading}
+              onClick={() => avatarInputRef.current?.click()}
+            >
+              {avatarUploading ? "Uploading…" : "Upload profile photo"}
+            </Button>
+          </div>
         </div>
         <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
           <form

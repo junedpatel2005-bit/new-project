@@ -3,7 +3,8 @@ import { faker } from "@faker-js/faker";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
 
-const marker = "[Subcategory Demo Job]";
+const marker = "[Taxonomy Demo Job]";
+const minimumJobsPerCategory = 2;
 const seedClientEmail = "seed.client@servio.example";
 const connectionString = process.env.DATABASE_URL;
 
@@ -44,62 +45,74 @@ async function main() {
   });
   if (!client) throw new Error(`Client ${seedClientEmail} was not found.`);
 
-  const subcategories = await db.serviceCategory.findMany({
-    where: { parentId: { not: null } },
+  const categories = await db.serviceCategory.findMany({
     orderBy: [{ segment: "asc" }, { sortOrder: "asc" }],
-    select: { name: true, segment: true, parent: { select: { name: true } } },
+    select: {
+      id: true,
+      name: true,
+      segment: true,
+      parentId: true,
+      parent: { select: { name: true } },
+    },
   });
-  if (!subcategories.length) {
-    throw new Error("No subcategories found. Run scripts/add-demo-subcategories.ts first.");
+  if (!categories.length) {
+    throw new Error("No service categories found. Run the service catalog seed first.");
   }
 
   let created = 0;
   let existing = 0;
-  for (const [index, subcategory] of subcategories.entries()) {
+  for (const [index, category] of categories.entries()) {
     const location = locations[index % locations.length]!;
-    const title = `${marker} ${subcategory.name} project in ${location.city}`;
-    const alreadyExists = await db.clientJob.findFirst({
-      where: { userId: client.id, title },
-      select: { id: true },
+    const taggedJobs = await db.clientJob.findMany({
+      where: { userId: client.id, category: category.name, description: { startsWith: marker } },
+      select: { title: true },
     });
-    if (alreadyExists) {
-      existing += 1;
-      continue;
+    const missing = Math.max(0, minimumJobsPerCategory - taggedJobs.length);
+    existing += taggedJobs.length;
+
+    for (let slot = taggedJobs.length; slot < minimumJobsPerCategory; slot += 1) {
+      const timingType = (index + slot) % 4 === 0 ? "HOURLY" : "FIXED";
+      const budgetMin = faker.number.int({ min: 700, max: 3000 });
+      const budgetMax = budgetMin + faker.number.int({ min: 900, max: 5000 });
+      const level = category.parentId
+        ? `subcategory of ${category.parent?.name}`
+        : "parent category";
+      const title = `${marker} ${category.name} ${slot + 1} in ${location.city}`;
+      await db.clientJob.create({
+        data: {
+          userId: client.id,
+          title,
+          category: category.name,
+          description: `${marker}\n${faker.lorem.paragraphs(3)}\nThe client needs an experienced professional for ${category.name.toLowerCase()} (${level}) in ${location.city}.`,
+          status: "OPEN",
+          timingType,
+          budgetMin: timingType === "FIXED" ? budgetMin : null,
+          budgetMax: timingType === "FIXED" ? budgetMax : null,
+          hourlyRate: timingType === "HOURLY" ? faker.number.int({ min: 25, max: 150 }) : null,
+          urgency: faker.helpers.arrayElement(["LOW", "MEDIUM", "HIGH"]),
+          workMode:
+            (index + slot) % 3 === 0 ? "REMOTE" : (index + slot) % 3 === 1 ? "ON_SITE" : "BOTH",
+          locationLabel: `${location.city}, ${location.country}`,
+          locationAddress: `${faker.location.streetAddress()}, ${location.city}, ${location.region}, ${location.country}`,
+          locationLat: jitter(location.lat),
+          locationLng: jitter(location.lng),
+          jobDate: faker.date.soon({ days: 20 }),
+          deadline: faker.date.soon({ days: 45 }),
+        },
+      });
+      created += 1;
+      console.log(
+        `Created ${category.segment} / ${category.name} (${slot + 1}/${minimumJobsPerCategory})`,
+      );
     }
 
-    const timingType = index % 4 === 0 ? "HOURLY" : "FIXED";
-    const budgetMin = faker.number.int({ min: 700, max: 3000 });
-    const budgetMax = budgetMin + faker.number.int({ min: 900, max: 5000 });
-    await db.clientJob.create({
-      data: {
-        userId: client.id,
-        title,
-        category: subcategory.name,
-        description: `${marker}\n${faker.lorem.paragraphs(3)}\nThe client needs an experienced professional for ${subcategory.name.toLowerCase()} in ${location.city}.`,
-        status: "OPEN",
-        timingType,
-        budgetMin: timingType === "FIXED" ? budgetMin : null,
-        budgetMax: timingType === "FIXED" ? budgetMax : null,
-        hourlyRate: timingType === "HOURLY" ? faker.number.int({ min: 25, max: 150 }) : null,
-        urgency: faker.helpers.arrayElement(["LOW", "MEDIUM", "HIGH"]),
-        workMode: index % 3 === 0 ? "REMOTE" : index % 3 === 1 ? "ON_SITE" : "BOTH",
-        locationLabel: `${location.city}, ${location.country}`,
-        locationAddress: `${faker.location.streetAddress()}, ${location.city}, ${location.region}, ${location.country}`,
-        locationLat: jitter(location.lat),
-        locationLng: jitter(location.lng),
-        jobDate: faker.date.soon({ days: 20 }),
-        deadline: faker.date.soon({ days: 45 }),
-      },
-    });
-    created += 1;
-    console.log(
-      `Created ${subcategory.segment} / ${subcategory.parent?.name} / ${subcategory.name}`,
-    );
+    if (!missing) console.log(`Already has ${minimumJobsPerCategory} jobs: ${category.name}`);
   }
 
   console.info("subcategory.jobs.completed", {
     client: seedClientEmail,
-    subcategories: subcategories.length,
+    categories: categories.length,
+    minimumJobsPerCategory,
     created,
     existing,
   });

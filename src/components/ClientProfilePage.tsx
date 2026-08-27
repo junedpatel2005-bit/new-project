@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -67,6 +67,8 @@ export function ClientProfilePage() {
   const [locationSaving, setLocationSaving] = useState(false);
   const [saveCurrentLocation, setSaveCurrentLocation] = useState(false);
   const [showSetupReminder, setShowSetupReminder] = useState(false);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const photoInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (searchParams.get("profileSetup") !== "1") return;
@@ -121,6 +123,26 @@ export function ClientProfilePage() {
       setMessage(error instanceof Error ? error.message : "Unable to save profile.");
     } finally {
       setSaving(false);
+    }
+  }
+  async function uploadAvatar(file: File) {
+    setAvatarUploading(true);
+    setMessage(null);
+    try {
+      const body = new FormData();
+      body.append("file", file);
+      const response = await fetch("/api/profile/avatar", { method: "POST", body });
+      const result = (await response.json()) as { avatarUrl?: string; error?: string };
+      if (!response.ok || !result.avatarUrl)
+        throw new Error(result.error ?? "Unable to upload photo.");
+      setForm((current) => ({ ...current, profilePhotoUrl: result.avatarUrl ?? "" }));
+      setMessage("Profile photo updated successfully.");
+      window.dispatchEvent(new Event("servio:profile-updated"));
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Unable to upload photo.");
+    } finally {
+      setAvatarUploading(false);
+      if (photoInputRef.current) photoInputRef.current.value = "";
     }
   }
   async function saveDetectedAddress(address: string) {
@@ -254,14 +276,25 @@ export function ClientProfilePage() {
               <AvatarFallback className="text-lg">{initials}</AvatarFallback>
             </Avatar>
             <div className="space-y-2">
+              <input
+                ref={photoInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="sr-only"
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+                  if (file) void uploadAvatar(file);
+                }}
+              />
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setMessage("Photo upload will be available soon.")}
+                disabled={avatarUploading}
+                onClick={() => photoInputRef.current?.click()}
               >
-                Choose photo
+                {avatarUploading ? "Uploading…" : "Upload photo"}
               </Button>
-              <p className="text-xs text-muted-foreground">JPG, PNG or WebP</p>
+              <p className="text-xs text-muted-foreground">JPG, PNG or WebP · Max 5 MB</p>
             </div>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">

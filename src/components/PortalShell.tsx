@@ -3,7 +3,12 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
-import { AppMobileNavigation, AppSidebar, type NavigationItem } from "@/components/AppNavigation";
+import {
+  AppMobileNavigation,
+  AppSidebar,
+  type NavigationItem,
+  type NavigationUser,
+} from "@/components/AppNavigation";
 import {
   clientItems,
   clientMobileItems,
@@ -11,12 +16,7 @@ import {
   professionalMobileItems,
 } from "@/lib/portal-navigation";
 
-type PortalUser = {
-  firstName: string;
-  lastName: string;
-  role: string;
-  avatarUrl: string | null;
-};
+type PortalUser = NavigationUser;
 
 const PortalTitleContext = createContext<{
   title?: string;
@@ -68,7 +68,7 @@ export function PortalShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background pb-16 lg:pb-0">
-      {showPortalNavigation && <AppSidebar items={items} pathname={pathname} />}
+      {showPortalNavigation && user && <AppSidebar items={items} pathname={pathname} user={user} />}
       <div className={showPortalNavigation ? "lg:pl-64" : ""}>
         <AppHeader role={user?.role} />
         <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
