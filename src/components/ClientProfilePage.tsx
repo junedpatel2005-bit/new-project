@@ -51,7 +51,6 @@ const emptyLocation = { label: "", address: "" };
 export function ClientProfilePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const fromDashboard = searchParams.get("from") === "dashboard";
   const [data, setData] = useState<Data | null>(null);
   const [form, setForm] = useState({
     firstName: "",
@@ -230,13 +229,6 @@ export function ClientProfilePage() {
                 <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">My Profile</h1>
               </div>
             </div>
-            <Button type="button" variant="outline" asChild>
-              <Link
-                href={fromDashboard ? "/dashboard" : "/login?next=/client-profile&profileSetup=1"}
-              >
-                {fromDashboard ? "Back to dashboard" : "Back to login"}
-              </Link>
-            </Button>
           </div>
           <p className="mt-5 max-w-2xl text-sm text-muted-foreground sm:text-base">
             Keep your details and service locations up to date so professionals can help you faster.

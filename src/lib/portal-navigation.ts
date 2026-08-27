@@ -18,6 +18,7 @@ import type { NavigationItem } from "@/components/AppNavigation";
 
 export const clientItems: NavigationItem[] = [
   { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+  { to: "/client-profile?from=dashboard", icon: User, label: "Profile" },
   { to: "/discover", icon: Users, label: "Find pros" },
   { to: "/post-job", icon: PlusCircle, label: "Post a job" },
   { to: "/my-jobs", icon: FolderKanban, label: "Projects" },
@@ -38,7 +39,7 @@ export const professionalItems: NavigationItem[] = [
   { to: "/professional/reviews", icon: Star, label: "Reviews" },
   { to: "/earnings", icon: Wallet, label: "Earnings" },
   { to: "/notifications", icon: BellRing, label: "Notifications" },
-  { to: "/professional-profile", icon: User, label: "Profile" },
+  { to: "/professional-profile?from=dashboard", icon: User, label: "Profile" },
 ];
 
 export const clientMobileItems: NavigationItem[] = [
@@ -46,7 +47,7 @@ export const clientMobileItems: NavigationItem[] = [
   { to: "/discover", icon: Search, label: "Search" },
   { to: "/my-jobs", icon: Briefcase, label: "Jobs" },
   { to: "/messages", icon: MessageSquare, label: "Messages" },
-  { to: "/dashboard", icon: User, label: "Profile" },
+  { to: "/client-profile?from=dashboard", icon: User, label: "Profile" },
 ];
 
 export const professionalMobileItems: NavigationItem[] = [
@@ -57,5 +58,5 @@ export const professionalMobileItems: NavigationItem[] = [
   { to: "/professional/messages", icon: MessageSquare, label: "Messages" },
   { to: "/earnings", icon: Wallet, label: "Earnings" },
   { to: "/notifications", icon: BellRing, label: "Notifications" },
-  { to: "/professional-profile", icon: User, label: "Profile" },
+  { to: "/professional-profile?from=dashboard", icon: User, label: "Profile" },
 ];

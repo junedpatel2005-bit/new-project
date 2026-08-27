@@ -69,7 +69,8 @@ export function AppSidebar({ items, pathname }: { items: NavigationItem[]; pathn
       </div>
       <nav className="px-3 py-2">
         {items.map((item) => {
-          const active = pathname === item.to || pathname.startsWith(`${item.to}/`);
+          const itemPath = item.to.split("?")[0];
+          const active = pathname === itemPath || pathname.startsWith(`${itemPath}/`);
           return (
             <Link
               key={item.to}
@@ -109,7 +110,8 @@ export function AppMobileNavigation({
     <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface/95 backdrop-blur-md lg:hidden">
       <div className="grid grid-cols-6">
         {items.map((item) => {
-          const active = pathname === item.to || pathname.startsWith(`${item.to}/`);
+          const itemPath = item.to.split("?")[0];
+          const active = pathname === itemPath || pathname.startsWith(`${itemPath}/`);
           return (
             <Link
               key={item.label}
