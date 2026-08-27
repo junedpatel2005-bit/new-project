@@ -170,9 +170,12 @@ export default async function ProfessionalProfilePage() {
   const professional = await getProfessionalProfile();
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6 p-6">
+    <div className="mx-auto max-w-6xl space-y-6 p-4 sm:p-6 lg:p-8">
       <article className="overflow-hidden rounded-3xl border border-border bg-card shadow-soft">
-        <div className="h-28 gradient-primary" />
+        <div className="relative h-36 overflow-hidden bg-gradient-to-r from-primary via-primary/80 to-accent">
+          <div className="absolute -right-10 -top-20 h-56 w-56 rounded-full bg-white/10 blur-2xl" />
+          <div className="absolute bottom-[-5rem] left-1/3 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
+        </div>
         <div className="px-6 pb-8 sm:px-8">
           <div className="-mt-12 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
             <div className="flex items-end gap-4">
@@ -245,14 +248,14 @@ export default async function ProfessionalProfilePage() {
 
       <section className="grid gap-6 xl:grid-cols-[1.4fr_0.8fr]">
         <div className="space-y-6">
-          <article className="rounded-3xl border border-border bg-card p-6">
+          <article className="rounded-3xl border border-border/80 bg-card p-6 shadow-soft">
             <h2 className="text-lg font-semibold">About</h2>
             <p className="mt-4 text-muted-foreground whitespace-pre-wrap">
               {professional.bio ?? "No bio has been provided yet."}
             </p>
           </article>
 
-          <article className="rounded-3xl border border-border bg-card p-6">
+          <article className="rounded-3xl border border-border/80 bg-card p-6 shadow-soft">
             <h2 className="text-lg font-semibold">Services</h2>
             {professional.services.length > 0 ? (
               <div className="mt-4 space-y-4">
@@ -277,7 +280,7 @@ export default async function ProfessionalProfilePage() {
             )}
           </article>
 
-          <article className="rounded-3xl border border-border bg-card p-6">
+          <article className="rounded-3xl border border-border/80 bg-card p-6 shadow-soft">
             <h2 className="text-lg font-semibold">Credentials</h2>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <div className="rounded-2xl border border-border p-4">
@@ -312,7 +315,7 @@ export default async function ProfessionalProfilePage() {
           </article>
 
           {professional.workPhotos.length > 0 && (
-            <article className="rounded-3xl border border-border bg-card p-6">
+            <article className="rounded-3xl border border-border/80 bg-card p-6 shadow-soft">
               <h2 className="text-lg font-semibold">Work Photos</h2>
               <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {professional.workPhotos.map((photo, index) => (
@@ -330,7 +333,7 @@ export default async function ProfessionalProfilePage() {
         </div>
 
         <aside className="space-y-6">
-          <article className="rounded-3xl border border-border bg-card p-6">
+          <article className="rounded-3xl border border-border/80 bg-card p-6 shadow-soft">
             <h2 className="text-lg font-semibold">Contact</h2>
             <div className="mt-4 space-y-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
@@ -365,7 +368,7 @@ export default async function ProfessionalProfilePage() {
             </div>
           </article>
 
-          <article className="rounded-3xl border border-border bg-card p-6">
+          <article className="rounded-3xl border border-border/80 bg-card p-6 shadow-soft">
             <h2 className="text-lg font-semibold">Company</h2>
             <div className="mt-4 space-y-4 text-sm text-muted-foreground">
               <div>

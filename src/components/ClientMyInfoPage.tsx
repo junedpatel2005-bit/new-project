@@ -123,7 +123,7 @@ export function ClientMyInfoPage({ data }: { data: ClientAccountSummaryResponse 
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <Button asChild variant="outline" size="sm">
-                    <Link href="/client-profile">Edit profile</Link>
+                    <Link href="/client-profile?from=dashboard">Edit profile</Link>
                   </Button>
                   <Button asChild size="sm">
                     <Link href="/dashboard">Go to dashboard</Link>
@@ -188,7 +188,7 @@ export function ClientMyInfoPage({ data }: { data: ClientAccountSummaryResponse 
               </CardContent>
               <CardFooter>
                 <Button asChild variant="outline" size="sm">
-                  <Link href="/client-profile">Edit profile</Link>
+                  <Link href="/client-profile?from=dashboard">Edit profile</Link>
                 </Button>
               </CardFooter>
             </Card>

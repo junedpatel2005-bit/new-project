@@ -51,6 +51,7 @@ const emptyLocation = { label: "", address: "" };
 export function ClientProfilePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const fromDashboard = searchParams.get("from") === "dashboard";
   const [data, setData] = useState<Data | null>(null);
   const [form, setForm] = useState({
     firstName: "",
@@ -198,7 +199,7 @@ export function ClientProfilePage() {
       </main>
     );
   return (
-    <main className="mx-auto max-w-5xl space-y-6 p-4 sm:p-6">
+    <main className="mx-auto max-w-6xl space-y-6 p-4 sm:p-6 lg:p-8">
       {showSetupReminder ? (
         <div
           role="status"
@@ -208,17 +209,38 @@ export function ClientProfilePage() {
           <p className="mt-1 text-amber-800">Complete your profile to continue.</p>
         </div>
       ) : null}
-      <header>
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">My Profile</h1>
-            <p className="mt-1 text-muted-foreground">
-              Manage your personal information, addresses and account details.
-            </p>
+      <header className="relative overflow-hidden rounded-3xl border border-border/80 bg-card shadow-soft">
+        <div className="h-32 bg-gradient-to-r from-primary via-primary/80 to-accent" />
+        <div className="relative px-5 pb-6 sm:px-8">
+          <div className="-mt-10 flex flex-wrap items-end justify-between gap-4">
+            <div className="flex items-end gap-4">
+              <Avatar className="h-20 w-20 border-4 border-card shadow-lg">
+                <AvatarImage
+                  src={form.profilePhotoUrl || undefined}
+                  alt={`${form.firstName} ${form.lastName}`}
+                />
+                <AvatarFallback className="bg-primary text-xl font-bold text-primary-foreground">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+              <div className="pb-1">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+                  Client account
+                </p>
+                <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">My Profile</h1>
+              </div>
+            </div>
+            <Button type="button" variant="outline" asChild>
+              <Link
+                href={fromDashboard ? "/dashboard" : "/login?next=/client-profile&profileSetup=1"}
+              >
+                {fromDashboard ? "Back to dashboard" : "Back to login"}
+              </Link>
+            </Button>
           </div>
-          <Button type="button" variant="ghost" asChild>
-            <Link href="/login?next=/client-profile&profileSetup=1">Back to login</Link>
-          </Button>
+          <p className="mt-5 max-w-2xl text-sm text-muted-foreground sm:text-base">
+            Keep your details and service locations up to date so professionals can help you faster.
+          </p>
         </div>
       </header>
       {message && (
@@ -428,9 +450,9 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="space-y-4 rounded-xl border bg-card p-5 shadow-sm">
-      <div>
-        <h2 className="text-lg font-semibold">{title}</h2>
+    <section className="space-y-5 rounded-2xl border border-border/80 bg-card p-5 shadow-soft sm:p-6">
+      <div className="border-b border-border/70 pb-4">
+        <h2 className="text-lg font-semibold tracking-tight">{title}</h2>
         <p className="text-sm text-muted-foreground">{description}</p>
       </div>
       {children}

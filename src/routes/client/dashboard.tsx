@@ -98,7 +98,7 @@ export default function Dashboard() {
               </div>
               <div className="flex shrink-0 items-center gap-2">
                 <Button asChild size="sm">
-                  <Link href="/client-profile">Verify phone</Link>
+                  <Link href="/client-profile?from=dashboard">Verify phone</Link>
                 </Button>
                 <button
                   type="button"

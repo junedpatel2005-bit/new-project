@@ -133,7 +133,7 @@ export default function ProfessionalDashboard() {
             </div>
           </div>
           <Button variant="outline" asChild>
-            <Link href="/professional-profile">
+            <Link href="/professional-profile?from=dashboard">
               <Pencil className="mr-2 h-4 w-4" />
               Edit profile
             </Link>
@@ -296,7 +296,7 @@ export default function ProfessionalDashboard() {
             Keep your services, rates, and portfolio up to date so clients can find you.
           </p>
           <Button variant="link" className="mt-3 h-auto px-0" asChild>
-            <Link href="/professional-profile">Edit profile</Link>
+            <Link href="/professional-profile?from=dashboard">Edit profile</Link>
           </Button>
         </div>
       </section>
