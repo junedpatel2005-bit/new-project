@@ -590,6 +590,15 @@ export default function SharedProjectTrackingPage() {
                 />
                 <Info
                   icon={Wallet}
+                  label="Project amount"
+                  value={
+                    data.agreedAmount == null
+                      ? "Amount pending"
+                      : `₹${data.agreedAmount.toLocaleString("en-IN")}`
+                  }
+                />
+                <Info
+                  icon={Wallet}
                   label="Total milestone value"
                   value={`₹${totalMilestoneValue.toLocaleString("en-IN")}`}
                 />
