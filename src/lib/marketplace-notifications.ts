@@ -10,6 +10,7 @@ type BroadcastNotification = {
   title: string;
   description: string;
   href: string;
+  emailDetails?: Array<{ label: string; value: string }>;
 };
 
 async function sendEmails(
@@ -19,7 +20,7 @@ async function sendEmails(
   const results = await Promise.allSettled(
     recipients
       .filter((recipient) => recipient.emailNotificationsEnabled)
-      .map((recipient) => sendNotificationEmail({ to: recipient.email, ...notification })),
+      .map((recipient) => sendNotificationEmail({ to: recipient.email, ...notification, details: notification.emailDetails })),
   );
   results.forEach((result) => {
     if (result.status === "rejected")
@@ -34,6 +35,7 @@ async function notifyRole(
   notification: BroadcastNotification,
 ) {
   try {
+    const { emailDetails: _emailDetails, ...storedNotification } = notification;
     const recipients = await db.user.findMany({
       where: { role, isActive: true },
       select: { id: true, email: true, emailNotificationsEnabled: true },
@@ -41,11 +43,11 @@ async function notifyRole(
     if (!recipients.length) return;
 
     await db.userNotification.createMany({
-      data: recipients.map((recipient) => ({ userId: recipient.id, ...notification })),
+      data: recipients.map((recipient) => ({ userId: recipient.id, ...storedNotification })),
     });
     emitRealtimeNotification(
       recipients.map((recipient) => recipient.id),
-      notification,
+      storedNotification,
     );
     const configuredAdminEmail =
       role === "ADMIN" && process.env.ADMIN_EMAIL?.includes("@")
@@ -104,13 +106,42 @@ export function notifyProfessionalsOfNewJob(job: {
   id: number;
   title: string | null;
   category: string | null;
+  description: string | null;
+  budgetMin: number | null;
+  budgetMax: number | null;
+  hourlyRate: number | null;
+  timingType: string;
+  workMode: string;
+  jobDate: Date | null;
+  deadline: Date | null;
+  locationLabel: string | null;
+  locationAddress: string | null;
 }) {
   const title = job.title?.trim() || "A new client job";
+  const formatDate = (date: Date | null) => date?.toLocaleDateString("en-IN") ?? "Not specified";
+  const budget = job.timingType === "HOURLY"
+    ? (job.hourlyRate == null ? "Not specified" : `₹${job.hourlyRate.toLocaleString("en-IN")} per hour`)
+    : job.budgetMin != null && job.budgetMax != null
+      ? `₹${job.budgetMin.toLocaleString("en-IN")} – ₹${job.budgetMax.toLocaleString("en-IN")}`
+      : "Not specified";
+  const location = job.workMode === "REMOTE"
+    ? "Remote"
+    : [job.locationLabel, job.locationAddress].filter(Boolean).join(" · ") || "Not specified";
   return notifyRole("PROFESSIONAL", {
     type: "NEW_JOB",
     title: "New job posted",
     description: `${title}${job.category ? ` · ${job.category}` : ""} is now open for proposals.`,
     href: `/job/${job.id}`,
+    emailDetails: [
+      { label: "Job title", value: title },
+      { label: "Category", value: job.category?.trim() || "Not specified" },
+      { label: "Description", value: job.description?.trim() || "No description provided." },
+      { label: "Budget", value: budget },
+      { label: "Work mode", value: job.workMode.replaceAll("_", " ") },
+      { label: "Preferred job date", value: formatDate(job.jobDate) },
+      { label: "Deadline", value: formatDate(job.deadline) },
+      { label: "Location", value: location },
+    ],
   });
 }
 

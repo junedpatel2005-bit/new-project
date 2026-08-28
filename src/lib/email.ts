@@ -74,6 +74,7 @@ export async function sendNotificationEmail(input: {
   title: string;
   description: string;
   href?: string;
+  details?: Array<{ label: string; value: string }>;
 }) {
   if (!isEmailConfigured()) {
     if (!emailConfigurationWarningShown) {
@@ -95,10 +96,25 @@ export async function sendNotificationEmail(input: {
   const safeTitle = escapeHtml(input.title);
   const safeDescription = escapeHtml(input.description);
   const safeActionUrl = escapeHtml(actionUrl);
+  const details = input.details?.filter((detail) => detail.value.trim()) ?? [];
+  const detailsHtml = details.length
+    ? `<div style="margin:24px 0 0;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden">${details
+        .map(
+          (detail) =>
+            `<div style="padding:12px 16px;border-bottom:1px solid #eef2f7"><div style="font-size:12px;color:#627d98;margin-bottom:4px">${escapeHtml(detail.label)}</div><div style="font-size:15px;color:#102a43;line-height:1.5;white-space:pre-line">${escapeHtml(detail.value)}</div></div>`,
+        )
+        .join("")}</div>`
+    : "";
+  const textDetails = details.length
+    ? `\n\n${details.map((detail) => `${detail.label}: ${detail.value}`).join("\n")}`
+    : "";
+  const textDescription = details.length ? "" : `\n\n${input.description}`;
+  const htmlDescription = details.length ? "" : `<p>${safeDescription}</p>`;
   await transporter.sendMail({
     from: process.env.SMTP_FROM,
     to: input.to,
     subject: input.title,
-    html: `<main style="font-family:Arial,sans-serif;background:#F7F9FC;padding:32px"><section style="max-width:560px;margin:auto;background:#fff;padding:32px;border-radius:16px"><h1 style="color:#0B1F4D">${safeTitle}</h1><p>${safeDescription}</p>${input.href ? `<a href="${safeActionUrl}" style="display:inline-block;background:#1D4ED8;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Open Klick-Pro</a>` : ""}</section></main>`,
+    text: `${input.title}${textDescription}${textDetails}${input.href ? `\n\nOpen Klick-Pro: ${actionUrl}` : ""}`,
+    html: `<main style="font-family:Arial,sans-serif;background:#F7F9FC;padding:32px"><section style="max-width:560px;margin:auto;background:#fff;padding:32px;border-radius:16px"><h1 style="color:#0B1F4D">${safeTitle}</h1>${htmlDescription}${detailsHtml}${input.href ? `<a href="${safeActionUrl}" style="display:inline-block;background:#1D4ED8;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;margin-top:24px">Open Klick-Pro</a>` : ""}</section></main>`,
   });
 }
