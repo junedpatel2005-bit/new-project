@@ -214,6 +214,20 @@ export async function POST(request: NextRequest) {
       });
     }
     if (input.action === "create-milestone") {
+      const jobDates = await db.clientJob.findUnique({
+        where: { id: project.jobId },
+        select: { jobDate: true, deadline: true },
+      });
+      if (
+        input.deadline &&
+        jobDates &&
+        ((jobDates.jobDate && new Date(input.deadline) < jobDates.jobDate) ||
+          (jobDates.deadline && new Date(input.deadline) > jobDates.deadline))
+      )
+        return NextResponse.json(
+          { error: "Milestone date must be between the preferred job date and deadline." },
+          { status: 400 },
+        );
       // A new milestone should start IN_PROGRESS whenever nothing else is currently active —
       // not just when it's the very first milestone ever created. Otherwise a milestone added
       // after all prior ones are already approved gets stuck at UPCOMING with no way for the

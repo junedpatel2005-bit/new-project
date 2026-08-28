@@ -78,6 +78,7 @@ type Data = {
   };
   job: {
     title: string | null;
+    jobDate: string | null;
     deadline: string | null;
     budgetMax: number | null;
     paymentMethod: "WALLET" | "OFFLINE";
@@ -127,6 +128,8 @@ const date = (value?: string | null) =>
   value
     ? new Date(value).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })
     : "Not started yet";
+const dateInputValue = (value?: string | null) =>
+  value ? new Date(value).toISOString().slice(0, 10) : undefined;
 function formatFileSize(bytes: number | null | undefined) {
   if (bytes == null) return "Unknown size";
   if (bytes < 1024) return `${bytes} B`;
@@ -386,6 +389,8 @@ export default function SharedProjectTrackingPage() {
     (total, milestone) => total + milestone.amount,
     0,
   );
+  const milestoneMinDate = dateInputValue(data.job?.jobDate);
+  const milestoneMaxDate = dateInputValue(data.job?.deadline);
   const paidToProfessional = data.milestones.reduce(
     (total, milestone) =>
       total +
@@ -1795,6 +1800,8 @@ export default function SharedProjectTrackingPage() {
               <input
                 type="date"
                 value={milestoneDate}
+                min={milestoneMinDate}
+                max={milestoneMaxDate}
                 onChange={(event) => setMilestoneDate(event.target.value)}
                 className="rounded-md border border-input bg-background px-3 py-2 text-sm"
               />
