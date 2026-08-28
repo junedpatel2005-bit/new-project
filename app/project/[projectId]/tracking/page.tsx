@@ -674,7 +674,7 @@ export default function SharedProjectTrackingPage() {
                 </div>
               </div>
               <div className="mt-4 flex flex-wrap gap-2">
-                {data.viewerRole === "PROFESSIONAL" && data.project.status === "READY_TO_START" && (
+                {data.viewerRole === "CLIENT" && data.project.status === "READY_TO_START" && (
                   <Button
                     disabled={busy === "start-work"}
                     onClick={() => void action("start-work")}
@@ -1963,8 +1963,8 @@ function statusText(
 ) {
   if (status === "READY_TO_START")
     return isClient
-      ? `${professional} accepted your project. Waiting for the professional to begin work.`
-      : "The client has hired you and the project is ready to begin.";
+      ? `${professional} accepted your project. Start work when you are ready.`
+      : "The client has hired you. Waiting for the client to start work.";
   if (status === "AWAITING_CLIENT_REVIEW")
     return isClient
       ? `${professional} submitted ${milestone ?? "work"} for your review.`

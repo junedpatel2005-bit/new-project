@@ -248,6 +248,7 @@ export default function JobDetails() {
   const [proposalMessage, setProposalMessage] = useState("");
   const [proposalBusy, setProposalBusy] = useState(false);
   const [proposalError, setProposalError] = useState<string | null>(null);
+  const [acceptedProjectId, setAcceptedProjectId] = useState<number | null>(null);
   const [pendingAcceptProposal, setPendingAcceptProposal] = useState<JobProposal | null>(null);
   type NegotiationKind = "clientProposal" | "sentHireRequest" | "ownProposal";
   const [negotiateTarget, setNegotiateTarget] = useState<{
@@ -518,9 +519,23 @@ export default function JobDetails() {
       body: JSON.stringify({ action }),
     });
     const payload = await response.json().catch(() => null);
-    if (!response.ok) return alert(payload?.error || "Unable to update this request.");
+    if (!response.ok) {
+      // A double-click or a stale page can retry an already accepted request.
+      // Treat it as success when the project now exists instead of showing an error.
+      if (action === "accept" && response.status === 409) {
+        const projectResponse = await fetch(
+          `/api/v1/portal/project?jobId=${encodeURIComponent(jobId)}`,
+        );
+        const projectPayload = await projectResponse.json().catch(() => null);
+        if (projectResponse.ok && projectPayload?.project?.id) {
+          setAcceptedProjectId(projectPayload.project.id);
+          return;
+        }
+      }
+      return alert(payload?.error || "Unable to update this request.");
+    }
     if (action === "accept" && payload.project?.id) {
-      window.location.assign(`/project/${payload.project.id}/tracking`);
+      setAcceptedProjectId(payload.project.id);
       return;
     }
     await refresh();
@@ -1407,6 +1422,35 @@ export default function JobDetails() {
               </Button>
             </div>
           </form>
+        </DialogContent>
+      </Dialog>
+      <Dialog
+        open={acceptedProjectId !== null}
+        onOpenChange={(open) => {
+          if (!open) setAcceptedProjectId(null);
+        }}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Project is now yours</DialogTitle>
+            <DialogDescription>
+              The client&apos;s terms were accepted. You can now manage this project from Running
+              Projects.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-wrap justify-end gap-2 pt-2">
+            <Button variant="outline" onClick={() => router.push("/professional/running-projects")}>
+              Go to Running Projects
+            </Button>
+            <Button
+              onClick={() => {
+                if (acceptedProjectId !== null)
+                  router.push(`/project/${acceptedProjectId}/tracking`);
+              }}
+            >
+              View Project
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
       <Dialog

@@ -89,6 +89,7 @@ const bodySchema = z.discriminatedUnion("action", [
 
 const clientActions = new Set([
   "create-milestone",
+  "start-work",
   "request-revision",
   "approve-milestone",
   "complete-project",
@@ -185,6 +186,11 @@ export async function POST(request: NextRequest) {
     };
 
     if (input.action === "start-work") {
+      if (session.role !== "CLIENT")
+        return NextResponse.json(
+          { error: "Only the client can start this project." },
+          { status: 403 },
+        );
       if (project.status !== "READY_TO_START")
         return NextResponse.json({ error: "This project has already started." }, { status: 409 });
       await db.projectTracking.update({
@@ -194,7 +200,7 @@ export async function POST(request: NextRequest) {
       await event(
         "WORK_STARTED",
         "Work started",
-        "The professional started working on this project.",
+        "The client started work on this project.",
       );
     }
     if (input.action === "update-progress") {
@@ -235,8 +241,7 @@ export async function POST(request: NextRequest) {
       });
     }
     if (input.action === "upload-work") {
-      const startsProject = project.status === "READY_TO_START";
-      if (!startsProject && !["IN_PROGRESS", "REVISION_REQUESTED"].includes(project.status))
+      if (!["IN_PROGRESS", "REVISION_REQUESTED"].includes(project.status))
         return NextResponse.json(
           { error: "Work can only be uploaded while the project is in progress." },
           { status: 409 },
@@ -260,12 +265,6 @@ export async function POST(request: NextRequest) {
           status: "UPLOADED",
         },
       });
-      if (startsProject) {
-        await db.projectTracking.update({
-          where: { id: project.id },
-          data: { status: "IN_PROGRESS", startedAt: new Date() },
-        });
-      }
       await event(
         upload.roundNumber > 1 ? "REVISED_WORK_UPLOADED" : "WORK_UPLOADED",
         upload.roundNumber > 1 ? "Revised work uploaded" : "Work uploaded",
