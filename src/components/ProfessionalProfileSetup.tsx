@@ -14,7 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import type { MarketplaceCategory } from "@/lib/types/marketplace";
 import { getAllStates, getDistrictsByState } from "@/lib/india-locations";
 
-const LeafletMap = dynamic(() => import("@/components/LeafletAddressMap"), {
+const GoogleMapView = dynamic(() => import("@/components/GoogleAddressMap"), {
   ssr: false,
   loading: () => <div className="h-64 animate-pulse rounded-lg bg-muted" />,
 });
@@ -421,7 +421,7 @@ export function ProfessionalProfileSetup() {
                 </p>
               </div>
               <div className="overflow-hidden rounded-xl border border-border shadow-sm">
-                <LeafletMap
+                <GoogleMapView
                   point={location}
                   onPointChange={(latitude, longitude) => {
                     setLocation([latitude, longitude]);

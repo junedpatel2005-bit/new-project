@@ -67,6 +67,8 @@ function dataOf(d: z.infer<typeof bodySchema>) {
 }
 async function errors(d: z.infer<typeof bodySchema>) {
   const fields: Record<string, string> = {};
+  if (d.paymentMethod === "OFFLINE" && d.workMode === "REMOTE")
+    fields.workMode = "Remote jobs require wallet payment.";
   if (!d.title?.trim()) fields.title = "Enter a job title.";
   if (!d.category?.trim()) fields.category = "Choose a category.";
   if (!d.description?.trim()) fields.description = "Describe the work needed.";

@@ -68,6 +68,8 @@ function normalized(data: z.infer<typeof jobInput>) {
 
 async function publishErrors(data: z.infer<typeof jobInput>) {
   const fields: Record<string, string> = {};
+  if (data.paymentMethod === "OFFLINE" && data.workMode === "REMOTE")
+    fields.workMode = "Remote jobs require wallet payment.";
   if (!data.title?.trim()) fields.title = "Enter a job title.";
   if (!data.category?.trim()) fields.category = "Choose a category.";
   if (!data.description?.trim()) fields.description = "Describe the work needed.";

@@ -26,7 +26,9 @@ const JobsPreviewMap = dynamic(() => import("@/components/JobsPreviewMap"), {
   loading: () => <div className="h-full w-full animate-pulse bg-muted" />,
 });
 
-const PAGE_SIZE = 20;
+// Keep the complete server-provided feed available to the search and filter controls.
+// The API applies the professional's eligibility and service-area rules first.
+const PAGE_SIZE = 100;
 const DEFAULT_NEAR_ME_RADIUS_KM = 25;
 const MIN_NEAR_ME_RADIUS_KM = 1;
 const MAX_NEAR_ME_RADIUS_KM = 100;
@@ -95,9 +97,9 @@ type JobsResponse = {
 };
 
 function requestStatusStyle(status: string) {
-  if (status === "PENDING") return "bg-yellow/10 text-yellow";
-  if (status === "ACCEPTED") return "bg-green/10 text-green";
-  return "bg-red/10 text-red";
+  if (status === "PENDING") return "bg-warning/10 text-warning";
+  if (status === "ACCEPTED") return "bg-success/10 text-success";
+  return "bg-destructive/10 text-destructive";
 }
 
 function formatBudgetAmount(value: number | null | undefined, timingType?: string | null) {
@@ -1127,7 +1129,11 @@ function ProfessionalJobsContent() {
             <Button variant="outline" onClick={() => setNegotiateTarget(null)}>
               Cancel
             </Button>
-            <Button disabled={negotiateBusy} onClick={() => void submitNegotiation()}>
+            <Button
+              className="bg-cta text-cta-foreground hover:bg-cta/90"
+              disabled={negotiateBusy}
+              onClick={() => void submitNegotiation()}
+            >
               {negotiateBusy ? "Sending…" : "Send Counter-Offer"}
             </Button>
           </div>

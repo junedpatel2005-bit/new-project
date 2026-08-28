@@ -4,9 +4,8 @@ import { AuthLayout } from "@/components/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import Link from "next/link";
 import { useEffect, useState } from "react";
-import { CheckCircle2, Mail, Pencil, ArrowRight } from "lucide-react";
+import { Mail, Pencil, ArrowRight } from "lucide-react";
 
 export default function Verify() {
   const [error, setError] = useState<string | null>(null);
@@ -39,6 +38,8 @@ export default function Verify() {
       window.clearInterval(interval);
     };
   }, []);
+
+  if (emailVerified) return null;
 
   async function resend() {
     if (resending) return;
@@ -83,12 +84,8 @@ export default function Verify() {
   return (
     <AuthLayout
       hideAside
-      title={emailVerified ? "Email verified successfully" : "Registration successful"}
-      subtitle={
-        emailVerified
-          ? "Your account is now verified."
-          : "Your account was created, but your email is not verified yet."
-      }
+      title="Registration successful"
+      subtitle="Your account was created, but your email is not verified yet."
       footer={<>Need help? Check your spam or promotions folder.</>}
     >
       <div className="space-y-5">
@@ -99,27 +96,17 @@ export default function Verify() {
         </div>
         <div className="rounded-2xl border border-border bg-card p-5 shadow-soft sm:p-6">
           <div className="mb-5 flex items-start gap-3">
-            <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+            <Mail className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
             <div>
-              <p className="font-semibold text-foreground">
-                {emailVerified ? "Email verified" : "One last step"}
-              </p>
+              <p className="font-semibold text-foreground">One last step</p>
               <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                {emailVerified
-                  ? "Your confirmation link was accepted successfully."
-                  : "Open the confirmation link we sent to "}
-                {!emailVerified && (
-                  <span className="font-medium text-foreground">{userEmail || "your email"}.</span>
-                )}
+                Open the confirmation link we sent to{" "}
+                <span className="font-medium text-foreground">{userEmail || "your email"}.</span>
               </p>
             </div>
           </div>
-          <div
-            className={`rounded-xl border p-4 text-sm leading-6 ${emailVerified ? "border-emerald-300 bg-emerald-50 text-emerald-900" : "border-amber-300 bg-amber-50 text-amber-950"}`}
-          >
-            {emailVerified
-              ? "Your Gmail/email has been verified. You can now access your account."
-              : "Your Gmail/email is not verified yet. The link expires in 24 hours."}
+          <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
+            Your Gmail/email is not verified yet. The link expires in 24 hours.
           </div>
           <Button
             type="button"
@@ -146,16 +133,6 @@ export default function Verify() {
               Change email
             </Button>
           </div>
-          {emailVerified && (
-            <div className="mt-5 grid gap-2">
-              <Button asChild>
-                <Link href="/client-profile">Continue to your account</Link>
-              </Button>
-              <Button type="button" variant="outline" onClick={() => window.close()}>
-                Close this tab
-              </Button>
-            </div>
-          )}
           {!editingEmail && emailMessage && (
             <p className="mt-4 rounded-lg bg-emerald-50 px-3 py-2 text-center text-sm text-emerald-700">
               {emailMessage}

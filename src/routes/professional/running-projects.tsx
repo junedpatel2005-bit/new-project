@@ -272,7 +272,13 @@ export default function RunningProjectsPage() {
                           <h3 className="truncate text-lg font-semibold">
                             {project.jobTitle ?? `Project #${project.id}`}
                           </h3>
-                          <span className="rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.13em] text-primary">
+                          <span
+                            className={`rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.13em] ${
+                              project.status === "REVISION_REQUESTED"
+                                ? "border-red-200 bg-red-50 text-red-700"
+                                : "border-primary/20 bg-primary/10 text-primary"
+                            }`}
+                          >
                             {displayStatus(project.status)}
                           </span>
                         </div>
@@ -312,7 +318,11 @@ export default function RunningProjectsPage() {
                             </>
                           ) : (
                             <>
-                              <span className="hidden sm:inline">View workspace</span>
+                              <span className="hidden sm:inline">
+                                {project.status === "REVISION_REQUESTED"
+                                  ? "Open revision"
+                                  : "View workspace"}
+                              </span>
                               <span className="sm:hidden">View</span>
                             </>
                           )}

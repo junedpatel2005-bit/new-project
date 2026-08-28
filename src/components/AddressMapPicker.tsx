@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-const LeafletMap = dynamic(() => import("@/components/LeafletAddressMap"), {
+const GoogleMapView = dynamic(() => import("@/components/GoogleAddressMap"), {
   ssr: false,
   loading: () => <div className="h-64 animate-pulse rounded-lg bg-muted" />,
 });
@@ -121,7 +121,7 @@ export function AddressMapPicker({
       <p className="text-sm text-muted-foreground">
         Click or drag the pin on the map to set the exact job location.
       </p>
-      <LeafletMap point={point} onPointChange={resolve} />
+      <GoogleMapView point={point} onPointChange={resolve} />
       <div className="flex flex-wrap items-center gap-3">
         <Button
           type="button"
@@ -138,7 +138,7 @@ export function AddressMapPicker({
         </Button>
         {pinStatus && <span className="text-sm text-muted-foreground">{pinStatus}</span>}
       </div>
-      <p className="text-xs text-muted-foreground">© OpenStreetMap contributors</p>
+      <p className="text-xs text-muted-foreground">Map data © Google</p>
     </div>
   );
 }

@@ -1,38 +1,46 @@
 "use client";
 
-import L from "leaflet";
-import { Circle, MapContainer, Marker, TileLayer } from "react-leaflet";
+import { Circle, GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
+import { useMemo } from "react";
 
-const markerIcon = L.divIcon({
-  className: "",
-  html: '<div class="text-2xl">📍</div>',
-  iconSize: [28, 28],
-  iconAnchor: [14, 28],
-});
+function isMapsEnabled(): boolean {
+  return Boolean(process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY) && process.env.NEXT_PUBLIC_GOOGLE_MAPS_JS_ENABLED !== "false";
+}
 
 export default function ProfessionalLocationMap({
   point,
 }: {
   point: { lat: number; lng: number };
 }) {
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
+  const center = useMemo(() => ({ lat: point.lat, lng: point.lng }), [point.lat, point.lng]);
+
+  if (!isMapsEnabled()) {
+    return (
+      <div className="flex h-64 w-full items-center justify-center rounded-xl border border-border bg-muted text-sm text-muted-foreground">
+        Map preview is unavailable.
+      </div>
+    );
+  }
+
   return (
     <div className="isolate h-64 w-full overflow-hidden rounded-xl border border-border">
-      <MapContainer
-        center={[point.lat, point.lng]}
-        zoom={12}
-        scrollWheelZoom={false}
-        zoomControl={false}
-        attributionControl={false}
-        className="h-full w-full"
-      >
-        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-        <Circle
-          center={[point.lat, point.lng]}
-          radius={1200}
-          pathOptions={{ color: "#2563eb", fillOpacity: 0.12 }}
-        />
-        <Marker position={[point.lat, point.lng]} icon={markerIcon} />
-      </MapContainer>
+      <LoadScript googleMapsApiKey={apiKey} loadingElement={<div className="h-64 w-full animate-pulse bg-muted" />}>
+        <GoogleMap
+          mapContainerStyle={{ width: "100%", height: "100%" }}
+          center={center}
+          zoom={12}
+          options={{
+            disableDefaultUI: true,
+            clickableIcons: false,
+            scrollwheel: false,
+            zoomControl: false,
+          }}
+        >
+          <Circle center={center} radius={1200} options={{ strokeColor: "#2563eb", fillOpacity: 0.12 }} />
+          <Marker position={center} />
+        </GoogleMap>
+      </LoadScript>
     </div>
   );
 }

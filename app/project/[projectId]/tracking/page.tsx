@@ -456,12 +456,6 @@ export default function SharedProjectTrackingPage() {
   return (
     <AppShell>
       <main className="mx-auto max-w-6xl space-y-6">
-        <Link
-          href={isClient ? "/my-jobs" : "/professional/my-jobs?tab=active"}
-          className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
-        >
-          ← Back to projects
-        </Link>
         {message && (
           <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
             {message}
@@ -628,7 +622,7 @@ export default function SharedProjectTrackingPage() {
                       title="Project location"
                       className="mt-3 h-[220px] w-full rounded-2xl border border-border"
                       loading="lazy"
-                      src={`https://www.openstreetmap.org/export/embed.html?bbox=${data.job.locationLng - 0.01}%2C${data.job.locationLat - 0.01}%2C${data.job.locationLng + 0.01}%2C${data.job.locationLat + 0.01}&layer=mapnik&marker=${data.job.locationLat}%2C${data.job.locationLng}`}
+                      src={`https://www.google.com/maps?q=${data.job.locationLat},${data.job.locationLng}&z=15&output=embed`}
                     />
                   )}
                 </div>
@@ -680,7 +674,7 @@ export default function SharedProjectTrackingPage() {
                 </div>
               </div>
               <div className="mt-4 flex flex-wrap gap-2">
-                {!isClient && data.project.status === "READY_TO_START" && (
+                {data.viewerRole === "PROFESSIONAL" && data.project.status === "READY_TO_START" && (
                   <Button
                     disabled={busy === "start-work"}
                     onClick={() => void action("start-work")}
@@ -1103,11 +1097,13 @@ export default function SharedProjectTrackingPage() {
                       className={`h-1.5 flex-1 rounded-full transition-colors ${
                         filled
                           ? "bg-emerald-500"
-                          : active
-                            ? "bg-amber-400"
-                            : milestone
-                              ? "bg-primary/40"
-                              : "bg-muted"
+                          : milestone?.status === "REVISION_REQUESTED"
+                            ? "bg-red-500"
+                            : active
+                              ? "bg-amber-400"
+                              : milestone
+                                ? "bg-primary/40"
+                                : "bg-muted"
                       }`}
                     />
                   );
@@ -1185,6 +1181,22 @@ export default function SharedProjectTrackingPage() {
                               </div>
                             );
                           })}
+                        </div>
+                      )}
+                      {m.status === "REVISION_REQUESTED" && data.revisions[0] && (
+                        <div className="mt-3 rounded-lg border border-red-200 bg-red-50 p-3 text-red-800">
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <p className="text-xs font-bold uppercase tracking-wide">
+                              Client requested changes
+                            </p>
+                            <span className="text-xs text-red-700/75">
+                              {date(data.revisions[0].createdAt)}
+                            </span>
+                          </div>
+                          <p className="mt-1.5 text-sm">
+                            {data.revisions[0].note ||
+                              "Please review the requested changes and resubmit your work."}
+                          </p>
                         </div>
                       )}
                       {!isClient && ["IN_PROGRESS", "REVISION_REQUESTED"].includes(m.status) && (

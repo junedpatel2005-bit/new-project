@@ -212,6 +212,17 @@ export default function JobDetails() {
   const [professionals, setProfessionals] = useState<ProfessionalDiscoveryResult[]>([]);
   const [finderQuery, setFinderQuery] = useState("");
   const [finderStatus, setFinderStatus] = useState<"idle" | "loading" | "error">("idle");
+  const [selectingId, setSelectingId] = useState<string | null>(null);
+  const [selectError, setSelectError] = useState<string | null>(null);
+  const [hireTarget, setHireTarget] = useState<ProfessionalDiscoveryResult | null>(null);
+  const [hireBidAmount, setHireBidAmount] = useState("");
+  const [hireDuration, setHireDuration] = useState("1 week");
+  const [hireCoverLetter, setHireCoverLetter] = useState("");
+  const [hireBusy, setHireBusy] = useState(false);
+  const [hireMessage, setHireMessage] = useState<string | null>(null);
+  const [hireMessageStatus, setHireMessageStatus] = useState<"idle" | "error" | "success">(
+    "idle",
+  );
   const [viewerRole, setViewerRole] = useState<"CLIENT" | "PROFESSIONAL" | null>(null);
   const [ownProposal, setOwnProposal] = useState<{
     id: number;
@@ -345,6 +356,79 @@ export default function JobDetails() {
   function openFinder() {
     setFinderOpen(true);
     if (!professionals.length) void searchProfessionals("");
+  }
+  function defaultHireBid() {
+    if (!job) return null;
+    if (job.timingType === "HOURLY") return job.hourlyRate ?? null;
+    if (job.budgetMin != null && job.budgetMax != null) {
+      return Math.round((job.budgetMin + job.budgetMax) / 2);
+    }
+    return null;
+  }
+  function openSelectHire(professional: ProfessionalDiscoveryResult) {
+    setHireTarget(professional);
+    setSelectError(null);
+    setHireMessage(null);
+    setHireMessageStatus("idle");
+    setHireCoverLetter("");
+    setHireDuration("1 week");
+    const fallback = defaultHireBid();
+    setHireBidAmount(fallback !== null ? String(fallback) : "");
+  }
+  function closeSelectHire() {
+    if (hireBusy) return;
+    setHireTarget(null);
+    setSelectError(null);
+    setHireMessage(null);
+    setHireMessageStatus("idle");
+  }
+  async function submitHire() {
+    if (!hireTarget) return;
+    const bidAmount = Number(hireBidAmount);
+    if (!Number.isFinite(bidAmount) || bidAmount < 1) {
+      setSelectError("Enter a valid bid amount.");
+      return;
+    }
+    if (!hireDuration.trim()) {
+      setSelectError("Enter a timeline.");
+      return;
+    }
+    setHireBusy(true);
+    setSelectError(null);
+    setHireMessage(null);
+    try {
+      const response = await fetch("/api/v1/client/project-requests", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          jobId: Number(jobId),
+          professionalId: hireTarget.id,
+          bidAmount: Math.round(bidAmount),
+          duration: hireDuration,
+          coverLetter: hireCoverLetter,
+        }),
+      });
+      const payload = (await response.json().catch(() => null)) as { error?: string } | null;
+      if (!response.ok) {
+        setHireMessage(payload?.error || "Unable to send the hire request.");
+        setHireMessageStatus("error");
+        return;
+      }
+      setHireMessage(`Hire request sent to ${hireTarget.name}.`);
+      setHireMessageStatus("success");
+      await refresh();
+      setTimeout(() => {
+        setHireTarget(null);
+        setFinderOpen(false);
+        setHireMessage(null);
+        setHireMessageStatus("idle");
+      }, 1200);
+    } catch {
+      setHireMessage("Unable to send the hire request right now.");
+      setHireMessageStatus("error");
+    } finally {
+      setHireBusy(false);
+    }
   }
   async function sendProposal() {
     const bidAmount = Number(proposalPrice);
@@ -515,9 +599,9 @@ export default function JobDetails() {
             <span
               className={`rounded-full px-3 py-1 ${
                 job.status === "OPEN"
-                  ? "bg-green/10 text-green"
+                  ? "bg-success/10 text-success"
                   : job.status === "CLOSED"
-                    ? "bg-red/10 text-red"
+                    ? "bg-destructive/10 text-destructive"
                     : "bg-muted"
               }`}
             >
@@ -620,7 +704,7 @@ export default function JobDetails() {
               loading="lazy"
               src={
                 job.locationLat !== null && job.locationLng !== null
-                  ? `https://www.openstreetmap.org/export/embed.html?bbox=${job.locationLng - 0.01}%2C${job.locationLat - 0.01}%2C${job.locationLng + 0.01}%2C${job.locationLat + 0.01}&layer=mapnik&marker=${job.locationLat}%2C${job.locationLng}`
+                  ? `https://www.google.com/maps?q=${job.locationLat},${job.locationLng}&z=15&output=embed`
                   : `https://www.google.com/maps?q=${encodeURIComponent(job.locationAddress ?? job.location ?? "")}&output=embed`
               }
             />
@@ -734,10 +818,10 @@ export default function JobDetails() {
                       <span
                         className={`rounded-full px-3 py-1 text-xs font-semibold ${
                           proposal.status === "PENDING"
-                            ? "bg-yellow/10 text-yellow"
+                            ? "bg-warning/10 text-warning"
                             : proposal.status === "ACCEPTED"
-                              ? "bg-green/10 text-green"
-                              : "bg-red/10 text-red"
+                              ? "bg-success/10 text-success"
+                              : "bg-destructive/10 text-destructive"
                         }`}
                       >
                         {proposal.status === "PENDING" ? "Pending Review" : proposal.status}
@@ -774,7 +858,7 @@ export default function JobDetails() {
                         <>
                           <Button
                             size="sm"
-                            className="bg-green hover:bg-green/90"
+                            className="bg-success text-success-foreground hover:bg-success/90"
                             onClick={() => setPendingAcceptProposal(proposal)}
                           >
                             Accept & Hire
@@ -856,10 +940,10 @@ export default function JobDetails() {
                       <span
                         className={`rounded-full px-3 py-1 text-xs font-semibold ${
                           hireRequest.status === "PENDING"
-                            ? "bg-yellow/10 text-yellow"
+                            ? "bg-warning/10 text-warning"
                             : hireRequest.status === "ACCEPTED"
-                              ? "bg-green/10 text-green"
-                              : "bg-red/10 text-red"
+                              ? "bg-success/10 text-success"
+                              : "bg-destructive/10 text-destructive"
                         }`}
                       >
                         {hireRequest.status === "PENDING"
@@ -897,7 +981,7 @@ export default function JobDetails() {
                         <>
                           <Button
                             size="sm"
-                            className="bg-green hover:bg-green/90"
+                            className="bg-success text-success-foreground hover:bg-success/90"
                             onClick={() =>
                               void respondToRequest("sentHireRequest", hireRequest.id, "accept")
                             }
@@ -944,19 +1028,19 @@ export default function JobDetails() {
               <div
                 className={`rounded-xl border p-5 ${
                   ownProposal.status === "ACCEPTED"
-                    ? "border-green/30 bg-green/5"
+                    ? "border-success/30 bg-success/5"
                     : ownProposal.status === "REJECTED"
-                      ? "border-red/30 bg-red/5"
-                      : "border-yellow/30 bg-yellow/5"
+                      ? "border-destructive/30 bg-destructive/5"
+                      : "border-warning/30 bg-warning/5"
                 }`}
               >
                 <p
                   className={`font-semibold text-sm ${
                     ownProposal.status === "ACCEPTED"
-                      ? "text-green"
+                      ? "text-success"
                       : ownProposal.status === "REJECTED"
-                        ? "text-red"
-                        : "text-yellow"
+                        ? "text-destructive"
+                        : "text-warning"
                   }`}
                 >
                   {ownProposal.status === "PENDING"
@@ -987,7 +1071,7 @@ export default function JobDetails() {
                   <div className="mt-4 flex flex-wrap gap-2">
                     <Button
                       size="sm"
-                      className="bg-green hover:bg-green/90"
+                      className="bg-success text-success-foreground hover:bg-success/90"
                       onClick={() => void respondToRequest("ownProposal", ownProposal.id, "accept")}
                     >
                       Accept Terms
@@ -1089,7 +1173,11 @@ export default function JobDetails() {
                   <Button variant="outline" onClick={() => setShowProposalForm(false)}>
                     Cancel
                   </Button>
-                  <Button disabled={proposalBusy} onClick={() => void sendProposal()}>
+                  <Button
+                    className="bg-cta text-cta-foreground hover:bg-cta/90"
+                    disabled={proposalBusy}
+                    onClick={() => void sendProposal()}
+                  >
                     {proposalBusy ? "Sending…" : "Send Proposal"}
                   </Button>
                 </div>
@@ -1302,7 +1390,11 @@ export default function JobDetails() {
             <Button variant="outline" onClick={() => setNegotiateTarget(null)}>
               Cancel
             </Button>
-            <Button disabled={negotiateBusy} onClick={() => void submitNegotiation()}>
+            <Button
+              className="bg-cta text-cta-foreground hover:bg-cta/90"
+              disabled={negotiateBusy}
+              onClick={() => void submitNegotiation()}
+            >
               {negotiateBusy ? "Sending…" : "Send Counter-Offer"}
             </Button>
           </div>
@@ -1358,13 +1450,22 @@ export default function JobDetails() {
                       <img
                         src={professional.avatarUrl}
                         alt={professional.name}
-                        className="h-11 w-11 rounded-xl object-cover"
+                        className="h-11 w-11 shrink-0 rounded-xl object-cover"
+                        onError={(event) => {
+                          (event.currentTarget as HTMLImageElement).style.display = "none";
+                          const fallback = (event.currentTarget as HTMLImageElement)
+                            .nextElementSibling;
+                          if (fallback instanceof HTMLElement) fallback.style.display = "grid";
+                        }}
                       />
-                    ) : (
-                      <div className="grid h-11 w-11 place-items-center rounded-xl bg-muted font-semibold">
-                        {professional.name.slice(0, 1)}
-                      </div>
-                    )}
+                    ) : null}
+                    <div
+                      className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-muted font-semibold ${
+                        professional.avatarUrl ? "hidden" : ""
+                      }`}
+                    >
+                      {professional.name.slice(0, 1)}
+                    </div>
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-semibold">{professional.name}</p>
                       <p className="truncate text-sm text-muted-foreground">{professional.title}</p>
@@ -1384,10 +1485,13 @@ export default function JobDetails() {
                         : `₹${professional.hourlyRate}/hr`}{" "}
                       · {professional.location ?? "Remote"}
                     </p>
-                    <Button asChild size="sm">
-                      <Link href={`/pro/${professional.id}?jobId=${encodeURIComponent(jobId)}`}>
-                        Select
-                      </Link>
+                    <Button
+                      size="sm"
+                      className="bg-cta text-cta-foreground hover:bg-cta/90"
+                      disabled={selectingId === professional.id}
+                      onClick={() => openSelectHire(professional)}
+                    >
+                      {selectingId === professional.id ? "Selecting…" : "Select"}
                     </Button>
                   </div>
                 </article>
@@ -1404,6 +1508,63 @@ export default function JobDetails() {
               <Link href={`/discover?jobId=${encodeURIComponent(jobId)}`}>
                 Open full professional search
               </Link>
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      <Dialog
+        open={hireTarget !== null}
+        onOpenChange={(open) => {
+          if (!open) closeSelectHire();
+        }}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Hire {hireTarget?.name ?? "professional"}</DialogTitle>
+            <DialogDescription>
+              Send a hire request for {job?.title ?? "this job"}. The professional can accept, decline, or counter.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-2 grid gap-3 [&_input]:rounded-md [&_input]:border [&_input]:bg-background [&_input]:px-3 [&_input]:py-2 [&_textarea]:rounded-md [&_textarea]:border [&_textarea]:bg-background [&_textarea]:px-3 [&_textarea]:py-2">
+            <input
+              type="number"
+              min="1"
+              value={hireBidAmount}
+              onChange={(event) => setHireBidAmount(event.target.value)}
+              placeholder="Your offer"
+            />
+            <input
+              value={hireDuration}
+              onChange={(event) => setHireDuration(event.target.value)}
+              placeholder="Timeline (for example, 1 week)"
+            />
+            <textarea
+              value={hireCoverLetter}
+              onChange={(event) => setHireCoverLetter(event.target.value)}
+              placeholder="Add a short note (optional)"
+              rows={3}
+            />
+          </div>
+          {selectError && <p className="mt-3 text-sm text-destructive">{selectError}</p>}
+          {hireMessage && (
+            <p
+              className={`mt-3 text-sm ${
+                hireMessageStatus === "success" ? "text-success" : "text-destructive"
+              }`}
+            >
+              {hireMessage}
+            </p>
+          )}
+          <div className="mt-4 flex justify-end gap-2">
+            <Button variant="outline" onClick={closeSelectHire} disabled={hireBusy}>
+              Cancel
+            </Button>
+            <Button
+              className="bg-cta text-cta-foreground hover:bg-cta/90"
+              disabled={hireBusy}
+              onClick={() => void submitHire()}
+            >
+              {hireBusy ? "Sending…" : "Send Hire Request"}
             </Button>
           </div>
         </DialogContent>

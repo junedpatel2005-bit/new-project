@@ -1,7 +1,8 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { ArrowLeft } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
 import { AppMobileNavigation, AppSidebar, type NavigationItem } from "@/components/AppNavigation";
 import {
@@ -20,6 +21,7 @@ type PortalUser = {
 
 export function AppShell({ children, title }: { children: React.ReactNode; title?: string }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [user, setUser] = useState<PortalUser | null>(null);
   const [items, setItems] = useState<NavigationItem[]>(clientItems);
   const [mobileItems, setMobileItems] = useState<NavigationItem[]>(clientMobileItems);
@@ -47,6 +49,14 @@ export function AppShell({ children, title }: { children: React.ReactNode; title
       <div className={user ? "lg:pl-64" : ""}>
         <AppHeader role={user?.role} />
         <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="mb-5 inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </button>
           {title && (
             <h1 className="mb-6 font-display text-3xl font-bold tracking-tight">{title}</h1>
           )}

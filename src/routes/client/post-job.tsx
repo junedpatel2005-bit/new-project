@@ -49,6 +49,7 @@ const empty: Form = {
   locationLng: null,
 };
 const steps = ["Details", "Budget & schedule", "Job type", "Location", "Review"];
+const postJobDraftKey = "klick-pro:post-job-draft";
 const segmentOptions: [string, string][] = [
   ["RESIDENTIAL", "Residential"],
   ["COMMERCIAL", "Commercial"],
@@ -61,30 +62,39 @@ const money = (value: number | null | undefined) =>
 
 export default function PostJob() {
   const router = useRouter();
+  const editJobId =
+    typeof window === "undefined" ? null : new URLSearchParams(window.location.search).get("edit");
   const [step, setStep] = useState(0),
     [maxStep, setMaxStep] = useState(0),
     [form, setForm] = useState<Form>(empty),
     [id, setId] = useState<number | null>(null),
     [categories, setCategories] = useState<MarketplaceCategory[]>([]),
-    [saved, setSaved] = useState<
-      Array<{
-        id: number;
-        label: string;
-        address: string;
-        latitude?: number | null;
-        longitude?: number | null;
-      }>
-    >([]),
     [primary, setPrimary] = useState<string>(""),
     [errors, setErrors] = useState<Record<string, string>>({}),
     [message, setMessage] = useState(""),
     [saving, setSaving] = useState(false),
-    [segment, setSegment] = useState("");
+    [segment, setSegment] = useState(""),
+    [hydrated, setHydrated] = useState(false);
   const update = <K extends keyof Form>(key: K, value: Form[K]) => {
     setForm((old) => ({ ...old, [key]: value }));
     setErrors((old) => {
       const next = { ...old };
       delete next[key];
+      return next;
+    });
+  };
+  const selectPaymentMethod = (paymentMethod: Form["paymentMethod"]) => {
+    setForm((old) => ({
+      ...old,
+      paymentMethod,
+      ...(paymentMethod === "OFFLINE" && old.workMode === "REMOTE"
+        ? { workMode: "ON_SITE" as const }
+        : {}),
+    }));
+    setErrors((old) => {
+      const next = { ...old };
+      delete next.paymentMethod;
+      delete next.workMode;
       return next;
     });
   };
@@ -100,23 +110,26 @@ export default function PostJob() {
           data: {
             profile?: {
               address?: string | null;
-              savedLocations?: Array<{
-                id: number;
-                label: string;
-                address: string;
-                latitude?: number | null;
-                longitude?: number | null;
-              }>;
             } | null;
           } | null,
         ) => {
           if (!data) return;
           setPrimary(data.profile?.address ?? "");
-          setSaved(data.profile?.savedLocations ?? []);
         },
       )
       .catch(() => {});
-    const edit = new URLSearchParams(window.location.search).get("edit");
+    const edit = editJobId;
+    if (!edit) {
+      try {
+        const draft = JSON.parse(localStorage.getItem(postJobDraftKey) ?? "null");
+        if (draft?.form) setForm({ ...empty, ...draft.form });
+        if (typeof draft?.step === "number") setStep(draft.step);
+        if (typeof draft?.maxStep === "number") setMaxStep(draft.maxStep);
+      } catch {
+        // Ignore an invalid local draft and start with a blank form.
+      }
+    }
+    setHydrated(true);
     if (edit && /^\d+$/.test(edit)) {
       void fetch(`/api/v1/client/jobs/${edit}`)
         .then((r) => (r.ok ? r.json() : Promise.reject()))
@@ -135,7 +148,10 @@ export default function PostJob() {
             urgency: job.urgency,
             jobDate: asDate(job.jobDate),
             deadline: asDate(job.deadline),
-            workMode: job.workMode,
+            workMode:
+              job.paymentMethod === "OFFLINE" && job.workMode === "REMOTE"
+                ? "ON_SITE"
+                : job.workMode,
             locationLabel: job.locationLabel ?? "",
             locationAddress: job.locationAddress ?? "",
             locationState: job.locationState ?? "",
@@ -146,7 +162,11 @@ export default function PostJob() {
         })
         .catch(() => setMessage("This draft could not be opened."));
     }
-  }, []);
+  }, [editJobId]);
+  useEffect(() => {
+    if (!hydrated || editJobId) return;
+    localStorage.setItem(postJobDraftKey, JSON.stringify({ form, step, maxStep }));
+  }, [editJobId, form, hydrated, maxStep, step]);
   const payload = (mode: "draft" | "publish") => ({
     ...form,
     budgetMin: form.budgetMin === "" ? null : Number(form.budgetMin),
@@ -214,17 +234,23 @@ export default function PostJob() {
         return;
       }
       setId(data.job.id);
-      if (mode === "publish") router.push("/my-jobs?posted=1");
-      else setMessage("Draft saved.");
+      if (mode === "publish") {
+        localStorage.removeItem(postJobDraftKey);
+        router.push("/my-jobs?posted=1");
+      } else setMessage("Draft saved.");
     } catch {
       setMessage("A network error occurred. Your form values are still here.");
     } finally {
       setSaving(false);
     }
   }
-  const topCategories = useMemo(
-    () => categories.filter((c) => c.parentId === null && (!segment || c.segment === segment)),
+  const segmentCategory = useMemo(
+    () => categories.find((c) => c.parentId === null && c.segment === segment) ?? null,
     [categories, segment],
+  );
+  const topCategories = useMemo(
+    () => (segmentCategory ? categories.filter((c) => c.parentId === segmentCategory.id) : []),
+    [categories, segmentCategory],
   );
   const selectedCategory = useMemo(
     () => categories.find((c) => c.name === form.category) ?? null,
@@ -232,9 +258,9 @@ export default function PostJob() {
   );
   const activeTopCategory = useMemo(() => {
     if (!selectedCategory) return null;
-    if (selectedCategory.parentId === null) return selectedCategory;
+    if (selectedCategory.parentId === segmentCategory?.id) return selectedCategory;
     return categories.find((c) => c.id === selectedCategory.parentId) ?? null;
-  }, [categories, selectedCategory]);
+  }, [categories, selectedCategory, segmentCategory]);
   const subCategories = useMemo(
     () => (activeTopCategory ? categories.filter((c) => c.parentId === activeTopCategory.id) : []),
     [categories, activeTopCategory],
@@ -245,17 +271,8 @@ export default function PostJob() {
   const locationOptions = useMemo<
     Array<{ label: string; address: string; lat: number | null; lng: number | null }>
   >(
-    () =>
-      [
-        { label: "Primary address", address: primary, lat: null, lng: null },
-        ...saved.map((x) => ({
-          label: x.label,
-          address: x.address,
-          lat: x.latitude ?? null,
-          lng: x.longitude ?? null,
-        })),
-      ].filter((x) => x.address),
-    [primary, saved],
+    () => (primary ? [{ label: "Primary address", address: primary, lat: null, lng: null }] : []),
+    [primary],
   );
   return (
     <div className="max-w-3xl">
@@ -426,13 +443,13 @@ export default function PostJob() {
               <div className="grid gap-3 sm:grid-cols-2">
                 <Mode
                   checked={form.paymentMethod === "WALLET"}
-                  onClick={() => update("paymentMethod", "WALLET")}
+                  onClick={() => selectPaymentMethod("WALLET")}
                   title="Wallet payment"
                   text="Pay milestone amounts through the platform wallet."
                 />
                 <Mode
                   checked={form.paymentMethod === "OFFLINE"}
-                  onClick={() => update("paymentMethod", "OFFLINE")}
+                  onClick={() => selectPaymentMethod("OFFLINE")}
                   title="Offline payment"
                   text="Pay the professional directly outside the platform."
                 />
@@ -468,12 +485,14 @@ export default function PostJob() {
                 title="On-site"
                 text="A professional comes to the job location."
               />
-              <Mode
-                checked={form.workMode === "REMOTE"}
-                onClick={() => update("workMode", "REMOTE")}
-                title="Remote"
-                text="The work can be completed remotely."
-              />
+              {form.paymentMethod !== "OFFLINE" && (
+                <Mode
+                  checked={form.workMode === "REMOTE"}
+                  onClick={() => update("workMode", "REMOTE")}
+                  title="Remote"
+                  text="The work can be completed remotely."
+                />
+              )}
               <Mode
                 checked={form.workMode === "BOTH"}
                 onClick={() => update("workMode", "BOTH")}
@@ -488,87 +507,91 @@ export default function PostJob() {
             <h2 className="text-xl font-semibold">Where will the job take place?</h2>
             {form.workMode === "REMOTE" ? (
               <p className="rounded-lg bg-muted p-4 text-sm">
-                Remote jobs do not need a physical location. You may still add one if it helps
-                professionals.
+                This job is remote and does not need a physical location.
               </p>
-            ) : null}
-            {locationOptions.length > 0 && (
-              <div className="space-y-2">
-                {locationOptions.map((option) => (
-                  <button
-                    key={`${option.label}-${option.address}`}
-                    type="button"
-                    className="w-full rounded-lg border p-3 text-left hover:border-primary"
-                    onClick={() => {
-                      update("locationLabel", option.label);
-                      update("locationAddress", option.address);
-                      update("locationLat", option.lat ?? null);
-                      update("locationLng", option.lng ?? null);
+            ) : (
+              <>
+                {locationOptions.length > 0 && (
+                  <div className="space-y-2">
+                    {locationOptions.map((option) => (
+                      <button
+                        key={`${option.label}-${option.address}`}
+                        type="button"
+                        className="w-full rounded-lg border p-3 text-left hover:border-primary"
+                        onClick={() => {
+                          update("locationLabel", option.label);
+                          update("locationAddress", option.address);
+                          update("locationLat", option.lat ?? null);
+                          update("locationLng", option.lng ?? null);
+                        }}
+                      >
+                        <span className="block font-medium">Use {option.label}</span>
+                        <span className="text-sm text-muted-foreground">{option.address}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <Field label="Location label">
+                  <Input
+                    value={form.locationLabel}
+                    onChange={(e) => update("locationLabel", e.target.value)}
+                    placeholder="e.g. Home or job site"
+                  />
+                </Field>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Field label="State">
+                    <select
+                      value={form.locationState}
+                      onChange={(event) => {
+                        update("locationState", event.target.value);
+                        update("locationDistrict", "");
+                      }}
+                      className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                    >
+                      <option value="">Select state</option>
+                      {getAllStates().map((item) => (
+                        <option key={item} value={item}>
+                          {item}
+                        </option>
+                      ))}
+                    </select>
+                  </Field>
+                  <Field label="District">
+                    <select
+                      value={form.locationDistrict}
+                      onChange={(event) => update("locationDistrict", event.target.value)}
+                      disabled={!form.locationState}
+                      className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      <option value="">Select district</option>
+                      {(getDistrictsByState(form.locationState) ?? []).map((item) => (
+                        <option key={item} value={item}>
+                          {item}
+                        </option>
+                      ))}
+                    </select>
+                  </Field>
+                </div>
+                <div
+                  className={
+                    errors.locationAddress ? "rounded-lg border border-destructive p-2" : ""
+                  }
+                >
+                  <AddressMapPicker
+                    id="job-location"
+                    value={form.locationAddress}
+                    onChange={(value) => update("locationAddress", value)}
+                    onCoordinatesChange={(lat, lng) => {
+                      update("locationLat", lat);
+                      update("locationLng", lng);
                     }}
-                  >
-                    <span className="block font-medium">Use {option.label}</span>
-                    <span className="text-sm text-muted-foreground">{option.address}</span>
-                  </button>
-                ))}
-              </div>
+                  />
+                  {errors.locationAddress && (
+                    <p className="mt-2 text-sm text-destructive">{errors.locationAddress}</p>
+                  )}
+                </div>
+              </>
             )}
-            <Field label="Location label">
-              <Input
-                value={form.locationLabel}
-                onChange={(e) => update("locationLabel", e.target.value)}
-                placeholder="e.g. Home or job site"
-              />
-            </Field>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="State">
-                <select
-                  value={form.locationState}
-                  onChange={(event) => {
-                    update("locationState", event.target.value);
-                    update("locationDistrict", "");
-                  }}
-                  className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-                >
-                  <option value="">Select state</option>
-                  {getAllStates().map((item) => (
-                    <option key={item} value={item}>
-                      {item}
-                    </option>
-                  ))}
-                </select>
-              </Field>
-              <Field label="District">
-                <select
-                  value={form.locationDistrict}
-                  onChange={(event) => update("locationDistrict", event.target.value)}
-                  disabled={!form.locationState}
-                  className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  <option value="">Select district</option>
-                  {(getDistrictsByState(form.locationState) ?? []).map((item) => (
-                    <option key={item} value={item}>
-                      {item}
-                    </option>
-                  ))}
-                </select>
-              </Field>
-            </div>
-            <div
-              className={errors.locationAddress ? "rounded-lg border border-destructive p-2" : ""}
-            >
-              <AddressMapPicker
-                id="job-location"
-                value={form.locationAddress}
-                onChange={(value) => update("locationAddress", value)}
-                onCoordinatesChange={(lat, lng) => {
-                  update("locationLat", lat);
-                  update("locationLng", lng);
-                }}
-              />
-              {errors.locationAddress && (
-                <p className="mt-2 text-sm text-destructive">{errors.locationAddress}</p>
-              )}
-            </div>
           </div>
         )}
         {step === 4 && (

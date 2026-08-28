@@ -162,6 +162,7 @@ export async function GET(
               ...(bbox
                 ? {
                     OR: [
+                      { workMode: { in: ["REMOTE", "BOTH"] } },
                       { locationLat: null },
                       {
                         locationLat: {
@@ -178,7 +179,6 @@ export async function GET(
                 : {}),
             },
             orderBy: { createdAt: "desc" },
-            take: bbox ? 100 : 20,
             include: {
               user: {
                 select: {
@@ -230,6 +230,13 @@ export async function GET(
           }),
         ]);
 
+      // Revision requests are actionable for professionals. Keep them first so the dashboard
+      // preview does not hide a project that needs the professional's response.
+      activeProjects.sort(
+        (a, b) =>
+          Number(b.status === "REVISION_REQUESTED") - Number(a.status === "REVISION_REQUESTED"),
+      );
+
       const hiddenJobIds = blockedJobs;
 
       function distanceKmFor(locationLat: number | null, locationLng: number | null) {
@@ -258,13 +265,11 @@ export async function GET(
         .map((job) => ({ ...job, distanceKm: distanceKmFor(job.locationLat, job.locationLng) }))
         .filter(
           (job) =>
+            ["REMOTE", "BOTH"].includes(job.workMode) ||
             job.distanceKm === null ||
             job.distanceKm <= (professional?.serviceRadiusKm ?? Infinity),
         )
-        .sort((a, b) =>
-          hasServiceArea ? (a.distanceKm ?? Infinity) - (b.distanceKm ?? Infinity) : 0,
-        )
-        .slice(0, 20);
+        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
       const visibleSavedJobs = savedJobs
         .filter((favorite) => !hiddenJobIds.has(favorite.job.id))
         .map((favorite) => ({
@@ -516,6 +521,7 @@ export async function GET(
         });
       }
       if (!project) return NextResponse.json({ error: "Project not found." }, { status: 404 });
+      const viewerRole = session.userId === project.clientId ? "CLIENT" : "PROFESSIONAL";
       const milestones = await db.projectMilestone.findMany({
         where: { trackingId: project.id },
         orderBy: { createdAt: "asc" },
@@ -591,7 +597,7 @@ export async function GET(
         job,
         professional,
         client,
-        viewerRole: session.role,
+        viewerRole,
         uploads,
         revisions,
         timeline,

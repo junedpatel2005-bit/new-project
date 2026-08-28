@@ -224,7 +224,6 @@ body:has(.cms-live-editable) button {
   background: #94a3b8;
 }
 @import "tw-animate-css";
-@import "leaflet/dist/leaflet.css";
 
 @custom-variant dark (&:is(.dark *));
 

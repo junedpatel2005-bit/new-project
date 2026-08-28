@@ -342,10 +342,10 @@ export default function Dashboard() {
                               <span
                                 className={`text-xs font-semibold ${
                                   hireRequest.status === "PENDING"
-                                    ? "text-yellow"
+                                    ? "text-warning"
                                     : hireRequest.status === "ACCEPTED"
-                                      ? "text-green"
-                                      : "text-red"
+                                      ? "text-success"
+                                      : "text-destructive"
                                 }`}
                               >
                                 {hireRequest.status === "PENDING"

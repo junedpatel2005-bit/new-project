@@ -1,8 +1,7 @@
 "use client";
 
-import L from "leaflet";
-import { useEffect } from "react";
-import { MapContainer, Marker, Tooltip, TileLayer, ZoomControl, useMap } from "react-leaflet";
+import { GoogleMap, InfoWindow, LoadScript, Marker } from "@react-google-maps/api";
+import { useEffect, useRef, useState } from "react";
 import { MapPin, Star } from "lucide-react";
 
 type MapJob = {
@@ -22,29 +21,16 @@ type MapJob = {
   distanceKm?: number | null;
 };
 
-const markerIcon = L.divIcon({
-  className: "",
-  html: '<div class="text-2xl">📍</div>',
-  iconSize: [28, 28],
-  iconAnchor: [14, 28],
-});
+function isMapsEnabled(): boolean {
+  return Boolean(process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY) && process.env.NEXT_PUBLIC_GOOGLE_MAPS_JS_ENABLED !== "false";
+}
 
-function budgetLabel(job: MapJob) {
+function budgetLabel(job: MapJob): string {
   if (job.timingType === "HOURLY") {
     return job.hourlyRate == null ? "Rate not set" : `₹${job.hourlyRate.toLocaleString()}/hr`;
   }
   if (job.budgetMin == null && job.budgetMax == null) return "Budget on request";
   return `₹${job.budgetMin?.toLocaleString() ?? "—"} – ₹${job.budgetMax?.toLocaleString() ?? "—"}`;
-}
-
-function MapCenterController({ center }: { center: [number, number] }) {
-  const map = useMap();
-
-  useEffect(() => {
-    map.setView(center, 6);
-  }, [center, map]);
-
-  return null;
 }
 
 export default function ProfessionalJobsMap({
@@ -56,61 +42,83 @@ export default function ProfessionalJobsMap({
   jobs: MapJob[];
   onSelectJob: (id: number) => void;
 }) {
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
+  const mapCenter = { lat: center[0], lng: center[1] };
+  const [activeJobId, setActiveJobId] = useState<number | null>(null);
+  const mapRef = useRef<google.maps.Map | null>(null);
+  const activeJob = jobs.find((job) => job.id === activeJobId) ?? null;
+
+  useEffect(() => {
+    if (mapRef.current) mapRef.current.setCenter(mapCenter);
+  }, [mapCenter.lat, mapCenter.lng]);
+
+  if (!isMapsEnabled()) {
+    return (
+      <div className="flex h-full w-full items-center justify-center rounded-xl bg-muted text-sm text-muted-foreground">
+        Map preview is unavailable.
+      </div>
+    );
+  }
+
   return (
-    <MapContainer
-      center={center}
-      zoom={6}
-      scrollWheelZoom
-      zoomControl={false}
-      className="h-full w-full z-0"
-    >
-      <ZoomControl position="bottomright" />
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      <MapCenterController center={center} />
-      {jobs.map((job) => (
-        <Marker
-          key={job.id}
-          position={[job.locationLat, job.locationLng]}
-          icon={markerIcon}
-          eventHandlers={{ click: () => onSelectJob(job.id) }}
-        >
-          <Tooltip direction="right" offset={[12, -14]} opacity={1}>
+    <LoadScript googleMapsApiKey={apiKey} loadingElement={<div className="h-full w-full animate-pulse bg-muted" />}>
+      <GoogleMap
+        onLoad={(map) => {
+          mapRef.current = map;
+        }}
+        mapContainerStyle={{ width: "100%", height: "100%" }}
+        center={mapCenter}
+        zoom={6}
+        options={{ mapTypeControl: false, streetViewControl: false }}
+      >
+        {jobs.map((job) => (
+          <Marker
+            key={job.id}
+            position={{ lat: job.locationLat, lng: job.locationLng }}
+            onClick={() => {
+              setActiveJobId(job.id);
+              onSelectJob(job.id);
+            }}
+          />
+        ))}
+        {activeJob ? (
+          <InfoWindow
+            position={{ lat: activeJob.locationLat, lng: activeJob.locationLng }}
+            onCloseClick={() => setActiveJobId(null)}
+          >
             <div className="w-60 space-y-1.5 whitespace-normal break-words p-0.5">
               <div className="flex items-center justify-between gap-2">
                 <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                  {job.category ?? "General"}
+                  {activeJob.category ?? "General"}
                 </span>
-                {job.status ? (
+                {activeJob.status ? (
                   <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
-                    {job.status}
+                    {activeJob.status}
                   </span>
                 ) : null}
               </div>
-              <p className="font-semibold text-foreground">{job.title}</p>
+              <p className="font-semibold text-foreground">{activeJob.title}</p>
               <div className="flex items-center gap-1 text-xs text-muted-foreground">
                 <MapPin className="h-3 w-3 shrink-0" />
-                {job.locationAddress ?? "Remote"}
-                {job.distanceKm != null && ` · ${job.distanceKm.toFixed(1)} km away`}
+                {activeJob.locationAddress ?? "Remote"}
+                {activeJob.distanceKm != null && ` · ${activeJob.distanceKm.toFixed(1)} km away`}
               </div>
-              {job.clientName ? (
+              {activeJob.clientName ? (
                 <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                  <span>{job.clientName}</span>
-                  {job.clientRating != null && (
+                  <span>{activeJob.clientName}</span>
+                  {activeJob.clientRating != null && (
                     <span className="inline-flex items-center gap-1">
                       <Star className="h-3 w-3 fill-warning text-warning" />
-                      {job.clientRating.toFixed(1)}
+                      {activeJob.clientRating.toFixed(1)}
                     </span>
                   )}
                 </div>
               ) : null}
-              <p className="text-sm font-semibold text-foreground">{budgetLabel(job)}</p>
+              <p className="text-sm font-semibold text-foreground">{budgetLabel(activeJob)}</p>
             </div>
-          </Tooltip>
-        </Marker>
-      ))}
-    </MapContainer>
+          </InfoWindow>
+        ) : null}
+      </GoogleMap>
+    </LoadScript>
   );
 }

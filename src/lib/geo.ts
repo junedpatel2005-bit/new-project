@@ -23,9 +23,9 @@ export function getDistanceBoundingBox(lat: number, distanceKm: number) {
 }
 
 /**
- * Reduces a full geocoded address (most-specific segment first, per Nominatim's
- * display_name convention) down to its coarsest 1-2 segments, so street-level
- * detail isn't exposed before a professional is authorized to see it.
+ * Reduces a full geocoded address (most-specific segment first, mirroring the
+ * formatter used by the upstream geocoder) down to its coarsest 1-2 segments,
+ * so street-level detail isn't exposed before a professional is authorized to see it.
  */
 export function approximateAddress(address: string | null): string | null {
   if (!address) return null;

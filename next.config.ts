@@ -3,12 +3,12 @@ import type { NextConfig } from "next";
 const isDevelopment = process.env.NODE_ENV !== "production";
 const contentSecurityPolicy = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline' https://checkout.razorpay.com${isDevelopment ? " 'unsafe-eval'" : ""}`,
+  `script-src 'self' 'unsafe-inline' https://checkout.razorpay.com https://maps.googleapis.com${isDevelopment ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://i.pravatar.cc https://*.tile.openstreetmap.org",
+  "img-src 'self' data: blob: https://i.pravatar.cc https://*.googleapis.com https://*.gstatic.com https://maps.gstatic.com",
   "font-src 'self' data:",
-  "connect-src 'self' https://api.razorpay.com https://nominatim.openstreetmap.org https://*.tile.openstreetmap.org",
-  "frame-src 'self' https://checkout.razorpay.com https://api.razorpay.com https://www.openstreetmap.org https://www.google.com",
+  "connect-src 'self' https://api.razorpay.com https://maps.googleapis.com https://places.googleapis.com https://*.googleapis.com https://*.gstatic.com",
+  "frame-src 'self' https://checkout.razorpay.com https://api.razorpay.com https://www.google.com https://maps.google.com",
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",

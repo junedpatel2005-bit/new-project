@@ -1,7 +1,9 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
 import {
   AppMobileNavigation,
@@ -38,16 +40,15 @@ export function usePortalTitle() {
 
 export function PortalShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const router = useRouter();
   const { title } = usePortalTitle();
   const [user, setUser] = useState<PortalUser | null>(null);
   const [items, setItems] = useState<NavigationItem[]>(clientItems);
   const [mobileItems, setMobileItems] = useState<NavigationItem[]>(clientMobileItems);
-  const profileRoute =
-    pathname === "/client-profile" ||
-    pathname === "/professional-profile" ||
-    pathname === "/professional/setup";
-  const showPortalNavigation = user && (!profileRoute || searchParams.get("from") === "dashboard");
+  // Keep the shared portal chrome mounted while auth data refreshes during navigation. The
+  // protected portal layout has already authorized the request, so a placeholder prevents the
+  // sidebar/header from disappearing while /auth/me resolves.
+  const navigationUser = user ?? { firstName: "", lastName: "", role: "CLIENT", avatarUrl: null };
 
   useEffect(() => {
     fetch("/api/v1/auth/me")
@@ -68,17 +69,25 @@ export function PortalShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background pb-16 lg:pb-0">
-      {showPortalNavigation && user && <AppSidebar items={items} pathname={pathname} user={user} />}
-      <div className={showPortalNavigation ? "lg:pl-64" : ""}>
+      <AppSidebar items={items} pathname={pathname} user={navigationUser} />
+      <div className="lg:pl-64">
         <AppHeader role={user?.role} />
         <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="mb-5 inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </button>
           {title && (
             <h1 className="mb-6 font-display text-3xl font-bold tracking-tight">{title}</h1>
           )}
           {children}
         </main>
       </div>
-      {showPortalNavigation && <AppMobileNavigation items={mobileItems} pathname={pathname} />}
+      <AppMobileNavigation items={mobileItems} pathname={pathname} />
     </div>
   );
 }

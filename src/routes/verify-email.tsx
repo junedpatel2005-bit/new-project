@@ -1,18 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
-import { AlertCircle, CheckCircle2 } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { AuthLayout } from "@/components/AuthLayout";
 import { Button } from "@/components/ui/button";
 
 function VerifyEmailContent() {
-  const router = useRouter();
   const params = useSearchParams();
   const [status, setStatus] = useState<"verifying" | "success" | "error">("verifying");
   const [error, setError] = useState<string | null>(null);
-  const [nextPath, setNextPath] = useState("/dashboard");
   const attempted = useRef(false);
 
   useEffect(() => {
@@ -43,13 +41,14 @@ function VerifyEmailContent() {
           return;
         }
         setStatus("success");
-        setNextPath(result.redirect ?? "/dashboard");
       })
       .catch(() => {
         setStatus("error");
         setError("Unable to verify your email. Please try again.");
       });
-  }, [params, router]);
+  }, [params]);
+
+  if (status === "success") return null;
 
   return (
     <AuthLayout
@@ -57,9 +56,7 @@ function VerifyEmailContent() {
       subtitle={
         status === "verifying"
           ? "Confirming your email address…"
-          : status === "success"
-            ? "Your email is confirmed."
-            : "We couldn't confirm your email."
+          : "We couldn't confirm your email."
       }
       hideAside
       footer={
@@ -70,19 +67,6 @@ function VerifyEmailContent() {
     >
       {status === "verifying" && (
         <p className="text-sm text-muted-foreground">Please wait a moment…</p>
-      )}
-      {status === "success" && (
-        <div className="space-y-5">
-          <div className="flex items-center gap-3 rounded-xl border border-success/20 bg-success/10 p-4">
-            <CheckCircle2 className="h-5 w-5 shrink-0 text-success" />
-            <p className="text-sm font-medium text-success">
-              Your account is verified successfully.
-            </p>
-          </div>
-          <Button className="h-11 w-full" onClick={() => router.push(nextPath)}>
-            Continue to your account
-          </Button>
-        </div>
       )}
       {status === "error" && (
         <div className="space-y-5">

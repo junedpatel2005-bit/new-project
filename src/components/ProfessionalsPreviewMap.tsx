@@ -1,27 +1,13 @@
 "use client";
 
-import L from "leaflet";
-import { useEffect } from "react";
-import { MapContainer, Marker, TileLayer, useMap } from "react-leaflet";
+import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
+import { useEffect, useRef } from "react";
 import type { ProfessionalDiscoveryResult } from "@/lib/types/professional-discovery";
 
-const markerIcon = L.divIcon({
-  className: "",
-  html: '<div class="text-lg">📍</div>',
-  iconSize: [20, 20],
-  iconAnchor: [10, 20],
-});
+const fallbackCenter = { lat: 37.7749, lng: -122.4194 };
 
-const fallbackCenter: [number, number] = [37.7749, -122.4194];
-
-function FollowPoints({ points }: { points: [number, number][] }) {
-  const map = useMap();
-  useEffect(() => {
-    if (points.length === 0) map.setView(fallbackCenter, 9, { animate: false });
-    else if (points.length === 1) map.setView(points[0] ?? fallbackCenter, 10, { animate: false });
-    else map.fitBounds(points, { padding: [20, 20], animate: false });
-  }, [points, map]);
-  return null;
+function isMapsEnabled(): boolean {
+  return Boolean(process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY) && process.env.NEXT_PUBLIC_GOOGLE_MAPS_JS_ENABLED !== "false";
 }
 
 export default function ProfessionalsPreviewMap({
@@ -29,38 +15,69 @@ export default function ProfessionalsPreviewMap({
 }: {
   professionals: ProfessionalDiscoveryResult[];
 }) {
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
   const pinned = professionals
     .map((professional) => ({ id: professional.id, point: professional.displayPoint }))
     .filter(
-      (entry): entry is { id: string; point: { lat: number; lng: number } } =>
-        entry.point !== undefined,
+      (entry): entry is { id: string; point: { lat: number; lng: number } } => entry.point !== undefined,
     );
-  const points = pinned.map((entry) => [entry.point.lat, entry.point.lng] as [number, number]);
+  const points = pinned.map((entry) => entry.point);
+  const mapRef = useRef<google.maps.Map | null>(null);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    if (points.length === 0) {
+      map.setCenter(fallbackCenter);
+      map.setZoom(9);
+      return;
+    }
+    if (points.length === 1) {
+      const first = points[0];
+      if (first) {
+        map.setCenter(first);
+        map.setZoom(10);
+      }
+      return;
+    }
+    const bounds = new google.maps.LatLngBounds();
+    points.forEach((p) => bounds.extend(p));
+    map.fitBounds(bounds);
+  }, [points]);
+
+  if (!isMapsEnabled()) {
+    return (
+      <div className="pointer-events-none flex h-full w-full items-center justify-center overflow-hidden rounded-xl bg-muted text-sm text-muted-foreground">
+        Map preview is unavailable.
+      </div>
+    );
+  }
 
   return (
     <div className="pointer-events-none h-full w-full overflow-hidden rounded-xl">
-      <MapContainer
-        center={points[0] ?? fallbackCenter}
-        zoom={9}
-        zoomAnimation={false}
-        markerZoomAnimation={false}
-        fadeAnimation={false}
-        zoomControl={false}
-        dragging={false}
-        scrollWheelZoom={false}
-        doubleClickZoom={false}
-        touchZoom={false}
-        boxZoom={false}
-        keyboard={false}
-        attributionControl={false}
-        className="h-full w-full"
-      >
-        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-        <FollowPoints points={points} />
-        {pinned.map((entry) => (
-          <Marker key={entry.id} position={[entry.point.lat, entry.point.lng]} icon={markerIcon} />
-        ))}
-      </MapContainer>
+      <LoadScript googleMapsApiKey={apiKey} loadingElement={<div className="h-full w-full animate-pulse bg-muted" />}>
+        <GoogleMap
+          onLoad={(map) => {
+            mapRef.current = map;
+          }}
+          mapContainerStyle={{ width: "100%", height: "100%" }}
+          center={points[0] ?? fallbackCenter}
+          zoom={9}
+          options={{
+            disableDefaultUI: true,
+            clickableIcons: false,
+            gestureHandling: "none",
+            zoomControl: false,
+            scrollwheel: false,
+            disableDoubleClickZoom: true,
+            keyboardShortcuts: false,
+          }}
+        >
+          {pinned.map((entry) => (
+            <Marker key={entry.id} position={entry.point} />
+          ))}
+        </GoogleMap>
+      </LoadScript>
     </div>
   );
 }

@@ -27,6 +27,7 @@
 
 le marketing pages; CMS marketing pages are for public viewing/content editing, not as authenticated landing pages. Confidence: 0.7
 - When reviewing or delivering API code (e.g., "check client job api"), explicitly expects clean, well-organized, "perfect" output rather than messy/ugly code — flags messy formatting or disorganized structure when asking for API inspection. Confidence: 0.6
+- Treats the database schema (Prisma `schema.prisma`) as in scope for coding-standards review: when asking to "check" the project against standards, expects the Prisma schema itself to be reviewed and brought into conformance, not just application code. Confidence: 0.7
 
 rmatting or disorganized structure when asking for API inspection. Confidence: 0.6
 
