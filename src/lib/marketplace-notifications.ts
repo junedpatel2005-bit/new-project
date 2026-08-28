@@ -30,6 +30,45 @@ async function sendEmails(
   });
 }
 
+async function projectEmailDetails(projectId: number) {
+  const project = await db.projectTracking.findUnique({
+    where: { id: projectId },
+    select: {
+      status: true,
+      progress: true,
+      currentStage: true,
+      jobId: true,
+      requestId: true,
+      startedAt: true,
+      completedAt: true,
+    },
+  });
+  if (!project) return [];
+  const [job, request] = await Promise.all([
+    db.clientJob.findUnique({
+      where: { id: project.jobId },
+      select: { title: true, deadline: true, jobDate: true },
+    }),
+    db.projectRequest.findUnique({
+      where: { id: project.requestId },
+      select: { bidAmount: true, duration: true },
+    }),
+  ]);
+  const date = (value: Date | null | undefined) => value?.toLocaleDateString("en-IN") ?? "Not specified";
+  return [
+    { label: "Project", value: job?.title?.trim() || `Project #${projectId}` },
+    { label: "Project amount", value: request?.bidAmount == null ? "Not specified" : `₹${request.bidAmount.toLocaleString("en-IN")}` },
+    { label: "Project timeline", value: request?.duration?.trim() || "Not specified" },
+    { label: "Status", value: project.status.replaceAll("_", " ") },
+    { label: "Progress", value: `${project.progress}%` },
+    { label: "Current stage", value: project.currentStage?.trim() || "Not specified" },
+    { label: "Preferred job date", value: date(job?.jobDate) },
+    { label: "Deadline", value: date(job?.deadline) },
+    { label: "Started", value: date(project.startedAt) },
+    { label: "Completed", value: date(project.completedAt) },
+  ];
+}
+
 async function notifyRole(
   role: "ADMIN" | "CLIENT" | "PROFESSIONAL",
   notification: BroadcastNotification,
@@ -102,8 +141,7 @@ export function notifyAdminsOfNewAccount(user: {
   });
 }
 
-export function notifyProfessionalsOfNewJob(job: {
-  id: number;
+function newJobEmailDetails(job: {
   title: string | null;
   category: string | null;
   description: string | null;
@@ -127,21 +165,40 @@ export function notifyProfessionalsOfNewJob(job: {
   const location = job.workMode === "REMOTE"
     ? "Remote"
     : [job.locationLabel, job.locationAddress].filter(Boolean).join(" · ") || "Not specified";
+  return [
+    { label: "Job title", value: title },
+    { label: "Category", value: job.category?.trim() || "Not specified" },
+    { label: "Description", value: job.description?.trim() || "No description provided." },
+    { label: "Budget", value: budget },
+    { label: "Work mode", value: job.workMode.replaceAll("_", " ") },
+    { label: "Preferred job date", value: formatDate(job.jobDate) },
+    { label: "Deadline", value: formatDate(job.deadline) },
+    { label: "Location", value: location },
+  ];
+}
+
+export function notifyProfessionalsOfNewJob(job: {
+  id: number;
+  title: string | null;
+  category: string | null;
+  description: string | null;
+  budgetMin: number | null;
+  budgetMax: number | null;
+  hourlyRate: number | null;
+  timingType: string;
+  workMode: string;
+  jobDate: Date | null;
+  deadline: Date | null;
+  locationLabel: string | null;
+  locationAddress: string | null;
+}) {
+  const title = job.title?.trim() || "A new client job";
   return notifyRole("PROFESSIONAL", {
     type: "NEW_JOB",
     title: "New job posted",
     description: `${title}${job.category ? ` · ${job.category}` : ""} is now open for proposals.`,
     href: `/job/${job.id}`,
-    emailDetails: [
-      { label: "Job title", value: title },
-      { label: "Category", value: job.category?.trim() || "Not specified" },
-      { label: "Description", value: job.description?.trim() || "No description provided." },
-      { label: "Budget", value: budget },
-      { label: "Work mode", value: job.workMode.replaceAll("_", " ") },
-      { label: "Preferred job date", value: formatDate(job.jobDate) },
-      { label: "Deadline", value: formatDate(job.deadline) },
-      { label: "Location", value: location },
-    ],
+    emailDetails: newJobEmailDetails(job),
   });
 }
 
@@ -149,12 +206,23 @@ export function notifyAdminsOfNewJob(job: {
   id: number;
   title: string | null;
   category: string | null;
+  description: string | null;
+  budgetMin: number | null;
+  budgetMax: number | null;
+  hourlyRate: number | null;
+  timingType: string;
+  workMode: string;
+  jobDate: Date | null;
+  deadline: Date | null;
+  locationLabel: string | null;
+  locationAddress: string | null;
 }) {
   return notifyRole("ADMIN", {
     type: "NEW_JOB",
     title: "New job posted",
     description: `${job.title?.trim() || "A client"}${job.category ? ` · ${job.category}` : ""} is now open.`,
     href: `/admin/operations?job=${job.id}`,
+    emailDetails: newJobEmailDetails(job),
   });
 }
 
@@ -175,18 +243,22 @@ export async function notifyUsers(userIds: number[], notification: BroadcastNoti
   const ids = [...new Set(userIds)];
   if (!ids.length) return;
   try {
+    const projectId = notification.href.match(/^\/project\/(\d+)\/tracking/)?.[1];
+    const details = projectId ? await projectEmailDetails(Number(projectId)) : [];
+    const emailDetails = [...details, ...(notification.emailDetails ?? [])];
+    const { emailDetails: _storedEmailDetails, ...storedNotification } = notification;
     const recipients = await db.user.findMany({
       where: { id: { in: ids }, isActive: true },
       select: { id: true, email: true, emailNotificationsEnabled: true },
     });
     await db.userNotification.createMany({
-      data: recipients.map((recipient) => ({ userId: recipient.id, ...notification })),
+      data: recipients.map((recipient) => ({ userId: recipient.id, ...storedNotification })),
     });
     emitRealtimeNotification(
       recipients.map((recipient) => recipient.id),
-      notification,
+      storedNotification,
     );
-    await sendEmails(recipients, notification);
+    await sendEmails(recipients, { ...storedNotification, emailDetails });
   } catch (error) {
     logServerError("marketplace.notification.direct.failed", error, {
       userIds: ids.join(","),

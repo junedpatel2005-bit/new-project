@@ -389,6 +389,8 @@ export default function SharedProjectTrackingPage() {
     (total, milestone) => total + milestone.amount,
     0,
   );
+  const remainingMilestoneAmount =
+    data.agreedAmount == null ? null : Math.max(0, data.agreedAmount - totalMilestoneValue);
   const milestoneMinDate = dateInputValue(data.job?.jobDate);
   const milestoneMaxDate = dateInputValue(data.job?.deadline);
   const paidToProfessional = data.milestones.reduce(
@@ -1789,11 +1791,23 @@ export default function SharedProjectTrackingPage() {
               <input
                 type="number"
                 min="0"
+                max={remainingMilestoneAmount ?? undefined}
                 value={milestoneAmount}
                 onChange={(event) => setMilestoneAmount(Number(event.target.value) || "")}
                 placeholder="Amount"
                 className="rounded-md border border-input bg-background px-3 py-2 text-sm"
               />
+              {remainingMilestoneAmount != null && (
+                <span className="text-xs text-muted-foreground">
+                  Remaining project amount: ₹{remainingMilestoneAmount.toLocaleString("en-IN")}
+                </span>
+              )}
+              {remainingMilestoneAmount != null &&
+                Number(milestoneAmount) > remainingMilestoneAmount && (
+                  <span className="text-xs text-destructive">
+                    This milestone exceeds the remaining project amount.
+                  </span>
+                )}
             </label>
             <label className="grid gap-2 text-sm font-medium">
               Note
@@ -1821,7 +1835,13 @@ export default function SharedProjectTrackingPage() {
               Cancel
             </Button>
             <Button
-              disabled={busy === "create-milestone" || !milestoneTitle.trim() || !milestoneAmount}
+              disabled={
+                busy === "create-milestone" ||
+                !milestoneTitle.trim() ||
+                !milestoneAmount ||
+                (remainingMilestoneAmount != null &&
+                  Number(milestoneAmount) > remainingMilestoneAmount)
+              }
               onClick={async () => {
                 if (!milestoneTitle.trim() || !milestoneAmount) return;
                 await action("create-milestone", {

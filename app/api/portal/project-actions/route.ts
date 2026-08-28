@@ -156,11 +156,32 @@ export async function POST(request: NextRequest) {
       if (!dedicatedNotificationTypes.has(type)) {
         const recipientId =
           session.userId === project.clientId ? project.professionalId : project.clientId;
+        const activityDetails = [
+          { label: "Activity", value: title },
+          ...(description ? [{ label: "Activity details", value: description }] : []),
+          ...(fields.milestoneId
+            ? [
+                {
+                  label: "Milestone",
+                  value:
+                    (await db.projectMilestone.findUnique({
+                      where: { id: fields.milestoneId },
+                      select: { title: true, amount: true, dueDate: true },
+                    }).then((milestone) =>
+                      milestone
+                        ? `${milestone.title} · ₹${milestone.amount.toLocaleString("en-IN")}${milestone.dueDate ? ` · due ${milestone.dueDate.toLocaleDateString("en-IN")}` : ""}`
+                        : `Milestone #${fields.milestoneId}`,
+                    )),
+                },
+              ]
+            : []),
+        ];
         await notifyUsers([recipientId], {
           type: `PROJECT_ACTIVITY_${type}`,
           title,
           description: description ?? title,
           href: `/project/${project.id}/tracking`,
+          emailDetails: activityDetails,
         });
       }
       return timelineEvent;
@@ -214,6 +235,24 @@ export async function POST(request: NextRequest) {
       });
     }
     if (input.action === "create-milestone") {
+      const projectRequest = await db.projectRequest.findUnique({
+        where: { id: project.requestId },
+        select: { bidAmount: true },
+      });
+      if (projectRequest?.bidAmount != null) {
+        const existingMilestones = await db.projectMilestone.aggregate({
+          where: { trackingId: project.id },
+          _sum: { amount: true },
+        });
+        const existingTotal = existingMilestones._sum.amount ?? 0;
+        if (existingTotal + input.amount > projectRequest.bidAmount)
+          return NextResponse.json(
+            {
+              error: `Milestone total cannot exceed the agreed project amount of ₹${projectRequest.bidAmount.toLocaleString("en-IN")}. Remaining amount: ₹${Math.max(0, projectRequest.bidAmount - existingTotal).toLocaleString("en-IN")}.`,
+            },
+            { status: 400 },
+          );
+      }
       const jobDates = await db.clientJob.findUnique({
         where: { id: project.jobId },
         select: { jobDate: true, deadline: true },
