@@ -103,6 +103,11 @@ type JobProposal = {
   status: string;
   lastActorRole: "CLIENT" | "PROFESSIONAL";
   createdAt: string;
+  previous?: {
+    bidAmount: number | null;
+    duration: string | null;
+    message: string | null;
+  } | null;
   professional: {
     id: number;
     firstName: string;
@@ -231,6 +236,9 @@ export default function JobDetails() {
     duration: string;
     coverLetter: string;
     lastActorRole: "CLIENT" | "PROFESSIONAL";
+    previousBidAmount?: number | null;
+    previousDuration?: string | null;
+    previousMessage?: string | null;
   } | null>(null);
   const [clientProposals, setClientProposals] = useState<JobProposal[]>([]);
   const [sentHireRequests, setSentHireRequests] = useState<JobHireRequest[]>([]);
@@ -297,9 +305,27 @@ export default function JobDetails() {
               duration: string;
               coverLetter: string;
               lastActorRole: "CLIENT" | "PROFESSIONAL";
+              previousBidAmount?: number | null;
+              previousDuration?: string | null;
+              previousMessage?: string | null;
+            } | null;
+            negotiation?: {
+              senderRole: string;
+              previousBidAmount: number | null;
+              previousDuration: string | null;
+              previousMessage: string | null;
             } | null;
           };
-          setOwnProposal(proposalData.proposal);
+          setOwnProposal(
+            proposalData.proposal
+              ? {
+                  ...proposalData.proposal,
+                  previousBidAmount: proposalData.negotiation?.previousBidAmount,
+                  previousDuration: proposalData.negotiation?.previousDuration,
+                  previousMessage: proposalData.negotiation?.previousMessage,
+                }
+              : null,
+          );
           if (proposalData.proposal) {
             setProposalPrice(String(proposalData.proposal.bidAmount));
             setProposalDuration(proposalData.proposal.duration);
@@ -432,13 +458,22 @@ export default function JobDetails() {
   }
   async function sendProposal() {
     const bidAmount = Number(proposalPrice);
+    const duration = proposalDuration.trim();
+    const message = proposalMessage.trim();
     if (
-      !Number.isSafeInteger(bidAmount) ||
+      !Number.isFinite(bidAmount) ||
+      !Number.isInteger(bidAmount) ||
       bidAmount < 1 ||
-      !proposalDuration.trim() ||
-      !proposalMessage.trim()
+      !duration ||
+      message.length < 10
     ) {
-      setProposalError("Enter a valid price, delivery estimate, and message.");
+      setProposalError(
+        !Number.isFinite(bidAmount) || !Number.isInteger(bidAmount) || bidAmount < 1
+          ? "Enter a valid price."
+          : !duration
+            ? "Enter a delivery estimate."
+            : "Your message must be at least 10 characters.",
+      );
       return;
     }
     setProposalBusy(true);
@@ -450,8 +485,8 @@ export default function JobDetails() {
         body: JSON.stringify({
           jobId: Number(jobId),
           bidAmount,
-          duration: proposalDuration,
-          coverLetter: proposalMessage,
+          duration,
+          coverLetter: message,
         }),
       });
       const payload = await response.json().catch(() => null);
@@ -829,6 +864,20 @@ export default function JobDetails() {
                     </div>
                   </div>
                   <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                    {proposal.previous?.bidAmount != null && (
+                      <div className="rounded-lg border border-border bg-background p-3 sm:col-span-2">
+                        <p className="text-xs text-muted-foreground">Previous proposal</p>
+                        <p className="mt-1 font-semibold">
+                          ₹{proposal.previous.bidAmount.toLocaleString()}
+                          {proposal.previous.duration ? ` · ${proposal.previous.duration}` : ""}
+                        </p>
+                        {proposal.previous.message && (
+                          <p className="mt-1 text-sm text-muted-foreground">
+                            {proposal.previous.message}
+                          </p>
+                        )}
+                      </div>
+                    )}
                     <div className="rounded-lg bg-muted p-3">
                       <p className="text-xs text-muted-foreground">Proposed Price</p>
                       <p className="mt-1 text-lg font-semibold">
@@ -1051,6 +1100,21 @@ export default function JobDetails() {
                       ? "✗ Proposal Declined — Client selected another professional"
                       : "✓ Proposal Accepted — Project Started"}
                 </p>
+                {ownProposal.status === "PENDING" &&
+                  ownProposal.lastActorRole === "CLIENT" &&
+                  ownProposal.previousBidAmount != null && (
+                    <div className="mt-3 rounded-lg border border-border bg-background p-3">
+                      <p className="text-xs text-muted-foreground">Your previous proposal</p>
+                      <p className="mt-1 font-semibold">
+                        ₹{ownProposal.previousBidAmount.toLocaleString()} · {ownProposal.previousDuration}
+                      </p>
+                      {ownProposal.previousMessage && (
+                        <p className="mt-1 text-sm text-muted-foreground">
+                          {ownProposal.previousMessage}
+                        </p>
+                      )}
+                    </div>
+                  )}
                 {ownProposal.status === "PENDING" && (
                   <div className="mt-3 grid gap-2 sm:grid-cols-2">
                     <div className="rounded-lg bg-background p-3">
@@ -1067,6 +1131,16 @@ export default function JobDetails() {
                     </div>
                   </div>
                 )}
+                {ownProposal.status === "PENDING" &&
+                  ownProposal.lastActorRole === "CLIENT" &&
+                  ownProposal.coverLetter && (
+                    <div className="mt-3 rounded-lg border border-border bg-background p-3">
+                      <p className="text-xs text-muted-foreground">Client&apos;s note</p>
+                      <p className="mt-1 whitespace-pre-wrap text-sm text-foreground">
+                        {ownProposal.coverLetter}
+                      </p>
+                    </div>
+                  )}
                 {ownProposal.status === "PENDING" && ownProposal.lastActorRole === "CLIENT" ? (
                   <div className="mt-4 flex flex-wrap gap-2">
                     <Button
@@ -1124,64 +1198,13 @@ export default function JobDetails() {
                     setProposalDuration(
                       daysLeft !== null ? `${daysLeft} day${daysLeft === 1 ? "" : "s"}` : "",
                     );
+                    setProposalError(null);
                     setShowProposalForm(true);
                   }}
                 >
                   Submit Proposal
                 </Button>
               </div>
-            )}
-            {showProposalForm && (
-              <section className="mt-5 rounded-xl border bg-muted/30 p-4">
-                <h2 className="text-lg font-semibold">Send Proposal</h2>
-                <div className="mt-3 grid gap-3 [&_input]:rounded-md [&_input]:border [&_input]:bg-background [&_input]:px-3 [&_input]:py-2 [&_textarea]:rounded-md [&_textarea]:border [&_textarea]:bg-background [&_textarea]:px-3 [&_textarea]:py-2">
-                  <input
-                    type="number"
-                    min="1"
-                    value={proposalPrice}
-                    onChange={(event) => setProposalPrice(event.target.value)}
-                    placeholder="Your price"
-                  />
-                  <div>
-                    <input
-                      value={proposalDuration}
-                      onChange={(event) => setProposalDuration(event.target.value)}
-                      placeholder="Estimated delivery (for example, 14 days)"
-                      className="w-full"
-                    />
-                    {deadlineFormatted && (
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        Client&apos;s deadline: {deadlineFormatted}
-                        {(() => {
-                          const daysLeft = daysUntilDeadline(job.deadline);
-                          return daysLeft !== null
-                            ? ` (${daysLeft} day${daysLeft === 1 ? "" : "s"} from today)`
-                            : "";
-                        })()}
-                      </p>
-                    )}
-                  </div>
-                  <textarea
-                    value={proposalMessage}
-                    onChange={(event) => setProposalMessage(event.target.value)}
-                    placeholder="Message to Client"
-                    rows={5}
-                  />
-                </div>
-                {proposalError && <p className="mt-3 text-sm text-destructive">{proposalError}</p>}
-                <div className="mt-4 flex gap-2">
-                  <Button variant="outline" onClick={() => setShowProposalForm(false)}>
-                    Cancel
-                  </Button>
-                  <Button
-                    className="bg-cta text-cta-foreground hover:bg-cta/90"
-                    disabled={proposalBusy}
-                    onClick={() => void sendProposal()}
-                  >
-                    {proposalBusy ? "Sending…" : "Send Proposal"}
-                  </Button>
-                </div>
-              </section>
             )}
           </section>
         )}
@@ -1306,6 +1329,86 @@ export default function JobDetails() {
           )}
         </div>
       </article>
+      <Dialog
+        open={showProposalForm}
+        onOpenChange={(open) => {
+          setShowProposalForm(open);
+          if (!open) setProposalError(null);
+        }}
+      >
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Send Proposal</DialogTitle>
+            <DialogDescription>
+              Enter your price, delivery estimate, and a message for the client.
+            </DialogDescription>
+          </DialogHeader>
+          <form
+            className="mt-2 grid gap-3 [&_input]:rounded-md [&_input]:border [&_input]:bg-background [&_input]:px-3 [&_input]:py-2 [&_textarea]:rounded-md [&_textarea]:border [&_textarea]:bg-background [&_textarea]:px-3 [&_textarea]:py-2"
+            onSubmit={(event) => {
+              event.preventDefault();
+              void sendProposal();
+            }}
+          >
+            <input
+              type="number"
+              min="1"
+              step="1"
+              value={proposalPrice}
+              onChange={(event) => {
+                setProposalPrice(event.target.value);
+                setProposalError(null);
+              }}
+              placeholder="Your price"
+            />
+            <div>
+              <input
+                value={proposalDuration}
+                onChange={(event) => {
+                  setProposalDuration(event.target.value);
+                  setProposalError(null);
+                }}
+                placeholder="Estimated delivery (for example, 14 days)"
+                className="w-full"
+              />
+              {deadlineFormatted && (
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Client&apos;s deadline: {deadlineFormatted}
+                  {(() => {
+                    const daysLeft = daysUntilDeadline(job.deadline);
+                    return daysLeft !== null
+                      ? ` (${daysLeft} day${daysLeft === 1 ? "" : "s"} from today)`
+                      : "";
+                  })()}
+                </p>
+              )}
+            </div>
+            <textarea
+              value={proposalMessage}
+              minLength={10}
+              onChange={(event) => {
+                setProposalMessage(event.target.value);
+                setProposalError(null);
+              }}
+              placeholder="Message to Client"
+              rows={5}
+            />
+            {proposalError && <p className="text-sm text-destructive">{proposalError}</p>}
+            <div className="flex justify-end gap-2 pt-1">
+              <Button type="button" variant="outline" onClick={() => setShowProposalForm(false)}>
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                className="bg-cta text-cta-foreground hover:bg-cta/90"
+                disabled={proposalBusy}
+              >
+                {proposalBusy ? "Sending…" : "Send Proposal"}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
       <Dialog
         open={pendingAcceptProposal !== null}
         onOpenChange={(open) => {

@@ -165,6 +165,21 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     attachLastActorRole(proposals),
     attachLastActorRole(hireRequests),
   ]);
+  const negotiations = await db.projectNegotiation.findMany({
+    where: { requestId: { in: proposals.map((proposal) => proposal.id) } },
+    orderBy: { createdAt: "desc" },
+    select: {
+      requestId: true,
+      previousBidAmount: true,
+      previousDuration: true,
+      previousMessage: true,
+    },
+  });
+  const latestNegotiationByRequest = new Map<number, (typeof negotiations)[number]>();
+  for (const negotiation of negotiations) {
+    if (!latestNegotiationByRequest.has(negotiation.requestId))
+      latestNegotiationByRequest.set(negotiation.requestId, negotiation);
+  }
   return NextResponse.json({
     job: {
       ...job,
@@ -174,6 +189,13 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     },
     proposals: proposalsWithActor.map((proposal) => ({
       ...proposal,
+      previous: latestNegotiationByRequest.get(proposal.id)
+        ? {
+            bidAmount: latestNegotiationByRequest.get(proposal.id)!.previousBidAmount,
+            duration: latestNegotiationByRequest.get(proposal.id)!.previousDuration,
+            message: latestNegotiationByRequest.get(proposal.id)!.previousMessage,
+          }
+        : null,
       professional: professionalById.get(proposal.professionalId) ?? null,
     })),
     hireRequests: hireRequestsWithActor.map((hireRequest) => ({

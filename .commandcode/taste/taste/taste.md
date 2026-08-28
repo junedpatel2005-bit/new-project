@@ -4,7 +4,7 @@
 - Expects professional, production-grade ("senior coder") implementations, not demo/toy work — calls out childish-quality output explicitly. Confidence: 0.8
 - Wants to reuse the existing Supabase PostgreSQL database and env vars (`DATABASE_URL`/`DIRECT_URL`) exactly as-is; explicitly forbids creating a new database, resetting data, switching providers, or inventing credentials. Confidence: 0.9
 - Treats Supabase as the PostgreSQL host accessed through Prisma with the existing connection (not Supabase Auth/SSR scaffolding) — kept the existing `User`/`ApiToken` models and built custom session auth on top. Confidence: 0.7
-- Keeps secrets server-side: `.env` never committed, server-only env vars never exposed in browser bundles; only `NEXT_PUBLIC_*` may reach client code. Confidence: 0.85
+- Keeps secrets server-side: `.env` never committed, server-only env vars never exposed in browser bundles; only `NEXT_PUBLIC_*` may reach client code; when an API key is provided, updates it in `.env` for both client and server vars and flags previously-committed keys for revocation. Confidence: 0.85
 - Wants prerequisites verified first (database connection, Prisma/schema validity, env config) before wiring features or migrating data. Confidence: 0.8
 - Wants a step-by-step implementation plan produced after review, before starting feature work. Confidence: 0.75
 - Requests full-project audits covering API flows, page wiring, and static/hardcoded UI elements — not just isolated fixes; e.g., asked to "check full project" and to review the codebase against the project's coding standards and report what's wrong before any work begins. Confidence: 0.85

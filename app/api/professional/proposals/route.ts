@@ -33,7 +33,19 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: "desc" },
     });
     const [proposalWithActor] = proposal ? await attachLastActorRole([proposal]) : [null];
-    return NextResponse.json({ proposal: proposalWithActor ?? null });
+    const negotiation = proposal
+      ? await db.projectNegotiation.findFirst({
+          where: { requestId: proposal.id },
+          orderBy: { createdAt: "desc" },
+          select: {
+            senderRole: true,
+            previousBidAmount: true,
+            previousDuration: true,
+            previousMessage: true,
+          },
+        })
+      : null;
+    return NextResponse.json({ proposal: proposalWithActor ?? null, negotiation });
   } catch {
     return NextResponse.json({ error: "Unable to load your proposal." }, { status: 500 });
   }
