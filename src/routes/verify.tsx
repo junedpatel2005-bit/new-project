@@ -39,7 +39,15 @@ export default function Verify() {
     };
   }, []);
 
-  if (emailVerified) return null;
+  if (emailVerified) {
+    return (
+      <AuthLayout hideAside title="Email verified" subtitle="Your account is ready to use.">
+        <p className="text-sm text-muted-foreground">
+          Your verification was completed successfully. You can close this tab.
+        </p>
+      </AuthLayout>
+    );
+  }
 
   async function resend() {
     if (resending) return;
