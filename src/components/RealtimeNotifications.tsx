@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { toast } from "sonner";
 
@@ -12,7 +12,6 @@ type RealtimeNotification = {
 };
 
 export function RealtimeNotifications() {
-  const shownIds = useRef(new Set<number>());
   const [userId, setUserId] = useState<number | null>(null);
 
   const showNotification = useCallback((notification: RealtimeNotification) => {
@@ -37,15 +36,9 @@ export function RealtimeNotifications() {
       try {
         const response = await fetch("/api/v1/portal/notifications", { cache: "no-store" });
         if (!response.ok) return;
-        const notifications = (await response.json()) as (RealtimeNotification & {
-          id: number;
-          readAt: string | null;
-        })[];
-        for (const notification of notifications.filter((item) => !item.readAt)) {
-          if (shownIds.current.has(notification.id)) continue;
-          shownIds.current.add(notification.id);
-          showNotification(notification);
-        }
+        // Historical unread notifications belong in the inbox and badge. Do not
+        // replay them as fresh toasts on every hard refresh or focus event.
+        await response.json();
         window.dispatchEvent(new CustomEvent("servio:notification"));
       } catch {
         // The inbox remains available if the background refresh is unavailable.

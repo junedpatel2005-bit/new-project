@@ -238,8 +238,11 @@ export async function readMarketingContent(page: MarketingPageId) {
   const value = all[page] ?? marketingDefaults[page];
   if (!all[page]) {
     all[page] = value;
-    await mkdir(path.dirname(file), { recursive: true });
-    await writeFile(file, JSON.stringify(all, null, 2) + "\n", "utf8");
+    // Vercel's deployed filesystem is read-only. The default content is still
+    // valid for this request even when the best-effort cache write is rejected.
+    await mkdir(path.dirname(file), { recursive: true })
+      .then(() => writeFile(file, JSON.stringify(all, null, 2) + "\n", "utf8"))
+      .catch(() => undefined);
   }
   return value;
 }

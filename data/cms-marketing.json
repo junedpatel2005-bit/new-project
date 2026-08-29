@@ -85,5 +85,71 @@
         "icon": "star"
       }
     ]
+  },
+  "for-clients": {
+    "hero": {
+      "label": "For clients",
+      "title": "Hire trusted pros — without the back-and-forth",
+      "description": "Post once. Get qualified, vetted proposals fast. Pay only when work is done. It's the modern way to get things done."
+    },
+    "items": [
+      {
+        "id": "vetted",
+        "title": "Vetted professionals",
+        "description": "Every pro is ID-verified. Background checks for in-home services.",
+        "icon": "shield"
+      },
+      {
+        "id": "escrow",
+        "title": "Escrow payments",
+        "description": "Your money is safe. Released only when you approve a milestone.",
+        "icon": "wallet"
+      },
+      {
+        "id": "matches",
+        "title": "Fast matches",
+        "description": "Get your first proposal in under 2 hours, on average.",
+        "icon": "clock"
+      },
+      {
+        "id": "support",
+        "title": "World-class support",
+        "description": "Real humans, 24/7 — never a bot.",
+        "icon": "users"
+      }
+    ]
+  },
+  "for-professionals": {
+    "hero": {
+      "label": "For professionals",
+      "title": "Find quality jobs. Get paid safely. Grow your business.",
+      "description": "No more chasing leads or waiting on payments. Klick-Pro brings nearby and remote jobs straight to you."
+    },
+    "items": [
+      {
+        "id": "grow",
+        "title": "Grow",
+        "description": "Algorithmic match-making puts you in front of the right clients.",
+        "icon": "trend"
+      },
+      {
+        "id": "trusted",
+        "title": "Trusted",
+        "description": "Verified badges and ratings build long-term reputation.",
+        "icon": "shield"
+      },
+      {
+        "id": "nearby",
+        "title": "Nearby",
+        "description": "See jobs by distance, urgency, and budget — at a glance.",
+        "icon": "map"
+      },
+      {
+        "id": "paid",
+        "title": "Paid weekly",
+        "description": "Withdraw earnings to your bank or wallet, anytime.",
+        "icon": "wallet"
+      }
+    ]
   }
 }

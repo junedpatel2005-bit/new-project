@@ -386,7 +386,12 @@ export async function POST(
         role: data.role,
       },
     });
-    if (user.role === "PROFESSIONAL") await notifyClientsOfNewProfessional(user);
+    // Registration notifications must be persisted even when the recipients are
+    // currently signed out. They will be shown from the inbox after login.
+    await Promise.all([
+      notifyAdminsOfNewAccount(user),
+      ...(user.role === "PROFESSIONAL" ? [notifyClientsOfNewProfessional(user)] : []),
+    ]);
     const raw = await createEmailVerificationToken(user.id);
     await sendEmailVerificationLink(user.email, raw, publicAppOrigin(request));
     const response = NextResponse.json(

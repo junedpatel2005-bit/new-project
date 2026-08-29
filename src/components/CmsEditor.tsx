@@ -18,12 +18,10 @@ import {
   useSortable,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Plus, Save, Copy } from "lucide-react";
+import { Copy, Plus, Save } from "lucide-react";
 import { useEffect, useState } from "react";
 import { AboutFeatureCard } from "@/components/AboutFeatureCard";
 import { AboutHero } from "@/components/AboutHero";
-import { SiteFooter } from "@/components/SiteFooter";
-import { SiteHeader } from "@/components/SiteHeader";
 import type { CmsCard, CmsContent } from "@/lib/cms-file";
 import Landing from "@/routes/index";
 import ProfessionalHome from "@/routes/professional-home";
@@ -209,20 +207,22 @@ export default function CmsEditor() {
           </button>
         </div>
       </div>
-      <label className="flex w-fit items-center gap-3 text-sm font-semibold text-slate-300">
-        Editing page:
-        <select
-          value={selectedPage}
-          onChange={(event) => handlePageChange(event.target.value)}
-          className="rounded-xl border border-white/15 bg-white/[.06] px-3 py-2 text-white"
-        >
-          {cmsPages.map((page) => (
-            <option key={page.href} value={page.href} className="text-slate-900">
-              {page.label}
-            </option>
-          ))}
-        </select>
-      </label>
+      <div className="flex flex-wrap items-center gap-4">
+        <label className="flex w-fit items-center gap-3 text-sm font-semibold text-slate-300">
+          Editing page:
+          <select
+            value={selectedPage}
+            onChange={(event) => handlePageChange(event.target.value)}
+            className="rounded-xl border border-white/15 bg-white/[.06] px-3 py-2 text-white"
+          >
+            {cmsPages.map((page) => (
+              <option key={page.href} value={page.href} className="text-slate-900">
+                {page.label}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
       {status === "ready" && <p className="text-sm text-amber-300">Unsaved changes</p>}
       {message && (
         <p className={status === "error" ? "text-rose-300" : "text-emerald-300"}>{message}</p>
@@ -244,7 +244,6 @@ export default function CmsEditor() {
         {textEditing && <InlineFormattingToolbar />}
         <>
           <div onFocusCapture={() => setTextEditing(true)}>
-            <SiteHeader preview onNavigate={handlePageChange} />
             <DndContext
               sensors={sensors}
               collisionDetection={closestCenter}
@@ -308,7 +307,6 @@ export default function CmsEditor() {
                 )}
               </SortableContext>
             </DndContext>
-            <SiteFooter />
           </div>
         </>
       </div>
@@ -329,12 +327,17 @@ function HomeCmsEditor({
   const [selectedFeatureId, setSelectedFeatureId] = useState<string | null>(null);
   const [pendingPage, setPendingPage] = useState<string | null>(null);
   const [notice, setNotice] = useState("");
+  const [loadError, setLoadError] = useState("");
   const [textEditing, setTextEditing] = useState(false);
   useEffect(() => {
     void fetch("/api/admin/cms?page=home", { cache: "no-store" })
-      .then((r) => r.json())
-      .then(setContent);
+      .then(async (response) => {
+        if (!response.ok) throw new Error();
+        setContent((await response.json()) as HomeContent);
+      })
+      .catch(() => setLoadError("Unable to load the Home page. Please refresh and try again."));
   }, []);
+  if (loadError) return <p className="text-rose-300">{loadError}</p>;
   if (!content) return <p className="text-slate-400">Loading Home page…</p>;
   const update = (next: HomeContent) => {
     setContent(next);
@@ -424,20 +427,22 @@ function HomeCmsEditor({
           Save
         </button>
       </div>
-      <label className="flex w-fit items-center gap-3 text-sm font-semibold text-slate-300">
-        Editing page:
-        <select
-          value={selectedPage}
-          onChange={(event) => requestPageChange(event.target.value)}
-          className="rounded-xl border border-white/15 bg-white/[.06] px-3 py-2 text-white"
-        >
-          {cmsPages.map((page) => (
-            <option key={page.href} value={page.href} className="text-slate-900">
-              {page.label}
-            </option>
-          ))}
-        </select>
-      </label>
+      <div className="flex flex-wrap items-center gap-4">
+        <label className="flex w-fit items-center gap-3 text-sm font-semibold text-slate-300">
+          Editing page:
+          <select
+            value={selectedPage}
+            onChange={(event) => requestPageChange(event.target.value)}
+            className="rounded-xl border border-white/15 bg-white/[.06] px-3 py-2 text-white"
+          >
+            {cmsPages.map((page) => (
+              <option key={page.href} value={page.href} className="text-slate-900">
+                {page.label}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
       {notice && <p className="text-sm text-amber-300">{notice}</p>}
       {saved && <p className="text-emerald-300">Changes saved successfully.</p>}
       {pendingPage && (
@@ -456,7 +461,6 @@ function HomeCmsEditor({
       {textEditing && <InlineFormattingToolbar />}
       <div className="overflow-hidden rounded-2xl bg-background text-foreground shadow-xl ring-1 ring-border">
         <div onFocusCapture={() => setTextEditing(true)}>
-          <SiteHeader preview onNavigate={requestPageChange} />
           <Landing
             isAuthenticated
             homeContent={content}
@@ -467,7 +471,6 @@ function HomeCmsEditor({
             onFeatureDelete={deleteFeature}
             onFeatureDuplicate={duplicateFeature}
           />
-          <SiteFooter />
         </div>
       </div>
     </div>
@@ -512,6 +515,7 @@ function MarketingCmsEditor({
   const [error, setError] = useState("");
   useEffect(() => {
     setContent(null);
+    setError("");
     setDirty(false);
     void fetch(`/api/admin/cms?page=${page}`, { cache: "no-store" })
       .then(async (response) => {
@@ -520,6 +524,7 @@ function MarketingCmsEditor({
       })
       .catch(() => setError("Unable to load this page."));
   }, [page]);
+  if (error && !content) return <p className="text-rose-300">{error}</p>;
   if (!content) return <p className="text-slate-400">Loading page…</p>;
   const update = (next: MarketingPageContent) => {
     setContent(next);
@@ -582,20 +587,22 @@ function MarketingCmsEditor({
           Save
         </button>
       </div>
-      <label className="flex w-fit items-center gap-3 text-sm font-semibold text-slate-300">
-        Editing page:
-        <select
-          value={`/${page}`}
-          onChange={(event) => switchPage(event.target.value)}
-          className="rounded-xl border border-white/15 bg-white/[.06] px-3 py-2 text-white"
-        >
-          {cmsPages.map((item) => (
-            <option key={item.href} value={item.href} className="text-slate-900">
-              {item.label}
-            </option>
-          ))}
-        </select>
-      </label>
+      <div className="flex flex-wrap items-center gap-4">
+        <label className="flex w-fit items-center gap-3 text-sm font-semibold text-slate-300">
+          Editing page:
+          <select
+            value={`/${page}`}
+            onChange={(event) => switchPage(event.target.value)}
+            className="rounded-xl border border-white/15 bg-white/[.06] px-3 py-2 text-white"
+          >
+            {cmsPages.map((item) => (
+              <option key={item.href} value={item.href} className="text-slate-900">
+                {item.label}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
       {dirty && <p className="text-sm text-amber-300">Unsaved changes</p>}
       {saved && <p className="text-sm text-emerald-300">Changes saved successfully.</p>}
       {error && <p className="text-sm text-rose-300">{error}</p>}
@@ -616,7 +623,6 @@ function MarketingCmsEditor({
         />
       )}
       <div className="overflow-hidden rounded-2xl bg-background text-foreground shadow-xl ring-1 ring-border">
-        <SiteHeader preview onNavigate={switchPage} />
         {page === "professional-home" ? (
           <ProfessionalHome cmsMode cmsContent={content} onCmsChange={update} />
         ) : (
@@ -631,7 +637,6 @@ function MarketingCmsEditor({
             onDuplicate={duplicateItem}
           />
         )}
-        <SiteFooter />
       </div>
     </div>
   );

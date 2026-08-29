@@ -93,6 +93,7 @@ export default function Landing({
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
+    if (cmsMode) return;
     async function loadHome() {
       try {
         const response = await fetch("/api/v1/marketplace/professionals");
@@ -103,7 +104,7 @@ export default function Landing({
       }
     }
     void loadHome();
-  }, []);
+  }, [cmsMode]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -236,14 +237,45 @@ export default function Landing({
                 Browse all <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
-            {!professionals.length && !failed && (
+            {cmsMode ? (
+              <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                {[
+                  "Professional one",
+                  "Professional two",
+                  "Professional three",
+                  "Professional four",
+                ].map((name) => (
+                  <div
+                    key={name}
+                    className="rounded-2xl border border-border bg-card p-5 shadow-soft"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="grid h-12 w-12 place-items-center rounded-full bg-muted text-lg font-semibold text-muted-foreground">
+                        P
+                      </div>
+                      <div>
+                        <p className="font-semibold">{name}</p>
+                        <p className="text-sm text-muted-foreground">Service category</p>
+                      </div>
+                    </div>
+                    <div className="mt-5 border-t border-border pt-4">
+                      <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                        Starting at
+                      </p>
+                      <p className="mt-1 text-xl font-bold">₹—</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+            {!cmsMode && !professionals.length && !failed && (
               <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
                 {Array.from({ length: 4 }).map((_, index) => (
                   <div key={index} className="h-64 animate-pulse rounded-2xl bg-muted" />
                 ))}
               </div>
             )}
-            {professionals.length > 0 && (
+            {!cmsMode && professionals.length > 0 && (
               <div
                 data-db-section="professionals"
                 className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4"

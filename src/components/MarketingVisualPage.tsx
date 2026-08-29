@@ -94,7 +94,9 @@ export default function MarketingVisualPage({
               "label",
               "text-xs font-semibold uppercase tracking-wider text-primary",
             )}
-            <h1 className="font-display mx-auto mt-3 max-w-3xl text-4xl font-bold tracking-tight md:text-6xl">
+            <h1
+              className={`font-display mx-auto mt-3 max-w-3xl text-4xl font-bold tracking-tight md:text-6xl ${page === "for-professionals" ? "text-black" : ""}`}
+            >
               {text(content.hero.title, "title", "")}
             </h1>
             <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
