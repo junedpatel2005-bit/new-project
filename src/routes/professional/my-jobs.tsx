@@ -12,7 +12,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Search, Map, MapPin, SlidersHorizontal, Star, ShieldCheck, Heart } from "lucide-react";
+import {
+  Home,
+  LocateFixed,
+  Search,
+  Map,
+  MapPin,
+  SlidersHorizontal,
+  Star,
+  ShieldCheck,
+  Heart,
+} from "lucide-react";
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { MarketplaceCategory } from "@/lib/types/marketplace";
 import { getAllStates, getDistrictsByState } from "@/lib/india-locations";
@@ -141,6 +151,7 @@ function ProfessionalJobsContent() {
   const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [nearMe, setNearMe] = useState(false);
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
+  const [serviceLocation, setServiceLocation] = useState<[number, number] | null>(null);
   const [locating, setLocating] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [radiusKm, setRadiusKm] = useState(DEFAULT_NEAR_ME_RADIUS_KM);
@@ -263,6 +274,16 @@ function ProfessionalJobsContent() {
     );
   }
 
+  function useServiceLocation() {
+    if (!serviceLocation) {
+      setLocationError("Please add your service location to your profile first.");
+      return;
+    }
+    setLocationError(null);
+    setUserLocation(serviceLocation);
+    setNearMe(true);
+  }
+
   const loadJobs = useCallback(async () => {
     try {
       setLoading(true);
@@ -278,6 +299,15 @@ function ProfessionalJobsContent() {
         payload.professional?.professionalLatitude != null &&
           payload.professional?.professionalLongitude != null,
       );
+      if (
+        payload.professional?.professionalLatitude != null &&
+        payload.professional?.professionalLongitude != null
+      ) {
+        setServiceLocation([
+          payload.professional.professionalLatitude,
+          payload.professional.professionalLongitude,
+        ]);
+      }
     } catch (loadError) {
       console.error(loadError);
       setError("Unable to load jobs. Please refresh and try again.");
@@ -756,18 +786,28 @@ function ProfessionalJobsContent() {
                   <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
                     Location
                   </p>
-                  <label className="flex items-center justify-between text-sm">
-                    <span className="inline-flex items-center gap-1.5">
-                      <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
-                      Jobs near me
-                    </span>
-                    <input
-                      type="checkbox"
-                      checked={nearMe}
-                      onChange={(event) => toggleNearMe(event.target.checked)}
-                      className="h-4 w-4 accent-primary"
-                    />
-                  </label>
+                  <div className="space-y-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="w-full justify-start gap-2"
+                      onClick={() => toggleNearMe(true)}
+                    >
+                      <LocateFixed className="size-4" />
+                      Use my current location
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="w-full justify-start gap-2"
+                      onClick={useServiceLocation}
+                    >
+                      <Home className="size-4" />
+                      Use my service location
+                    </Button>
+                  </div>
                   {locating && <p className="mt-1.5 text-xs text-muted-foreground">Locating…</p>}
                   {locationError && (
                     <p className="mt-1.5 text-xs text-destructive">{locationError}</p>

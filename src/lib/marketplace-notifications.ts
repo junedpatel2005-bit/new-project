@@ -17,10 +17,23 @@ async function sendEmails(
   recipients: Array<{ email: string; emailNotificationsEnabled: boolean }>,
   notification: BroadcastNotification,
 ) {
+  const configuredTestEmail = process.env.ADMIN_EMAIL?.includes("@")
+    ? process.env.ADMIN_EMAIL.trim().toLowerCase()
+    : null;
   const results = await Promise.allSettled(
     recipients
       .filter((recipient) => recipient.emailNotificationsEnabled)
-      .map((recipient) => sendNotificationEmail({ to: recipient.email, ...notification, details: notification.emailDetails })),
+      .map((recipient) =>
+        sendNotificationEmail({
+          to:
+            configuredTestEmail &&
+            (recipient.email.endsWith(".local") || recipient.email.endsWith(".example"))
+              ? configuredTestEmail
+              : recipient.email,
+          ...notification,
+          details: notification.emailDetails,
+        }),
+      ),
   );
   results.forEach((result) => {
     if (result.status === "rejected")

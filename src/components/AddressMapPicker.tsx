@@ -1,25 +1,36 @@
 "use client";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
+import { MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { matchIndiaLocation } from "@/lib/india-locations";
 const GoogleMapView = dynamic(() => import("@/components/GoogleAddressMap"), {
   ssr: false,
   loading: () => <div className="h-64 animate-pulse rounded-lg bg-muted" />,
 });
-type Result = { address: string; lat: number; lon: number };
+type Result = {
+  address: string;
+  lat: number;
+  lon: number;
+  state?: string | null;
+  city?: string | null;
+  district?: string | null;
+};
 export function AddressMapPicker({
   id,
   value,
   onChange,
   onCoordinatesChange,
+  onLocationChange,
   onCurrentLocation,
 }: {
   id: string;
   value: string;
   onChange: (value: string) => void;
   onCoordinatesChange?: (latitude: number, longitude: number) => void;
+  onLocationChange?: (state: string, district: string) => void;
   onCurrentLocation?: () => void;
 }) {
   const [results, setResults] = useState<Result[]>([]);
@@ -45,7 +56,11 @@ export function AddressMapPicker({
           signal: controller.signal,
         });
         const d = (await r.json()) as { results?: Result[]; error?: string };
-        setResults(d.results ?? []);
+        setResults(
+          (d.results ?? []).filter(
+            (item) => Number.isFinite(item.lat) && Number.isFinite(item.lon),
+          ),
+        );
         setSearchStatus(d.error ?? "");
       } catch (error) {
         setResults([]);
@@ -71,6 +86,11 @@ export function AddressMapPicker({
       const d = (await r.json()) as { results?: Result[]; error?: string };
       if (d.results?.[0]) {
         onChange(d.results[0].address);
+        const matched = matchIndiaLocation(d.results[0].state, d.results[0].district);
+        onLocationChange?.(
+          matched.state,
+          d.results[0].city || d.results[0].district || matched.district,
+        );
         setPinStatus("");
       } else setPinStatus(d.error ?? "Address not found for that point.");
     } catch {
@@ -78,51 +98,14 @@ export function AddressMapPicker({
     }
   }
   return (
-    <div className="space-y-3">
-      <div className="space-y-1.5">
-        <Label htmlFor={id}>Search or enter address</Label>
-        <Input
-          id={id}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder="Start typing an address…"
-          maxLength={300}
-        />
+    <div className="flex flex-col gap-3">
+      <div className="order-2">
+        <GoogleMapView point={point} onPointChange={resolve} />
       </div>
-      {searching && <p className="text-sm text-muted-foreground">Searching…</p>}
-      {!searching && results.length > 0 && (
-        <ul className="rounded-lg border bg-card">
-          {results.map((item) => (
-            <li key={`${item.lat}-${item.lon}`}>
-              <button
-                type="button"
-                className="w-full px-3 py-2 text-left text-sm hover:bg-muted"
-                onClick={() => {
-                  onChange(item.address);
-                  setPoint([item.lat, item.lon]);
-                  onCoordinatesChange?.(item.lat, item.lon);
-                  setResults([]);
-                  setSearched(false);
-                  setSearchStatus("");
-                }}
-              >
-                {item.address}
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-      {!searching && searched && results.length === 0 && (
-        <p className="text-sm text-muted-foreground">
-          {searchStatus ||
-            "No matches found. You can drop a pin on the map or enter the address manually."}
-        </p>
-      )}
-      <p className="text-sm text-muted-foreground">
+      <p className="order-2 text-sm text-muted-foreground">
         Click or drag the pin on the map to set the exact job location.
       </p>
-      <GoogleMapView point={point} onPointChange={resolve} />
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="order-2 flex flex-wrap items-center gap-3">
         <Button
           type="button"
           variant="outline"
@@ -138,7 +121,52 @@ export function AddressMapPicker({
         </Button>
         {pinStatus && <span className="text-sm text-muted-foreground">{pinStatus}</span>}
       </div>
-      <p className="text-xs text-muted-foreground">Map data © Google</p>
+      <div className="space-y-1.5">
+        <Label htmlFor={id}>Search or enter address</Label>
+        <Input
+          id={id}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="Enter complete address: house no., street, area, city, state and PIN code"
+          maxLength={300}
+        />
+      </div>
+      {searching && <p className="text-sm text-muted-foreground">Searching…</p>}
+      {!searching && results.length > 0 && (
+        <ul className="max-h-72 overflow-y-auto rounded-lg border bg-card shadow-md">
+          {results.map((item) => (
+            <li key={`${item.lat}-${item.lon}`}>
+              <button
+                type="button"
+                className="flex w-full items-start gap-2 px-3 py-2.5 text-left text-sm transition-colors hover:bg-muted"
+                onClick={() => {
+                  onChange(item.address);
+                  setPoint([item.lat, item.lon]);
+                  onCoordinatesChange?.(item.lat, item.lon);
+                  const matched = matchIndiaLocation(item.state, item.district);
+                  onLocationChange?.(matched.state, item.city || item.district || matched.district);
+                  setResults([]);
+                  setSearched(false);
+                  setSearchStatus("");
+                }}
+              >
+                <MapPin className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
+                <span className="min-w-0">
+                  <span className="block font-medium">Select this location</span>
+                  <span className="block truncate text-muted-foreground">{item.address}</span>
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+      {!searching && searched && results.length === 0 && (
+        <p className="text-sm text-muted-foreground">
+          {searchStatus ||
+            "No matches found. You can drop a pin on the map or enter the address manually."}
+        </p>
+      )}
+      <p className="order-3 text-xs text-muted-foreground">Map data © Google</p>
     </div>
   );
 }

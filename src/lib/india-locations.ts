@@ -875,6 +875,27 @@ const locationGroups = [
 
 export const getAllStates = (): string[] => locationGroups.map((item) => item.name);
 
+/**
+ * Matches raw state/district strings from Google's geocoding response
+ * (e.g. "Pune District") against this list's canonical names.
+ */
+export function matchIndiaLocation(
+  rawState: string | null | undefined,
+  rawDistrict: string | null | undefined,
+): { state: string; district: string } {
+  const matchedState = rawState?.trim();
+  if (!matchedState || !getAllStates().includes(matchedState)) return { state: "", district: "" };
+
+  const normalizedDistrict = rawDistrict
+    ?.replace(/\s+district$/i, "")
+    .trim()
+    .toLowerCase();
+  const districtMatch = getDistrictsByState(matchedState).find(
+    (item) => item.toLowerCase() === normalizedDistrict,
+  );
+  return { state: matchedState, district: districtMatch ?? "" };
+}
+
 export const getDistrictsByState = (stateName: string): string[] => [
   ...(locationGroups.find((item) => item.name === stateName)?.districts ?? []),
 ];

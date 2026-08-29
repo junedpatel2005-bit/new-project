@@ -6,7 +6,7 @@ import { AddressMapPicker } from "@/components/AddressMapPicker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { MarketplaceCategory } from "@/lib/types/marketplace";
-import { getAllStates, getDistrictsByState } from "@/lib/india-locations";
+import { getAllStates } from "@/lib/india-locations";
 
 type Form = {
   title: string;
@@ -531,11 +531,33 @@ export default function PostJob() {
                     ))}
                   </div>
                 )}
-                <Field label="Location label">
+                <div
+                  className={
+                    errors.locationAddress ? "rounded-lg border border-destructive p-2" : ""
+                  }
+                >
+                  <AddressMapPicker
+                    id="job-location"
+                    value={form.locationAddress}
+                    onChange={(value) => update("locationAddress", value)}
+                    onCoordinatesChange={(lat, lng) => {
+                      update("locationLat", lat);
+                      update("locationLng", lng);
+                    }}
+                    onLocationChange={(state, city) => {
+                      update("locationState", state);
+                      update("locationDistrict", city);
+                    }}
+                  />
+                  {errors.locationAddress && (
+                    <p className="mt-2 text-sm text-destructive">{errors.locationAddress}</p>
+                  )}
+                </div>
+                <Field label="Add address manually">
                   <Input
                     value={form.locationLabel}
                     onChange={(e) => update("locationLabel", e.target.value)}
-                    placeholder="e.g. Home or job site"
+                    placeholder="Name this address, e.g. Home or Job site"
                   />
                 </Field>
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -556,39 +578,13 @@ export default function PostJob() {
                       ))}
                     </select>
                   </Field>
-                  <Field label="District">
-                    <select
+                  <Field label="City">
+                    <Input
                       value={form.locationDistrict}
                       onChange={(event) => update("locationDistrict", event.target.value)}
-                      disabled={!form.locationState}
-                      className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      <option value="">Select district</option>
-                      {(getDistrictsByState(form.locationState) ?? []).map((item) => (
-                        <option key={item} value={item}>
-                          {item}
-                        </option>
-                      ))}
-                    </select>
+                      placeholder="City will be detected from the address"
+                    />
                   </Field>
-                </div>
-                <div
-                  className={
-                    errors.locationAddress ? "rounded-lg border border-destructive p-2" : ""
-                  }
-                >
-                  <AddressMapPicker
-                    id="job-location"
-                    value={form.locationAddress}
-                    onChange={(value) => update("locationAddress", value)}
-                    onCoordinatesChange={(lat, lng) => {
-                      update("locationLat", lat);
-                      update("locationLng", lng);
-                    }}
-                  />
-                  {errors.locationAddress && (
-                    <p className="mt-2 text-sm text-destructive">{errors.locationAddress}</p>
-                  )}
                 </div>
               </>
             )}

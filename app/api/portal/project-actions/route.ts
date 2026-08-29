@@ -154,8 +154,6 @@ export async function POST(request: NextRequest) {
         "PROFESSIONAL_REQUEST",
       ]);
       if (!dedicatedNotificationTypes.has(type)) {
-        const recipientId =
-          session.userId === project.clientId ? project.professionalId : project.clientId;
         const activityDetails = [
           { label: "Activity", value: title },
           ...(description ? [{ label: "Activity details", value: description }] : []),
@@ -176,7 +174,7 @@ export async function POST(request: NextRequest) {
               ]
             : []),
         ];
-        await notifyUsers([recipientId], {
+        await notifyUsers([project.clientId, project.professionalId], {
           type: `PROJECT_ACTIVITY_${type}`,
           title,
           description: description ?? title,
@@ -560,7 +558,7 @@ export async function POST(request: NextRequest) {
     }
     if (input.action === "request-client") {
       await event("PROFESSIONAL_REQUEST", input.title ?? "Request sent to client", input.note);
-      await notifyUsers([project.clientId], {
+      await notifyUsers([project.clientId, project.professionalId], {
         type: "PROJECT_REQUEST",
         title: input.title ?? "Request from your professional",
         description: input.note,
@@ -582,7 +580,7 @@ export async function POST(request: NextRequest) {
         "Completion confirmation requested",
         "The client reviewed the final work and asked the professional to confirm project completion.",
       );
-      await notifyUsers([project.professionalId], {
+      await notifyUsers([project.clientId, project.professionalId], {
         type: "PROJECT_COMPLETION_REQUESTED",
         title: "Confirm project completion",
         description: "The client reviewed the final work and is asking you to confirm completion.",
@@ -609,7 +607,7 @@ export async function POST(request: NextRequest) {
         "The professional confirmed project completion after the client requested confirmation.",
         { progress: 100 },
       );
-      await notifyUsers([project.clientId], {
+      await notifyUsers([project.clientId, project.professionalId], {
         type: "PROJECT_COMPLETED",
         title: "Project completed",
         description: "The professional confirmed that your project is complete.",

@@ -1,14 +1,11 @@
 "use client";
 
-import { GoogleMap, InfoWindow, LoadScript, Marker } from "@react-google-maps/api";
+import { GoogleMap, InfoWindow, Marker } from "@react-google-maps/api";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { BadgeCheck, MapPin, Star } from "lucide-react";
 import type { ProfessionalDiscoveryResult } from "@/lib/types/professional-discovery";
-
-function isMapsEnabled(): boolean {
-  return Boolean(process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY) && process.env.NEXT_PUBLIC_GOOGLE_MAPS_JS_ENABLED !== "false";
-}
+import { useGoogleMaps } from "@/components/GoogleMapsProvider";
 
 export default function ProfessionalDiscoveryMap({
   professionals,
@@ -17,7 +14,7 @@ export default function ProfessionalDiscoveryMap({
   professionals: ProfessionalDiscoveryResult[];
   selectedPoint?: { lat: number; lng: number };
 }) {
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
+  const { isLoaded, isConfigured } = useGoogleMaps();
   const router = useRouter();
   const points = professionals
     .map((professional) => professional.displayPoint)
@@ -31,9 +28,7 @@ export default function ProfessionalDiscoveryMap({
   const activeProfessional =
     professionals.find((professional) => professional.id === activeProfessionalId) ?? null;
 
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!map) return;
+  const applyView = (map: google.maps.Map) => {
     if (selectedPoint) {
       map.panTo(selectedPoint);
       map.setZoom(12);
@@ -44,9 +39,13 @@ export default function ProfessionalDiscoveryMap({
       points.forEach((p) => bounds.extend(p));
       map.fitBounds(bounds);
     }
+  };
+
+  useEffect(() => {
+    if (mapRef.current) applyView(mapRef.current);
   }, [selectedPoint?.lat, selectedPoint?.lng, points.length]);
 
-  if (!isMapsEnabled()) {
+  if (!isConfigured) {
     return (
       <div className="flex h-[520px] w-full items-center justify-center overflow-hidden rounded-2xl border bg-muted text-sm text-muted-foreground">
         Map preview is unavailable.
@@ -54,43 +53,45 @@ export default function ProfessionalDiscoveryMap({
     );
   }
 
+  if (!isLoaded) {
+    return <div className="h-[520px] w-full animate-pulse rounded-2xl border bg-muted" />;
+  }
+
   return (
     <div className="h-[520px] w-full overflow-hidden rounded-2xl border">
-      <LoadScript googleMapsApiKey={apiKey} loadingElement={<div className="h-[520px] w-full animate-pulse bg-muted" />}>
-        <GoogleMap
-          onLoad={(map) => {
-            mapRef.current = map;
-          }}
-          mapContainerStyle={{ width: "100%", height: "100%" }}
-          center={initialPoint}
-          zoom={points.length > 0 ? 6 : 3}
-          options={{ mapTypeControl: false, streetViewControl: false }}
-        >
-          {professionals.map((professional) => {
-            const point = professional.displayPoint;
-            if (!point) return null;
-            const goToProfile = () => router.push(`/pro/${professional.id}`);
-            return (
-              <Marker
-                key={professional.id}
-                position={point}
-                onClick={() => {
-                  setActiveProfessionalId(professional.id);
-                  goToProfile();
-                }}
-              />
-            );
-          })}
-          {activeProfessional?.displayPoint ? (
-            <InfoWindow
-              position={activeProfessional.displayPoint}
-              onCloseClick={() => setActiveProfessionalId(null)}
-            >
-              <ProfessionalTooltipContent professional={activeProfessional} />
-            </InfoWindow>
-          ) : null}
-        </GoogleMap>
-      </LoadScript>
+      <GoogleMap
+        onLoad={(map) => {
+          mapRef.current = map;
+        }}
+        mapContainerStyle={{ width: "100%", height: "100%" }}
+        center={initialPoint}
+        zoom={points.length > 0 ? 6 : 3}
+        options={{ mapTypeControl: false, streetViewControl: false }}
+      >
+        {professionals.map((professional) => {
+          const point = professional.displayPoint;
+          if (!point) return null;
+          const goToProfile = () => router.push(`/pro/${professional.id}`);
+          return (
+            <Marker
+              key={professional.id}
+              position={point}
+              onClick={() => {
+                setActiveProfessionalId(professional.id);
+                goToProfile();
+              }}
+            />
+          );
+        })}
+        {activeProfessional?.displayPoint ? (
+          <InfoWindow
+            position={activeProfessional.displayPoint}
+            onCloseClick={() => setActiveProfessionalId(null)}
+          >
+            <ProfessionalTooltipContent professional={activeProfessional} />
+          </InfoWindow>
+        ) : null}
+      </GoogleMap>
     </div>
   );
 }

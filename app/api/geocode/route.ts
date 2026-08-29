@@ -15,6 +15,7 @@ type GeocodeResult = {
   lat: number;
   lon: number;
   state: string | null;
+  city: string | null;
   district: string | null;
 };
 
@@ -32,6 +33,12 @@ function mapGoogleResult(result: GoogleGeocodingResult): GeocodeResult {
     lat: result.geometry.location.lat,
     lon: result.geometry.location.lng,
     state: extractAddressComponent(components, "administrative_area_level_1"),
+    city:
+      extractAddressComponent(components, "locality") ??
+      extractAddressComponent(components, "postal_town") ??
+      extractAddressComponent(components, "sublocality_level_1") ??
+      extractAddressComponent(components, "administrative_area_level_3") ??
+      extractAddressComponent(components, "administrative_area_level_2"),
     district:
       extractAddressComponent(components, "administrative_area_level_2") ??
       extractAddressComponent(components, "administrative_area_level_3"),
@@ -46,7 +53,8 @@ export async function GET(request: NextRequest) {
   const lon = request.nextUrl.searchParams.get("lon");
   if (!query && (!lat || !lon)) return NextResponse.json({ results: [] });
 
-  const serverKey = process.env.GOOGLE_MAPS_SERVER_KEY ?? process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
+  const serverKey =
+    process.env.GOOGLE_MAPS_SERVER_KEY ?? process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
   if (!serverKey) {
     return NextResponse.json(
       { error: "Address search is not configured on the server." },

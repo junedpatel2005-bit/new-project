@@ -13,7 +13,7 @@ import { ProCard } from "@/components/ProCard";
 import Skeleton from "react-loading-skeleton";
 import type { MarketplaceCategory, MarketplaceProfessional } from "@/lib/types/marketplace";
 import type { ProfessionalDiscoveryResponse } from "@/lib/types/professional-discovery";
-import { Map, SlidersHorizontal, Search } from "lucide-react";
+import { Home, LocateFixed, Map, SlidersHorizontal, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
@@ -96,6 +96,37 @@ function DiscoverContent() {
         alert("Unable to retrieve your location. Please enable location access or enter a city.");
       },
     );
+  }
+
+  async function requestPrimaryAddress() {
+    try {
+      const profileResponse = await fetch("/api/profile");
+      if (!profileResponse.ok) throw new Error("Unable to load your primary address.");
+      const profileData = (await profileResponse.json()) as {
+        account?: { address?: string | null };
+        profile?: { address?: string | null } | null;
+      };
+      const address = profileData.profile?.address?.trim() || profileData.account?.address?.trim();
+      if (!address) {
+        alert("Please add a primary address to your profile first.");
+        return;
+      }
+
+      const geocodeResponse = await fetch(`/api/geocode?q=${encodeURIComponent(address)}`);
+      const geocodeData = (await geocodeResponse.json()) as {
+        results?: { lat: number; lon: number }[];
+        error?: string;
+      };
+      const location = geocodeData.results?.[0];
+      if (!location) throw new Error(geocodeData.error ?? "Unable to find your primary address.");
+
+      setOriginLat(location.lat);
+      setOriginLng(location.lon);
+      setDistanceKm((current) => (current === "" ? 25 : current));
+      setPage(1);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Unable to use your primary address.");
+    }
   }
 
   useEffect(() => {
@@ -416,24 +447,26 @@ function DiscoverContent() {
 
           <FilterSection title="Distance">
             <div className="space-y-2">
-              <label className="flex items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={distanceKm !== "" && originLat !== null && originLng !== null}
-                  onChange={(event) => {
-                    if (event.target.checked) {
-                      requestMyLocation();
-                    } else {
-                      setDistanceKm("");
-                      setOriginLat(null);
-                      setOriginLng(null);
-                      userLocationRef.current = null;
-                    }
-                  }}
-                  className="h-4 w-4 rounded border-border accent-primary"
-                />
-                <span>Use my location</span>
-              </label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="w-full justify-start gap-2"
+                onClick={requestMyLocation}
+              >
+                <LocateFixed className="size-4" />
+                Use my current location
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="w-full justify-start gap-2"
+                onClick={() => void requestPrimaryAddress()}
+              >
+                <Home className="size-4" />
+                Use my primary address
+              </Button>
               {distanceKm !== "" && originLat !== null && originLng !== null && (
                 <div className="space-y-2">
                   <label className="flex items-center gap-2 text-sm">

@@ -1,8 +1,9 @@
 "use client";
 
-import { GoogleMap, InfoWindow, LoadScript, Marker } from "@react-google-maps/api";
+import { GoogleMap, InfoWindow, Marker } from "@react-google-maps/api";
 import { useEffect, useRef, useState } from "react";
 import { MapPin, Star } from "lucide-react";
+import { useGoogleMaps } from "@/components/GoogleMapsProvider";
 
 type MapJob = {
   id: number;
@@ -21,10 +22,6 @@ type MapJob = {
   distanceKm?: number | null;
 };
 
-function isMapsEnabled(): boolean {
-  return Boolean(process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY) && process.env.NEXT_PUBLIC_GOOGLE_MAPS_JS_ENABLED !== "false";
-}
-
 function budgetLabel(job: MapJob): string {
   if (job.timingType === "HOURLY") {
     return job.hourlyRate == null ? "Rate not set" : `₹${job.hourlyRate.toLocaleString()}/hr`;
@@ -42,7 +39,7 @@ export default function ProfessionalJobsMap({
   jobs: MapJob[];
   onSelectJob: (id: number) => void;
 }) {
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
+  const { isLoaded, isConfigured } = useGoogleMaps();
   const mapCenter = { lat: center[0], lng: center[1] };
   const [activeJobId, setActiveJobId] = useState<number | null>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
@@ -52,7 +49,7 @@ export default function ProfessionalJobsMap({
     if (mapRef.current) mapRef.current.setCenter(mapCenter);
   }, [mapCenter.lat, mapCenter.lng]);
 
-  if (!isMapsEnabled()) {
+  if (!isConfigured) {
     return (
       <div className="flex h-full w-full items-center justify-center rounded-xl bg-muted text-sm text-muted-foreground">
         Map preview is unavailable.
@@ -60,65 +57,67 @@ export default function ProfessionalJobsMap({
     );
   }
 
+  if (!isLoaded) {
+    return <div className="h-full w-full animate-pulse rounded-xl bg-muted" />;
+  }
+
   return (
-    <LoadScript googleMapsApiKey={apiKey} loadingElement={<div className="h-full w-full animate-pulse bg-muted" />}>
-      <GoogleMap
-        onLoad={(map) => {
-          mapRef.current = map;
-        }}
-        mapContainerStyle={{ width: "100%", height: "100%" }}
-        center={mapCenter}
-        zoom={6}
-        options={{ mapTypeControl: false, streetViewControl: false }}
-      >
-        {jobs.map((job) => (
-          <Marker
-            key={job.id}
-            position={{ lat: job.locationLat, lng: job.locationLng }}
-            onClick={() => {
-              setActiveJobId(job.id);
-              onSelectJob(job.id);
-            }}
-          />
-        ))}
-        {activeJob ? (
-          <InfoWindow
-            position={{ lat: activeJob.locationLat, lng: activeJob.locationLng }}
-            onCloseClick={() => setActiveJobId(null)}
-          >
-            <div className="w-60 space-y-1.5 whitespace-normal break-words p-0.5">
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                  {activeJob.category ?? "General"}
+    <GoogleMap
+      onLoad={(map) => {
+        mapRef.current = map;
+      }}
+      mapContainerStyle={{ width: "100%", height: "100%" }}
+      center={mapCenter}
+      zoom={6}
+      options={{ mapTypeControl: false, streetViewControl: false }}
+    >
+      {jobs.map((job) => (
+        <Marker
+          key={job.id}
+          position={{ lat: job.locationLat, lng: job.locationLng }}
+          onClick={() => {
+            setActiveJobId(job.id);
+            onSelectJob(job.id);
+          }}
+        />
+      ))}
+      {activeJob ? (
+        <InfoWindow
+          position={{ lat: activeJob.locationLat, lng: activeJob.locationLng }}
+          onCloseClick={() => setActiveJobId(null)}
+        >
+          <div className="w-60 space-y-1.5 whitespace-normal break-words p-0.5">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                {activeJob.category ?? "General"}
+              </span>
+              {activeJob.status ? (
+                <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+                  {activeJob.status}
                 </span>
-                {activeJob.status ? (
-                  <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
-                    {activeJob.status}
-                  </span>
-                ) : null}
-              </div>
-              <p className="font-semibold text-foreground">{activeJob.title}</p>
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <MapPin className="h-3 w-3 shrink-0" />
-                {activeJob.locationAddress ?? "Remote"}
-                {activeJob.distanceKm != null && ` · ${activeJob.distanceKm.toFixed(1)} km away`}
-              </div>
-              {activeJob.clientName ? (
-                <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                  <span>{activeJob.clientName}</span>
-                  {activeJob.clientRating != null && (
-                    <span className="inline-flex items-center gap-1">
-                      <Star className="h-3 w-3 fill-warning text-warning" />
-                      {activeJob.clientRating.toFixed(1)}
-                    </span>
-                  )}
-                </div>
               ) : null}
-              <p className="text-sm font-semibold text-foreground">{budgetLabel(activeJob)}</p>
             </div>
-          </InfoWindow>
-        ) : null}
-      </GoogleMap>
-    </LoadScript>
+            <p className="font-semibold text-foreground">{activeJob.title}</p>
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <MapPin className="h-3 w-3 shrink-0" />
+              {activeJob.locationAddress ?? "Remote"}
+              {activeJob.distanceKm != null && ` · ${activeJob.distanceKm.toFixed(1)} km away`}
+            </div>
+            {activeJob.clientName ? (
+              <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                <span>{activeJob.clientName}</span>
+                {activeJob.clientRating != null && (
+                  <span className="inline-flex items-center gap-1">
+                    <Star className="h-3 w-3 fill-warning text-warning" />
+                    {activeJob.clientRating.toFixed(1)}
+                  </span>
+                )}
+              </div>
+            ) : null}
+            <p className="text-sm font-semibold text-foreground">{budgetLabel(activeJob)}</p>
+          </div>
+        </InfoWindow>
+      ) : null}
+    </GoogleMap>
   );
 }
