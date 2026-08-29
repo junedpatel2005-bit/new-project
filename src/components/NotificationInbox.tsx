@@ -33,20 +33,7 @@ export function NotificationInbox({ admin = false }: { admin?: boolean }) {
       const response = await fetch("/api/v1/portal/notifications", { cache: "no-store" });
       if (!response.ok) throw new Error("Unable to load notifications");
       const nextItems = (await response.json()) as Notification[];
-      const hasUnread = nextItems.some((item) => !item.readAt);
-      setItems(
-        hasUnread
-          ? nextItems.map((item) => ({ ...item, readAt: item.readAt ?? new Date().toISOString() }))
-          : nextItems,
-      );
-      if (hasUnread) {
-        await fetch("/api/v1/portal/notifications", {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ all: true }),
-        });
-        window.dispatchEvent(new Event("servio:notifications-read"));
-      }
+      setItems(nextItems);
       setError(false);
     } catch {
       setError(true);

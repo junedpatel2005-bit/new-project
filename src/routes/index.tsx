@@ -8,6 +8,64 @@ import { Button } from "@/components/ui/button";
 import type { MarketplaceProfessional } from "@/lib/types/marketplace";
 import { sanitizeInlineHtml } from "@/lib/sanitizeInlineHtml";
 
+const featureDefs = [
+  {
+    id: "feature-1",
+    icon: ShieldCheck,
+    title: "Verified Professionals",
+    text: "All professionals are verified and vetted to ensure quality work and your peace of mind.",
+  },
+  {
+    id: "feature-2",
+    icon: Briefcase,
+    title: "Project Management",
+    text: "Track progress, communicate in real-time, and manage all projects in one centralized dashboard.",
+  },
+  {
+    id: "feature-3",
+    icon: Users,
+    title: "Expert Matching",
+    text: "Get matched with professionals that best fit your project needs and budget requirements.",
+  },
+  {
+    id: "feature-4",
+    icon: MapPin,
+    title: "Local & Remote",
+    text: "Work with professionals near you or globally - choose what works best for your project.",
+  },
+  {
+    id: "feature-5",
+    icon: Search,
+    title: "Easy Discovery",
+    text: "Browse portfolios, reviews, and rates to find the right fit. Make data-driven decisions.",
+  },
+  {
+    id: "feature-6",
+    icon: ArrowRight,
+    title: "Seamless Growth",
+    text: "Build long-term relationships with reliable partners and scale your business together.",
+  },
+];
+const featureIds = featureDefs.map((feature) => feature.id);
+
+function orderFeatures(rawOrder: string | undefined) {
+  if (rawOrder) {
+    try {
+      const parsed = JSON.parse(rawOrder) as unknown;
+      if (
+        Array.isArray(parsed) &&
+        parsed.length === featureIds.length &&
+        featureIds.every((id) => parsed.includes(id))
+      ) {
+        return parsed.map((id) => featureDefs.find((feature) => feature.id === id)!);
+      }
+    } catch {
+      // Fall through to the default order below.
+    }
+  }
+  return featureDefs;
+}
+
 export default function Landing({ isAuthenticated = false }: { isAuthenticated?: boolean }) {
   const [professionals, setProfessionals] = useState<MarketplaceProfessional[]>([]);
   const [failed, setFailed] = useState(false);
@@ -55,7 +113,7 @@ export default function Landing({ isAuthenticated = false }: { isAuthenticated?:
     if (preview) {
       try {
         setPageText(
-          JSON.parse(window.sessionStorage.getItem("servio-home-preview") ?? "{}") as Record<
+          JSON.parse(window.sessionStorage.getItem("servio-home-preview:/") ?? "{}") as Record<
             string,
             string
           >,
@@ -119,90 +177,19 @@ export default function Landing({ isAuthenticated = false }: { isAuthenticated?:
             </p>
           </div>
           <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            <div className="rounded-2xl border border-border bg-card p-8 shadow-soft">
-              <div className="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                <ShieldCheck className="h-6 w-6" />
+            {orderFeatures(pageText.__feature_order__).map((feature) => (
+              <div key={feature.id} className="rounded-2xl border border-border bg-card p-8 shadow-soft">
+                <div className="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <feature.icon className="h-6 w-6" />
+                </div>
+                <h3 className="mt-4 font-display font-semibold">
+                  {editableText(`${feature.id}-title`, feature.title)}
+                </h3>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {editableText(`${feature.id}-text`, feature.text)}
+                </p>
               </div>
-              <h3 className="mt-4 font-display font-semibold">
-                {editableText("feature-1-title", "Verified Professionals")}
-              </h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                {editableText(
-                  "feature-1-text",
-                  "All professionals are verified and vetted to ensure quality work and your peace of mind.",
-                )}
-              </p>
-            </div>
-            <div className="rounded-2xl border border-border bg-card p-8 shadow-soft">
-              <div className="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                <Briefcase className="h-6 w-6" />
-              </div>
-              <h3 className="mt-4 font-display font-semibold">
-                {editableText("feature-2-title", "Project Management")}
-              </h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                {editableText(
-                  "feature-2-text",
-                  "Track progress, communicate in real-time, and manage all projects in one centralized dashboard.",
-                )}
-              </p>
-            </div>
-            <div className="rounded-2xl border border-border bg-card p-8 shadow-soft">
-              <div className="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                <Users className="h-6 w-6" />
-              </div>
-              <h3 className="mt-4 font-display font-semibold">
-                {editableText("feature-3-title", "Expert Matching")}
-              </h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                {editableText(
-                  "feature-3-text",
-                  "Get matched with professionals that best fit your project needs and budget requirements.",
-                )}
-              </p>
-            </div>
-            <div className="rounded-2xl border border-border bg-card p-8 shadow-soft">
-              <div className="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                <MapPin className="h-6 w-6" />
-              </div>
-              <h3 className="mt-4 font-display font-semibold">
-                {editableText("feature-4-title", "Local & Remote")}
-              </h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                {editableText(
-                  "feature-4-text",
-                  "Work with professionals near you or globally - choose what works best for your project.",
-                )}
-              </p>
-            </div>
-            <div className="rounded-2xl border border-border bg-card p-8 shadow-soft">
-              <div className="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                <Search className="h-6 w-6" />
-              </div>
-              <h3 className="mt-4 font-display font-semibold">
-                {editableText("feature-5-title", "Easy Discovery")}
-              </h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                {editableText(
-                  "feature-5-text",
-                  "Browse portfolios, reviews, and rates to find the right fit. Make data-driven decisions.",
-                )}
-              </p>
-            </div>
-            <div className="rounded-2xl border border-border bg-card p-8 shadow-soft">
-              <div className="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                <ArrowRight className="h-6 w-6" />
-              </div>
-              <h3 className="mt-4 font-display font-semibold">
-                {editableText("feature-6-title", "Seamless Growth")}
-              </h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                {editableText(
-                  "feature-6-text",
-                  "Build long-term relationships with reliable partners and scale your business together.",
-                )}
-              </p>
-            </div>
+            ))}
           </div>
         </section>
         <section className="bg-surface">

@@ -73,14 +73,16 @@ export function PortalShell({ children }: { children: React.ReactNode }) {
       <div className="lg:pl-64">
         <AppHeader role={user?.role} />
         <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-          <button
-            type="button"
-            onClick={() => router.back()}
-            className="mb-5 inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back
-          </button>
+          {pathname !== "/dashboard" && pathname !== "/professional/dashboard" && (
+            <button
+              type="button"
+              onClick={() => router.back()}
+              className="mb-5 inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </button>
+          )}
           {title && (
             <h1 className="mb-6 font-display text-3xl font-bold tracking-tight">{title}</h1>
           )}

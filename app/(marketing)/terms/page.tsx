@@ -1,21 +1,10 @@
-import { LegalPage } from "@/components/LegalPage";
+import { CmsHtmlPage } from "@/components/CmsHtmlPage";
+import { TERMS_DEFAULT_HTML } from "@/lib/cms-page-defaults";
 
-export default function TermsPage() {
-  return (
-    <LegalPage
-      eyebrow="Legal"
-      title="Terms of Service"
-      description="The basic rules for using the Klick-Pro marketplace."
-      sections={[
-        {
-          title: "Using Klick-Pro",
-          body: "Clients and professionals must provide accurate information and use the marketplace respectfully and lawfully.",
-        },
-        {
-          title: "Marketplace projects",
-          body: "Project payments, milestones, reviews, disputes, and communications should be managed through Klick-Pro where available.",
-        },
-      ]}
-    />
-  );
+export default async function TermsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ cmsPreview?: string }>;
+}) {
+  return <CmsHtmlPage slug="terms" searchParams={searchParams} defaultHtml={TERMS_DEFAULT_HTML} />;
 }

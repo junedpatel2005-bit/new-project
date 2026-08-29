@@ -1,11 +1,39 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Blocks, ChevronDown, ExternalLink, Eye, Pencil, Save, X } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import {
+  Briefcase,
+  ChevronDown,
+  ExternalLink,
+  Eye,
+  HandCoins,
+  Home,
+  HelpCircle,
+  Info,
+  LayoutGrid,
+  ListChecks,
+  Mail,
+  Pencil,
+  Save,
+  ScrollText,
+  ShieldCheck,
+  Tag,
+  Users2,
+  X,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { HomeVisualEditor } from "@/components/HomeVisualEditor";
-import { CmsBlockBuilder } from "@/components/CmsBlockBuilder";
-import { VisualPageEditor } from "@/components/VisualPageEditor";
+import { CmsHtmlEditor } from "@/components/CmsHtmlEditor";
+import {
+  ABOUT_DEFAULT_HTML,
+  FOR_CLIENTS_DEFAULT_HTML,
+  FOR_PROFESSIONALS_DEFAULT_HTML,
+  HOW_IT_WORKS_DEFAULT_HTML,
+  PRICING_DEFAULT_HTML,
+  TERMS_DEFAULT_HTML,
+  PRIVACY_DEFAULT_HTML,
+} from "@/lib/cms-page-defaults";
 
 type Page = {
   id: number;
@@ -16,22 +44,55 @@ type Page = {
   status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
 };
 
-function normalizeCmsContent(value: string) {
-  const cssEnd = value.lastIndexOf("}");
-  const prefix = value.slice(0, cssEnd + 1);
-  if (cssEnd < 0 || !prefix.includes("{") || !/\.cms-[\w-]+/.test(prefix)) return value;
-  return value.slice(cssEnd + 1).trimStart();
-}
+const HTML_EDITABLE_DEFAULTS: Record<string, string> = {
+  about: ABOUT_DEFAULT_HTML,
+  "for-clients": FOR_CLIENTS_DEFAULT_HTML,
+  "for-professionals": FOR_PROFESSIONALS_DEFAULT_HTML,
+  "how-it-works": HOW_IT_WORKS_DEFAULT_HTML,
+  pricing: PRICING_DEFAULT_HTML,
+  terms: TERMS_DEFAULT_HTML,
+  "privacy-policy": PRIVACY_DEFAULT_HTML,
+};
 
 function defaultCmsContent(page: Page | null) {
-  if (page?.slug !== "terms" || page.content.trim())
-    return normalizeCmsContent(page?.content ?? "");
-  return [
-    "<h2>Using Klick-Pro</h2>",
-    "<p>Clients and professionals must provide accurate information and use the marketplace respectfully and lawfully.</p>",
-    "<h2>Marketplace projects</h2>",
-    "<p>Project payments, milestones, reviews, disputes, and communications should be managed through Klick-Pro where available.</p>",
-  ].join("");
+  const existing = (page?.content ?? "").trim();
+  if (existing) return existing;
+  return page?.slug ? (HTML_EDITABLE_DEFAULTS[page.slug] ?? "") : "";
+}
+
+const PAGE_ICONS: Record<string, LucideIcon> = {
+  "": Home,
+  "professional-home": Users2,
+  services: LayoutGrid,
+  about: Info,
+  "how-it-works": ListChecks,
+  "for-clients": HandCoins,
+  "for-professionals": Briefcase,
+  pricing: Tag,
+  faq: HelpCircle,
+  contact: Mail,
+  terms: ScrollText,
+  "privacy-policy": ShieldCheck,
+};
+
+const PAGE_GROUPS: { label: string; slugs: string[] }[] = [
+  { label: "Core", slugs: ["", "professional-home", "services"] },
+  {
+    label: "Marketing",
+    slugs: ["about", "how-it-works", "for-clients", "for-professionals", "pricing", "faq", "contact"],
+  },
+  { label: "Legal", slugs: ["terms", "privacy-policy"] },
+];
+
+function groupPages(pages: Page[]) {
+  const bySlug = new Map(pages.map((page) => [page.slug, page]));
+  const grouped = PAGE_GROUPS.map((group) => ({
+    label: group.label,
+    pages: group.slugs.map((slug) => bySlug.get(slug)).filter((page): page is Page => Boolean(page)),
+  })).filter((group) => group.pages.length > 0);
+  const known = new Set(PAGE_GROUPS.flatMap((group) => group.slugs));
+  const other = pages.filter((page) => !known.has(page.slug));
+  return other.length ? [...grouped, { label: "Other", pages: other }] : grouped;
 }
 
 export default function CmsPage() {
@@ -43,9 +104,8 @@ export default function CmsPage() {
   const [message, setMessage] = useState("");
   const [preview, setPreview] = useState(false);
   const [editorOpen, setEditorOpen] = useState(false);
-  const [editorTab, setEditorTab] = useState<"canvas" | "blocks">("canvas");
-  const [blocksOpen, setBlocksOpen] = useState(false);
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const pick = useCallback((page: Page | null, list?: Page[], keepEditorOpen = false) => {
     if (list) setPages(list);
@@ -55,15 +115,7 @@ export default function CmsPage() {
     setStatus(page?.status ?? "DRAFT");
     setPreview(false);
     if (!keepEditorOpen) setEditorOpen(false);
-    setEditorTab("canvas");
-    setBlocksOpen(false);
     setPageMenuOpen(false);
-  }, []);
-  const updatePageSections = useCallback((pageId: number, sections: string) => {
-    setPages((current) =>
-      current.map((page) => (page.id === pageId ? { ...page, sections } : page)),
-    );
-    setSelected((current) => (current?.id === pageId ? { ...current, sections } : current));
   }, []);
   useEffect(() => {
     void fetch("/api/v1/admin/data/cms", { cache: "no-store" })
@@ -71,13 +123,13 @@ export default function CmsPage() {
       .then((data) => pick(data.pages?.[0] ?? null, data.pages ?? []));
   }, [pick]);
   useEffect(() => {
-    if (!editorOpen && !blocksOpen && !preview) return;
+    if (!editorOpen && !preview) return;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = previousOverflow;
     };
-  }, [blocksOpen, editorOpen, preview]);
+  }, [editorOpen, preview]);
   async function publish() {
     if (!selected) return;
     const nextStatus = status === "PUBLISHED" ? "DRAFT" : "PUBLISHED";
@@ -95,12 +147,14 @@ export default function CmsPage() {
   }
   async function savePage() {
     if (!selected) return;
+    setSaving(true);
     const response = await fetch(`/api/v1/admin/cms/${selected.id}`, {
       method: "PUT",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ title, content, status }),
     });
     const data = await response.json();
+    setSaving(false);
     if (!response.ok) return setMessage(data.error ?? "Could not save page.");
     setPages((current) => current.map((page) => (page.id === selected.id ? data.page : page)));
     setSelected(data.page);
@@ -112,41 +166,50 @@ export default function CmsPage() {
   const isHome = selected?.slug === "" || selected?.slug === "/";
   const isProHome = selected?.slug === "professional-home";
   const isServices = selected?.slug === "services";
+  const isHtmlEditable = Boolean(selected && selected.slug in HTML_EDITABLE_DEFAULTS);
   const editorLabel = isHome
     ? "Edit the client homepage layout directly. Click text in the page to change it."
     : isProHome
       ? "Edit the professional homepage layout directly. Click text in the page to change it. Job cards are live database data and cannot be edited."
       : isServices
         ? "Edit the services page header text. Job cards are live database data and cannot be edited."
-        : "Edit the actual website page directly. Click highlighted text to change it, then upload your changes.";
+        : isHtmlEditable
+          ? "Edit this page's HTML directly, then save a draft or publish it live."
+          : "This page uses live application features and isn't editable as raw HTML.";
+
+  const pageGroups = groupPages(pages);
+  const SelectedIcon = selected ? (PAGE_ICONS[selected.slug] ?? Info) : Info;
 
   return (
     <div className="space-y-6">
-      <div className="sticky top-0 z-20 -mx-5 border-b border-white/10 bg-[#0b1020]/95 px-5 py-4 shadow-xl backdrop-blur sm:-mx-8 sm:px-8">
+      <div className="sticky top-0 z-20 -mx-5 border-b border-white/10 bg-[#0b1020]/95 px-5 py-5 shadow-xl backdrop-blur sm:-mx-8 sm:px-8">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-          <div className="min-w-0">
-            <p className="text-xs font-bold uppercase tracking-[.2em] text-indigo-400">
-              Admin module
-            </p>
-            <div className="mt-2 flex items-center gap-3">
-              <h1 className="font-display text-2xl font-bold sm:text-3xl">Website CMS</h1>
-              {selected && (
-                <span className="rounded-full bg-white/10 px-2.5 py-1 text-xs text-slate-300">
-                  Editing: {selected.title}
-                </span>
-              )}
+          <div className="flex min-w-0 items-start gap-4">
+            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-lg shadow-indigo-500/20">
+              <SelectedIcon className="h-5 w-5 text-white" />
             </div>
-            <p className="mt-2 max-w-3xl text-sm text-slate-400">{editorLabel}</p>
+            <div className="min-w-0">
+              <p className="text-xs font-bold uppercase tracking-[.2em] text-indigo-400">
+                Website CMS
+              </p>
+              <h1 className="mt-0.5 truncate font-display text-2xl font-bold sm:text-3xl">
+                {selected ? selected.title : "Choose a page"}
+              </h1>
+              <p className="mt-1.5 max-w-2xl text-sm text-slate-400">{editorLabel}</p>
+            </div>
           </div>
           {selected && (
             <div className="flex flex-wrap items-center gap-2">
               <span
-                className={`rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide ${
+                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide ${
                   status === "PUBLISHED"
                     ? "bg-emerald-500/15 text-emerald-300"
                     : "bg-amber-500/15 text-amber-300"
                 }`}
               >
+                <span
+                  className={`h-1.5 w-1.5 rounded-full ${status === "PUBLISHED" ? "bg-emerald-400" : "bg-amber-400"}`}
+                />
                 {status}
               </span>
               <Button
@@ -167,9 +230,8 @@ export default function CmsPage() {
               </Button>
               <Button
                 size="sm"
-                variant="outline"
                 onClick={() => void publish()}
-                className="border-white/15 bg-transparent text-white hover:bg-white/10 hover:text-white"
+                className="bg-indigo-500 text-white hover:bg-indigo-400"
               >
                 {status === "PUBLISHED" ? "Move to draft" : "Publish page"}
               </Button>
@@ -178,22 +240,55 @@ export default function CmsPage() {
           )}
         </div>
       </div>
-      <div className="mt-8 grid gap-6 lg:grid-cols-[260px_1fr]">
-        <aside className="rounded-2xl border border-white/10 bg-white/[.035] p-3">
-          <p className="px-3 py-2 text-xs font-bold uppercase tracking-wide text-slate-400">
-            Website pages
-          </p>
-          {pages.map((page) => (
-            <button
-              key={page.id}
-              onClick={() => pick(page)}
-              className={`w-full rounded-xl px-3 py-3 text-left ${selected?.id === page.id ? "bg-indigo-500 text-white" : "text-slate-300 hover:bg-white/5"}`}
-            >
-              <p className="truncate text-sm font-semibold">{page.title}</p>
-              <p className="mt-1 text-xs opacity-70">
-                /{page.slug} · {page.status}
+      <div className="mt-8 grid gap-6 lg:grid-cols-[280px_1fr]">
+        <aside className="h-fit space-y-5 rounded-2xl border border-white/10 bg-white/[.035] p-3">
+          {pageGroups.map((group) => (
+            <div key={group.label}>
+              <p className="px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-slate-500">
+                {group.label}
               </p>
-            </button>
+              <div className="space-y-1">
+                {group.pages.map((page) => {
+                  const Icon = PAGE_ICONS[page.slug] ?? Info;
+                  const active = selected?.id === page.id;
+                  return (
+                    <button
+                      key={page.id}
+                      onClick={() => pick(page)}
+                      className={`group relative flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition ${
+                        active ? "bg-indigo-500/15 text-white" : "text-slate-300 hover:bg-white/5"
+                      }`}
+                    >
+                      <span
+                        className={`absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full transition ${
+                          active ? "bg-indigo-400" : "bg-transparent"
+                        }`}
+                      />
+                      <span
+                        className={`grid h-8 w-8 shrink-0 place-items-center rounded-lg ${
+                          active
+                            ? "bg-indigo-500 text-white"
+                            : "bg-white/5 text-slate-400 group-hover:text-slate-200"
+                        }`}
+                      >
+                        <Icon className="h-4 w-4" />
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-sm font-semibold">{page.title}</span>
+                        <span className="mt-0.5 flex items-center gap-1.5 text-xs opacity-70">
+                          <span
+                            className={`h-1.5 w-1.5 rounded-full ${
+                              page.status === "PUBLISHED" ? "bg-emerald-400" : "bg-amber-400"
+                            }`}
+                          />
+                          /{page.slug || "home"}
+                        </span>
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           ))}
         </aside>
         <div>
@@ -217,10 +312,7 @@ export default function CmsPage() {
                   </a>
                   <button
                     type="button"
-                    onClick={() => {
-                      setEditorTab("canvas");
-                      setEditorOpen(true);
-                    }}
+                    onClick={() => setEditorOpen(true)}
                     className="inline-flex h-9 items-center gap-2 rounded-lg bg-indigo-500 px-3 text-xs font-bold text-white transition hover:bg-indigo-400"
                   >
                     <Pencil className="h-4 w-4" /> Edit page
@@ -228,8 +320,16 @@ export default function CmsPage() {
                 </div>
               )}
             </div>
+            <div className="flex items-center gap-2 border-b border-white/5 bg-[#0b1020] px-4 py-2.5">
+              <span className="h-2.5 w-2.5 rounded-full bg-red-500/70" />
+              <span className="h-2.5 w-2.5 rounded-full bg-amber-500/70" />
+              <span className="h-2.5 w-2.5 rounded-full bg-emerald-500/70" />
+              <span className="ml-3 truncate rounded-md bg-white/5 px-3 py-1 text-xs text-slate-400">
+                klick-pro.com{url}
+              </span>
+            </div>
             <iframe
-              className="h-[calc(100vh-285px)] min-h-[620px] w-full bg-white"
+              className="h-[calc(100vh-330px)] min-h-[560px] w-full bg-white"
               src={selected ? previewUrl : "about:blank"}
               title="Website page preview"
             />
@@ -278,33 +378,10 @@ export default function CmsPage() {
               </div>
               <div id="cms-editor-message" className="absolute left-28 top-1/2 -translate-y-1/2" />
               <div id="cms-editor-actions" className="ml-auto mr-3" />
-              <div className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-1 rounded-xl border border-white/10 bg-black/10 p-1 md:flex">
-                <button
-                  type="button"
-                  onClick={() => setEditorTab("canvas")}
-                  className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold transition ${
-                    editorTab === "canvas"
-                      ? "bg-indigo-500 text-white shadow-lg"
-                      : "text-slate-400 hover:bg-white/5 hover:text-white"
-                  }`}
-                >
-                  <Pencil className="h-3.5 w-3.5" /> Page editor
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setBlocksOpen(true)}
-                  className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold text-slate-400 transition hover:bg-white/5 hover:text-white"
-                >
-                  <Blocks className="h-3.5 w-3.5" /> Content blocks
-                </button>
-              </div>
               <button
                 type="button"
                 className="rounded-lg p-2 text-slate-300 transition hover:bg-white/10 hover:text-white"
-                onClick={() => {
-                  setEditorOpen(false);
-                  setBlocksOpen(false);
-                }}
+                onClick={() => setEditorOpen(false)}
                 aria-label="Close editor"
               >
                 <X className="h-5 w-5" />
@@ -321,43 +398,28 @@ export default function CmsPage() {
                   actionsTargetId="cms-editor-actions"
                   messageTargetId="cms-editor-message"
                 />
-              ) : (
-                <VisualPageEditor
+              ) : isHtmlEditable ? (
+                <CmsHtmlEditor
+                  slug={selected.slug}
                   path={url}
-                  title={selected.title}
+                  title={title}
+                  onTitleChange={setTitle}
+                  content={content}
+                  onContentChange={setContent}
+                  onSave={() => void savePage()}
+                  onPublish={() => void publish()}
+                  saving={saving}
+                  status={status}
                   actionsTargetId="cms-editor-actions"
                   messageTargetId="cms-editor-message"
+                  message={message}
                 />
+              ) : (
+                <div className="flex h-full items-center justify-center px-6 text-center text-sm text-slate-400">
+                  This page uses live application features (a working form or database-backed
+                  content) and can&rsquo;t be edited as raw HTML here.
+                </div>
               )}
-            </div>
-          </div>
-        </div>
-      )}
-      {blocksOpen && selected && (
-        <div className="fixed inset-0 z-50 bg-[#060913]/90 p-0 backdrop-blur-sm sm:p-4">
-          <div className="mx-auto flex h-full max-w-6xl flex-col overflow-hidden rounded-none border border-white/10 bg-[#11182b] shadow-2xl sm:rounded-2xl">
-            <header className="flex items-center justify-between border-b border-white/10 px-5 py-4 text-white">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-[.18em] text-indigo-300">
-                  Content blocks
-                </p>
-                <h2 className="mt-1 text-lg font-bold">Build page sections</h2>
-              </div>
-              <button
-                type="button"
-                className="rounded-lg p-2 text-slate-300 transition hover:bg-white/10 hover:text-white"
-                onClick={() => setBlocksOpen(false)}
-                aria-label="Close content blocks"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </header>
-            <div className="min-h-0 flex-1 overflow-auto p-4 sm:p-6">
-              <CmsBlockBuilder
-                key={selected.id}
-                page={selected}
-                onSaved={(sections) => updatePageSections(selected.id, sections)}
-              />
             </div>
           </div>
         </div>

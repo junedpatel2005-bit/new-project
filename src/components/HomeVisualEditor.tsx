@@ -59,6 +59,32 @@ const servicesDefaults = {
   description: "Explore open work posted by clients and find the right service category for you.",
 };
 
+const featureIds = [
+  "feature-1",
+  "feature-2",
+  "feature-3",
+  "feature-4",
+  "feature-5",
+  "feature-6",
+];
+
+function parseFeatureOrder(raw: string | undefined): string[] {
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw) as unknown;
+      if (
+        Array.isArray(parsed) &&
+        parsed.length === featureIds.length &&
+        featureIds.every((id) => parsed.includes(id))
+      )
+        return parsed as string[];
+    } catch {
+      // Fall through to the default order below.
+    }
+  }
+  return featureIds;
+}
+
 export function HomeVisualEditor({
   path = "/",
   actionsTargetId,
@@ -70,12 +96,25 @@ export function HomeVisualEditor({
 }) {
   const isProHome = path === "/professional-home";
   const isServices = path === "/services";
+  const showFeatureReorder = !isProHome && !isServices;
   const defaults = isProHome
     ? professionalDefaults
     : isServices
       ? servicesDefaults
       : clientDefaults;
-  const [text, setText] = useState(defaults);
+  const [text, setText] = useState<Record<string, string>>(defaults);
+  const [draggingFeatureId, setDraggingFeatureId] = useState<string | null>(null);
+  const featureOrder = parseFeatureOrder(text.__feature_order__);
+  const moveFeature = (targetId: string) => {
+    if (!draggingFeatureId || draggingFeatureId === targetId) return;
+    const next = [...featureOrder];
+    const from = next.indexOf(draggingFeatureId);
+    const to = next.indexOf(targetId);
+    if (from === -1 || to === -1) return;
+    next.splice(from, 1);
+    next.splice(to, 0, draggingFeatureId);
+    setText((current) => ({ ...current, __feature_order__: JSON.stringify(next) }));
+  };
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [previewVersion, setPreviewVersion] = useState(0);
@@ -242,6 +281,31 @@ export function HomeVisualEditor({
             </Button>
           </div>
         </div>
+        {showFeatureReorder && (
+          <div className="border-b border-white/10 px-4 py-3">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+              Reorder &ldquo;Why Choose Us&rdquo; boxes — drag to change position, then click
+              Refresh canvas
+            </p>
+            <ul className="flex flex-wrap gap-2">
+              {featureOrder.map((id) => (
+                <li
+                  key={id}
+                  draggable
+                  onDragStart={() => setDraggingFeatureId(id)}
+                  onDragOver={(event) => event.preventDefault()}
+                  onDrop={() => moveFeature(id)}
+                  onDragEnd={() => setDraggingFeatureId(null)}
+                  className={`cursor-grab select-none rounded-lg border border-white/15 bg-[#0b1020] px-3 py-2 text-xs font-semibold text-slate-200 transition-opacity active:cursor-grabbing ${
+                    draggingFeatureId === id ? "opacity-40" : ""
+                  }`}
+                >
+                  {text[`${id}-title`] || defaults[`${id}-title` as keyof typeof defaults]}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
         <iframe
           key={previewVersion}
           className="h-[calc(100vh-160px)] min-h-[760px] w-full bg-white"

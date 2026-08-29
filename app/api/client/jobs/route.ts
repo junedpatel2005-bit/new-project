@@ -3,7 +3,6 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { sessionCookie, verifySession } from "@/lib/auth";
 import { notifyAdminsOfNewJob, notifyProfessionalsOfNewJob } from "@/lib/marketplace-notifications";
-import { enqueueBackgroundJob } from "@/lib/background-jobs";
 
 const jobInput = z.object({
   title: z.string().trim().max(160).optional().or(z.literal("")),
@@ -157,14 +156,7 @@ export async function POST(request: NextRequest) {
     },
   });
   if (job.status === "OPEN") {
-    enqueueBackgroundJob(
-      "job.posted.notifications",
-      () =>
-        Promise.all([notifyProfessionalsOfNewJob(job), notifyAdminsOfNewJob(job)]).then(
-          () => undefined,
-        ),
-      { jobId: job.id },
-    );
+    await Promise.all([notifyProfessionalsOfNewJob(job), notifyAdminsOfNewJob(job)]);
   }
   return NextResponse.json({ job }, { status: 201 });
 }
