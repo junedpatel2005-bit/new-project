@@ -26,6 +26,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import type { CmsCard, CmsContent } from "@/lib/cms-file";
 import Landing from "@/routes/index";
+import ProfessionalHome from "@/routes/professional-home";
 import type { HomeContent, HomeFeature } from "@/lib/home-cms-file";
 import MarketingVisualPage from "@/components/MarketingVisualPage";
 import {
@@ -616,16 +617,20 @@ function MarketingCmsEditor({
       )}
       <div className="overflow-hidden rounded-2xl bg-background text-foreground shadow-xl ring-1 ring-border">
         <SiteHeader preview onNavigate={switchPage} />
-        <MarketingVisualPage
-          page={page}
-          content={content}
-          cmsMode
-          selectedId={selectedId}
-          onSelect={setSelectedId}
-          onChange={update}
-          onDelete={deleteItem}
-          onDuplicate={duplicateItem}
-        />
+        {page === "professional-home" ? (
+          <ProfessionalHome cmsMode cmsContent={content} onCmsChange={update} />
+        ) : (
+          <MarketingVisualPage
+            page={page}
+            content={content}
+            cmsMode
+            selectedId={selectedId}
+            onSelect={setSelectedId}
+            onChange={update}
+            onDelete={deleteItem}
+            onDuplicate={duplicateItem}
+          />
+        )}
         <SiteFooter />
       </div>
     </div>

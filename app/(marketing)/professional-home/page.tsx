@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { sessionCookie, verifySession } from "@/lib/auth";
 import ProfessionalHome from "@/routes/professional-home";
+import { readMarketingContent } from "@/lib/marketing-cms";
 
 export default async function ProfessionalHomePage() {
   const token = (await cookies()).get(sessionCookie)?.value;
@@ -35,5 +36,5 @@ export default async function ProfessionalHomePage() {
     redirect("/professional/setup?profileSetup=1");
   }
 
-  return <ProfessionalHome />;
+  return <ProfessionalHome cmsContent={await readMarketingContent("professional-home")} />;
 }
