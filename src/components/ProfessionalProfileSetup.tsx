@@ -257,9 +257,7 @@ export function ProfessionalProfileSetup() {
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Logo />
           <Link
-            href={
-              isEdit ? "/professional-profile" : "/login?next=/professional/setup&profileSetup=1"
-            }
+            href={isEdit ? "/professional-profile" : "/professional/dashboard"}
             className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" />

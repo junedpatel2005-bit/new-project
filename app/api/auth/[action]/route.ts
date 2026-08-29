@@ -778,7 +778,7 @@ export async function POST(
         success: true,
         redirect:
           user.role === "CLIENT"
-            ? "/client-profile"
+            ? "/client-profile?profileSetup=1"
             : user.professionalCategory &&
                 user.professionalLatitude !== null &&
                 user.professionalLongitude !== null

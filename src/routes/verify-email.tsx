@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { AlertCircle } from "lucide-react";
 import { AuthLayout } from "@/components/AuthLayout";
 import { Button } from "@/components/ui/button";
 
 function VerifyEmailContent() {
+  const router = useRouter();
   const params = useSearchParams();
   const [status, setStatus] = useState<"verifying" | "success" | "error">("verifying");
   const [error, setError] = useState<string | null>(null);
@@ -41,14 +42,30 @@ function VerifyEmailContent() {
           return;
         }
         setStatus("success");
+        router.replace(result.redirect ?? "/login");
       })
       .catch(() => {
         setStatus("error");
         setError("Unable to verify your email. Please try again.");
       });
-  }, [params]);
+  }, [params, router]);
 
-  if (status === "success") return null;
+  if (status === "success") {
+    return (
+      <AuthLayout
+        title="Email confirmed"
+        subtitle="Your email address has been verified successfully."
+        hideAside
+        footer={
+          <Link href="/login" className="text-primary hover:underline">
+            Continue to log in
+          </Link>
+        }
+      >
+        <p className="text-sm text-muted-foreground">Redirecting you to your account…</p>
+      </AuthLayout>
+    );
+  }
 
   return (
     <AuthLayout

@@ -2,7 +2,6 @@
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   AlertDialog,
@@ -159,7 +158,6 @@ export function ClientProfilePage() {
       const result = (await response.json()) as { error?: string };
       if (!response.ok) throw new Error(result.error ?? "Unable to save your location.");
       setMessage("Your current location was saved automatically.");
-      await load();
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Unable to save your location.");
     }
@@ -347,12 +345,6 @@ export function ClientProfilePage() {
           </Button>
           <Button type="button" variant="outline" onClick={() => router.push("/dashboard")}>
             Skip for now
-          </Button>
-          <Button type="button" variant="ghost" asChild>
-            <Link href="/">Go to Home</Link>
-          </Button>
-          <Button type="button" variant="ghost" asChild>
-            <Link href="/dashboard">Go to dashboard</Link>
           </Button>
         </div>
       </form>
