@@ -37,7 +37,11 @@ export default function ProfessionalLocationMap({
           zoomControl: false,
         }}
       >
-        <Circle center={center} radius={1200} options={{ strokeColor: "#2563eb", fillOpacity: 0.12 }} />
+        <Circle
+          center={center}
+          radius={1200}
+          options={{ strokeColor: "#2563eb", fillOpacity: 0.12 }}
+        />
         <Marker position={center} />
       </GoogleMap>
     </div>

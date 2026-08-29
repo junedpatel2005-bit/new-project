@@ -225,9 +225,7 @@ export default function JobDetails() {
   const [hireCoverLetter, setHireCoverLetter] = useState("");
   const [hireBusy, setHireBusy] = useState(false);
   const [hireMessage, setHireMessage] = useState<string | null>(null);
-  const [hireMessageStatus, setHireMessageStatus] = useState<"idle" | "error" | "success">(
-    "idle",
-  );
+  const [hireMessageStatus, setHireMessageStatus] = useState<"idle" | "error" | "success">("idle");
   const [viewerRole, setViewerRole] = useState<"CLIENT" | "PROFESSIONAL" | null>(null);
   const [ownProposal, setOwnProposal] = useState<{
     id: number;
@@ -1121,7 +1119,8 @@ export default function JobDetails() {
                     <div className="mt-3 rounded-lg border border-border bg-background p-3">
                       <p className="text-xs text-muted-foreground">Your previous proposal</p>
                       <p className="mt-1 font-semibold">
-                        ₹{ownProposal.previousBidAmount.toLocaleString()} · {ownProposal.previousDuration}
+                        ₹{ownProposal.previousBidAmount.toLocaleString()} ·{" "}
+                        {ownProposal.previousDuration}
                       </p>
                       {ownProposal.previousMessage && (
                         <p className="mt-1 text-sm text-muted-foreground">
@@ -1669,7 +1668,8 @@ export default function JobDetails() {
           <DialogHeader>
             <DialogTitle>Hire {hireTarget?.name ?? "professional"}</DialogTitle>
             <DialogDescription>
-              Send a hire request for {job?.title ?? "this job"}. The professional can accept, decline, or counter.
+              Send a hire request for {job?.title ?? "this job"}. The professional can accept,
+              decline, or counter.
             </DialogDescription>
           </DialogHeader>
           <div className="mt-2 grid gap-3 [&_input]:rounded-md [&_input]:border [&_input]:bg-background [&_input]:px-3 [&_input]:py-2 [&_textarea]:rounded-md [&_textarea]:border [&_textarea]:bg-background [&_textarea]:px-3 [&_textarea]:py-2">

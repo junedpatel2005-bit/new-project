@@ -1,12 +1,21 @@
-import { CmsHtmlPage } from "@/components/CmsHtmlPage";
-import { PRIVACY_DEFAULT_HTML } from "@/lib/cms-page-defaults";
+import { LegalPage } from "@/components/LegalPage";
 
-export default async function PrivacyPolicyPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ cmsPreview?: string }>;
-}) {
+export default function PrivacyPolicyPage() {
   return (
-    <CmsHtmlPage slug="privacy-policy" searchParams={searchParams} defaultHtml={PRIVACY_DEFAULT_HTML} />
+    <LegalPage
+      eyebrow="Legal"
+      title="Privacy Policy"
+      description="How Klick-Pro handles your account and marketplace information."
+      sections={[
+        {
+          title: "Information we use",
+          body: "We use account, profile, job, proposal, project, and payment information only to operate and improve the Klick-Pro marketplace.",
+        },
+        {
+          title: "Your choices",
+          body: "You can update your profile details and contact information from your account settings. We protect personal data using reasonable security measures.",
+        },
+      ]}
+    />
   );
 }

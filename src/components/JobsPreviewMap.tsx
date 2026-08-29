@@ -78,7 +78,10 @@ export default function JobsPreviewMap({
         }}
       >
         {points.map((point, index) => (
-          <Marker key={`${point[0]}-${point[1]}-${index}`} position={{ lat: point[0], lng: point[1] }} />
+          <Marker
+            key={`${point[0]}-${point[1]}-${index}`}
+            position={{ lat: point[0], lng: point[1] }}
+          />
         ))}
       </GoogleMap>
     </div>

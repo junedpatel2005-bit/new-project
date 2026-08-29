@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "../src/styles.css";
 import "react-loading-skeleton/dist/skeleton.css";
 import { Providers } from "@/components/providers";
-import { CmsLiveEditor } from "@/components/CmsLiveEditor";
 
 export const metadata: Metadata = {
   title: { default: "Klick-Pro — Hire trusted professionals near you", template: "%s | Klick-Pro" },
@@ -13,10 +12,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <body>
-        <Providers>
-          <CmsLiveEditor />
-          {children}
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

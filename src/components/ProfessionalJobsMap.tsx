@@ -1,7 +1,7 @@
 "use client";
 
 import { GoogleMap, InfoWindow, Marker } from "@react-google-maps/api";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { MapPin, Star } from "lucide-react";
 import { useGoogleMaps } from "@/components/GoogleMapsProvider";
 
@@ -40,14 +40,14 @@ export default function ProfessionalJobsMap({
   onSelectJob: (id: number) => void;
 }) {
   const { isLoaded, isConfigured } = useGoogleMaps();
-  const mapCenter = { lat: center[0], lng: center[1] };
+  const mapCenter = useMemo(() => ({ lat: center[0], lng: center[1] }), [center[0], center[1]]);
   const [activeJobId, setActiveJobId] = useState<number | null>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
   const activeJob = jobs.find((job) => job.id === activeJobId) ?? null;
 
   useEffect(() => {
     if (mapRef.current) mapRef.current.setCenter(mapCenter);
-  }, [mapCenter.lat, mapCenter.lng]);
+  }, [mapCenter]);
 
   if (!isConfigured) {
     return (

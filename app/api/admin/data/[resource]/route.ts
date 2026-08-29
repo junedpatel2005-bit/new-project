@@ -3,21 +3,6 @@ import { db } from "@/lib/db";
 import { ensureWallet } from "@/lib/wallet-ledger";
 import { sessionCookie, verifySession } from "@/lib/auth";
 
-const publicPages = [
-  { title: "Home", slug: "", pageKey: "home" },
-  { title: "Home (Professional)", slug: "professional-home", pageKey: "professional-home" },
-  { title: "About", slug: "about", pageKey: "about" },
-  { title: "How It Works", slug: "how-it-works", pageKey: "how-it-works" },
-  { title: "Services", slug: "services", pageKey: "services" },
-  { title: "For Clients", slug: "for-clients", pageKey: "for-clients" },
-  { title: "For Professionals", slug: "for-professionals", pageKey: "for-professionals" },
-  { title: "Pricing", slug: "pricing", pageKey: "pricing" },
-  { title: "FAQ", slug: "faq", pageKey: "faq" },
-  { title: "Contact", slug: "contact", pageKey: "contact" },
-  { title: "Terms & Conditions", slug: "terms", pageKey: "terms" },
-  { title: "Privacy Policy", slug: "privacy-policy", pageKey: "privacy-policy" },
-];
-
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ resource: string }> },
@@ -261,22 +246,6 @@ export async function GET(
         : null,
       platformWalletTransactions,
       names,
-    });
-  }
-  if (resource === "cms") {
-    const now = new Date();
-    const pages = await Promise.all(
-      publicPages.map((page) =>
-        db.cmsPage.upsert({
-          where: { slug: page.slug },
-          create: { ...page, content: "", status: "PUBLISHED", createdAt: now, updatedAt: now },
-          update: { title: page.title, pageKey: page.pageKey },
-        }),
-      ),
-    );
-    return NextResponse.json({
-      pages,
-      faqs: await db.faq.findMany({ orderBy: { displayOrder: "asc" }, take: 100 }),
     });
   }
   if (resource === "support") {

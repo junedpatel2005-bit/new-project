@@ -326,9 +326,9 @@ export function InvoiceDocument({
         <View style={styles.noteBlock}>
           <Text style={styles.noteTitle}>Note</Text>
           <Text style={styles.noteText}>
-            This invoice reflects a milestone payment processed through the Klick-Pro
-            marketplace. The net payable amount is the sum released to the professional after
-            deducting the platform commission from the gross amount collected from the client.
+            This invoice reflects a milestone payment processed through the Klick-Pro marketplace.
+            The net payable amount is the sum released to the professional after deducting the
+            platform commission from the gross amount collected from the client.
           </Text>
         </View>
 

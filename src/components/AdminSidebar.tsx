@@ -28,9 +28,9 @@ const links = [
   { href: "/admin/finance", label: "Finance & payouts", icon: CircleDollarSign },
   { href: "/admin/reports", label: "Reports", icon: FileBarChart },
   { href: "/admin/support", label: "Support", icon: FileText },
+  { href: "/admin/cms", label: "Website content", icon: FileText },
   { href: "/admin/notifications", label: "Notifications", icon: Bell, badge: "notifications" },
   { href: "/admin/messages", label: "Messages", icon: MessageSquare, badge: "messages" },
-  { href: "/admin/cms", label: "CMS", icon: FileText },
 ];
 
 export function AdminSidebar() {

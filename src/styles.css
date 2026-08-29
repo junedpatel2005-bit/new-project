@@ -7,6 +7,71 @@
   width: 100%;
 }
 
+.cms-input {
+  width: 100%;
+  border: 1px solid rgb(255 255 255 / 15%);
+  border-radius: 0.75rem;
+  background: rgb(255 255 255 / 6%);
+  padding: 0.7rem 0.8rem;
+  color: white;
+  outline: none;
+}
+
+.cms-input:focus {
+  border-color: rgb(129 140 248 / 80%);
+  box-shadow: 0 0 0 2px rgb(99 102 241 / 20%);
+}
+
+.cms-editor .ck-editor__editable_inline {
+  min-height: 400px;
+}
+
+.cms-public-content h2,
+.cms-public-content h3,
+.cms-public-content h4 {
+  margin-top: 1.25rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+
+.cms-public-content h2 {
+  font-size: 1.75rem;
+}
+.cms-public-content h3 {
+  font-size: 1.35rem;
+}
+.cms-public-content p {
+  margin-top: 0.75rem;
+}
+.cms-public-content ul {
+  list-style: disc;
+  margin: 0.75rem 0 0 1.5rem;
+}
+.cms-public-content ol {
+  list-style: decimal;
+  margin: 0.75rem 0 0 1.5rem;
+}
+.cms-public-content blockquote {
+  border-left: 3px solid hsl(var(--primary));
+  margin: 1rem 0;
+  padding-left: 1rem;
+}
+.cms-public-content a {
+  color: hsl(var(--primary));
+  text-decoration: underline;
+}
+.cms-public-content table {
+  border-collapse: collapse;
+  margin-top: 1rem;
+  width: 100%;
+}
+.cms-public-content th,
+.cms-public-content td {
+  border: 1px solid hsl(var(--border));
+  padding: 0.5rem;
+  text-align: left;
+}
+
 .cms-editor .ck.ck-toolbar {
   display: flex !important;
   visibility: visible !important;

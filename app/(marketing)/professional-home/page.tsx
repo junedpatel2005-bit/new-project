@@ -4,13 +4,7 @@ import { db } from "@/lib/db";
 import { sessionCookie, verifySession } from "@/lib/auth";
 import ProfessionalHome from "@/routes/professional-home";
 
-type ProfessionalHomePageProps = {
-  searchParams: Promise<{ cmsPreview?: string; cmsEdit?: string }>;
-};
-
-export default async function ProfessionalHomePage({ searchParams }: ProfessionalHomePageProps) {
-  const params = await searchParams;
-  const cmsAdminPreview = params.cmsPreview === "1";
+export default async function ProfessionalHomePage() {
   const token = (await cookies()).get(sessionCookie)?.value;
   if (!token) redirect("/login");
 
@@ -20,10 +14,7 @@ export default async function ProfessionalHomePage({ searchParams }: Professiona
   } catch {
     redirect("/login");
   }
-  if (session.role !== "PROFESSIONAL" && !(session.role === "ADMIN" && cmsAdminPreview))
-    redirect("/login");
-
-  if (session.role === "ADMIN" && cmsAdminPreview) return <ProfessionalHome />;
+  if (session.role !== "PROFESSIONAL") redirect("/login");
 
   const user = await db.user.findUnique({
     where: { id: session.userId },

@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { sessionCookie, verifySession } from "@/lib/auth";
 import Landing from "@/routes/index";
+import { readHomeContent } from "@/lib/home-cms-file";
 
 export default async function HomePage() {
   const token = (await cookies()).get(sessionCookie)?.value;
@@ -17,5 +18,5 @@ export default async function HomePage() {
     }
     if (role === "PROFESSIONAL") redirect("/professional-home");
   }
-  return <Landing isAuthenticated={isAuthenticated} />;
+  return <Landing isAuthenticated={isAuthenticated} homeContent={await readHomeContent()} />;
 }

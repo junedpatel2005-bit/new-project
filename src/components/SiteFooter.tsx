@@ -1,12 +1,10 @@
 import Link from "next/link";
 import { Logo } from "./Logo";
 import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
-import { PublicCmsBlocks } from "./PublicCmsBlocks";
 
 export function SiteFooter() {
   return (
     <>
-      <PublicCmsBlocks />
       <footer className="border-t border-border bg-ink text-ink-foreground">
         <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 md:grid-cols-5 lg:px-8">
           <div className="md:col-span-2">

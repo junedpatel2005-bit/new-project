@@ -96,7 +96,11 @@ export default function ProfessionalDiscoveryMap({
   );
 }
 
-function ProfessionalTooltipContent({ professional }: { professional: ProfessionalDiscoveryResult }) {
+function ProfessionalTooltipContent({
+  professional,
+}: {
+  professional: ProfessionalDiscoveryResult;
+}) {
   const router = useRouter();
   const goToProfile = () => router.push(`/pro/${professional.id}`);
   return (
@@ -143,8 +147,12 @@ function findProAtPoint(
   const closest = professionals
     .map((professional) => ({ professional, point: professional.displayPoint }))
     .filter(
-      (entry): entry is { professional: ProfessionalDiscoveryResult; point: { lat: number; lng: number } } =>
-        entry.point !== undefined,
+      (
+        entry,
+      ): entry is {
+        professional: ProfessionalDiscoveryResult;
+        point: { lat: number; lng: number };
+      } => entry.point !== undefined,
     )
     .reduce<{ id: string; distance: number } | null>((acc, entry) => {
       const distance = haversine(entry.point, point);
@@ -161,7 +169,6 @@ function haversine(a: { lat: number; lng: number }, b: { lat: number; lng: numbe
   const dLng = toRad(b.lng - a.lng);
   const lat1 = toRad(a.lat);
   const lat2 = toRad(b.lat);
-  const x =
-    Math.sin(dLat / 2) ** 2 + Math.sin(dLng / 2) ** 2 * Math.cos(lat1) * Math.cos(lat2);
+  const x = Math.sin(dLat / 2) ** 2 + Math.sin(dLng / 2) ** 2 * Math.cos(lat1) * Math.cos(lat2);
   return 2 * R * Math.asin(Math.sqrt(x));
 }

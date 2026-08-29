@@ -67,10 +67,17 @@ async function projectEmailDetails(projectId: number) {
       select: { bidAmount: true, duration: true },
     }),
   ]);
-  const date = (value: Date | null | undefined) => value?.toLocaleDateString("en-IN") ?? "Not specified";
+  const date = (value: Date | null | undefined) =>
+    value?.toLocaleDateString("en-IN") ?? "Not specified";
   return [
     { label: "Project", value: job?.title?.trim() || `Project #${projectId}` },
-    { label: "Project amount", value: request?.bidAmount == null ? "Not specified" : `₹${request.bidAmount.toLocaleString("en-IN")}` },
+    {
+      label: "Project amount",
+      value:
+        request?.bidAmount == null
+          ? "Not specified"
+          : `₹${request.bidAmount.toLocaleString("en-IN")}`,
+    },
     { label: "Project timeline", value: request?.duration?.trim() || "Not specified" },
     { label: "Status", value: project.status.replaceAll("_", " ") },
     { label: "Progress", value: `${project.progress}%` },
@@ -170,14 +177,18 @@ function newJobEmailDetails(job: {
 }) {
   const title = job.title?.trim() || "A new client job";
   const formatDate = (date: Date | null) => date?.toLocaleDateString("en-IN") ?? "Not specified";
-  const budget = job.timingType === "HOURLY"
-    ? (job.hourlyRate == null ? "Not specified" : `₹${job.hourlyRate.toLocaleString("en-IN")} per hour`)
-    : job.budgetMin != null && job.budgetMax != null
-      ? `₹${job.budgetMin.toLocaleString("en-IN")} – ₹${job.budgetMax.toLocaleString("en-IN")}`
-      : "Not specified";
-  const location = job.workMode === "REMOTE"
-    ? "Remote"
-    : [job.locationLabel, job.locationAddress].filter(Boolean).join(" · ") || "Not specified";
+  const budget =
+    job.timingType === "HOURLY"
+      ? job.hourlyRate == null
+        ? "Not specified"
+        : `₹${job.hourlyRate.toLocaleString("en-IN")} per hour`
+      : job.budgetMin != null && job.budgetMax != null
+        ? `₹${job.budgetMin.toLocaleString("en-IN")} – ₹${job.budgetMax.toLocaleString("en-IN")}`
+        : "Not specified";
+  const location =
+    job.workMode === "REMOTE"
+      ? "Remote"
+      : [job.locationLabel, job.locationAddress].filter(Boolean).join(" · ") || "Not specified";
   return [
     { label: "Job title", value: title },
     { label: "Category", value: job.category?.trim() || "Not specified" },

@@ -161,15 +161,16 @@ export async function POST(request: NextRequest) {
             ? [
                 {
                   label: "Milestone",
-                  value:
-                    (await db.projectMilestone.findUnique({
+                  value: await db.projectMilestone
+                    .findUnique({
                       where: { id: fields.milestoneId },
                       select: { title: true, amount: true, dueDate: true },
-                    }).then((milestone) =>
+                    })
+                    .then((milestone) =>
                       milestone
                         ? `${milestone.title} · ₹${milestone.amount.toLocaleString("en-IN")}${milestone.dueDate ? ` · due ${milestone.dueDate.toLocaleDateString("en-IN")}` : ""}`
                         : `Milestone #${fields.milestoneId}`,
-                    )),
+                    ),
                 },
               ]
             : []),
@@ -216,11 +217,7 @@ export async function POST(request: NextRequest) {
         where: { id: project.id },
         data: { status: "IN_PROGRESS", startedAt: new Date() },
       });
-      await event(
-        "WORK_STARTED",
-        "Work started",
-        "The client started work on this project.",
-      );
+      await event("WORK_STARTED", "Work started", "The client started work on this project.");
     }
     if (input.action === "update-progress") {
       await db.projectTracking.update({

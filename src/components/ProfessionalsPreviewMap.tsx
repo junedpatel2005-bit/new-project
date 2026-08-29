@@ -1,7 +1,7 @@
 "use client";
 
 import { GoogleMap, Marker } from "@react-google-maps/api";
-import { useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import type { ProfessionalDiscoveryResult } from "@/lib/types/professional-discovery";
 import { useGoogleMaps } from "@/components/GoogleMapsProvider";
 

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ArrowRight, Briefcase, MapPin, Search, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { sanitizeInlineHtml } from "@/lib/sanitizeInlineHtml";
+import type { MarketingPageContent } from "@/lib/marketing-cms-shared";
 
 type HomeJob = {
   id: number;
@@ -19,37 +19,16 @@ type HomeJob = {
   clientName: string;
 };
 
-const PAGE_PATH = "/professional-home";
-
-export default function ProfessionalHome() {
+export default function ProfessionalHome({ cmsMode = false, cmsContent, onCmsChange }: { cmsMode?: boolean; cmsContent?: MarketingPageContent; onCmsChange?: (content: MarketingPageContent) => void }) {
   const [jobs, setJobs] = useState<HomeJob[]>([]);
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
-  const [pageText, setPageText] = useState<Record<string, string>>({});
-  const [cmsEdit, setCmsEdit] = useState(false);
-  const text = (key: string, fallback: string) => pageText[key] || fallback;
-  const editableText = (key: string, fallback: string) =>
-    cmsEdit ? (
-      <span
-        contentEditable
-        suppressContentEditableWarning
-        onClick={(event) => event.preventDefault()}
-        onBlur={(event) => {
-          const value = sanitizeInlineHtml(event.currentTarget.innerHTML);
-          if (!event.currentTarget.textContent?.trim()) return;
-          setPageText((current) => ({ ...current, [key]: value }));
-          window.parent.postMessage(
-            { type: "servio-cms-text", key, value },
-            window.location.origin,
-          );
-        }}
-        className="rounded outline-none ring-2 ring-indigo-400/50 focus:ring-indigo-500"
-        title="Click and type to edit"
-        dangerouslySetInnerHTML={{ __html: text(key, fallback) }}
-      />
-    ) : (
-      <span dangerouslySetInnerHTML={{ __html: text(key, fallback) }} />
-    );
+  const content = cmsContent ?? {
+    hero: { label: "Grow your professional business", title: "Find projects that match your skills", description: "Browse available projects, bid on work, and build your reputation with satisfied clients worldwide." },
+    items: [],
+  } satisfies MarketingPageContent;
+  const editHero = (field: keyof MarketingPageContent["hero"], value: string) => onCmsChange?.({ ...content, hero: { ...content.hero, [field]: value } });
+
   useEffect(() => {
     async function loadJobs() {
       try {
@@ -65,26 +44,7 @@ export default function ProfessionalHome() {
     }
     void loadJobs();
   }, []);
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const preview = params.get("cmsPreview") === "1";
-    setCmsEdit(params.get("cmsEdit") === "1");
-    if (preview) {
-      try {
-        setPageText(
-          JSON.parse(
-            window.sessionStorage.getItem(`servio-home-preview:${PAGE_PATH}`) ?? "{}",
-          ) as Record<string, string>,
-        );
-      } catch {
-        setPageText({});
-      }
-      return;
-    }
-    void fetch(`/api/v1/website/page-text?path=${PAGE_PATH}`)
-      .then((response) => (response.ok ? response.json() : null))
-      .then((result: { text?: Record<string, string> } | null) => setPageText(result?.text ?? {}));
-  }, []);
+
   return (
     <div className="min-h-screen bg-background">
       <main>
@@ -92,28 +52,25 @@ export default function ProfessionalHome() {
           <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
             <p className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground">
               <ShieldCheck className="h-3.5 w-3.5 text-success" />
-              {editableText("prof-badge", "Grow your professional business")}
+              <span contentEditable={cmsMode} suppressContentEditableWarning={cmsMode} onInput={(e) => editHero("label", e.currentTarget.textContent ?? "")}>{content.hero.label}</span>
             </p>
             <h1 className="mt-5 max-w-3xl font-display text-4xl font-bold tracking-tight sm:text-5xl">
-              {editableText("prof-heading", "Find projects that match your skills")}
+              <span contentEditable={cmsMode} suppressContentEditableWarning={cmsMode} onInput={(e) => editHero("title", e.currentTarget.textContent ?? "")}>{content.hero.title}</span>
             </h1>
             <p className="mt-5 max-w-2xl text-lg text-muted-foreground">
-              {editableText(
-                "prof-description",
-                "Browse available projects, bid on work, and build your reputation with satisfied clients worldwide.",
-              )}
+              <span contentEditable={cmsMode} suppressContentEditableWarning={cmsMode} onInput={(e) => editHero("description", e.currentTarget.textContent ?? "")}>{content.hero.description}</span>
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild size="lg">
                 <Link href="/professional/my-jobs?tab=find">
                   <Search className="mr-2 h-4 w-4" />
-                  {editableText("prof-browse", "Find Projects")}
+                  Find Projects
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline">
                 <Link href="/professional/dashboard">
                   <Briefcase className="mr-2 h-4 w-4" />
-                  {editableText("prof-dashboard", "My Dashboard")}
+                  My Dashboard
                 </Link>
               </Button>
             </div>
@@ -122,16 +79,13 @@ export default function ProfessionalHome() {
         <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
           <div className="text-center">
             <p className="text-xs font-semibold uppercase tracking-wider text-primary">
-              {editableText("prof-why-eyebrow", "Why Professionals Choose Us")}
+              Why Professionals Choose Us
             </p>
             <h2 className="mt-3 font-display text-3xl font-bold sm:text-4xl">
-              {editableText("prof-why-heading", "Everything you need to grow")}
+              Everything you need to grow
             </h2>
             <p className="mt-4 mx-auto max-w-2xl text-lg text-muted-foreground">
-              {editableText(
-                "prof-why-description",
-                "Find quality projects, get paid safely, and build a reputation clients trust.",
-              )}
+              Find quality projects, get paid safely, and build a reputation clients trust.
             </p>
           </div>
         </section>
@@ -140,17 +94,15 @@ export default function ProfessionalHome() {
             <div className="flex items-end justify-between">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-primary">
-                  {editableText("prof-featured-eyebrow", "Featured")}
+                  Featured
                 </p>
-                <h2 className="mt-2 font-display text-3xl font-bold">
-                  {editableText("prof-featured-heading", "Jobs ready for you")}
-                </h2>
+                <h2 className="mt-2 font-display text-3xl font-bold">Jobs ready for you</h2>
               </div>
               <Link
                 className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
                 href="/professional/my-jobs?tab=find"
               >
-                {editableText("prof-browse-all", "Browse all")} <ArrowRight className="h-4 w-4" />
+                Browse all <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
             {loading && (
