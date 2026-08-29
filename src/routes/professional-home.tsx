@@ -19,15 +19,31 @@ type HomeJob = {
   clientName: string;
 };
 
-export default function ProfessionalHome({ cmsMode = false, cmsContent, onCmsChange }: { cmsMode?: boolean; cmsContent?: MarketingPageContent; onCmsChange?: (content: MarketingPageContent) => void }) {
+export default function ProfessionalHome({
+  cmsMode = false,
+  cmsContent,
+  onCmsChange,
+}: {
+  cmsMode?: boolean;
+  cmsContent?: MarketingPageContent;
+  onCmsChange?: (content: MarketingPageContent) => void;
+}) {
   const [jobs, setJobs] = useState<HomeJob[]>([]);
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
-  const content = cmsContent ?? {
-    hero: { label: "Grow your professional business", title: "Find projects that match your skills", description: "Browse available projects, bid on work, and build your reputation with satisfied clients worldwide." },
-    items: [],
-  } satisfies MarketingPageContent;
-  const editHero = (field: keyof MarketingPageContent["hero"], value: string) => onCmsChange?.({ ...content, hero: { ...content.hero, [field]: value } });
+  const content =
+    cmsContent ??
+    ({
+      hero: {
+        label: "Grow your professional business",
+        title: "Find projects that match your skills",
+        description:
+          "Browse available projects, bid on work, and build your reputation with satisfied clients worldwide.",
+      },
+      items: [],
+    } satisfies MarketingPageContent);
+  const editHero = (field: keyof MarketingPageContent["hero"], value: string) =>
+    onCmsChange?.({ ...content, hero: { ...content.hero, [field]: value } });
 
   useEffect(() => {
     async function loadJobs() {
@@ -52,13 +68,31 @@ export default function ProfessionalHome({ cmsMode = false, cmsContent, onCmsCha
           <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
             <p className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground">
               <ShieldCheck className="h-3.5 w-3.5 text-success" />
-              <span contentEditable={cmsMode} suppressContentEditableWarning={cmsMode} onInput={(e) => editHero("label", e.currentTarget.textContent ?? "")}>{content.hero.label}</span>
+              <span
+                contentEditable={cmsMode}
+                suppressContentEditableWarning={cmsMode}
+                onInput={(e) => editHero("label", e.currentTarget.textContent ?? "")}
+              >
+                {content.hero.label}
+              </span>
             </p>
             <h1 className="mt-5 max-w-3xl font-display text-4xl font-bold tracking-tight sm:text-5xl">
-              <span contentEditable={cmsMode} suppressContentEditableWarning={cmsMode} onInput={(e) => editHero("title", e.currentTarget.textContent ?? "")}>{content.hero.title}</span>
+              <span
+                contentEditable={cmsMode}
+                suppressContentEditableWarning={cmsMode}
+                onInput={(e) => editHero("title", e.currentTarget.textContent ?? "")}
+              >
+                {content.hero.title}
+              </span>
             </h1>
             <p className="mt-5 max-w-2xl text-lg text-muted-foreground">
-              <span contentEditable={cmsMode} suppressContentEditableWarning={cmsMode} onInput={(e) => editHero("description", e.currentTarget.textContent ?? "")}>{content.hero.description}</span>
+              <span
+                contentEditable={cmsMode}
+                suppressContentEditableWarning={cmsMode}
+                onInput={(e) => editHero("description", e.currentTarget.textContent ?? "")}
+              >
+                {content.hero.description}
+              </span>
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild size="lg">
