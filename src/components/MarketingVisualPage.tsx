@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { arrayMove, rectSortingStrategy, SortableContext, useSortable } from "@dnd-kit/sortable";
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
@@ -11,6 +11,8 @@ import {
   Check,
   CheckCircle2,
   Clock,
+  Home,
+  LocateFixed,
   Mail,
   MapPin,
   MessageCircle,
@@ -27,6 +29,25 @@ import type {
   MarketingPageId,
   MarketingItem,
 } from "@/lib/marketing-cms-shared";
+import { getAllStates, getDistrictsByState } from "@/lib/india-locations";
+
+type ServiceJob = {
+  id: number;
+  title: string | null;
+  description: string | null;
+  category: string | null;
+  locationLabel: string | null;
+  locationAddress: string | null;
+  locationState: string | null;
+  locationDistrict: string | null;
+  budgetMin: number | null;
+  budgetMax: number | null;
+  hourlyRate: number | null;
+  timingType: string;
+  clientName: string;
+  createdAt: string;
+  clientVerified: boolean;
+};
 
 const iconMap = {
   shield: ShieldCheck,
@@ -143,6 +164,7 @@ export default function MarketingVisualPage({
             </SortableContext>
           </DndContext>
         </section>
+        {page === "services" && <ServicesJobsSection cmsMode={cmsMode} />}
         {page === "contact" ? (
           <ContactForm />
         ) : page === "pricing" ? (
@@ -158,6 +180,271 @@ export default function MarketingVisualPage({
         )}
       </main>
     </div>
+  );
+}
+
+function ServicesJobsSection({ cmsMode }: { cmsMode: boolean }) {
+  const [jobs, setJobs] = useState<ServiceJob[]>([]);
+  const [query, setQuery] = useState("");
+  const [category, setCategory] = useState("");
+  const [location, setLocation] = useState("");
+  const [state, setState] = useState("");
+  const [district, setDistrict] = useState("");
+  const [segment, setSegment] = useState("");
+  const [verifiedOnly, setVerifiedOnly] = useState(false);
+  const [loading, setLoading] = useState(!cmsMode);
+  const [isAuthenticated, setIsAuthenticated] = useState(cmsMode);
+
+  useEffect(() => {
+    if (cmsMode) return;
+    void fetch("/api/v1/auth/me", { cache: "no-store" })
+      .then((response) => (response.ok ? response.json() : { user: null }))
+      .then((data: { user?: unknown }) => setIsAuthenticated(Boolean(data.user)))
+      .catch(() => setIsAuthenticated(false));
+  }, [cmsMode]);
+
+  useEffect(() => {
+    if (cmsMode) return;
+    void fetch("/api/marketplace/jobs", { cache: "no-store" })
+      .then((response) => (response.ok ? response.json() : Promise.reject()))
+      .then((data: ServiceJob[]) => setJobs(Array.isArray(data) ? data : []))
+      .finally(() => setLoading(false));
+  }, [cmsMode]);
+
+  const categories = [...new Set(jobs.map((job) => job.category).filter(Boolean))] as string[];
+  const filteredJobs = cmsMode
+    ? []
+    : jobs.filter((job) => {
+        const searchable =
+          `${job.title ?? ""} ${job.description ?? ""} ${job.category ?? ""} ${job.locationLabel ?? ""} ${job.locationAddress ?? ""}`.toLowerCase();
+        return (
+          (!query || searchable.includes(query.toLowerCase())) &&
+          (!category || job.category === category) &&
+          (!location || searchable.includes(location.toLowerCase())) &&
+          (!state || job.locationState === state) &&
+          (!district || job.locationDistrict === district) &&
+          (!segment || (job.category ?? "").toLowerCase().includes(segment.toLowerCase())) &&
+          (!verifiedOnly || job.clientVerified)
+        );
+      });
+  const filtersEnabled = cmsMode || isAuthenticated;
+
+  return (
+    <section className="border-t border-border bg-surface">
+      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <p className="text-xs font-semibold uppercase tracking-wider text-primary">Open jobs</p>
+        <h2 className="mt-2 font-display text-3xl font-bold">Find work from clients</h2>
+        <p className="mt-3 max-w-2xl text-muted-foreground">
+          Browse open jobs posted by clients and filter them by service or location.
+        </p>
+        <div className={`mt-8 grid gap-6 ${filtersEnabled ? "lg:grid-cols-[260px_1fr]" : ""}`}>
+          {filtersEnabled && (
+            <aside className="h-fit rounded-2xl border border-border bg-card p-5 lg:sticky lg:top-20 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
+              <div className="mb-5 flex items-center justify-between">
+                <h3 className="font-semibold">Filters</h3>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setQuery("");
+                    setCategory("");
+                    setLocation("");
+                    setState("");
+                    setDistrict("");
+                    setSegment("");
+                    setVerifiedOnly(false);
+                  }}
+                  className="text-xs text-primary hover:underline"
+                >
+                  Clear all
+                </button>
+              </div>
+              <div className="space-y-6">
+                <div>
+                  <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                    State and district
+                  </p>
+                  <div className="space-y-2">
+                    <select
+                      value={state}
+                      onChange={(event) => {
+                        setState(event.target.value);
+                        setDistrict("");
+                      }}
+                      className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm"
+                    >
+                      <option value="">All states</option>
+                      {getAllStates().map((item) => (
+                        <option key={item}>{item}</option>
+                      ))}
+                    </select>
+                    <select
+                      value={district}
+                      onChange={(event) => setDistrict(event.target.value)}
+                      disabled={!state}
+                      className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm disabled:opacity-60"
+                    >
+                      <option value="">All districts</option>
+                      {(getDistrictsByState(state) ?? []).map((item) => (
+                        <option key={item}>{item}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                    Category
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {["Residential", "Commercial", "Industrial"].map((item) => (
+                      <button
+                        key={item}
+                        type="button"
+                        onClick={() => setSegment(segment === item ? "" : item)}
+                        className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${segment === item ? "border-primary bg-primary text-primary-foreground" : "border-border text-muted-foreground hover:border-primary/40"}`}
+                      >
+                        {item}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Select a service type to narrow the jobs.
+                  </p>
+                </div>
+                <div>
+                  <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                    Location
+                  </p>
+                  <div className="space-y-2">
+                    <button
+                      type="button"
+                      onClick={() => setLocation("current location")}
+                      className="flex h-10 w-full items-center gap-2 rounded-lg border border-border px-3 text-left text-xs font-semibold hover:bg-muted"
+                    >
+                      <LocateFixed className="h-4 w-4" /> Use my current location
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setLocation("service location")}
+                      className="flex h-10 w-full items-center gap-2 rounded-lg border border-border px-3 text-left text-xs font-semibold hover:bg-muted"
+                    >
+                      <Home className="h-4 w-4" /> Use my service location
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                    Verified only
+                  </p>
+                  <label className="flex items-center justify-between text-sm">
+                    <span>Verified clients</span>
+                    <input
+                      type="checkbox"
+                      checked={verifiedOnly}
+                      onChange={(event) => setVerifiedOnly(event.target.checked)}
+                      className="h-4 w-4 accent-primary"
+                    />
+                  </label>
+                </div>
+                <div>
+                  <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                    City
+                  </p>
+                  <input
+                    value={location}
+                    onChange={(event) => setLocation(event.target.value)}
+                    placeholder="e.g. Toronto, Vancouver"
+                    className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm"
+                  />
+                </div>
+              </div>
+            </aside>
+          )}
+          <div className="min-w-0">
+            {filtersEnabled && (
+              <div className="grid gap-3 rounded-2xl border border-border bg-card p-4 md:grid-cols-[1.5fr_1fr_auto]">
+                <input
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder="Search jobs"
+                  className="h-10 rounded-lg border border-input bg-background px-3 text-sm"
+                />
+                <select
+                  value={category}
+                  onChange={(event) => setCategory(event.target.value)}
+                  className="h-10 rounded-lg border border-input bg-background px-3 text-sm"
+                >
+                  <option value="">All services</option>
+                  {categories.map((item) => (
+                    <option key={item}>{item}</option>
+                  ))}
+                </select>
+                <span className="hidden items-center text-sm text-muted-foreground md:flex">
+                  {cmsMode ? "Preview filters" : `${filteredJobs.length} jobs`}
+                </span>
+              </div>
+            )}
+            {cmsMode ? (
+              <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {["Sample client job", "Sample service request", "Sample local project"].map(
+                  (title) => (
+                    <div
+                      key={title}
+                      className="rounded-2xl border border-border bg-card p-5 shadow-soft"
+                    >
+                      <p className="text-xs font-semibold uppercase tracking-wide text-primary">
+                        Open job
+                      </p>
+                      <h3 className="mt-2 font-semibold">{title}</h3>
+                      <p className="mt-2 text-sm text-muted-foreground">
+                        Service category · Location
+                      </p>
+                      <p className="mt-5 text-sm font-semibold">Budget shown here</p>
+                    </div>
+                  ),
+                )}
+              </div>
+            ) : loading ? (
+              <div className="mt-8 h-48 animate-pulse rounded-2xl bg-muted" />
+            ) : filteredJobs.length ? (
+              <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {filteredJobs.map((job) => (
+                  <Link
+                    key={job.id}
+                    href={`/job/${job.id}`}
+                    className="rounded-2xl border border-border bg-card p-5 shadow-soft transition hover:-translate-y-0.5 hover:shadow-card"
+                  >
+                    <p className="text-xs font-semibold uppercase tracking-wide text-primary">
+                      {job.category || "Open job"}
+                    </p>
+                    <h3 className="mt-2 font-semibold">{job.title || "Client job"}</h3>
+                    <p className="mt-2 line-clamp-3 text-sm text-muted-foreground">
+                      {job.description || "View the request details."}
+                    </p>
+                    <div className="mt-5 flex items-end justify-between gap-3 border-t border-border pt-4">
+                      <div>
+                        <p className="text-xs text-muted-foreground">
+                          {job.locationLabel || job.locationAddress || "Location not specified"}
+                        </p>
+                        <p className="mt-1 text-sm font-semibold">
+                          {job.timingType === "HOURLY"
+                            ? `₹${job.hourlyRate ?? "—"}/hr`
+                            : `₹${job.budgetMin ?? "—"}${job.budgetMax ? `–₹${job.budgetMax}` : ""}`}
+                        </p>
+                      </div>
+                      <span className="text-xs text-muted-foreground">{job.clientName}</span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-8 rounded-2xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
+                No open jobs match these filters.
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
 
