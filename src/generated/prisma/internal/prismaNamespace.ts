@@ -406,6 +406,7 @@ export const ModelName = {
   LegalPage: 'LegalPage',
   ServiceCategory: 'ServiceCategory',
   User: 'User',
+  Session: 'Session',
   ClientProfile: 'ClientProfile',
   ClientSavedLocation: 'ClientSavedLocation',
   ClientHiringNeed: 'ClientHiringNeed',
@@ -479,7 +480,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "cmsPage" | "cmsPageVersion" | "cmsMedia" | "sQLiteMigrationTableArchive" | "sQLiteMigrationAudit" | "websitePage" | "legalPage" | "serviceCategory" | "user" | "clientProfile" | "clientSavedLocation" | "clientHiringNeed" | "clientJob" | "favoriteJob" | "clientJobAttachment" | "projectTransaction" | "projectNegotiation" | "projectReview" | "projectRequest" | "projectTracking" | "projectTimelineEvent" | "projectMilestone" | "projectWorkUpload" | "hireJob" | "hireContract" | "hireAttachment" | "hireMilestone" | "directHireNegotiation" | "socketConversation" | "socketMessage" | "socketConversationClear" | "callSession" | "messageConversation" | "message" | "userNotification" | "userNotificationState" | "payment" | "razorpayWebhookEvent" | "wallet" | "walletTransaction" | "projectWithdrawal" | "invoice" | "projectDispute" | "projectDisputeMessage" | "projectCompletionRequest" | "projectRevisionRequest" | "projectReviewRequest" | "professionalVerification" | "verificationDocumentReview" | "personaVerification" | "personaWebhookEvent" | "storedFile" | "auditLog" | "apiToken" | "otpCode" | "browserSubscription" | "faq" | "contactRequest" | "service" | "pageConfiguration" | "websitePageOverride" | "pageTextOverride" | "legacyUser" | "legacyUserProfile" | "legacyProfessionalDetail" | "legacyLocation" | "legacyVerification"
+    modelProps: "cmsPage" | "cmsPageVersion" | "cmsMedia" | "sQLiteMigrationTableArchive" | "sQLiteMigrationAudit" | "websitePage" | "legalPage" | "serviceCategory" | "user" | "session" | "clientProfile" | "clientSavedLocation" | "clientHiringNeed" | "clientJob" | "favoriteJob" | "clientJobAttachment" | "projectTransaction" | "projectNegotiation" | "projectReview" | "projectRequest" | "projectTracking" | "projectTimelineEvent" | "projectMilestone" | "projectWorkUpload" | "hireJob" | "hireContract" | "hireAttachment" | "hireMilestone" | "directHireNegotiation" | "socketConversation" | "socketMessage" | "socketConversationClear" | "callSession" | "messageConversation" | "message" | "userNotification" | "userNotificationState" | "payment" | "razorpayWebhookEvent" | "wallet" | "walletTransaction" | "projectWithdrawal" | "invoice" | "projectDispute" | "projectDisputeMessage" | "projectCompletionRequest" | "projectRevisionRequest" | "projectReviewRequest" | "professionalVerification" | "verificationDocumentReview" | "personaVerification" | "personaWebhookEvent" | "storedFile" | "auditLog" | "apiToken" | "otpCode" | "browserSubscription" | "faq" | "contactRequest" | "service" | "pageConfiguration" | "websitePageOverride" | "pageTextOverride" | "legacyUser" | "legacyUserProfile" | "legacyProfessionalDetail" | "legacyLocation" | "legacyVerification"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1146,6 +1147,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.UserCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.UserCountAggregateOutputType> | number
+        }
+      }
+    }
+    Session: {
+      payload: Prisma.$SessionPayload<ExtArgs>
+      fields: Prisma.SessionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SessionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SessionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionPayload>
+        }
+        findFirst: {
+          args: Prisma.SessionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SessionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionPayload>
+        }
+        findMany: {
+          args: Prisma.SessionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionPayload>[]
+        }
+        create: {
+          args: Prisma.SessionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionPayload>
+        }
+        createMany: {
+          args: Prisma.SessionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SessionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionPayload>[]
+        }
+        delete: {
+          args: Prisma.SessionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionPayload>
+        }
+        update: {
+          args: Prisma.SessionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionPayload>
+        }
+        deleteMany: {
+          args: Prisma.SessionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SessionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SessionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionPayload>[]
+        }
+        upsert: {
+          args: Prisma.SessionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionPayload>
+        }
+        aggregate: {
+          args: Prisma.SessionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSession>
+        }
+        groupBy: {
+          args: Prisma.SessionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SessionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SessionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SessionCountAggregateOutputType> | number
         }
       }
     }
@@ -5644,6 +5719,17 @@ export const UserScalarFieldEnum = {
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
+export const SessionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  expiresAt: 'expiresAt',
+  revokedAt: 'revokedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
+
+
 export const ClientProfileScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -6899,6 +6985,7 @@ export type GlobalOmitConfig = {
   legalPage?: Prisma.LegalPageOmit
   serviceCategory?: Prisma.ServiceCategoryOmit
   user?: Prisma.UserOmit
+  session?: Prisma.SessionOmit
   clientProfile?: Prisma.ClientProfileOmit
   clientSavedLocation?: Prisma.ClientSavedLocationOmit
   clientHiringNeed?: Prisma.ClientHiringNeedOmit

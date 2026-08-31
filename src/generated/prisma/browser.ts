@@ -63,6 +63,11 @@ export type ServiceCategory = Prisma.ServiceCategoryModel
  */
 export type User = Prisma.UserModel
 /**
+ * Model Session
+ * 
+ */
+export type Session = Prisma.SessionModel
+/**
  * Model ClientProfile
  * 
  */

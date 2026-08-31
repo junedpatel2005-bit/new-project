@@ -60,6 +60,7 @@ export const ModelName = {
   LegalPage: 'LegalPage',
   ServiceCategory: 'ServiceCategory',
   User: 'User',
+  Session: 'Session',
   ClientProfile: 'ClientProfile',
   ClientSavedLocation: 'ClientSavedLocation',
   ClientHiringNeed: 'ClientHiringNeed',
@@ -298,6 +299,17 @@ export const UserScalarFieldEnum = {
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+export const SessionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  expiresAt: 'expiresAt',
+  revokedAt: 'revokedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
 
 
 export const ClientProfileScalarFieldEnum = {

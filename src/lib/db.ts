@@ -15,8 +15,15 @@ const globalForPrisma = global as unknown as {
   prismaSchemaVersion?: string;
 };
 
-const connectionString = process.env.DATABASE_URL;
-if (!connectionString) throw new Error("DATABASE_URL is required.");
+const connectionString =
+  process.env.NODE_ENV === "test" ? process.env.TEST_DATABASE_URL : process.env.DATABASE_URL;
+if (!connectionString) {
+  throw new Error(
+    process.env.NODE_ENV === "test"
+      ? "TEST_DATABASE_URL is required for database tests."
+      : "DATABASE_URL is required.",
+  );
+}
 
 // PrismaPg creates a new Pool for every adapter connection when it receives a
 // config object. Supplying one shared Pool prevents concurrent requests from
@@ -30,7 +37,7 @@ const pgPool =
     connectionTimeoutMillis: 10_000,
   });
 const adapter = new PrismaPg(pgPool);
-const prismaSchemaVersion = "20260831-razorpay-webhook-state";
+const prismaSchemaVersion = "20260831-revocable-sessions";
 // Regenerate the development singleton after a Prisma schema change. Without this
 // guard, Next's hot-reload can retain a client created before a new model existed.
 export const db =

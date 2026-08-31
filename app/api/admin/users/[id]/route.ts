@@ -13,10 +13,19 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const { id } = await params;
     if (!body.success || !Number.isInteger(Number(id)))
       return NextResponse.json({ error: "Invalid account update." }, { status: 400 });
-    const user = await db.user.update({
-      where: { id: Number(id) },
-      data: { isActive: body.data.isActive },
-      select: { id: true, isActive: true },
+    const user = await db.$transaction(async (transaction) => {
+      const updated = await transaction.user.update({
+        where: { id: Number(id) },
+        data: { isActive: body.data.isActive },
+        select: { id: true, isActive: true },
+      });
+      if (!body.data.isActive) {
+        await transaction.session.updateMany({
+          where: { userId: updated.id, revokedAt: null },
+          data: { revokedAt: new Date() },
+        });
+      }
+      return updated;
     });
     return NextResponse.json({ user });
   } catch {

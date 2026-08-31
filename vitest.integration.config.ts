@@ -6,11 +6,7 @@ export default defineConfig({
     alias: [{ find: /^@\/(.*)$/, replacement: `${path.resolve(import.meta.dirname)}/$1` }],
   },
   test: {
-    exclude: [
-      "**/node_modules/**",
-      "**/dist/**",
-      "**/.{git,cache,output,temp}/**",
-      "tests/integration/**",
-    ],
+    include: ["tests/integration/**/*.test.ts"],
+    exclude: ["**/node_modules/**", "**/dist/**", "**/.{git,cache,output,temp}/**"],
   },
 });

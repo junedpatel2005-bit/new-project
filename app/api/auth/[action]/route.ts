@@ -3,7 +3,13 @@ import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { createHash, randomBytes } from "crypto";
 import { db } from "@/lib/db";
-import { createSession, sessionCookie, sessionOptions, verifySession } from "@/lib/auth";
+import {
+  createSession,
+  revokeSession,
+  sessionCookie,
+  sessionOptions,
+  verifySession,
+} from "@/lib/auth";
 import {
   createPhoneVerificationProof,
   phoneProofCookie,
@@ -608,6 +614,14 @@ export async function POST(
     return response;
   }
   if (action === "logout") {
+    const token = request.cookies.get(sessionCookie)?.value;
+    if (token) {
+      try {
+        await revokeSession(token);
+      } catch {
+        return safe("Unable to sign out right now.", 500);
+      }
+    }
     const response = NextResponse.json({ success: true });
     response.cookies.set(sessionCookie, "", { ...sessionOptions, maxAge: 0 });
     return response;
@@ -812,6 +826,10 @@ export async function POST(
       db.user.update({
         where: { id: token.userId },
         data: { passwordHash: await bcrypt.hash(parsed.data.password, 12) },
+      }),
+      db.session.updateMany({
+        where: { userId: token.userId, revokedAt: null },
+        data: { revokedAt: new Date() },
       }),
     ]);
     return NextResponse.json({ success: true });
