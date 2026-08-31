@@ -759,6 +759,12 @@ export const RazorpayWebhookEventScalarFieldEnum = {
   eventId: 'eventId',
   eventName: 'eventName',
   payloadJson: 'payloadJson',
+  processingStatus: 'processingStatus',
+  processingAttempts: 'processingAttempts',
+  lastError: 'lastError',
+  receivedAt: 'receivedAt',
+  processingStartedAt: 'processingStartedAt',
+  processedAt: 'processedAt',
   createdAt: 'createdAt'
 } as const
 

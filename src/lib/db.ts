@@ -30,7 +30,7 @@ const pgPool =
     connectionTimeoutMillis: 10_000,
   });
 const adapter = new PrismaPg(pgPool);
-const prismaSchemaVersion = "20260824-message-read-state";
+const prismaSchemaVersion = "20260831-razorpay-webhook-state";
 // Regenerate the development singleton after a Prisma schema change. Without this
 // guard, Next's hot-reload can retain a client created before a new model existed.
 export const db =

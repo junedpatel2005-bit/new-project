@@ -28,10 +28,12 @@ export type AggregateRazorpayWebhookEvent = {
 
 export type RazorpayWebhookEventAvgAggregateOutputType = {
   id: number | null
+  processingAttempts: number | null
 }
 
 export type RazorpayWebhookEventSumAggregateOutputType = {
   id: number | null
+  processingAttempts: number | null
 }
 
 export type RazorpayWebhookEventMinAggregateOutputType = {
@@ -39,6 +41,12 @@ export type RazorpayWebhookEventMinAggregateOutputType = {
   eventId: string | null
   eventName: string | null
   payloadJson: string | null
+  processingStatus: string | null
+  processingAttempts: number | null
+  lastError: string | null
+  receivedAt: Date | null
+  processingStartedAt: Date | null
+  processedAt: Date | null
   createdAt: Date | null
 }
 
@@ -47,6 +55,12 @@ export type RazorpayWebhookEventMaxAggregateOutputType = {
   eventId: string | null
   eventName: string | null
   payloadJson: string | null
+  processingStatus: string | null
+  processingAttempts: number | null
+  lastError: string | null
+  receivedAt: Date | null
+  processingStartedAt: Date | null
+  processedAt: Date | null
   createdAt: Date | null
 }
 
@@ -55,6 +69,12 @@ export type RazorpayWebhookEventCountAggregateOutputType = {
   eventId: number
   eventName: number
   payloadJson: number
+  processingStatus: number
+  processingAttempts: number
+  lastError: number
+  receivedAt: number
+  processingStartedAt: number
+  processedAt: number
   createdAt: number
   _all: number
 }
@@ -62,10 +82,12 @@ export type RazorpayWebhookEventCountAggregateOutputType = {
 
 export type RazorpayWebhookEventAvgAggregateInputType = {
   id?: true
+  processingAttempts?: true
 }
 
 export type RazorpayWebhookEventSumAggregateInputType = {
   id?: true
+  processingAttempts?: true
 }
 
 export type RazorpayWebhookEventMinAggregateInputType = {
@@ -73,6 +95,12 @@ export type RazorpayWebhookEventMinAggregateInputType = {
   eventId?: true
   eventName?: true
   payloadJson?: true
+  processingStatus?: true
+  processingAttempts?: true
+  lastError?: true
+  receivedAt?: true
+  processingStartedAt?: true
+  processedAt?: true
   createdAt?: true
 }
 
@@ -81,6 +109,12 @@ export type RazorpayWebhookEventMaxAggregateInputType = {
   eventId?: true
   eventName?: true
   payloadJson?: true
+  processingStatus?: true
+  processingAttempts?: true
+  lastError?: true
+  receivedAt?: true
+  processingStartedAt?: true
+  processedAt?: true
   createdAt?: true
 }
 
@@ -89,6 +123,12 @@ export type RazorpayWebhookEventCountAggregateInputType = {
   eventId?: true
   eventName?: true
   payloadJson?: true
+  processingStatus?: true
+  processingAttempts?: true
+  lastError?: true
+  receivedAt?: true
+  processingStartedAt?: true
+  processedAt?: true
   createdAt?: true
   _all?: true
 }
@@ -184,6 +224,12 @@ export type RazorpayWebhookEventGroupByOutputType = {
   eventId: string
   eventName: string
   payloadJson: string
+  processingStatus: string
+  processingAttempts: number
+  lastError: string | null
+  receivedAt: Date
+  processingStartedAt: Date | null
+  processedAt: Date | null
   createdAt: Date
   _count: RazorpayWebhookEventCountAggregateOutputType | null
   _avg: RazorpayWebhookEventAvgAggregateOutputType | null
@@ -215,6 +261,12 @@ export type RazorpayWebhookEventWhereInput = {
   eventId?: Prisma.StringFilter<"RazorpayWebhookEvent"> | string
   eventName?: Prisma.StringFilter<"RazorpayWebhookEvent"> | string
   payloadJson?: Prisma.StringFilter<"RazorpayWebhookEvent"> | string
+  processingStatus?: Prisma.StringFilter<"RazorpayWebhookEvent"> | string
+  processingAttempts?: Prisma.IntFilter<"RazorpayWebhookEvent"> | number
+  lastError?: Prisma.StringNullableFilter<"RazorpayWebhookEvent"> | string | null
+  receivedAt?: Prisma.DateTimeFilter<"RazorpayWebhookEvent"> | Date | string
+  processingStartedAt?: Prisma.DateTimeNullableFilter<"RazorpayWebhookEvent"> | Date | string | null
+  processedAt?: Prisma.DateTimeNullableFilter<"RazorpayWebhookEvent"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"RazorpayWebhookEvent"> | Date | string
 }
 
@@ -223,6 +275,12 @@ export type RazorpayWebhookEventOrderByWithRelationInput = {
   eventId?: Prisma.SortOrder
   eventName?: Prisma.SortOrder
   payloadJson?: Prisma.SortOrder
+  processingStatus?: Prisma.SortOrder
+  processingAttempts?: Prisma.SortOrder
+  lastError?: Prisma.SortOrderInput | Prisma.SortOrder
+  receivedAt?: Prisma.SortOrder
+  processingStartedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  processedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -234,6 +292,12 @@ export type RazorpayWebhookEventWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.RazorpayWebhookEventWhereInput | Prisma.RazorpayWebhookEventWhereInput[]
   eventName?: Prisma.StringFilter<"RazorpayWebhookEvent"> | string
   payloadJson?: Prisma.StringFilter<"RazorpayWebhookEvent"> | string
+  processingStatus?: Prisma.StringFilter<"RazorpayWebhookEvent"> | string
+  processingAttempts?: Prisma.IntFilter<"RazorpayWebhookEvent"> | number
+  lastError?: Prisma.StringNullableFilter<"RazorpayWebhookEvent"> | string | null
+  receivedAt?: Prisma.DateTimeFilter<"RazorpayWebhookEvent"> | Date | string
+  processingStartedAt?: Prisma.DateTimeNullableFilter<"RazorpayWebhookEvent"> | Date | string | null
+  processedAt?: Prisma.DateTimeNullableFilter<"RazorpayWebhookEvent"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"RazorpayWebhookEvent"> | Date | string
 }, "id" | "eventId">
 
@@ -242,6 +306,12 @@ export type RazorpayWebhookEventOrderByWithAggregationInput = {
   eventId?: Prisma.SortOrder
   eventName?: Prisma.SortOrder
   payloadJson?: Prisma.SortOrder
+  processingStatus?: Prisma.SortOrder
+  processingAttempts?: Prisma.SortOrder
+  lastError?: Prisma.SortOrderInput | Prisma.SortOrder
+  receivedAt?: Prisma.SortOrder
+  processingStartedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  processedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.RazorpayWebhookEventCountOrderByAggregateInput
   _avg?: Prisma.RazorpayWebhookEventAvgOrderByAggregateInput
@@ -258,6 +328,12 @@ export type RazorpayWebhookEventScalarWhereWithAggregatesInput = {
   eventId?: Prisma.StringWithAggregatesFilter<"RazorpayWebhookEvent"> | string
   eventName?: Prisma.StringWithAggregatesFilter<"RazorpayWebhookEvent"> | string
   payloadJson?: Prisma.StringWithAggregatesFilter<"RazorpayWebhookEvent"> | string
+  processingStatus?: Prisma.StringWithAggregatesFilter<"RazorpayWebhookEvent"> | string
+  processingAttempts?: Prisma.IntWithAggregatesFilter<"RazorpayWebhookEvent"> | number
+  lastError?: Prisma.StringNullableWithAggregatesFilter<"RazorpayWebhookEvent"> | string | null
+  receivedAt?: Prisma.DateTimeWithAggregatesFilter<"RazorpayWebhookEvent"> | Date | string
+  processingStartedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"RazorpayWebhookEvent"> | Date | string | null
+  processedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"RazorpayWebhookEvent"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"RazorpayWebhookEvent"> | Date | string
 }
 
@@ -265,6 +341,12 @@ export type RazorpayWebhookEventCreateInput = {
   eventId: string
   eventName: string
   payloadJson: string
+  processingStatus?: string
+  processingAttempts?: number
+  lastError?: string | null
+  receivedAt?: Date | string
+  processingStartedAt?: Date | string | null
+  processedAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -273,6 +355,12 @@ export type RazorpayWebhookEventUncheckedCreateInput = {
   eventId: string
   eventName: string
   payloadJson: string
+  processingStatus?: string
+  processingAttempts?: number
+  lastError?: string | null
+  receivedAt?: Date | string
+  processingStartedAt?: Date | string | null
+  processedAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -280,6 +368,12 @@ export type RazorpayWebhookEventUpdateInput = {
   eventId?: Prisma.StringFieldUpdateOperationsInput | string
   eventName?: Prisma.StringFieldUpdateOperationsInput | string
   payloadJson?: Prisma.StringFieldUpdateOperationsInput | string
+  processingStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  processingAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receivedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  processingStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  processedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -288,6 +382,12 @@ export type RazorpayWebhookEventUncheckedUpdateInput = {
   eventId?: Prisma.StringFieldUpdateOperationsInput | string
   eventName?: Prisma.StringFieldUpdateOperationsInput | string
   payloadJson?: Prisma.StringFieldUpdateOperationsInput | string
+  processingStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  processingAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receivedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  processingStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  processedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -296,6 +396,12 @@ export type RazorpayWebhookEventCreateManyInput = {
   eventId: string
   eventName: string
   payloadJson: string
+  processingStatus?: string
+  processingAttempts?: number
+  lastError?: string | null
+  receivedAt?: Date | string
+  processingStartedAt?: Date | string | null
+  processedAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -303,6 +409,12 @@ export type RazorpayWebhookEventUpdateManyMutationInput = {
   eventId?: Prisma.StringFieldUpdateOperationsInput | string
   eventName?: Prisma.StringFieldUpdateOperationsInput | string
   payloadJson?: Prisma.StringFieldUpdateOperationsInput | string
+  processingStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  processingAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receivedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  processingStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  processedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -311,6 +423,12 @@ export type RazorpayWebhookEventUncheckedUpdateManyInput = {
   eventId?: Prisma.StringFieldUpdateOperationsInput | string
   eventName?: Prisma.StringFieldUpdateOperationsInput | string
   payloadJson?: Prisma.StringFieldUpdateOperationsInput | string
+  processingStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  processingAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receivedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  processingStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  processedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -319,11 +437,18 @@ export type RazorpayWebhookEventCountOrderByAggregateInput = {
   eventId?: Prisma.SortOrder
   eventName?: Prisma.SortOrder
   payloadJson?: Prisma.SortOrder
+  processingStatus?: Prisma.SortOrder
+  processingAttempts?: Prisma.SortOrder
+  lastError?: Prisma.SortOrder
+  receivedAt?: Prisma.SortOrder
+  processingStartedAt?: Prisma.SortOrder
+  processedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
 export type RazorpayWebhookEventAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  processingAttempts?: Prisma.SortOrder
 }
 
 export type RazorpayWebhookEventMaxOrderByAggregateInput = {
@@ -331,6 +456,12 @@ export type RazorpayWebhookEventMaxOrderByAggregateInput = {
   eventId?: Prisma.SortOrder
   eventName?: Prisma.SortOrder
   payloadJson?: Prisma.SortOrder
+  processingStatus?: Prisma.SortOrder
+  processingAttempts?: Prisma.SortOrder
+  lastError?: Prisma.SortOrder
+  receivedAt?: Prisma.SortOrder
+  processingStartedAt?: Prisma.SortOrder
+  processedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -339,11 +470,18 @@ export type RazorpayWebhookEventMinOrderByAggregateInput = {
   eventId?: Prisma.SortOrder
   eventName?: Prisma.SortOrder
   payloadJson?: Prisma.SortOrder
+  processingStatus?: Prisma.SortOrder
+  processingAttempts?: Prisma.SortOrder
+  lastError?: Prisma.SortOrder
+  receivedAt?: Prisma.SortOrder
+  processingStartedAt?: Prisma.SortOrder
+  processedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
 export type RazorpayWebhookEventSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  processingAttempts?: Prisma.SortOrder
 }
 
 
@@ -353,6 +491,12 @@ export type RazorpayWebhookEventSelect<ExtArgs extends runtime.Types.Extensions.
   eventId?: boolean
   eventName?: boolean
   payloadJson?: boolean
+  processingStatus?: boolean
+  processingAttempts?: boolean
+  lastError?: boolean
+  receivedAt?: boolean
+  processingStartedAt?: boolean
+  processedAt?: boolean
   createdAt?: boolean
 }, ExtArgs["result"]["razorpayWebhookEvent"]>
 
@@ -361,6 +505,12 @@ export type RazorpayWebhookEventSelectCreateManyAndReturn<ExtArgs extends runtim
   eventId?: boolean
   eventName?: boolean
   payloadJson?: boolean
+  processingStatus?: boolean
+  processingAttempts?: boolean
+  lastError?: boolean
+  receivedAt?: boolean
+  processingStartedAt?: boolean
+  processedAt?: boolean
   createdAt?: boolean
 }, ExtArgs["result"]["razorpayWebhookEvent"]>
 
@@ -369,6 +519,12 @@ export type RazorpayWebhookEventSelectUpdateManyAndReturn<ExtArgs extends runtim
   eventId?: boolean
   eventName?: boolean
   payloadJson?: boolean
+  processingStatus?: boolean
+  processingAttempts?: boolean
+  lastError?: boolean
+  receivedAt?: boolean
+  processingStartedAt?: boolean
+  processedAt?: boolean
   createdAt?: boolean
 }, ExtArgs["result"]["razorpayWebhookEvent"]>
 
@@ -377,10 +533,16 @@ export type RazorpayWebhookEventSelectScalar = {
   eventId?: boolean
   eventName?: boolean
   payloadJson?: boolean
+  processingStatus?: boolean
+  processingAttempts?: boolean
+  lastError?: boolean
+  receivedAt?: boolean
+  processingStartedAt?: boolean
+  processedAt?: boolean
   createdAt?: boolean
 }
 
-export type RazorpayWebhookEventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "eventId" | "eventName" | "payloadJson" | "createdAt", ExtArgs["result"]["razorpayWebhookEvent"]>
+export type RazorpayWebhookEventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "eventId" | "eventName" | "payloadJson" | "processingStatus" | "processingAttempts" | "lastError" | "receivedAt" | "processingStartedAt" | "processedAt" | "createdAt", ExtArgs["result"]["razorpayWebhookEvent"]>
 
 export type $RazorpayWebhookEventPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "RazorpayWebhookEvent"
@@ -390,6 +552,12 @@ export type $RazorpayWebhookEventPayload<ExtArgs extends runtime.Types.Extension
     eventId: string
     eventName: string
     payloadJson: string
+    processingStatus: string
+    processingAttempts: number
+    lastError: string | null
+    receivedAt: Date
+    processingStartedAt: Date | null
+    processedAt: Date | null
     createdAt: Date
   }, ExtArgs["result"]["razorpayWebhookEvent"]>
   composites: {}
@@ -818,6 +986,12 @@ export interface RazorpayWebhookEventFieldRefs {
   readonly eventId: Prisma.FieldRef<"RazorpayWebhookEvent", 'String'>
   readonly eventName: Prisma.FieldRef<"RazorpayWebhookEvent", 'String'>
   readonly payloadJson: Prisma.FieldRef<"RazorpayWebhookEvent", 'String'>
+  readonly processingStatus: Prisma.FieldRef<"RazorpayWebhookEvent", 'String'>
+  readonly processingAttempts: Prisma.FieldRef<"RazorpayWebhookEvent", 'Int'>
+  readonly lastError: Prisma.FieldRef<"RazorpayWebhookEvent", 'String'>
+  readonly receivedAt: Prisma.FieldRef<"RazorpayWebhookEvent", 'DateTime'>
+  readonly processingStartedAt: Prisma.FieldRef<"RazorpayWebhookEvent", 'DateTime'>
+  readonly processedAt: Prisma.FieldRef<"RazorpayWebhookEvent", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"RazorpayWebhookEvent", 'DateTime'>
 }
     

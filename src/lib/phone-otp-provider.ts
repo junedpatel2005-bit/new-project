@@ -2,6 +2,7 @@ import "server-only";
 import { createHash, randomInt } from "crypto";
 import twilio from "twilio";
 import { db } from "@/lib/db";
+import { Prisma } from "@/generated/prisma/client";
 
 export type PhoneOtpResult = { ok: true } | { ok: false; error: string; status: number };
 export type AccountRole = "CLIENT" | "PROFESSIONAL";
@@ -144,14 +145,21 @@ export async function verifyPhoneOtp(
       };
     }
 
-    const attempts = record.attempts + 1;
-    await db.otpCode.update({ where: { id: record.id }, data: { attempts } });
-
-    if (record.codeHash !== hashCode(trimmedCode)) {
+    const isCorrectCode = record.codeHash === hashCode(trimmedCode);
+    const result = await db.$executeRaw(
+      Prisma.sql`
+        UPDATE "OtpCode"
+        SET "attempts" = "attempts" + 1,
+            "consumedAt" = CASE WHEN ${isCorrectCode} THEN NOW() ELSE "consumedAt" END
+        WHERE "id" = ${record.id}
+          AND "consumedAt" IS NULL
+          AND "expiresAt" > NOW()
+          AND "attempts" < ${MAX_ATTEMPTS}
+      `,
+    );
+    if (result !== 1 || !isCorrectCode) {
       return { ok: false, status: 400, error: "Invalid verification code." };
     }
-
-    await db.otpCode.update({ where: { id: record.id }, data: { consumedAt: new Date() } });
     return { ok: true };
   }
 
