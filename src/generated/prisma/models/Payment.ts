@@ -413,6 +413,10 @@ export type PaymentWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Payment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Payment"> | Date | string
   milestone?: Prisma.XOR<Prisma.ProjectMilestoneNullableScalarRelationFilter, Prisma.ProjectMilestoneWhereInput> | null
+  client?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  professional?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  job?: Prisma.XOR<Prisma.ClientJobNullableScalarRelationFilter, Prisma.ClientJobWhereInput> | null
+  projectTracking?: Prisma.XOR<Prisma.ProjectTrackingNullableScalarRelationFilter, Prisma.ProjectTrackingWhereInput> | null
 }
 
 export type PaymentOrderByWithRelationInput = {
@@ -441,6 +445,10 @@ export type PaymentOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   milestone?: Prisma.ProjectMilestoneOrderByWithRelationInput
+  client?: Prisma.UserOrderByWithRelationInput
+  professional?: Prisma.UserOrderByWithRelationInput
+  job?: Prisma.ClientJobOrderByWithRelationInput
+  projectTracking?: Prisma.ProjectTrackingOrderByWithRelationInput
 }
 
 export type PaymentWhereUniqueInput = Prisma.AtLeast<{
@@ -472,6 +480,10 @@ export type PaymentWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"Payment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Payment"> | Date | string
   milestone?: Prisma.XOR<Prisma.ProjectMilestoneNullableScalarRelationFilter, Prisma.ProjectMilestoneWhereInput> | null
+  client?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  professional?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  job?: Prisma.XOR<Prisma.ClientJobNullableScalarRelationFilter, Prisma.ClientJobWhereInput> | null
+  projectTracking?: Prisma.XOR<Prisma.ProjectTrackingNullableScalarRelationFilter, Prisma.ProjectTrackingWhereInput> | null
 }, "id" | "razorpayOrderId" | "razorpayPaymentId" | "milestoneId" | "idempotencyKey">
 
 export type PaymentOrderByWithAggregationInput = {
@@ -537,9 +549,6 @@ export type PaymentScalarWhereWithAggregatesInput = {
 }
 
 export type PaymentCreateInput = {
-  clientId: number
-  professionalId: number
-  jobId?: number | null
   amount: number
   baseAmount?: number
   clientFeeAmount?: number
@@ -552,7 +561,6 @@ export type PaymentCreateInput = {
   razorpayOrderId?: string | null
   razorpayPaymentId?: string | null
   razorpaySignature?: string | null
-  projectTrackingId?: number | null
   capturedAt?: Date | string | null
   failureReason?: string | null
   status?: string
@@ -560,6 +568,10 @@ export type PaymentCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   milestone?: Prisma.ProjectMilestoneCreateNestedOneWithoutPaymentInput
+  client: Prisma.UserCreateNestedOneWithoutClientPaymentsInput
+  professional: Prisma.UserCreateNestedOneWithoutProfessionalPaymentsInput
+  job?: Prisma.ClientJobCreateNestedOneWithoutPaymentsInput
+  projectTracking?: Prisma.ProjectTrackingCreateNestedOneWithoutPaymentsInput
 }
 
 export type PaymentUncheckedCreateInput = {
@@ -590,9 +602,6 @@ export type PaymentUncheckedCreateInput = {
 }
 
 export type PaymentUpdateInput = {
-  clientId?: Prisma.IntFieldUpdateOperationsInput | number
-  professionalId?: Prisma.IntFieldUpdateOperationsInput | number
-  jobId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   baseAmount?: Prisma.IntFieldUpdateOperationsInput | number
   clientFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -605,7 +614,6 @@ export type PaymentUpdateInput = {
   razorpayOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   razorpayPaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   razorpaySignature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  projectTrackingId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   capturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
@@ -613,6 +621,10 @@ export type PaymentUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   milestone?: Prisma.ProjectMilestoneUpdateOneWithoutPaymentNestedInput
+  client?: Prisma.UserUpdateOneRequiredWithoutClientPaymentsNestedInput
+  professional?: Prisma.UserUpdateOneRequiredWithoutProfessionalPaymentsNestedInput
+  job?: Prisma.ClientJobUpdateOneWithoutPaymentsNestedInput
+  projectTracking?: Prisma.ProjectTrackingUpdateOneWithoutPaymentsNestedInput
 }
 
 export type PaymentUncheckedUpdateInput = {
@@ -670,9 +682,6 @@ export type PaymentCreateManyInput = {
 }
 
 export type PaymentUpdateManyMutationInput = {
-  clientId?: Prisma.IntFieldUpdateOperationsInput | number
-  professionalId?: Prisma.IntFieldUpdateOperationsInput | number
-  jobId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   baseAmount?: Prisma.IntFieldUpdateOperationsInput | number
   clientFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -685,7 +694,6 @@ export type PaymentUpdateManyMutationInput = {
   razorpayOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   razorpayPaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   razorpaySignature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  projectTrackingId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   capturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
@@ -719,6 +727,16 @@ export type PaymentUncheckedUpdateManyInput = {
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type PaymentListRelationFilter = {
+  every?: Prisma.PaymentWhereInput
+  some?: Prisma.PaymentWhereInput
+  none?: Prisma.PaymentWhereInput
+}
+
+export type PaymentOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type PaymentNullableScalarRelationFilter = {
@@ -837,6 +855,174 @@ export type PaymentSumOrderByAggregateInput = {
   milestoneId?: Prisma.SortOrder
 }
 
+export type PaymentCreateNestedManyWithoutClientInput = {
+  create?: Prisma.XOR<Prisma.PaymentCreateWithoutClientInput, Prisma.PaymentUncheckedCreateWithoutClientInput> | Prisma.PaymentCreateWithoutClientInput[] | Prisma.PaymentUncheckedCreateWithoutClientInput[]
+  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutClientInput | Prisma.PaymentCreateOrConnectWithoutClientInput[]
+  createMany?: Prisma.PaymentCreateManyClientInputEnvelope
+  connect?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+}
+
+export type PaymentCreateNestedManyWithoutProfessionalInput = {
+  create?: Prisma.XOR<Prisma.PaymentCreateWithoutProfessionalInput, Prisma.PaymentUncheckedCreateWithoutProfessionalInput> | Prisma.PaymentCreateWithoutProfessionalInput[] | Prisma.PaymentUncheckedCreateWithoutProfessionalInput[]
+  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutProfessionalInput | Prisma.PaymentCreateOrConnectWithoutProfessionalInput[]
+  createMany?: Prisma.PaymentCreateManyProfessionalInputEnvelope
+  connect?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+}
+
+export type PaymentUncheckedCreateNestedManyWithoutClientInput = {
+  create?: Prisma.XOR<Prisma.PaymentCreateWithoutClientInput, Prisma.PaymentUncheckedCreateWithoutClientInput> | Prisma.PaymentCreateWithoutClientInput[] | Prisma.PaymentUncheckedCreateWithoutClientInput[]
+  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutClientInput | Prisma.PaymentCreateOrConnectWithoutClientInput[]
+  createMany?: Prisma.PaymentCreateManyClientInputEnvelope
+  connect?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+}
+
+export type PaymentUncheckedCreateNestedManyWithoutProfessionalInput = {
+  create?: Prisma.XOR<Prisma.PaymentCreateWithoutProfessionalInput, Prisma.PaymentUncheckedCreateWithoutProfessionalInput> | Prisma.PaymentCreateWithoutProfessionalInput[] | Prisma.PaymentUncheckedCreateWithoutProfessionalInput[]
+  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutProfessionalInput | Prisma.PaymentCreateOrConnectWithoutProfessionalInput[]
+  createMany?: Prisma.PaymentCreateManyProfessionalInputEnvelope
+  connect?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+}
+
+export type PaymentUpdateManyWithoutClientNestedInput = {
+  create?: Prisma.XOR<Prisma.PaymentCreateWithoutClientInput, Prisma.PaymentUncheckedCreateWithoutClientInput> | Prisma.PaymentCreateWithoutClientInput[] | Prisma.PaymentUncheckedCreateWithoutClientInput[]
+  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutClientInput | Prisma.PaymentCreateOrConnectWithoutClientInput[]
+  upsert?: Prisma.PaymentUpsertWithWhereUniqueWithoutClientInput | Prisma.PaymentUpsertWithWhereUniqueWithoutClientInput[]
+  createMany?: Prisma.PaymentCreateManyClientInputEnvelope
+  set?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  disconnect?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  delete?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  connect?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  update?: Prisma.PaymentUpdateWithWhereUniqueWithoutClientInput | Prisma.PaymentUpdateWithWhereUniqueWithoutClientInput[]
+  updateMany?: Prisma.PaymentUpdateManyWithWhereWithoutClientInput | Prisma.PaymentUpdateManyWithWhereWithoutClientInput[]
+  deleteMany?: Prisma.PaymentScalarWhereInput | Prisma.PaymentScalarWhereInput[]
+}
+
+export type PaymentUpdateManyWithoutProfessionalNestedInput = {
+  create?: Prisma.XOR<Prisma.PaymentCreateWithoutProfessionalInput, Prisma.PaymentUncheckedCreateWithoutProfessionalInput> | Prisma.PaymentCreateWithoutProfessionalInput[] | Prisma.PaymentUncheckedCreateWithoutProfessionalInput[]
+  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutProfessionalInput | Prisma.PaymentCreateOrConnectWithoutProfessionalInput[]
+  upsert?: Prisma.PaymentUpsertWithWhereUniqueWithoutProfessionalInput | Prisma.PaymentUpsertWithWhereUniqueWithoutProfessionalInput[]
+  createMany?: Prisma.PaymentCreateManyProfessionalInputEnvelope
+  set?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  disconnect?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  delete?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  connect?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  update?: Prisma.PaymentUpdateWithWhereUniqueWithoutProfessionalInput | Prisma.PaymentUpdateWithWhereUniqueWithoutProfessionalInput[]
+  updateMany?: Prisma.PaymentUpdateManyWithWhereWithoutProfessionalInput | Prisma.PaymentUpdateManyWithWhereWithoutProfessionalInput[]
+  deleteMany?: Prisma.PaymentScalarWhereInput | Prisma.PaymentScalarWhereInput[]
+}
+
+export type PaymentUncheckedUpdateManyWithoutClientNestedInput = {
+  create?: Prisma.XOR<Prisma.PaymentCreateWithoutClientInput, Prisma.PaymentUncheckedCreateWithoutClientInput> | Prisma.PaymentCreateWithoutClientInput[] | Prisma.PaymentUncheckedCreateWithoutClientInput[]
+  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutClientInput | Prisma.PaymentCreateOrConnectWithoutClientInput[]
+  upsert?: Prisma.PaymentUpsertWithWhereUniqueWithoutClientInput | Prisma.PaymentUpsertWithWhereUniqueWithoutClientInput[]
+  createMany?: Prisma.PaymentCreateManyClientInputEnvelope
+  set?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  disconnect?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  delete?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  connect?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  update?: Prisma.PaymentUpdateWithWhereUniqueWithoutClientInput | Prisma.PaymentUpdateWithWhereUniqueWithoutClientInput[]
+  updateMany?: Prisma.PaymentUpdateManyWithWhereWithoutClientInput | Prisma.PaymentUpdateManyWithWhereWithoutClientInput[]
+  deleteMany?: Prisma.PaymentScalarWhereInput | Prisma.PaymentScalarWhereInput[]
+}
+
+export type PaymentUncheckedUpdateManyWithoutProfessionalNestedInput = {
+  create?: Prisma.XOR<Prisma.PaymentCreateWithoutProfessionalInput, Prisma.PaymentUncheckedCreateWithoutProfessionalInput> | Prisma.PaymentCreateWithoutProfessionalInput[] | Prisma.PaymentUncheckedCreateWithoutProfessionalInput[]
+  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutProfessionalInput | Prisma.PaymentCreateOrConnectWithoutProfessionalInput[]
+  upsert?: Prisma.PaymentUpsertWithWhereUniqueWithoutProfessionalInput | Prisma.PaymentUpsertWithWhereUniqueWithoutProfessionalInput[]
+  createMany?: Prisma.PaymentCreateManyProfessionalInputEnvelope
+  set?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  disconnect?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  delete?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  connect?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  update?: Prisma.PaymentUpdateWithWhereUniqueWithoutProfessionalInput | Prisma.PaymentUpdateWithWhereUniqueWithoutProfessionalInput[]
+  updateMany?: Prisma.PaymentUpdateManyWithWhereWithoutProfessionalInput | Prisma.PaymentUpdateManyWithWhereWithoutProfessionalInput[]
+  deleteMany?: Prisma.PaymentScalarWhereInput | Prisma.PaymentScalarWhereInput[]
+}
+
+export type PaymentCreateNestedManyWithoutJobInput = {
+  create?: Prisma.XOR<Prisma.PaymentCreateWithoutJobInput, Prisma.PaymentUncheckedCreateWithoutJobInput> | Prisma.PaymentCreateWithoutJobInput[] | Prisma.PaymentUncheckedCreateWithoutJobInput[]
+  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutJobInput | Prisma.PaymentCreateOrConnectWithoutJobInput[]
+  createMany?: Prisma.PaymentCreateManyJobInputEnvelope
+  connect?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+}
+
+export type PaymentUncheckedCreateNestedManyWithoutJobInput = {
+  create?: Prisma.XOR<Prisma.PaymentCreateWithoutJobInput, Prisma.PaymentUncheckedCreateWithoutJobInput> | Prisma.PaymentCreateWithoutJobInput[] | Prisma.PaymentUncheckedCreateWithoutJobInput[]
+  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutJobInput | Prisma.PaymentCreateOrConnectWithoutJobInput[]
+  createMany?: Prisma.PaymentCreateManyJobInputEnvelope
+  connect?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+}
+
+export type PaymentUpdateManyWithoutJobNestedInput = {
+  create?: Prisma.XOR<Prisma.PaymentCreateWithoutJobInput, Prisma.PaymentUncheckedCreateWithoutJobInput> | Prisma.PaymentCreateWithoutJobInput[] | Prisma.PaymentUncheckedCreateWithoutJobInput[]
+  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutJobInput | Prisma.PaymentCreateOrConnectWithoutJobInput[]
+  upsert?: Prisma.PaymentUpsertWithWhereUniqueWithoutJobInput | Prisma.PaymentUpsertWithWhereUniqueWithoutJobInput[]
+  createMany?: Prisma.PaymentCreateManyJobInputEnvelope
+  set?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  disconnect?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  delete?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  connect?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  update?: Prisma.PaymentUpdateWithWhereUniqueWithoutJobInput | Prisma.PaymentUpdateWithWhereUniqueWithoutJobInput[]
+  updateMany?: Prisma.PaymentUpdateManyWithWhereWithoutJobInput | Prisma.PaymentUpdateManyWithWhereWithoutJobInput[]
+  deleteMany?: Prisma.PaymentScalarWhereInput | Prisma.PaymentScalarWhereInput[]
+}
+
+export type PaymentUncheckedUpdateManyWithoutJobNestedInput = {
+  create?: Prisma.XOR<Prisma.PaymentCreateWithoutJobInput, Prisma.PaymentUncheckedCreateWithoutJobInput> | Prisma.PaymentCreateWithoutJobInput[] | Prisma.PaymentUncheckedCreateWithoutJobInput[]
+  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutJobInput | Prisma.PaymentCreateOrConnectWithoutJobInput[]
+  upsert?: Prisma.PaymentUpsertWithWhereUniqueWithoutJobInput | Prisma.PaymentUpsertWithWhereUniqueWithoutJobInput[]
+  createMany?: Prisma.PaymentCreateManyJobInputEnvelope
+  set?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  disconnect?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  delete?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  connect?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  update?: Prisma.PaymentUpdateWithWhereUniqueWithoutJobInput | Prisma.PaymentUpdateWithWhereUniqueWithoutJobInput[]
+  updateMany?: Prisma.PaymentUpdateManyWithWhereWithoutJobInput | Prisma.PaymentUpdateManyWithWhereWithoutJobInput[]
+  deleteMany?: Prisma.PaymentScalarWhereInput | Prisma.PaymentScalarWhereInput[]
+}
+
+export type PaymentCreateNestedManyWithoutProjectTrackingInput = {
+  create?: Prisma.XOR<Prisma.PaymentCreateWithoutProjectTrackingInput, Prisma.PaymentUncheckedCreateWithoutProjectTrackingInput> | Prisma.PaymentCreateWithoutProjectTrackingInput[] | Prisma.PaymentUncheckedCreateWithoutProjectTrackingInput[]
+  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutProjectTrackingInput | Prisma.PaymentCreateOrConnectWithoutProjectTrackingInput[]
+  createMany?: Prisma.PaymentCreateManyProjectTrackingInputEnvelope
+  connect?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+}
+
+export type PaymentUncheckedCreateNestedManyWithoutProjectTrackingInput = {
+  create?: Prisma.XOR<Prisma.PaymentCreateWithoutProjectTrackingInput, Prisma.PaymentUncheckedCreateWithoutProjectTrackingInput> | Prisma.PaymentCreateWithoutProjectTrackingInput[] | Prisma.PaymentUncheckedCreateWithoutProjectTrackingInput[]
+  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutProjectTrackingInput | Prisma.PaymentCreateOrConnectWithoutProjectTrackingInput[]
+  createMany?: Prisma.PaymentCreateManyProjectTrackingInputEnvelope
+  connect?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+}
+
+export type PaymentUpdateManyWithoutProjectTrackingNestedInput = {
+  create?: Prisma.XOR<Prisma.PaymentCreateWithoutProjectTrackingInput, Prisma.PaymentUncheckedCreateWithoutProjectTrackingInput> | Prisma.PaymentCreateWithoutProjectTrackingInput[] | Prisma.PaymentUncheckedCreateWithoutProjectTrackingInput[]
+  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutProjectTrackingInput | Prisma.PaymentCreateOrConnectWithoutProjectTrackingInput[]
+  upsert?: Prisma.PaymentUpsertWithWhereUniqueWithoutProjectTrackingInput | Prisma.PaymentUpsertWithWhereUniqueWithoutProjectTrackingInput[]
+  createMany?: Prisma.PaymentCreateManyProjectTrackingInputEnvelope
+  set?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  disconnect?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  delete?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  connect?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  update?: Prisma.PaymentUpdateWithWhereUniqueWithoutProjectTrackingInput | Prisma.PaymentUpdateWithWhereUniqueWithoutProjectTrackingInput[]
+  updateMany?: Prisma.PaymentUpdateManyWithWhereWithoutProjectTrackingInput | Prisma.PaymentUpdateManyWithWhereWithoutProjectTrackingInput[]
+  deleteMany?: Prisma.PaymentScalarWhereInput | Prisma.PaymentScalarWhereInput[]
+}
+
+export type PaymentUncheckedUpdateManyWithoutProjectTrackingNestedInput = {
+  create?: Prisma.XOR<Prisma.PaymentCreateWithoutProjectTrackingInput, Prisma.PaymentUncheckedCreateWithoutProjectTrackingInput> | Prisma.PaymentCreateWithoutProjectTrackingInput[] | Prisma.PaymentUncheckedCreateWithoutProjectTrackingInput[]
+  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutProjectTrackingInput | Prisma.PaymentCreateOrConnectWithoutProjectTrackingInput[]
+  upsert?: Prisma.PaymentUpsertWithWhereUniqueWithoutProjectTrackingInput | Prisma.PaymentUpsertWithWhereUniqueWithoutProjectTrackingInput[]
+  createMany?: Prisma.PaymentCreateManyProjectTrackingInputEnvelope
+  set?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  disconnect?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  delete?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  connect?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  update?: Prisma.PaymentUpdateWithWhereUniqueWithoutProjectTrackingInput | Prisma.PaymentUpdateWithWhereUniqueWithoutProjectTrackingInput[]
+  updateMany?: Prisma.PaymentUpdateManyWithWhereWithoutProjectTrackingInput | Prisma.PaymentUpdateManyWithWhereWithoutProjectTrackingInput[]
+  deleteMany?: Prisma.PaymentScalarWhereInput | Prisma.PaymentScalarWhereInput[]
+}
+
 export type PaymentCreateNestedOneWithoutMilestoneInput = {
   create?: Prisma.XOR<Prisma.PaymentCreateWithoutMilestoneInput, Prisma.PaymentUncheckedCreateWithoutMilestoneInput>
   connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutMilestoneInput
@@ -869,8 +1055,33 @@ export type PaymentUncheckedUpdateOneWithoutMilestoneNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PaymentUpdateToOneWithWhereWithoutMilestoneInput, Prisma.PaymentUpdateWithoutMilestoneInput>, Prisma.PaymentUncheckedUpdateWithoutMilestoneInput>
 }
 
-export type PaymentCreateWithoutMilestoneInput = {
-  clientId: number
+export type PaymentCreateWithoutClientInput = {
+  amount: number
+  baseAmount?: number
+  clientFeeAmount?: number
+  professionalPayoutAmount?: number
+  adminNetAmount?: number
+  commissionAmount?: number
+  currency?: string
+  provider: string
+  providerReference?: string | null
+  razorpayOrderId?: string | null
+  razorpayPaymentId?: string | null
+  razorpaySignature?: string | null
+  capturedAt?: Date | string | null
+  failureReason?: string | null
+  status?: string
+  idempotencyKey: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  milestone?: Prisma.ProjectMilestoneCreateNestedOneWithoutPaymentInput
+  professional: Prisma.UserCreateNestedOneWithoutProfessionalPaymentsInput
+  job?: Prisma.ClientJobCreateNestedOneWithoutPaymentsInput
+  projectTracking?: Prisma.ProjectTrackingCreateNestedOneWithoutPaymentsInput
+}
+
+export type PaymentUncheckedCreateWithoutClientInput = {
+  id?: number
   professionalId: number
   jobId?: number | null
   amount: number
@@ -886,12 +1097,325 @@ export type PaymentCreateWithoutMilestoneInput = {
   razorpayPaymentId?: string | null
   razorpaySignature?: string | null
   projectTrackingId?: number | null
+  milestoneId?: number | null
   capturedAt?: Date | string | null
   failureReason?: string | null
   status?: string
   idempotencyKey: string
   createdAt?: Date | string
   updatedAt?: Date | string
+}
+
+export type PaymentCreateOrConnectWithoutClientInput = {
+  where: Prisma.PaymentWhereUniqueInput
+  create: Prisma.XOR<Prisma.PaymentCreateWithoutClientInput, Prisma.PaymentUncheckedCreateWithoutClientInput>
+}
+
+export type PaymentCreateManyClientInputEnvelope = {
+  data: Prisma.PaymentCreateManyClientInput | Prisma.PaymentCreateManyClientInput[]
+  skipDuplicates?: boolean
+}
+
+export type PaymentCreateWithoutProfessionalInput = {
+  amount: number
+  baseAmount?: number
+  clientFeeAmount?: number
+  professionalPayoutAmount?: number
+  adminNetAmount?: number
+  commissionAmount?: number
+  currency?: string
+  provider: string
+  providerReference?: string | null
+  razorpayOrderId?: string | null
+  razorpayPaymentId?: string | null
+  razorpaySignature?: string | null
+  capturedAt?: Date | string | null
+  failureReason?: string | null
+  status?: string
+  idempotencyKey: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  milestone?: Prisma.ProjectMilestoneCreateNestedOneWithoutPaymentInput
+  client: Prisma.UserCreateNestedOneWithoutClientPaymentsInput
+  job?: Prisma.ClientJobCreateNestedOneWithoutPaymentsInput
+  projectTracking?: Prisma.ProjectTrackingCreateNestedOneWithoutPaymentsInput
+}
+
+export type PaymentUncheckedCreateWithoutProfessionalInput = {
+  id?: number
+  clientId: number
+  jobId?: number | null
+  amount: number
+  baseAmount?: number
+  clientFeeAmount?: number
+  professionalPayoutAmount?: number
+  adminNetAmount?: number
+  commissionAmount?: number
+  currency?: string
+  provider: string
+  providerReference?: string | null
+  razorpayOrderId?: string | null
+  razorpayPaymentId?: string | null
+  razorpaySignature?: string | null
+  projectTrackingId?: number | null
+  milestoneId?: number | null
+  capturedAt?: Date | string | null
+  failureReason?: string | null
+  status?: string
+  idempotencyKey: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type PaymentCreateOrConnectWithoutProfessionalInput = {
+  where: Prisma.PaymentWhereUniqueInput
+  create: Prisma.XOR<Prisma.PaymentCreateWithoutProfessionalInput, Prisma.PaymentUncheckedCreateWithoutProfessionalInput>
+}
+
+export type PaymentCreateManyProfessionalInputEnvelope = {
+  data: Prisma.PaymentCreateManyProfessionalInput | Prisma.PaymentCreateManyProfessionalInput[]
+  skipDuplicates?: boolean
+}
+
+export type PaymentUpsertWithWhereUniqueWithoutClientInput = {
+  where: Prisma.PaymentWhereUniqueInput
+  update: Prisma.XOR<Prisma.PaymentUpdateWithoutClientInput, Prisma.PaymentUncheckedUpdateWithoutClientInput>
+  create: Prisma.XOR<Prisma.PaymentCreateWithoutClientInput, Prisma.PaymentUncheckedCreateWithoutClientInput>
+}
+
+export type PaymentUpdateWithWhereUniqueWithoutClientInput = {
+  where: Prisma.PaymentWhereUniqueInput
+  data: Prisma.XOR<Prisma.PaymentUpdateWithoutClientInput, Prisma.PaymentUncheckedUpdateWithoutClientInput>
+}
+
+export type PaymentUpdateManyWithWhereWithoutClientInput = {
+  where: Prisma.PaymentScalarWhereInput
+  data: Prisma.XOR<Prisma.PaymentUpdateManyMutationInput, Prisma.PaymentUncheckedUpdateManyWithoutClientInput>
+}
+
+export type PaymentScalarWhereInput = {
+  AND?: Prisma.PaymentScalarWhereInput | Prisma.PaymentScalarWhereInput[]
+  OR?: Prisma.PaymentScalarWhereInput[]
+  NOT?: Prisma.PaymentScalarWhereInput | Prisma.PaymentScalarWhereInput[]
+  id?: Prisma.IntFilter<"Payment"> | number
+  clientId?: Prisma.IntFilter<"Payment"> | number
+  professionalId?: Prisma.IntFilter<"Payment"> | number
+  jobId?: Prisma.IntNullableFilter<"Payment"> | number | null
+  amount?: Prisma.IntFilter<"Payment"> | number
+  baseAmount?: Prisma.IntFilter<"Payment"> | number
+  clientFeeAmount?: Prisma.IntFilter<"Payment"> | number
+  professionalPayoutAmount?: Prisma.IntFilter<"Payment"> | number
+  adminNetAmount?: Prisma.IntFilter<"Payment"> | number
+  commissionAmount?: Prisma.IntFilter<"Payment"> | number
+  currency?: Prisma.StringFilter<"Payment"> | string
+  provider?: Prisma.StringFilter<"Payment"> | string
+  providerReference?: Prisma.StringNullableFilter<"Payment"> | string | null
+  razorpayOrderId?: Prisma.StringNullableFilter<"Payment"> | string | null
+  razorpayPaymentId?: Prisma.StringNullableFilter<"Payment"> | string | null
+  razorpaySignature?: Prisma.StringNullableFilter<"Payment"> | string | null
+  projectTrackingId?: Prisma.IntNullableFilter<"Payment"> | number | null
+  milestoneId?: Prisma.IntNullableFilter<"Payment"> | number | null
+  capturedAt?: Prisma.DateTimeNullableFilter<"Payment"> | Date | string | null
+  failureReason?: Prisma.StringNullableFilter<"Payment"> | string | null
+  status?: Prisma.StringFilter<"Payment"> | string
+  idempotencyKey?: Prisma.StringFilter<"Payment"> | string
+  createdAt?: Prisma.DateTimeFilter<"Payment"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Payment"> | Date | string
+}
+
+export type PaymentUpsertWithWhereUniqueWithoutProfessionalInput = {
+  where: Prisma.PaymentWhereUniqueInput
+  update: Prisma.XOR<Prisma.PaymentUpdateWithoutProfessionalInput, Prisma.PaymentUncheckedUpdateWithoutProfessionalInput>
+  create: Prisma.XOR<Prisma.PaymentCreateWithoutProfessionalInput, Prisma.PaymentUncheckedCreateWithoutProfessionalInput>
+}
+
+export type PaymentUpdateWithWhereUniqueWithoutProfessionalInput = {
+  where: Prisma.PaymentWhereUniqueInput
+  data: Prisma.XOR<Prisma.PaymentUpdateWithoutProfessionalInput, Prisma.PaymentUncheckedUpdateWithoutProfessionalInput>
+}
+
+export type PaymentUpdateManyWithWhereWithoutProfessionalInput = {
+  where: Prisma.PaymentScalarWhereInput
+  data: Prisma.XOR<Prisma.PaymentUpdateManyMutationInput, Prisma.PaymentUncheckedUpdateManyWithoutProfessionalInput>
+}
+
+export type PaymentCreateWithoutJobInput = {
+  amount: number
+  baseAmount?: number
+  clientFeeAmount?: number
+  professionalPayoutAmount?: number
+  adminNetAmount?: number
+  commissionAmount?: number
+  currency?: string
+  provider: string
+  providerReference?: string | null
+  razorpayOrderId?: string | null
+  razorpayPaymentId?: string | null
+  razorpaySignature?: string | null
+  capturedAt?: Date | string | null
+  failureReason?: string | null
+  status?: string
+  idempotencyKey: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  milestone?: Prisma.ProjectMilestoneCreateNestedOneWithoutPaymentInput
+  client: Prisma.UserCreateNestedOneWithoutClientPaymentsInput
+  professional: Prisma.UserCreateNestedOneWithoutProfessionalPaymentsInput
+  projectTracking?: Prisma.ProjectTrackingCreateNestedOneWithoutPaymentsInput
+}
+
+export type PaymentUncheckedCreateWithoutJobInput = {
+  id?: number
+  clientId: number
+  professionalId: number
+  amount: number
+  baseAmount?: number
+  clientFeeAmount?: number
+  professionalPayoutAmount?: number
+  adminNetAmount?: number
+  commissionAmount?: number
+  currency?: string
+  provider: string
+  providerReference?: string | null
+  razorpayOrderId?: string | null
+  razorpayPaymentId?: string | null
+  razorpaySignature?: string | null
+  projectTrackingId?: number | null
+  milestoneId?: number | null
+  capturedAt?: Date | string | null
+  failureReason?: string | null
+  status?: string
+  idempotencyKey: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type PaymentCreateOrConnectWithoutJobInput = {
+  where: Prisma.PaymentWhereUniqueInput
+  create: Prisma.XOR<Prisma.PaymentCreateWithoutJobInput, Prisma.PaymentUncheckedCreateWithoutJobInput>
+}
+
+export type PaymentCreateManyJobInputEnvelope = {
+  data: Prisma.PaymentCreateManyJobInput | Prisma.PaymentCreateManyJobInput[]
+  skipDuplicates?: boolean
+}
+
+export type PaymentUpsertWithWhereUniqueWithoutJobInput = {
+  where: Prisma.PaymentWhereUniqueInput
+  update: Prisma.XOR<Prisma.PaymentUpdateWithoutJobInput, Prisma.PaymentUncheckedUpdateWithoutJobInput>
+  create: Prisma.XOR<Prisma.PaymentCreateWithoutJobInput, Prisma.PaymentUncheckedCreateWithoutJobInput>
+}
+
+export type PaymentUpdateWithWhereUniqueWithoutJobInput = {
+  where: Prisma.PaymentWhereUniqueInput
+  data: Prisma.XOR<Prisma.PaymentUpdateWithoutJobInput, Prisma.PaymentUncheckedUpdateWithoutJobInput>
+}
+
+export type PaymentUpdateManyWithWhereWithoutJobInput = {
+  where: Prisma.PaymentScalarWhereInput
+  data: Prisma.XOR<Prisma.PaymentUpdateManyMutationInput, Prisma.PaymentUncheckedUpdateManyWithoutJobInput>
+}
+
+export type PaymentCreateWithoutProjectTrackingInput = {
+  amount: number
+  baseAmount?: number
+  clientFeeAmount?: number
+  professionalPayoutAmount?: number
+  adminNetAmount?: number
+  commissionAmount?: number
+  currency?: string
+  provider: string
+  providerReference?: string | null
+  razorpayOrderId?: string | null
+  razorpayPaymentId?: string | null
+  razorpaySignature?: string | null
+  capturedAt?: Date | string | null
+  failureReason?: string | null
+  status?: string
+  idempotencyKey: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  milestone?: Prisma.ProjectMilestoneCreateNestedOneWithoutPaymentInput
+  client: Prisma.UserCreateNestedOneWithoutClientPaymentsInput
+  professional: Prisma.UserCreateNestedOneWithoutProfessionalPaymentsInput
+  job?: Prisma.ClientJobCreateNestedOneWithoutPaymentsInput
+}
+
+export type PaymentUncheckedCreateWithoutProjectTrackingInput = {
+  id?: number
+  clientId: number
+  professionalId: number
+  jobId?: number | null
+  amount: number
+  baseAmount?: number
+  clientFeeAmount?: number
+  professionalPayoutAmount?: number
+  adminNetAmount?: number
+  commissionAmount?: number
+  currency?: string
+  provider: string
+  providerReference?: string | null
+  razorpayOrderId?: string | null
+  razorpayPaymentId?: string | null
+  razorpaySignature?: string | null
+  milestoneId?: number | null
+  capturedAt?: Date | string | null
+  failureReason?: string | null
+  status?: string
+  idempotencyKey: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type PaymentCreateOrConnectWithoutProjectTrackingInput = {
+  where: Prisma.PaymentWhereUniqueInput
+  create: Prisma.XOR<Prisma.PaymentCreateWithoutProjectTrackingInput, Prisma.PaymentUncheckedCreateWithoutProjectTrackingInput>
+}
+
+export type PaymentCreateManyProjectTrackingInputEnvelope = {
+  data: Prisma.PaymentCreateManyProjectTrackingInput | Prisma.PaymentCreateManyProjectTrackingInput[]
+  skipDuplicates?: boolean
+}
+
+export type PaymentUpsertWithWhereUniqueWithoutProjectTrackingInput = {
+  where: Prisma.PaymentWhereUniqueInput
+  update: Prisma.XOR<Prisma.PaymentUpdateWithoutProjectTrackingInput, Prisma.PaymentUncheckedUpdateWithoutProjectTrackingInput>
+  create: Prisma.XOR<Prisma.PaymentCreateWithoutProjectTrackingInput, Prisma.PaymentUncheckedCreateWithoutProjectTrackingInput>
+}
+
+export type PaymentUpdateWithWhereUniqueWithoutProjectTrackingInput = {
+  where: Prisma.PaymentWhereUniqueInput
+  data: Prisma.XOR<Prisma.PaymentUpdateWithoutProjectTrackingInput, Prisma.PaymentUncheckedUpdateWithoutProjectTrackingInput>
+}
+
+export type PaymentUpdateManyWithWhereWithoutProjectTrackingInput = {
+  where: Prisma.PaymentScalarWhereInput
+  data: Prisma.XOR<Prisma.PaymentUpdateManyMutationInput, Prisma.PaymentUncheckedUpdateManyWithoutProjectTrackingInput>
+}
+
+export type PaymentCreateWithoutMilestoneInput = {
+  amount: number
+  baseAmount?: number
+  clientFeeAmount?: number
+  professionalPayoutAmount?: number
+  adminNetAmount?: number
+  commissionAmount?: number
+  currency?: string
+  provider: string
+  providerReference?: string | null
+  razorpayOrderId?: string | null
+  razorpayPaymentId?: string | null
+  razorpaySignature?: string | null
+  capturedAt?: Date | string | null
+  failureReason?: string | null
+  status?: string
+  idempotencyKey: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  client: Prisma.UserCreateNestedOneWithoutClientPaymentsInput
+  professional: Prisma.UserCreateNestedOneWithoutProfessionalPaymentsInput
+  job?: Prisma.ClientJobCreateNestedOneWithoutPaymentsInput
+  projectTracking?: Prisma.ProjectTrackingCreateNestedOneWithoutPaymentsInput
 }
 
 export type PaymentUncheckedCreateWithoutMilestoneInput = {
@@ -937,6 +1461,32 @@ export type PaymentUpdateToOneWithWhereWithoutMilestoneInput = {
 }
 
 export type PaymentUpdateWithoutMilestoneInput = {
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
+  baseAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  clientFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalPayoutAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  adminNetAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  commissionAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.StringFieldUpdateOperationsInput | string
+  providerReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpayOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpayPaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpaySignature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  capturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  client?: Prisma.UserUpdateOneRequiredWithoutClientPaymentsNestedInput
+  professional?: Prisma.UserUpdateOneRequiredWithoutProfessionalPaymentsNestedInput
+  job?: Prisma.ClientJobUpdateOneWithoutPaymentsNestedInput
+  projectTracking?: Prisma.ProjectTrackingUpdateOneWithoutPaymentsNestedInput
+}
+
+export type PaymentUncheckedUpdateWithoutMilestoneInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
   clientId?: Prisma.IntFieldUpdateOperationsInput | number
   professionalId?: Prisma.IntFieldUpdateOperationsInput | number
   jobId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -961,7 +1511,367 @@ export type PaymentUpdateWithoutMilestoneInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type PaymentUncheckedUpdateWithoutMilestoneInput = {
+export type PaymentCreateManyClientInput = {
+  id?: number
+  professionalId: number
+  jobId?: number | null
+  amount: number
+  baseAmount?: number
+  clientFeeAmount?: number
+  professionalPayoutAmount?: number
+  adminNetAmount?: number
+  commissionAmount?: number
+  currency?: string
+  provider: string
+  providerReference?: string | null
+  razorpayOrderId?: string | null
+  razorpayPaymentId?: string | null
+  razorpaySignature?: string | null
+  projectTrackingId?: number | null
+  milestoneId?: number | null
+  capturedAt?: Date | string | null
+  failureReason?: string | null
+  status?: string
+  idempotencyKey: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type PaymentCreateManyProfessionalInput = {
+  id?: number
+  clientId: number
+  jobId?: number | null
+  amount: number
+  baseAmount?: number
+  clientFeeAmount?: number
+  professionalPayoutAmount?: number
+  adminNetAmount?: number
+  commissionAmount?: number
+  currency?: string
+  provider: string
+  providerReference?: string | null
+  razorpayOrderId?: string | null
+  razorpayPaymentId?: string | null
+  razorpaySignature?: string | null
+  projectTrackingId?: number | null
+  milestoneId?: number | null
+  capturedAt?: Date | string | null
+  failureReason?: string | null
+  status?: string
+  idempotencyKey: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type PaymentUpdateWithoutClientInput = {
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
+  baseAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  clientFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalPayoutAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  adminNetAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  commissionAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.StringFieldUpdateOperationsInput | string
+  providerReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpayOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpayPaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpaySignature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  capturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  milestone?: Prisma.ProjectMilestoneUpdateOneWithoutPaymentNestedInput
+  professional?: Prisma.UserUpdateOneRequiredWithoutProfessionalPaymentsNestedInput
+  job?: Prisma.ClientJobUpdateOneWithoutPaymentsNestedInput
+  projectTracking?: Prisma.ProjectTrackingUpdateOneWithoutPaymentsNestedInput
+}
+
+export type PaymentUncheckedUpdateWithoutClientInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalId?: Prisma.IntFieldUpdateOperationsInput | number
+  jobId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
+  baseAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  clientFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalPayoutAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  adminNetAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  commissionAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.StringFieldUpdateOperationsInput | string
+  providerReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpayOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpayPaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpaySignature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectTrackingId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  milestoneId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  capturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type PaymentUncheckedUpdateManyWithoutClientInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalId?: Prisma.IntFieldUpdateOperationsInput | number
+  jobId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
+  baseAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  clientFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalPayoutAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  adminNetAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  commissionAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.StringFieldUpdateOperationsInput | string
+  providerReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpayOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpayPaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpaySignature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectTrackingId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  milestoneId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  capturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type PaymentUpdateWithoutProfessionalInput = {
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
+  baseAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  clientFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalPayoutAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  adminNetAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  commissionAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.StringFieldUpdateOperationsInput | string
+  providerReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpayOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpayPaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpaySignature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  capturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  milestone?: Prisma.ProjectMilestoneUpdateOneWithoutPaymentNestedInput
+  client?: Prisma.UserUpdateOneRequiredWithoutClientPaymentsNestedInput
+  job?: Prisma.ClientJobUpdateOneWithoutPaymentsNestedInput
+  projectTracking?: Prisma.ProjectTrackingUpdateOneWithoutPaymentsNestedInput
+}
+
+export type PaymentUncheckedUpdateWithoutProfessionalInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  clientId?: Prisma.IntFieldUpdateOperationsInput | number
+  jobId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
+  baseAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  clientFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalPayoutAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  adminNetAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  commissionAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.StringFieldUpdateOperationsInput | string
+  providerReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpayOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpayPaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpaySignature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectTrackingId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  milestoneId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  capturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type PaymentUncheckedUpdateManyWithoutProfessionalInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  clientId?: Prisma.IntFieldUpdateOperationsInput | number
+  jobId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
+  baseAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  clientFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalPayoutAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  adminNetAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  commissionAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.StringFieldUpdateOperationsInput | string
+  providerReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpayOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpayPaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpaySignature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectTrackingId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  milestoneId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  capturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type PaymentCreateManyJobInput = {
+  id?: number
+  clientId: number
+  professionalId: number
+  amount: number
+  baseAmount?: number
+  clientFeeAmount?: number
+  professionalPayoutAmount?: number
+  adminNetAmount?: number
+  commissionAmount?: number
+  currency?: string
+  provider: string
+  providerReference?: string | null
+  razorpayOrderId?: string | null
+  razorpayPaymentId?: string | null
+  razorpaySignature?: string | null
+  projectTrackingId?: number | null
+  milestoneId?: number | null
+  capturedAt?: Date | string | null
+  failureReason?: string | null
+  status?: string
+  idempotencyKey: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type PaymentUpdateWithoutJobInput = {
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
+  baseAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  clientFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalPayoutAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  adminNetAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  commissionAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.StringFieldUpdateOperationsInput | string
+  providerReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpayOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpayPaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpaySignature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  capturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  milestone?: Prisma.ProjectMilestoneUpdateOneWithoutPaymentNestedInput
+  client?: Prisma.UserUpdateOneRequiredWithoutClientPaymentsNestedInput
+  professional?: Prisma.UserUpdateOneRequiredWithoutProfessionalPaymentsNestedInput
+  projectTracking?: Prisma.ProjectTrackingUpdateOneWithoutPaymentsNestedInput
+}
+
+export type PaymentUncheckedUpdateWithoutJobInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  clientId?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalId?: Prisma.IntFieldUpdateOperationsInput | number
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
+  baseAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  clientFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalPayoutAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  adminNetAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  commissionAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.StringFieldUpdateOperationsInput | string
+  providerReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpayOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpayPaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpaySignature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectTrackingId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  milestoneId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  capturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type PaymentUncheckedUpdateManyWithoutJobInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  clientId?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalId?: Prisma.IntFieldUpdateOperationsInput | number
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
+  baseAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  clientFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalPayoutAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  adminNetAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  commissionAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.StringFieldUpdateOperationsInput | string
+  providerReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpayOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpayPaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpaySignature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  projectTrackingId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  milestoneId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  capturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type PaymentCreateManyProjectTrackingInput = {
+  id?: number
+  clientId: number
+  professionalId: number
+  jobId?: number | null
+  amount: number
+  baseAmount?: number
+  clientFeeAmount?: number
+  professionalPayoutAmount?: number
+  adminNetAmount?: number
+  commissionAmount?: number
+  currency?: string
+  provider: string
+  providerReference?: string | null
+  razorpayOrderId?: string | null
+  razorpayPaymentId?: string | null
+  razorpaySignature?: string | null
+  milestoneId?: number | null
+  capturedAt?: Date | string | null
+  failureReason?: string | null
+  status?: string
+  idempotencyKey: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type PaymentUpdateWithoutProjectTrackingInput = {
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
+  baseAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  clientFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalPayoutAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  adminNetAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  commissionAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.StringFieldUpdateOperationsInput | string
+  providerReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpayOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpayPaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpaySignature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  capturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  milestone?: Prisma.ProjectMilestoneUpdateOneWithoutPaymentNestedInput
+  client?: Prisma.UserUpdateOneRequiredWithoutClientPaymentsNestedInput
+  professional?: Prisma.UserUpdateOneRequiredWithoutProfessionalPaymentsNestedInput
+  job?: Prisma.ClientJobUpdateOneWithoutPaymentsNestedInput
+}
+
+export type PaymentUncheckedUpdateWithoutProjectTrackingInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   clientId?: Prisma.IntFieldUpdateOperationsInput | number
   professionalId?: Prisma.IntFieldUpdateOperationsInput | number
@@ -978,7 +1888,33 @@ export type PaymentUncheckedUpdateWithoutMilestoneInput = {
   razorpayOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   razorpayPaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   razorpaySignature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  projectTrackingId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  milestoneId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  capturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type PaymentUncheckedUpdateManyWithoutProjectTrackingInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  clientId?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalId?: Prisma.IntFieldUpdateOperationsInput | number
+  jobId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
+  baseAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  clientFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalPayoutAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  adminNetAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  commissionAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.StringFieldUpdateOperationsInput | string
+  providerReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpayOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpayPaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpaySignature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  milestoneId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   capturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1015,6 +1951,10 @@ export type PaymentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   createdAt?: boolean
   updatedAt?: boolean
   milestone?: boolean | Prisma.Payment$milestoneArgs<ExtArgs>
+  client?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  professional?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  job?: boolean | Prisma.Payment$jobArgs<ExtArgs>
+  projectTracking?: boolean | Prisma.Payment$projectTrackingArgs<ExtArgs>
 }, ExtArgs["result"]["payment"]>
 
 export type PaymentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1043,6 +1983,10 @@ export type PaymentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   createdAt?: boolean
   updatedAt?: boolean
   milestone?: boolean | Prisma.Payment$milestoneArgs<ExtArgs>
+  client?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  professional?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  job?: boolean | Prisma.Payment$jobArgs<ExtArgs>
+  projectTracking?: boolean | Prisma.Payment$projectTrackingArgs<ExtArgs>
 }, ExtArgs["result"]["payment"]>
 
 export type PaymentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1071,6 +2015,10 @@ export type PaymentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   createdAt?: boolean
   updatedAt?: boolean
   milestone?: boolean | Prisma.Payment$milestoneArgs<ExtArgs>
+  client?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  professional?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  job?: boolean | Prisma.Payment$jobArgs<ExtArgs>
+  projectTracking?: boolean | Prisma.Payment$projectTrackingArgs<ExtArgs>
 }, ExtArgs["result"]["payment"]>
 
 export type PaymentSelectScalar = {
@@ -1103,18 +2051,34 @@ export type PaymentSelectScalar = {
 export type PaymentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clientId" | "professionalId" | "jobId" | "amount" | "baseAmount" | "clientFeeAmount" | "professionalPayoutAmount" | "adminNetAmount" | "commissionAmount" | "currency" | "provider" | "providerReference" | "razorpayOrderId" | "razorpayPaymentId" | "razorpaySignature" | "projectTrackingId" | "milestoneId" | "capturedAt" | "failureReason" | "status" | "idempotencyKey" | "createdAt" | "updatedAt", ExtArgs["result"]["payment"]>
 export type PaymentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   milestone?: boolean | Prisma.Payment$milestoneArgs<ExtArgs>
+  client?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  professional?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  job?: boolean | Prisma.Payment$jobArgs<ExtArgs>
+  projectTracking?: boolean | Prisma.Payment$projectTrackingArgs<ExtArgs>
 }
 export type PaymentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   milestone?: boolean | Prisma.Payment$milestoneArgs<ExtArgs>
+  client?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  professional?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  job?: boolean | Prisma.Payment$jobArgs<ExtArgs>
+  projectTracking?: boolean | Prisma.Payment$projectTrackingArgs<ExtArgs>
 }
 export type PaymentIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   milestone?: boolean | Prisma.Payment$milestoneArgs<ExtArgs>
+  client?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  professional?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  job?: boolean | Prisma.Payment$jobArgs<ExtArgs>
+  projectTracking?: boolean | Prisma.Payment$projectTrackingArgs<ExtArgs>
 }
 
 export type $PaymentPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Payment"
   objects: {
     milestone: Prisma.$ProjectMilestonePayload<ExtArgs> | null
+    client: Prisma.$UserPayload<ExtArgs>
+    professional: Prisma.$UserPayload<ExtArgs>
+    job: Prisma.$ClientJobPayload<ExtArgs> | null
+    projectTracking: Prisma.$ProjectTrackingPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1536,6 +2500,10 @@ readonly fields: PaymentFieldRefs;
 export interface Prisma__PaymentClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   milestone<T extends Prisma.Payment$milestoneArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Payment$milestoneArgs<ExtArgs>>): Prisma.Prisma__ProjectMilestoneClient<runtime.Types.Result.GetResult<Prisma.$ProjectMilestonePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  client<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  professional<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  job<T extends Prisma.Payment$jobArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Payment$jobArgs<ExtArgs>>): Prisma.Prisma__ClientJobClient<runtime.Types.Result.GetResult<Prisma.$ClientJobPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  projectTracking<T extends Prisma.Payment$projectTrackingArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Payment$projectTrackingArgs<ExtArgs>>): Prisma.Prisma__ProjectTrackingClient<runtime.Types.Result.GetResult<Prisma.$ProjectTrackingPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2006,6 +2974,44 @@ export type Payment$milestoneArgs<ExtArgs extends runtime.Types.Extensions.Inter
    */
   include?: Prisma.ProjectMilestoneInclude<ExtArgs> | null
   where?: Prisma.ProjectMilestoneWhereInput
+}
+
+/**
+ * Payment.job
+ */
+export type Payment$jobArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ClientJob
+   */
+  select?: Prisma.ClientJobSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ClientJob
+   */
+  omit?: Prisma.ClientJobOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ClientJobInclude<ExtArgs> | null
+  where?: Prisma.ClientJobWhereInput
+}
+
+/**
+ * Payment.projectTracking
+ */
+export type Payment$projectTrackingArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProjectTracking
+   */
+  select?: Prisma.ProjectTrackingSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ProjectTracking
+   */
+  omit?: Prisma.ProjectTrackingOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectTrackingInclude<ExtArgs> | null
+  where?: Prisma.ProjectTrackingWhereInput
 }
 
 /**

@@ -9,7 +9,18 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <GoogleMapsProvider>
       {children}
       <RealtimeNotifications />
-      <Toaster position="bottom-right" closeButton richColors />
+      <Toaster
+        position="top-right"
+        offset="76px"
+        duration={4500}
+        closeButton
+        richColors
+        toastOptions={{
+          classNames: {
+            toast: "w-[min(380px,calc(100vw-2rem))]",
+          },
+        }}
+      />
     </GoogleMapsProvider>
   );
 }

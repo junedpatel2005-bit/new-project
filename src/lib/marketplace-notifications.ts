@@ -101,12 +101,15 @@ async function notifyRole(
     });
     if (!recipients.length) return;
 
-    await db.userNotification.createMany({
+    const created = await db.userNotification.createManyAndReturn({
       data: recipients.map((recipient) => ({ userId: recipient.id, ...storedNotification })),
     });
-    emitRealtimeNotification(
-      recipients.map((recipient) => recipient.id),
-      storedNotification,
+    created.forEach((notification) =>
+      emitRealtimeNotification([notification.userId], {
+        ...storedNotification,
+        id: notification.id,
+        createdAt: notification.createdAt.toISOString(),
+      }),
     );
     const configuredAdminEmail =
       role === "ADMIN" && process.env.ADMIN_EMAIL?.includes("@")
@@ -275,12 +278,15 @@ export async function notifyUsers(userIds: number[], notification: BroadcastNoti
       where: { id: { in: ids }, isActive: true },
       select: { id: true, email: true, emailNotificationsEnabled: true },
     });
-    await db.userNotification.createMany({
+    const created = await db.userNotification.createManyAndReturn({
       data: recipients.map((recipient) => ({ userId: recipient.id, ...storedNotification })),
     });
-    emitRealtimeNotification(
-      recipients.map((recipient) => recipient.id),
-      storedNotification,
+    created.forEach((notification) =>
+      emitRealtimeNotification([notification.userId], {
+        ...storedNotification,
+        id: notification.id,
+        createdAt: notification.createdAt.toISOString(),
+      }),
     );
     await sendEmails(recipients, { ...storedNotification, emailDetails });
   } catch (error) {
@@ -307,14 +313,19 @@ export async function notifyDisputeRaised(input: {
     type: "DISPUTE_RAISED",
     title: "New dispute raised",
     description: `${input.reporterName} (${reporterLabel}) raised a ${input.issueType} dispute on ${jobLabel}.`,
-    href: `/admin/operations?dispute=${input.disputeId}`,
+    href: `/admin/operations?dispute=${input.disputeId}&project=${input.trackingId}`,
   });
-  await notifyUsers([input.clientId, input.professionalId], {
-    type: "DISPUTE_RAISED",
-    title: "A dispute was raised on your project",
-    description: `${input.reporterName} raised a ${input.issueType} dispute on ${jobLabel}. Our team will review it and follow up soon.`,
-    href: `/project/${input.trackingId}/tracking`,
-  });
+  await notifyUsers(
+    [input.clientId, input.professionalId].filter(
+      (id) => id !== (input.reporterRole === "CLIENT" ? input.clientId : input.professionalId),
+    ),
+    {
+      type: "DISPUTE_RAISED",
+      title: "A dispute was raised on your project",
+      description: `${input.reporterName} raised a ${input.issueType} dispute on ${jobLabel}. Our team will review it and follow up soon.`,
+      href: `/project/${input.trackingId}/tracking`,
+    },
+  );
 }
 
 export async function notifyDisputeResolved(input: {
@@ -377,7 +388,7 @@ export async function notifyMilestoneFunded(input: {
     type: "MILESTONE_FUNDED",
     title: "Milestone payout approval required",
     description: `${input.milestoneTitle} has received ${amount}. Review and approve the professional payout.`,
-    href: "/admin/finance",
+    href: `/admin/finance?project=${input.projectId}`,
   });
 }
 
@@ -407,6 +418,6 @@ export async function notifyMilestonePayoutApproved(input: {
     type: "MILESTONE_PAYOUT_APPROVED",
     title: "Milestone payout completed",
     description: `${payout} was released for ${input.milestoneTitle}. Platform earnings: ₹${input.platformEarnings.toLocaleString("en-IN")}.`,
-    href: "/admin/finance",
+    href: `/admin/finance?project=${input.projectId}`,
   });
 }

@@ -387,6 +387,9 @@ export type ClientJobWhereInput = {
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   attachments?: Prisma.ClientJobAttachmentListRelationFilter
   favoriteJobs?: Prisma.FavoriteJobListRelationFilter
+  projectRequests?: Prisma.ProjectRequestListRelationFilter
+  projectTrackings?: Prisma.ProjectTrackingListRelationFilter
+  payments?: Prisma.PaymentListRelationFilter
 }
 
 export type ClientJobOrderByWithRelationInput = {
@@ -416,6 +419,9 @@ export type ClientJobOrderByWithRelationInput = {
   user?: Prisma.UserOrderByWithRelationInput
   attachments?: Prisma.ClientJobAttachmentOrderByRelationAggregateInput
   favoriteJobs?: Prisma.FavoriteJobOrderByRelationAggregateInput
+  projectRequests?: Prisma.ProjectRequestOrderByRelationAggregateInput
+  projectTrackings?: Prisma.ProjectTrackingOrderByRelationAggregateInput
+  payments?: Prisma.PaymentOrderByRelationAggregateInput
 }
 
 export type ClientJobWhereUniqueInput = Prisma.AtLeast<{
@@ -448,6 +454,9 @@ export type ClientJobWhereUniqueInput = Prisma.AtLeast<{
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   attachments?: Prisma.ClientJobAttachmentListRelationFilter
   favoriteJobs?: Prisma.FavoriteJobListRelationFilter
+  projectRequests?: Prisma.ProjectRequestListRelationFilter
+  projectTrackings?: Prisma.ProjectTrackingListRelationFilter
+  payments?: Prisma.PaymentListRelationFilter
 }, "id">
 
 export type ClientJobOrderByWithAggregationInput = {
@@ -535,6 +544,9 @@ export type ClientJobCreateInput = {
   user: Prisma.UserCreateNestedOneWithoutClientJobsInput
   attachments?: Prisma.ClientJobAttachmentCreateNestedManyWithoutJobInput
   favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutJobInput
+  projectRequests?: Prisma.ProjectRequestCreateNestedManyWithoutJobInput
+  projectTrackings?: Prisma.ProjectTrackingCreateNestedManyWithoutJobInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutJobInput
 }
 
 export type ClientJobUncheckedCreateInput = {
@@ -563,6 +575,9 @@ export type ClientJobUncheckedCreateInput = {
   paymentMethod?: string
   attachments?: Prisma.ClientJobAttachmentUncheckedCreateNestedManyWithoutJobInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedCreateNestedManyWithoutJobInput
+  projectRequests?: Prisma.ProjectRequestUncheckedCreateNestedManyWithoutJobInput
+  projectTrackings?: Prisma.ProjectTrackingUncheckedCreateNestedManyWithoutJobInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutJobInput
 }
 
 export type ClientJobUpdateInput = {
@@ -590,6 +605,9 @@ export type ClientJobUpdateInput = {
   user?: Prisma.UserUpdateOneRequiredWithoutClientJobsNestedInput
   attachments?: Prisma.ClientJobAttachmentUpdateManyWithoutJobNestedInput
   favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutJobNestedInput
+  projectRequests?: Prisma.ProjectRequestUpdateManyWithoutJobNestedInput
+  projectTrackings?: Prisma.ProjectTrackingUpdateManyWithoutJobNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutJobNestedInput
 }
 
 export type ClientJobUncheckedUpdateInput = {
@@ -618,6 +636,9 @@ export type ClientJobUncheckedUpdateInput = {
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   attachments?: Prisma.ClientJobAttachmentUncheckedUpdateManyWithoutJobNestedInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedUpdateManyWithoutJobNestedInput
+  projectRequests?: Prisma.ProjectRequestUncheckedUpdateManyWithoutJobNestedInput
+  projectTrackings?: Prisma.ProjectTrackingUncheckedUpdateManyWithoutJobNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutJobNestedInput
 }
 
 export type ClientJobCreateManyInput = {
@@ -809,6 +830,11 @@ export type ClientJobScalarRelationFilter = {
   isNot?: Prisma.ClientJobWhereInput
 }
 
+export type ClientJobNullableScalarRelationFilter = {
+  is?: Prisma.ClientJobWhereInput | null
+  isNot?: Prisma.ClientJobWhereInput | null
+}
+
 export type ClientJobCreateNestedManyWithoutUserInput = {
   create?: Prisma.XOR<Prisma.ClientJobCreateWithoutUserInput, Prisma.ClientJobUncheckedCreateWithoutUserInput> | Prisma.ClientJobCreateWithoutUserInput[] | Prisma.ClientJobUncheckedCreateWithoutUserInput[]
   connectOrCreate?: Prisma.ClientJobCreateOrConnectWithoutUserInput | Prisma.ClientJobCreateOrConnectWithoutUserInput[]
@@ -891,6 +917,50 @@ export type ClientJobUpdateOneRequiredWithoutAttachmentsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ClientJobUpdateToOneWithWhereWithoutAttachmentsInput, Prisma.ClientJobUpdateWithoutAttachmentsInput>, Prisma.ClientJobUncheckedUpdateWithoutAttachmentsInput>
 }
 
+export type ClientJobCreateNestedOneWithoutProjectRequestsInput = {
+  create?: Prisma.XOR<Prisma.ClientJobCreateWithoutProjectRequestsInput, Prisma.ClientJobUncheckedCreateWithoutProjectRequestsInput>
+  connectOrCreate?: Prisma.ClientJobCreateOrConnectWithoutProjectRequestsInput
+  connect?: Prisma.ClientJobWhereUniqueInput
+}
+
+export type ClientJobUpdateOneRequiredWithoutProjectRequestsNestedInput = {
+  create?: Prisma.XOR<Prisma.ClientJobCreateWithoutProjectRequestsInput, Prisma.ClientJobUncheckedCreateWithoutProjectRequestsInput>
+  connectOrCreate?: Prisma.ClientJobCreateOrConnectWithoutProjectRequestsInput
+  upsert?: Prisma.ClientJobUpsertWithoutProjectRequestsInput
+  connect?: Prisma.ClientJobWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ClientJobUpdateToOneWithWhereWithoutProjectRequestsInput, Prisma.ClientJobUpdateWithoutProjectRequestsInput>, Prisma.ClientJobUncheckedUpdateWithoutProjectRequestsInput>
+}
+
+export type ClientJobCreateNestedOneWithoutProjectTrackingsInput = {
+  create?: Prisma.XOR<Prisma.ClientJobCreateWithoutProjectTrackingsInput, Prisma.ClientJobUncheckedCreateWithoutProjectTrackingsInput>
+  connectOrCreate?: Prisma.ClientJobCreateOrConnectWithoutProjectTrackingsInput
+  connect?: Prisma.ClientJobWhereUniqueInput
+}
+
+export type ClientJobUpdateOneRequiredWithoutProjectTrackingsNestedInput = {
+  create?: Prisma.XOR<Prisma.ClientJobCreateWithoutProjectTrackingsInput, Prisma.ClientJobUncheckedCreateWithoutProjectTrackingsInput>
+  connectOrCreate?: Prisma.ClientJobCreateOrConnectWithoutProjectTrackingsInput
+  upsert?: Prisma.ClientJobUpsertWithoutProjectTrackingsInput
+  connect?: Prisma.ClientJobWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ClientJobUpdateToOneWithWhereWithoutProjectTrackingsInput, Prisma.ClientJobUpdateWithoutProjectTrackingsInput>, Prisma.ClientJobUncheckedUpdateWithoutProjectTrackingsInput>
+}
+
+export type ClientJobCreateNestedOneWithoutPaymentsInput = {
+  create?: Prisma.XOR<Prisma.ClientJobCreateWithoutPaymentsInput, Prisma.ClientJobUncheckedCreateWithoutPaymentsInput>
+  connectOrCreate?: Prisma.ClientJobCreateOrConnectWithoutPaymentsInput
+  connect?: Prisma.ClientJobWhereUniqueInput
+}
+
+export type ClientJobUpdateOneWithoutPaymentsNestedInput = {
+  create?: Prisma.XOR<Prisma.ClientJobCreateWithoutPaymentsInput, Prisma.ClientJobUncheckedCreateWithoutPaymentsInput>
+  connectOrCreate?: Prisma.ClientJobCreateOrConnectWithoutPaymentsInput
+  upsert?: Prisma.ClientJobUpsertWithoutPaymentsInput
+  disconnect?: Prisma.ClientJobWhereInput | boolean
+  delete?: Prisma.ClientJobWhereInput | boolean
+  connect?: Prisma.ClientJobWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ClientJobUpdateToOneWithWhereWithoutPaymentsInput, Prisma.ClientJobUpdateWithoutPaymentsInput>, Prisma.ClientJobUncheckedUpdateWithoutPaymentsInput>
+}
+
 export type ClientJobCreateWithoutUserInput = {
   category?: string | null
   title?: string | null
@@ -915,6 +985,9 @@ export type ClientJobCreateWithoutUserInput = {
   paymentMethod?: string
   attachments?: Prisma.ClientJobAttachmentCreateNestedManyWithoutJobInput
   favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutJobInput
+  projectRequests?: Prisma.ProjectRequestCreateNestedManyWithoutJobInput
+  projectTrackings?: Prisma.ProjectTrackingCreateNestedManyWithoutJobInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutJobInput
 }
 
 export type ClientJobUncheckedCreateWithoutUserInput = {
@@ -942,6 +1015,9 @@ export type ClientJobUncheckedCreateWithoutUserInput = {
   paymentMethod?: string
   attachments?: Prisma.ClientJobAttachmentUncheckedCreateNestedManyWithoutJobInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedCreateNestedManyWithoutJobInput
+  projectRequests?: Prisma.ProjectRequestUncheckedCreateNestedManyWithoutJobInput
+  projectTrackings?: Prisma.ProjectTrackingUncheckedCreateNestedManyWithoutJobInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutJobInput
 }
 
 export type ClientJobCreateOrConnectWithoutUserInput = {
@@ -1023,6 +1099,9 @@ export type ClientJobCreateWithoutFavoriteJobsInput = {
   paymentMethod?: string
   user: Prisma.UserCreateNestedOneWithoutClientJobsInput
   attachments?: Prisma.ClientJobAttachmentCreateNestedManyWithoutJobInput
+  projectRequests?: Prisma.ProjectRequestCreateNestedManyWithoutJobInput
+  projectTrackings?: Prisma.ProjectTrackingCreateNestedManyWithoutJobInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutJobInput
 }
 
 export type ClientJobUncheckedCreateWithoutFavoriteJobsInput = {
@@ -1050,6 +1129,9 @@ export type ClientJobUncheckedCreateWithoutFavoriteJobsInput = {
   timingType?: string
   paymentMethod?: string
   attachments?: Prisma.ClientJobAttachmentUncheckedCreateNestedManyWithoutJobInput
+  projectRequests?: Prisma.ProjectRequestUncheckedCreateNestedManyWithoutJobInput
+  projectTrackings?: Prisma.ProjectTrackingUncheckedCreateNestedManyWithoutJobInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutJobInput
 }
 
 export type ClientJobCreateOrConnectWithoutFavoriteJobsInput = {
@@ -1092,6 +1174,9 @@ export type ClientJobUpdateWithoutFavoriteJobsInput = {
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   user?: Prisma.UserUpdateOneRequiredWithoutClientJobsNestedInput
   attachments?: Prisma.ClientJobAttachmentUpdateManyWithoutJobNestedInput
+  projectRequests?: Prisma.ProjectRequestUpdateManyWithoutJobNestedInput
+  projectTrackings?: Prisma.ProjectTrackingUpdateManyWithoutJobNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutJobNestedInput
 }
 
 export type ClientJobUncheckedUpdateWithoutFavoriteJobsInput = {
@@ -1119,6 +1204,9 @@ export type ClientJobUncheckedUpdateWithoutFavoriteJobsInput = {
   timingType?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   attachments?: Prisma.ClientJobAttachmentUncheckedUpdateManyWithoutJobNestedInput
+  projectRequests?: Prisma.ProjectRequestUncheckedUpdateManyWithoutJobNestedInput
+  projectTrackings?: Prisma.ProjectTrackingUncheckedUpdateManyWithoutJobNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutJobNestedInput
 }
 
 export type ClientJobCreateWithoutAttachmentsInput = {
@@ -1145,6 +1233,9 @@ export type ClientJobCreateWithoutAttachmentsInput = {
   paymentMethod?: string
   user: Prisma.UserCreateNestedOneWithoutClientJobsInput
   favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutJobInput
+  projectRequests?: Prisma.ProjectRequestCreateNestedManyWithoutJobInput
+  projectTrackings?: Prisma.ProjectTrackingCreateNestedManyWithoutJobInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutJobInput
 }
 
 export type ClientJobUncheckedCreateWithoutAttachmentsInput = {
@@ -1172,6 +1263,9 @@ export type ClientJobUncheckedCreateWithoutAttachmentsInput = {
   timingType?: string
   paymentMethod?: string
   favoriteJobs?: Prisma.FavoriteJobUncheckedCreateNestedManyWithoutJobInput
+  projectRequests?: Prisma.ProjectRequestUncheckedCreateNestedManyWithoutJobInput
+  projectTrackings?: Prisma.ProjectTrackingUncheckedCreateNestedManyWithoutJobInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutJobInput
 }
 
 export type ClientJobCreateOrConnectWithoutAttachmentsInput = {
@@ -1214,6 +1308,9 @@ export type ClientJobUpdateWithoutAttachmentsInput = {
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   user?: Prisma.UserUpdateOneRequiredWithoutClientJobsNestedInput
   favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutJobNestedInput
+  projectRequests?: Prisma.ProjectRequestUpdateManyWithoutJobNestedInput
+  projectTrackings?: Prisma.ProjectTrackingUpdateManyWithoutJobNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutJobNestedInput
 }
 
 export type ClientJobUncheckedUpdateWithoutAttachmentsInput = {
@@ -1241,6 +1338,411 @@ export type ClientJobUncheckedUpdateWithoutAttachmentsInput = {
   timingType?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   favoriteJobs?: Prisma.FavoriteJobUncheckedUpdateManyWithoutJobNestedInput
+  projectRequests?: Prisma.ProjectRequestUncheckedUpdateManyWithoutJobNestedInput
+  projectTrackings?: Prisma.ProjectTrackingUncheckedUpdateManyWithoutJobNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutJobNestedInput
+}
+
+export type ClientJobCreateWithoutProjectRequestsInput = {
+  category?: string | null
+  title?: string | null
+  description?: string | null
+  budgetMin?: number | null
+  budgetMax?: number | null
+  urgency?: $Enums.JobUrgency
+  jobDate?: Date | string | null
+  deadline?: Date | string | null
+  workMode?: $Enums.JobWorkMode
+  locationLabel?: string | null
+  locationAddress?: string | null
+  locationState?: string | null
+  locationDistrict?: string | null
+  locationLat?: number | null
+  locationLng?: number | null
+  status?: $Enums.JobStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  hourlyRate?: number | null
+  timingType?: string
+  paymentMethod?: string
+  user: Prisma.UserCreateNestedOneWithoutClientJobsInput
+  attachments?: Prisma.ClientJobAttachmentCreateNestedManyWithoutJobInput
+  favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutJobInput
+  projectTrackings?: Prisma.ProjectTrackingCreateNestedManyWithoutJobInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutJobInput
+}
+
+export type ClientJobUncheckedCreateWithoutProjectRequestsInput = {
+  id?: number
+  userId: number
+  category?: string | null
+  title?: string | null
+  description?: string | null
+  budgetMin?: number | null
+  budgetMax?: number | null
+  urgency?: $Enums.JobUrgency
+  jobDate?: Date | string | null
+  deadline?: Date | string | null
+  workMode?: $Enums.JobWorkMode
+  locationLabel?: string | null
+  locationAddress?: string | null
+  locationState?: string | null
+  locationDistrict?: string | null
+  locationLat?: number | null
+  locationLng?: number | null
+  status?: $Enums.JobStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  hourlyRate?: number | null
+  timingType?: string
+  paymentMethod?: string
+  attachments?: Prisma.ClientJobAttachmentUncheckedCreateNestedManyWithoutJobInput
+  favoriteJobs?: Prisma.FavoriteJobUncheckedCreateNestedManyWithoutJobInput
+  projectTrackings?: Prisma.ProjectTrackingUncheckedCreateNestedManyWithoutJobInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutJobInput
+}
+
+export type ClientJobCreateOrConnectWithoutProjectRequestsInput = {
+  where: Prisma.ClientJobWhereUniqueInput
+  create: Prisma.XOR<Prisma.ClientJobCreateWithoutProjectRequestsInput, Prisma.ClientJobUncheckedCreateWithoutProjectRequestsInput>
+}
+
+export type ClientJobUpsertWithoutProjectRequestsInput = {
+  update: Prisma.XOR<Prisma.ClientJobUpdateWithoutProjectRequestsInput, Prisma.ClientJobUncheckedUpdateWithoutProjectRequestsInput>
+  create: Prisma.XOR<Prisma.ClientJobCreateWithoutProjectRequestsInput, Prisma.ClientJobUncheckedCreateWithoutProjectRequestsInput>
+  where?: Prisma.ClientJobWhereInput
+}
+
+export type ClientJobUpdateToOneWithWhereWithoutProjectRequestsInput = {
+  where?: Prisma.ClientJobWhereInput
+  data: Prisma.XOR<Prisma.ClientJobUpdateWithoutProjectRequestsInput, Prisma.ClientJobUncheckedUpdateWithoutProjectRequestsInput>
+}
+
+export type ClientJobUpdateWithoutProjectRequestsInput = {
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  budgetMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  budgetMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  urgency?: Prisma.EnumJobUrgencyFieldUpdateOperationsInput | $Enums.JobUrgency
+  jobDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
+  locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  locationLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  timingType?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
+  user?: Prisma.UserUpdateOneRequiredWithoutClientJobsNestedInput
+  attachments?: Prisma.ClientJobAttachmentUpdateManyWithoutJobNestedInput
+  favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutJobNestedInput
+  projectTrackings?: Prisma.ProjectTrackingUpdateManyWithoutJobNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutJobNestedInput
+}
+
+export type ClientJobUncheckedUpdateWithoutProjectRequestsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  userId?: Prisma.IntFieldUpdateOperationsInput | number
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  budgetMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  budgetMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  urgency?: Prisma.EnumJobUrgencyFieldUpdateOperationsInput | $Enums.JobUrgency
+  jobDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
+  locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  locationLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  timingType?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
+  attachments?: Prisma.ClientJobAttachmentUncheckedUpdateManyWithoutJobNestedInput
+  favoriteJobs?: Prisma.FavoriteJobUncheckedUpdateManyWithoutJobNestedInput
+  projectTrackings?: Prisma.ProjectTrackingUncheckedUpdateManyWithoutJobNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutJobNestedInput
+}
+
+export type ClientJobCreateWithoutProjectTrackingsInput = {
+  category?: string | null
+  title?: string | null
+  description?: string | null
+  budgetMin?: number | null
+  budgetMax?: number | null
+  urgency?: $Enums.JobUrgency
+  jobDate?: Date | string | null
+  deadline?: Date | string | null
+  workMode?: $Enums.JobWorkMode
+  locationLabel?: string | null
+  locationAddress?: string | null
+  locationState?: string | null
+  locationDistrict?: string | null
+  locationLat?: number | null
+  locationLng?: number | null
+  status?: $Enums.JobStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  hourlyRate?: number | null
+  timingType?: string
+  paymentMethod?: string
+  user: Prisma.UserCreateNestedOneWithoutClientJobsInput
+  attachments?: Prisma.ClientJobAttachmentCreateNestedManyWithoutJobInput
+  favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutJobInput
+  projectRequests?: Prisma.ProjectRequestCreateNestedManyWithoutJobInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutJobInput
+}
+
+export type ClientJobUncheckedCreateWithoutProjectTrackingsInput = {
+  id?: number
+  userId: number
+  category?: string | null
+  title?: string | null
+  description?: string | null
+  budgetMin?: number | null
+  budgetMax?: number | null
+  urgency?: $Enums.JobUrgency
+  jobDate?: Date | string | null
+  deadline?: Date | string | null
+  workMode?: $Enums.JobWorkMode
+  locationLabel?: string | null
+  locationAddress?: string | null
+  locationState?: string | null
+  locationDistrict?: string | null
+  locationLat?: number | null
+  locationLng?: number | null
+  status?: $Enums.JobStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  hourlyRate?: number | null
+  timingType?: string
+  paymentMethod?: string
+  attachments?: Prisma.ClientJobAttachmentUncheckedCreateNestedManyWithoutJobInput
+  favoriteJobs?: Prisma.FavoriteJobUncheckedCreateNestedManyWithoutJobInput
+  projectRequests?: Prisma.ProjectRequestUncheckedCreateNestedManyWithoutJobInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutJobInput
+}
+
+export type ClientJobCreateOrConnectWithoutProjectTrackingsInput = {
+  where: Prisma.ClientJobWhereUniqueInput
+  create: Prisma.XOR<Prisma.ClientJobCreateWithoutProjectTrackingsInput, Prisma.ClientJobUncheckedCreateWithoutProjectTrackingsInput>
+}
+
+export type ClientJobUpsertWithoutProjectTrackingsInput = {
+  update: Prisma.XOR<Prisma.ClientJobUpdateWithoutProjectTrackingsInput, Prisma.ClientJobUncheckedUpdateWithoutProjectTrackingsInput>
+  create: Prisma.XOR<Prisma.ClientJobCreateWithoutProjectTrackingsInput, Prisma.ClientJobUncheckedCreateWithoutProjectTrackingsInput>
+  where?: Prisma.ClientJobWhereInput
+}
+
+export type ClientJobUpdateToOneWithWhereWithoutProjectTrackingsInput = {
+  where?: Prisma.ClientJobWhereInput
+  data: Prisma.XOR<Prisma.ClientJobUpdateWithoutProjectTrackingsInput, Prisma.ClientJobUncheckedUpdateWithoutProjectTrackingsInput>
+}
+
+export type ClientJobUpdateWithoutProjectTrackingsInput = {
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  budgetMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  budgetMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  urgency?: Prisma.EnumJobUrgencyFieldUpdateOperationsInput | $Enums.JobUrgency
+  jobDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
+  locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  locationLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  timingType?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
+  user?: Prisma.UserUpdateOneRequiredWithoutClientJobsNestedInput
+  attachments?: Prisma.ClientJobAttachmentUpdateManyWithoutJobNestedInput
+  favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutJobNestedInput
+  projectRequests?: Prisma.ProjectRequestUpdateManyWithoutJobNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutJobNestedInput
+}
+
+export type ClientJobUncheckedUpdateWithoutProjectTrackingsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  userId?: Prisma.IntFieldUpdateOperationsInput | number
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  budgetMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  budgetMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  urgency?: Prisma.EnumJobUrgencyFieldUpdateOperationsInput | $Enums.JobUrgency
+  jobDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
+  locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  locationLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  timingType?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
+  attachments?: Prisma.ClientJobAttachmentUncheckedUpdateManyWithoutJobNestedInput
+  favoriteJobs?: Prisma.FavoriteJobUncheckedUpdateManyWithoutJobNestedInput
+  projectRequests?: Prisma.ProjectRequestUncheckedUpdateManyWithoutJobNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutJobNestedInput
+}
+
+export type ClientJobCreateWithoutPaymentsInput = {
+  category?: string | null
+  title?: string | null
+  description?: string | null
+  budgetMin?: number | null
+  budgetMax?: number | null
+  urgency?: $Enums.JobUrgency
+  jobDate?: Date | string | null
+  deadline?: Date | string | null
+  workMode?: $Enums.JobWorkMode
+  locationLabel?: string | null
+  locationAddress?: string | null
+  locationState?: string | null
+  locationDistrict?: string | null
+  locationLat?: number | null
+  locationLng?: number | null
+  status?: $Enums.JobStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  hourlyRate?: number | null
+  timingType?: string
+  paymentMethod?: string
+  user: Prisma.UserCreateNestedOneWithoutClientJobsInput
+  attachments?: Prisma.ClientJobAttachmentCreateNestedManyWithoutJobInput
+  favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutJobInput
+  projectRequests?: Prisma.ProjectRequestCreateNestedManyWithoutJobInput
+  projectTrackings?: Prisma.ProjectTrackingCreateNestedManyWithoutJobInput
+}
+
+export type ClientJobUncheckedCreateWithoutPaymentsInput = {
+  id?: number
+  userId: number
+  category?: string | null
+  title?: string | null
+  description?: string | null
+  budgetMin?: number | null
+  budgetMax?: number | null
+  urgency?: $Enums.JobUrgency
+  jobDate?: Date | string | null
+  deadline?: Date | string | null
+  workMode?: $Enums.JobWorkMode
+  locationLabel?: string | null
+  locationAddress?: string | null
+  locationState?: string | null
+  locationDistrict?: string | null
+  locationLat?: number | null
+  locationLng?: number | null
+  status?: $Enums.JobStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  hourlyRate?: number | null
+  timingType?: string
+  paymentMethod?: string
+  attachments?: Prisma.ClientJobAttachmentUncheckedCreateNestedManyWithoutJobInput
+  favoriteJobs?: Prisma.FavoriteJobUncheckedCreateNestedManyWithoutJobInput
+  projectRequests?: Prisma.ProjectRequestUncheckedCreateNestedManyWithoutJobInput
+  projectTrackings?: Prisma.ProjectTrackingUncheckedCreateNestedManyWithoutJobInput
+}
+
+export type ClientJobCreateOrConnectWithoutPaymentsInput = {
+  where: Prisma.ClientJobWhereUniqueInput
+  create: Prisma.XOR<Prisma.ClientJobCreateWithoutPaymentsInput, Prisma.ClientJobUncheckedCreateWithoutPaymentsInput>
+}
+
+export type ClientJobUpsertWithoutPaymentsInput = {
+  update: Prisma.XOR<Prisma.ClientJobUpdateWithoutPaymentsInput, Prisma.ClientJobUncheckedUpdateWithoutPaymentsInput>
+  create: Prisma.XOR<Prisma.ClientJobCreateWithoutPaymentsInput, Prisma.ClientJobUncheckedCreateWithoutPaymentsInput>
+  where?: Prisma.ClientJobWhereInput
+}
+
+export type ClientJobUpdateToOneWithWhereWithoutPaymentsInput = {
+  where?: Prisma.ClientJobWhereInput
+  data: Prisma.XOR<Prisma.ClientJobUpdateWithoutPaymentsInput, Prisma.ClientJobUncheckedUpdateWithoutPaymentsInput>
+}
+
+export type ClientJobUpdateWithoutPaymentsInput = {
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  budgetMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  budgetMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  urgency?: Prisma.EnumJobUrgencyFieldUpdateOperationsInput | $Enums.JobUrgency
+  jobDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
+  locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  locationLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  timingType?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
+  user?: Prisma.UserUpdateOneRequiredWithoutClientJobsNestedInput
+  attachments?: Prisma.ClientJobAttachmentUpdateManyWithoutJobNestedInput
+  favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutJobNestedInput
+  projectRequests?: Prisma.ProjectRequestUpdateManyWithoutJobNestedInput
+  projectTrackings?: Prisma.ProjectTrackingUpdateManyWithoutJobNestedInput
+}
+
+export type ClientJobUncheckedUpdateWithoutPaymentsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  userId?: Prisma.IntFieldUpdateOperationsInput | number
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  budgetMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  budgetMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  urgency?: Prisma.EnumJobUrgencyFieldUpdateOperationsInput | $Enums.JobUrgency
+  jobDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
+  locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  locationLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  timingType?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
+  attachments?: Prisma.ClientJobAttachmentUncheckedUpdateManyWithoutJobNestedInput
+  favoriteJobs?: Prisma.FavoriteJobUncheckedUpdateManyWithoutJobNestedInput
+  projectRequests?: Prisma.ProjectRequestUncheckedUpdateManyWithoutJobNestedInput
+  projectTrackings?: Prisma.ProjectTrackingUncheckedUpdateManyWithoutJobNestedInput
 }
 
 export type ClientJobCreateManyUserInput = {
@@ -1292,6 +1794,9 @@ export type ClientJobUpdateWithoutUserInput = {
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   attachments?: Prisma.ClientJobAttachmentUpdateManyWithoutJobNestedInput
   favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutJobNestedInput
+  projectRequests?: Prisma.ProjectRequestUpdateManyWithoutJobNestedInput
+  projectTrackings?: Prisma.ProjectTrackingUpdateManyWithoutJobNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutJobNestedInput
 }
 
 export type ClientJobUncheckedUpdateWithoutUserInput = {
@@ -1319,6 +1824,9 @@ export type ClientJobUncheckedUpdateWithoutUserInput = {
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   attachments?: Prisma.ClientJobAttachmentUncheckedUpdateManyWithoutJobNestedInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedUpdateManyWithoutJobNestedInput
+  projectRequests?: Prisma.ProjectRequestUncheckedUpdateManyWithoutJobNestedInput
+  projectTrackings?: Prisma.ProjectTrackingUncheckedUpdateManyWithoutJobNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutJobNestedInput
 }
 
 export type ClientJobUncheckedUpdateManyWithoutUserInput = {
@@ -1354,11 +1862,17 @@ export type ClientJobUncheckedUpdateManyWithoutUserInput = {
 export type ClientJobCountOutputType = {
   attachments: number
   favoriteJobs: number
+  projectRequests: number
+  projectTrackings: number
+  payments: number
 }
 
 export type ClientJobCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   attachments?: boolean | ClientJobCountOutputTypeCountAttachmentsArgs
   favoriteJobs?: boolean | ClientJobCountOutputTypeCountFavoriteJobsArgs
+  projectRequests?: boolean | ClientJobCountOutputTypeCountProjectRequestsArgs
+  projectTrackings?: boolean | ClientJobCountOutputTypeCountProjectTrackingsArgs
+  payments?: boolean | ClientJobCountOutputTypeCountPaymentsArgs
 }
 
 /**
@@ -1383,6 +1897,27 @@ export type ClientJobCountOutputTypeCountAttachmentsArgs<ExtArgs extends runtime
  */
 export type ClientJobCountOutputTypeCountFavoriteJobsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.FavoriteJobWhereInput
+}
+
+/**
+ * ClientJobCountOutputType without action
+ */
+export type ClientJobCountOutputTypeCountProjectRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ProjectRequestWhereInput
+}
+
+/**
+ * ClientJobCountOutputType without action
+ */
+export type ClientJobCountOutputTypeCountProjectTrackingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ProjectTrackingWhereInput
+}
+
+/**
+ * ClientJobCountOutputType without action
+ */
+export type ClientJobCountOutputTypeCountPaymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PaymentWhereInput
 }
 
 
@@ -1413,6 +1948,9 @@ export type ClientJobSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   attachments?: boolean | Prisma.ClientJob$attachmentsArgs<ExtArgs>
   favoriteJobs?: boolean | Prisma.ClientJob$favoriteJobsArgs<ExtArgs>
+  projectRequests?: boolean | Prisma.ClientJob$projectRequestsArgs<ExtArgs>
+  projectTrackings?: boolean | Prisma.ClientJob$projectTrackingsArgs<ExtArgs>
+  payments?: boolean | Prisma.ClientJob$paymentsArgs<ExtArgs>
   _count?: boolean | Prisma.ClientJobCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["clientJob"]>
 
@@ -1501,6 +2039,9 @@ export type ClientJobInclude<ExtArgs extends runtime.Types.Extensions.InternalAr
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   attachments?: boolean | Prisma.ClientJob$attachmentsArgs<ExtArgs>
   favoriteJobs?: boolean | Prisma.ClientJob$favoriteJobsArgs<ExtArgs>
+  projectRequests?: boolean | Prisma.ClientJob$projectRequestsArgs<ExtArgs>
+  projectTrackings?: boolean | Prisma.ClientJob$projectTrackingsArgs<ExtArgs>
+  payments?: boolean | Prisma.ClientJob$paymentsArgs<ExtArgs>
   _count?: boolean | Prisma.ClientJobCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ClientJobIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1516,6 +2057,9 @@ export type $ClientJobPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     user: Prisma.$UserPayload<ExtArgs>
     attachments: Prisma.$ClientJobAttachmentPayload<ExtArgs>[]
     favoriteJobs: Prisma.$FavoriteJobPayload<ExtArgs>[]
+    projectRequests: Prisma.$ProjectRequestPayload<ExtArgs>[]
+    projectTrackings: Prisma.$ProjectTrackingPayload<ExtArgs>[]
+    payments: Prisma.$PaymentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1938,6 +2482,9 @@ export interface Prisma__ClientJobClient<T, Null = never, ExtArgs extends runtim
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   attachments<T extends Prisma.ClientJob$attachmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ClientJob$attachmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClientJobAttachmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   favoriteJobs<T extends Prisma.ClientJob$favoriteJobsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ClientJob$favoriteJobsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FavoriteJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  projectRequests<T extends Prisma.ClientJob$projectRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ClientJob$projectRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProjectRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  projectTrackings<T extends Prisma.ClientJob$projectTrackingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ClientJob$projectTrackingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProjectTrackingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  payments<T extends Prisma.ClientJob$paymentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ClientJob$paymentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2436,6 +2983,78 @@ export type ClientJob$favoriteJobsArgs<ExtArgs extends runtime.Types.Extensions.
   take?: number
   skip?: number
   distinct?: Prisma.FavoriteJobScalarFieldEnum | Prisma.FavoriteJobScalarFieldEnum[]
+}
+
+/**
+ * ClientJob.projectRequests
+ */
+export type ClientJob$projectRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProjectRequest
+   */
+  select?: Prisma.ProjectRequestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ProjectRequest
+   */
+  omit?: Prisma.ProjectRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectRequestInclude<ExtArgs> | null
+  where?: Prisma.ProjectRequestWhereInput
+  orderBy?: Prisma.ProjectRequestOrderByWithRelationInput | Prisma.ProjectRequestOrderByWithRelationInput[]
+  cursor?: Prisma.ProjectRequestWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ProjectRequestScalarFieldEnum | Prisma.ProjectRequestScalarFieldEnum[]
+}
+
+/**
+ * ClientJob.projectTrackings
+ */
+export type ClientJob$projectTrackingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProjectTracking
+   */
+  select?: Prisma.ProjectTrackingSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ProjectTracking
+   */
+  omit?: Prisma.ProjectTrackingOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectTrackingInclude<ExtArgs> | null
+  where?: Prisma.ProjectTrackingWhereInput
+  orderBy?: Prisma.ProjectTrackingOrderByWithRelationInput | Prisma.ProjectTrackingOrderByWithRelationInput[]
+  cursor?: Prisma.ProjectTrackingWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ProjectTrackingScalarFieldEnum | Prisma.ProjectTrackingScalarFieldEnum[]
+}
+
+/**
+ * ClientJob.payments
+ */
+export type ClientJob$paymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Payment
+   */
+  select?: Prisma.PaymentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Payment
+   */
+  omit?: Prisma.PaymentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PaymentInclude<ExtArgs> | null
+  where?: Prisma.PaymentWhereInput
+  orderBy?: Prisma.PaymentOrderByWithRelationInput | Prisma.PaymentOrderByWithRelationInput[]
+  cursor?: Prisma.PaymentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PaymentScalarFieldEnum | Prisma.PaymentScalarFieldEnum[]
 }
 
 /**

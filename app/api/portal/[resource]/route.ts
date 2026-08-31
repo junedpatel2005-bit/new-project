@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import type { Prisma } from "@/generated/prisma/client";
 import { sessionCookie, verifySession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import {
@@ -29,13 +30,74 @@ export async function GET(
   if (!session) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
   const { resource } = await params;
   try {
-    if (resource === "notifications")
+    if (resource === "notifications") {
+      const notifications = await db.userNotification.findMany({
+        where: { userId: session.userId, clearedAt: null },
+        orderBy: { createdAt: "desc" },
+      });
+      const projectIdFor = (href: string | null) => {
+        if (!href) return null;
+        const pathMatch = href.match(/^\/project\/(\d+)\/tracking/);
+        if (pathMatch) return Number(pathMatch[1]);
+        const queryMatch = href.match(/[?&]project=(\d+)(?:&|$)/);
+        return queryMatch ? Number(queryMatch[1]) : null;
+      };
+      const legacyDisputeIds = notifications.flatMap((notification) => {
+        const match = notification.href?.match(/[?&]dispute=(\d+)(?:&|$)/);
+        return match ? [Number(match[1])] : [];
+      });
+      const [disputes, milestones] = await Promise.all([
+        db.projectDispute.findMany({
+          where: { id: { in: legacyDisputeIds } },
+          select: { id: true, trackingId: true },
+        }),
+        db.projectMilestone.findMany({
+          select: { title: true, trackingId: true },
+        }),
+      ]);
+      const disputeProjectMap = new Map(
+        disputes.map((dispute) => [dispute.id, dispute.trackingId]),
+      );
+      const resolvedProjectIdFor = (notification: (typeof notifications)[number]) => {
+        const directProjectId = projectIdFor(notification.href);
+        if (directProjectId) return directProjectId;
+        const disputeId = notification.href?.match(/[?&]dispute=(\d+)(?:&|$)/)?.[1];
+        if (disputeId && disputeProjectMap.has(Number(disputeId))) {
+          return disputeProjectMap.get(Number(disputeId)) ?? null;
+        }
+        if (notification.type.includes("MILESTONE") || notification.type.includes("PAYOUT")) {
+          const text = `${notification.title} ${notification.description ?? ""}`;
+          return milestones.find((milestone) => text.includes(milestone.title))?.trackingId ?? null;
+        }
+        return null;
+      };
+      const projectIds = notifications.flatMap((notification) => {
+        const projectId = resolvedProjectIdFor(notification);
+        return projectId ? [projectId] : [];
+      });
+      const projects = await db.projectTracking.findMany({
+        where: { id: { in: projectIds } },
+        select: { id: true, jobId: true },
+      });
+      const jobs = await db.clientJob.findMany({
+        where: { id: { in: projects.map((project) => project.jobId) } },
+        select: { id: true, title: true },
+      });
+      const jobMap = new Map(jobs.map((job) => [job.id, job.title]));
+      const projectMap = new Map(
+        projects.map((project) => [project.id, jobMap.get(project.jobId)]),
+      );
       return NextResponse.json(
-        await db.userNotification.findMany({
-          where: { userId: session.userId, clearedAt: null },
-          orderBy: { createdAt: "desc" },
+        notifications.map((notification) => {
+          const projectId = resolvedProjectIdFor(notification);
+          return {
+            ...notification,
+            projectId,
+            projectTitle: projectId ? projectMap.get(projectId) || `Project #${projectId}` : null,
+          };
         }),
       );
+    }
     if (resource === "earnings") {
       if (!["PROFESSIONAL", "CLIENT"].includes(session.role))
         return NextResponse.json({ error: "Account access required." }, { status: 403 });
@@ -152,6 +214,24 @@ export async function GET(
           ...acceptedRequests.map((request) => request.jobId),
         ]);
       });
+      const availabilityFilter: Prisma.ClientJobWhereInput = bbox
+        ? {
+            OR: [
+              { workMode: { in: ["REMOTE", "BOTH"] } },
+              { locationLat: null },
+              {
+                locationLat: {
+                  gte: professional!.professionalLatitude! - bbox.latDelta,
+                  lte: professional!.professionalLatitude! + bbox.latDelta,
+                },
+                locationLng: {
+                  gte: professional!.professionalLongitude! - bbox.lngDelta,
+                  lte: professional!.professionalLongitude! + bbox.lngDelta,
+                },
+              },
+            ],
+          }
+        : {};
 
       const [openJobs, savedJobs, proposals, offers, activeProjects, completedProjects] =
         await Promise.all([
@@ -159,24 +239,11 @@ export async function GET(
             where: {
               status: "OPEN",
               id: { notIn: [...blockedJobs] },
-              ...(bbox
-                ? {
-                    OR: [
-                      { workMode: { in: ["REMOTE", "BOTH"] } },
-                      { locationLat: null },
-                      {
-                        locationLat: {
-                          gte: professional!.professionalLatitude! - bbox.latDelta,
-                          lte: professional!.professionalLatitude! + bbox.latDelta,
-                        },
-                        locationLng: {
-                          gte: professional!.professionalLongitude! - bbox.lngDelta,
-                          lte: professional!.professionalLongitude! + bbox.lngDelta,
-                        },
-                      },
-                    ],
-                  }
-                : {}),
+              AND: [
+                { OR: [{ jobDate: null }, { jobDate: { lte: new Date() } }] },
+                { OR: [{ deadline: null }, { deadline: { gte: new Date() } }] },
+                availabilityFilter,
+              ],
             },
             orderBy: { createdAt: "desc" },
             include: {
@@ -191,7 +258,16 @@ export async function GET(
             },
           }),
           db.favoriteJob.findMany({
-            where: { userId: session.userId, job: { status: "OPEN" } },
+            where: {
+              userId: session.userId,
+              job: {
+                status: "OPEN",
+                AND: [
+                  { OR: [{ jobDate: null }, { jobDate: { lte: new Date() } }] },
+                  { OR: [{ deadline: null }, { deadline: { gte: new Date() } }] },
+                ],
+              },
+            },
             take: 20,
             include: {
               job: {
@@ -506,6 +582,7 @@ export async function GET(
       if (id.success) {
         project = await db.projectTracking.findUnique({ where: { id: id.data } });
         if (
+          session.role !== "ADMIN" &&
           project &&
           project.clientId !== session.userId &&
           project.professionalId !== session.userId
@@ -615,6 +692,7 @@ export async function GET(
 
 const markReadSchema = z
   .object({ id: z.number().int().positive() })
+  .or(z.object({ ids: z.array(z.number().int().positive()).min(1).max(100) }))
   .or(z.object({ all: z.literal(true) }));
 
 export async function PATCH(
@@ -632,6 +710,11 @@ export async function PATCH(
   if ("all" in parsed.data) {
     await db.userNotification.updateMany({
       where: { userId: session.userId, readAt: null },
+      data: { readAt: new Date() },
+    });
+  } else if ("ids" in parsed.data) {
+    await db.userNotification.updateMany({
+      where: { id: { in: parsed.data.ids }, userId: session.userId, readAt: null },
       data: { readAt: new Date() },
     });
   } else {

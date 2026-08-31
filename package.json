@@ -57,6 +57,7 @@
     "@react-pdf/renderer": "^4.6.1",
     "@sentry/nextjs": "^10.70.0",
     "@tanstack/react-query": "^5.83.0",
+    "@vercel/functions": "^3.9.5",
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

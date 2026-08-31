@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { io } from "socket.io-client";
 import {
   ArrowRight,
   BriefcaseBusiness,
@@ -30,13 +31,15 @@ type Job = {
   locationAddress: string | null;
   updatedAt: string;
   createdAt: string;
+  jobDate: string | null;
 };
 
-type Filter = "ALL" | Job["status"];
+type Filter = "ALL" | Job["status"] | "SCHEDULED";
 
 const filters: { value: Filter; label: string }[] = [
   { value: "ALL", label: "All projects" },
   { value: "OPEN", label: "Open" },
+  { value: "SCHEDULED", label: "Scheduled jobs" },
   { value: "RUNNING", label: "In progress" },
   { value: "DRAFT", label: "Drafts" },
   { value: "CLOSED", label: "Completed" },
@@ -44,6 +47,15 @@ const filters: { value: Filter; label: string }[] = [
 
 function jobStatus(job: Job) {
   return job.projectId ? "RUNNING" : job.status;
+}
+
+function isScheduled(job: Job) {
+  return (
+    job.status === "OPEN" &&
+    !job.projectId &&
+    job.jobDate != null &&
+    new Date(job.jobDate).getTime() > Date.now()
+  );
 }
 
 function readableStatus(status: Job["status"]) {
@@ -95,17 +107,53 @@ export default function MyJobs() {
     }
   }, []);
 
+  useEffect(() => {
+    const socket = io({
+      path: "/api/realtime",
+      withCredentials: true,
+      transports: ["websocket", "polling"],
+    });
+    const refresh = () => {
+      void fetch("/api/v1/client/jobs", { cache: "no-store" })
+        .then((response) => (response.ok ? response.json() : Promise.reject()))
+        .then((data: { jobs: Job[] }) => setJobs(data.jobs))
+        .catch(() => undefined);
+    };
+    socket.on("proposal:new", refresh);
+    socket.on("notification:new", refresh);
+    return () => {
+      socket.off("proposal:new", refresh);
+      socket.off("notification:new", refresh);
+      socket.disconnect();
+    };
+  }, []);
+
   const summary = useMemo(
     () => ({
       total: jobs.length,
-      open: jobs.filter((job) => jobStatus(job) === "OPEN").length,
+      open: jobs.filter((job) => jobStatus(job) === "OPEN" && !isScheduled(job)).length,
       running: jobs.filter((job) => jobStatus(job) === "RUNNING").length,
       drafts: jobs.filter((job) => jobStatus(job) === "DRAFT").length,
     }),
     [jobs],
   );
+  const filterCounts: Record<Filter, number> = {
+    ALL: jobs.length,
+    OPEN: summary.open,
+    SCHEDULED: jobs.filter(isScheduled).length,
+    RUNNING: summary.running,
+    DRAFT: summary.drafts,
+    CLOSED: jobs.filter((job) => jobStatus(job) === "CLOSED").length,
+  };
   const visible = useMemo(() => {
-    const filtered = status === "ALL" ? jobs : jobs.filter((job) => jobStatus(job) === status);
+    const filtered =
+      status === "ALL"
+        ? jobs
+        : status === "SCHEDULED"
+          ? jobs.filter(isScheduled)
+          : jobs.filter(
+              (job) => jobStatus(job) === status && (status !== "OPEN" || !isScheduled(job)),
+            );
     return [...filtered].sort((a, b) => {
       const statusRank: Record<Job["status"], number> = {
         OPEN: 0,
@@ -235,9 +283,15 @@ export default function MyJobs() {
               <button
                 key={filter.value}
                 onClick={() => setStatus(filter.value)}
-                className={`whitespace-nowrap rounded-lg px-3 py-2 text-xs font-semibold transition-all sm:text-sm ${status === filter.value ? "bg-card text-primary shadow-soft" : "text-muted-foreground hover:text-foreground"}`}
+                aria-label={`${filter.label}: ${filterCounts[filter.value]} projects`}
+                className={`flex items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-2 text-xs font-semibold transition-all sm:text-sm ${status === filter.value ? "bg-card text-primary shadow-soft" : "text-muted-foreground hover:text-foreground"}`}
               >
                 {filter.label}
+                <span
+                  className={`rounded-full px-1.5 py-0.5 text-[10px] leading-none ${status === filter.value ? "bg-primary/10 text-primary" : "bg-foreground/5 text-muted-foreground"}`}
+                >
+                  {filterCounts[filter.value]}
+                </span>
               </button>
             ))}
           </div>
@@ -282,9 +336,9 @@ export default function MyJobs() {
                             {job.title ?? `Untitled job #${job.id}`}
                           </h3>
                           <span
-                            className={`rounded-full border px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide ${statusStyle(currentStatus)}`}
+                            className={`rounded-full border px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide ${isScheduled(job) ? "border-violet-200 bg-violet-50 text-violet-700" : statusStyle(currentStatus)}`}
                           >
-                            {readableStatus(currentStatus)}
+                            {isScheduled(job) ? "Scheduled" : readableStatus(currentStatus)}
                           </span>
                           {currentStatus !== "RUNNING" && job.proposalCount > 0 && (
                             <span className="animate-pulse rounded-full bg-primary/10 px-2 py-1 text-[11px] font-semibold text-primary ring-1 ring-primary/20">

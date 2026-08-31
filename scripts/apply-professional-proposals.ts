@@ -1,23 +1,15 @@
 import "dotenv/config";
-import { readFile } from "node:fs/promises";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "../src/generated/prisma/client";
+import { execFileSync } from "node:child_process";
 
-const db = new PrismaClient({
-  adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
-});
-const sql = await readFile(
-  "prisma/migrations/202608120004_professional_proposals/migration.sql",
-  "utf8",
-);
-
-try {
-  for (const statement of sql
-    .split(";\n")
-    .map((item) => item.trim())
-    .filter(Boolean))
-    await db.$executeRawUnsafe(statement);
-  console.log("Professional proposal schema applied safely.");
-} finally {
-  await db.$disconnect();
+if (process.env.ALLOW_LEGACY_MIGRATION_SCRIPT !== "true") {
+  throw new Error(
+    "This legacy wrapper is disabled. Use `npx prisma migrate deploy`; set ALLOW_LEGACY_MIGRATION_SCRIPT=true only for an explicitly approved non-production run.",
+  );
 }
+
+if (process.env.NODE_ENV === "production") {
+  throw new Error("Legacy migration wrappers cannot run in production.");
+}
+
+const executable = process.platform === "win32" ? "npx.cmd" : "npx";
+execFileSync(executable, ["prisma", "migrate", "deploy"], { stdio: "inherit" });

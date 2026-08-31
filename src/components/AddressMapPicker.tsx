@@ -23,6 +23,7 @@ export function AddressMapPicker({
   value,
   onChange,
   onCoordinatesChange,
+  coordinates,
   onLocationChange,
   onCurrentLocation,
 }: {
@@ -30,6 +31,7 @@ export function AddressMapPicker({
   value: string;
   onChange: (value: string) => void;
   onCoordinatesChange?: (latitude: number, longitude: number) => void;
+  coordinates?: [number, number] | null;
   onLocationChange?: (state: string, district: string) => void;
   onCurrentLocation?: () => void;
 }) {
@@ -39,6 +41,11 @@ export function AddressMapPicker({
   const [pinStatus, setPinStatus] = useState("");
   const [searching, setSearching] = useState(false);
   const [searched, setSearched] = useState(false);
+  useEffect(() => {
+    if (coordinates && Number.isFinite(coordinates[0]) && Number.isFinite(coordinates[1])) {
+      setPoint(coordinates);
+    }
+  }, [coordinates]);
   useEffect(() => {
     if (value.trim().length < 3) {
       setResults([]);
@@ -127,6 +134,19 @@ export function AddressMapPicker({
           id={id}
           value={value}
           onChange={(e) => onChange(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key !== "Enter" || !results[0]) return;
+            e.preventDefault();
+            const item = results[0];
+            onChange(item.address);
+            setPoint([item.lat, item.lon]);
+            onCoordinatesChange?.(item.lat, item.lon);
+            const matched = matchIndiaLocation(item.state, item.district);
+            onLocationChange?.(matched.state, item.city || item.district || matched.district);
+            setResults([]);
+            setSearched(false);
+            setSearchStatus("");
+          }}
           placeholder="Enter complete address: house no., street, area, city, state and PIN code"
           maxLength={300}
         />

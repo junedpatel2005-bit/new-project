@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { io } from "socket.io-client";
 import {
   AlertCircle,
   CalendarDays,
@@ -173,6 +174,7 @@ const disputeEligibleStatuses = [
 
 export default function SharedProjectTrackingPage() {
   const { projectId } = useParams<{ projectId: string }>();
+  const searchParams = useSearchParams();
   const [data, setData] = useState<Data | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -227,6 +229,23 @@ export default function SharedProjectTrackingPage() {
       setMessage(error instanceof Error ? error.message : "Unable to load this project."),
     );
   }, [refresh]);
+
+  useEffect(() => {
+    const socket = io({
+      path: "/api/realtime",
+      withCredentials: true,
+      transports: ["websocket", "polling"],
+    });
+    const onProjectUpdated = (payload: { projectId: number | string }) => {
+      if (String(payload.projectId) !== String(projectId)) return;
+      void refresh().catch(() => undefined);
+    };
+    socket.on("project:updated", onProjectUpdated);
+    return () => {
+      socket.off("project:updated", onProjectUpdated);
+      socket.disconnect();
+    };
+  }, [projectId, refresh]);
 
   useEffect(() => {
     if (!approvalMilestone) return;
@@ -497,7 +516,10 @@ export default function SharedProjectTrackingPage() {
           </div>
         </section>
 
-        <Tabs defaultValue="overview" className="w-full">
+        <Tabs
+          defaultValue={searchParams.get("tab") === "timeline" ? "timeline" : "overview"}
+          className="w-full"
+        >
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="overview" className="gap-1.5">
               <LayoutGrid className="h-3.5 w-3.5" />
@@ -1532,10 +1554,10 @@ export default function SharedProjectTrackingPage() {
       <Dialog open={showCompleteModal} onOpenChange={setShowCompleteModal}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Complete project?</DialogTitle>
+            <DialogTitle>Request completion confirmation?</DialogTitle>
             <DialogDescription>
-              Review the current project work and request completion. Any unpaid milestone amount
-              will remain visible for the professional to review before confirming.
+              This will notify the professional to review the final work and confirm completion. The
+              project will not be completed until they confirm it.
             </DialogDescription>
           </DialogHeader>
           <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
@@ -1586,10 +1608,10 @@ export default function SharedProjectTrackingPage() {
               }}
             >
               {busy === "complete-project"
-                ? "Completing…"
+                ? "Sending request…"
                 : remainingClientPayment > 0
-                  ? "Request with remaining amount"
-                  : "Request confirmation"}
+                  ? "Send request with remaining amount"
+                  : "Send completion request"}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -112,7 +112,7 @@ export function AppHeader({ role }: { role?: string }) {
 
   const loadNotifications = useCallback(async () => {
     try {
-      const response = await fetch("/api/v1/portal/notifications", { cache: "no-store" });
+      const response = await fetch("/api/portal/notifications", { cache: "no-store" });
       if (!response.ok) return;
       const notifications = (await response.json()) as DashboardNotification[];
       setUnreadNotifications(notifications.filter((notification) => !notification.readAt).length);

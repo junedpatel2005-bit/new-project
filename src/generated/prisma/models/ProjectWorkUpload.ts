@@ -276,6 +276,8 @@ export type ProjectWorkUploadWhereInput = {
   fileUrl?: Prisma.StringNullableFilter<"ProjectWorkUpload"> | string | null
   filesJson?: Prisma.StringNullableFilter<"ProjectWorkUpload"> | string | null
   createdAt?: Prisma.DateTimeFilter<"ProjectWorkUpload"> | Date | string
+  tracking?: Prisma.XOR<Prisma.ProjectTrackingScalarRelationFilter, Prisma.ProjectTrackingWhereInput>
+  milestone?: Prisma.XOR<Prisma.ProjectMilestoneNullableScalarRelationFilter, Prisma.ProjectMilestoneWhereInput> | null
 }
 
 export type ProjectWorkUploadOrderByWithRelationInput = {
@@ -290,6 +292,8 @@ export type ProjectWorkUploadOrderByWithRelationInput = {
   fileUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   filesJson?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  tracking?: Prisma.ProjectTrackingOrderByWithRelationInput
+  milestone?: Prisma.ProjectMilestoneOrderByWithRelationInput
 }
 
 export type ProjectWorkUploadWhereUniqueInput = Prisma.AtLeast<{
@@ -307,6 +311,8 @@ export type ProjectWorkUploadWhereUniqueInput = Prisma.AtLeast<{
   fileUrl?: Prisma.StringNullableFilter<"ProjectWorkUpload"> | string | null
   filesJson?: Prisma.StringNullableFilter<"ProjectWorkUpload"> | string | null
   createdAt?: Prisma.DateTimeFilter<"ProjectWorkUpload"> | Date | string
+  tracking?: Prisma.XOR<Prisma.ProjectTrackingScalarRelationFilter, Prisma.ProjectTrackingWhereInput>
+  milestone?: Prisma.XOR<Prisma.ProjectMilestoneNullableScalarRelationFilter, Prisma.ProjectMilestoneWhereInput> | null
 }, "id">
 
 export type ProjectWorkUploadOrderByWithAggregationInput = {
@@ -346,8 +352,6 @@ export type ProjectWorkUploadScalarWhereWithAggregatesInput = {
 }
 
 export type ProjectWorkUploadCreateInput = {
-  trackingId: number
-  milestoneId?: number | null
   status?: string
   roundNumber?: number
   title: string
@@ -356,6 +360,8 @@ export type ProjectWorkUploadCreateInput = {
   fileUrl?: string | null
   filesJson?: string | null
   createdAt?: Date | string
+  tracking: Prisma.ProjectTrackingCreateNestedOneWithoutWorkUploadsInput
+  milestone?: Prisma.ProjectMilestoneCreateNestedOneWithoutWorkUploadsInput
 }
 
 export type ProjectWorkUploadUncheckedCreateInput = {
@@ -373,8 +379,6 @@ export type ProjectWorkUploadUncheckedCreateInput = {
 }
 
 export type ProjectWorkUploadUpdateInput = {
-  trackingId?: Prisma.IntFieldUpdateOperationsInput | number
-  milestoneId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   roundNumber?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
@@ -383,6 +387,8 @@ export type ProjectWorkUploadUpdateInput = {
   fileUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   filesJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tracking?: Prisma.ProjectTrackingUpdateOneRequiredWithoutWorkUploadsNestedInput
+  milestone?: Prisma.ProjectMilestoneUpdateOneWithoutWorkUploadsNestedInput
 }
 
 export type ProjectWorkUploadUncheckedUpdateInput = {
@@ -414,8 +420,6 @@ export type ProjectWorkUploadCreateManyInput = {
 }
 
 export type ProjectWorkUploadUpdateManyMutationInput = {
-  trackingId?: Prisma.IntFieldUpdateOperationsInput | number
-  milestoneId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   roundNumber?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
@@ -438,6 +442,16 @@ export type ProjectWorkUploadUncheckedUpdateManyInput = {
   fileUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   filesJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ProjectWorkUploadListRelationFilter = {
+  every?: Prisma.ProjectWorkUploadWhereInput
+  some?: Prisma.ProjectWorkUploadWhereInput
+  none?: Prisma.ProjectWorkUploadWhereInput
+}
+
+export type ProjectWorkUploadOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type ProjectWorkUploadCountOrderByAggregateInput = {
@@ -496,6 +510,311 @@ export type ProjectWorkUploadSumOrderByAggregateInput = {
   roundNumber?: Prisma.SortOrder
 }
 
+export type ProjectWorkUploadCreateNestedManyWithoutTrackingInput = {
+  create?: Prisma.XOR<Prisma.ProjectWorkUploadCreateWithoutTrackingInput, Prisma.ProjectWorkUploadUncheckedCreateWithoutTrackingInput> | Prisma.ProjectWorkUploadCreateWithoutTrackingInput[] | Prisma.ProjectWorkUploadUncheckedCreateWithoutTrackingInput[]
+  connectOrCreate?: Prisma.ProjectWorkUploadCreateOrConnectWithoutTrackingInput | Prisma.ProjectWorkUploadCreateOrConnectWithoutTrackingInput[]
+  createMany?: Prisma.ProjectWorkUploadCreateManyTrackingInputEnvelope
+  connect?: Prisma.ProjectWorkUploadWhereUniqueInput | Prisma.ProjectWorkUploadWhereUniqueInput[]
+}
+
+export type ProjectWorkUploadUncheckedCreateNestedManyWithoutTrackingInput = {
+  create?: Prisma.XOR<Prisma.ProjectWorkUploadCreateWithoutTrackingInput, Prisma.ProjectWorkUploadUncheckedCreateWithoutTrackingInput> | Prisma.ProjectWorkUploadCreateWithoutTrackingInput[] | Prisma.ProjectWorkUploadUncheckedCreateWithoutTrackingInput[]
+  connectOrCreate?: Prisma.ProjectWorkUploadCreateOrConnectWithoutTrackingInput | Prisma.ProjectWorkUploadCreateOrConnectWithoutTrackingInput[]
+  createMany?: Prisma.ProjectWorkUploadCreateManyTrackingInputEnvelope
+  connect?: Prisma.ProjectWorkUploadWhereUniqueInput | Prisma.ProjectWorkUploadWhereUniqueInput[]
+}
+
+export type ProjectWorkUploadUpdateManyWithoutTrackingNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectWorkUploadCreateWithoutTrackingInput, Prisma.ProjectWorkUploadUncheckedCreateWithoutTrackingInput> | Prisma.ProjectWorkUploadCreateWithoutTrackingInput[] | Prisma.ProjectWorkUploadUncheckedCreateWithoutTrackingInput[]
+  connectOrCreate?: Prisma.ProjectWorkUploadCreateOrConnectWithoutTrackingInput | Prisma.ProjectWorkUploadCreateOrConnectWithoutTrackingInput[]
+  upsert?: Prisma.ProjectWorkUploadUpsertWithWhereUniqueWithoutTrackingInput | Prisma.ProjectWorkUploadUpsertWithWhereUniqueWithoutTrackingInput[]
+  createMany?: Prisma.ProjectWorkUploadCreateManyTrackingInputEnvelope
+  set?: Prisma.ProjectWorkUploadWhereUniqueInput | Prisma.ProjectWorkUploadWhereUniqueInput[]
+  disconnect?: Prisma.ProjectWorkUploadWhereUniqueInput | Prisma.ProjectWorkUploadWhereUniqueInput[]
+  delete?: Prisma.ProjectWorkUploadWhereUniqueInput | Prisma.ProjectWorkUploadWhereUniqueInput[]
+  connect?: Prisma.ProjectWorkUploadWhereUniqueInput | Prisma.ProjectWorkUploadWhereUniqueInput[]
+  update?: Prisma.ProjectWorkUploadUpdateWithWhereUniqueWithoutTrackingInput | Prisma.ProjectWorkUploadUpdateWithWhereUniqueWithoutTrackingInput[]
+  updateMany?: Prisma.ProjectWorkUploadUpdateManyWithWhereWithoutTrackingInput | Prisma.ProjectWorkUploadUpdateManyWithWhereWithoutTrackingInput[]
+  deleteMany?: Prisma.ProjectWorkUploadScalarWhereInput | Prisma.ProjectWorkUploadScalarWhereInput[]
+}
+
+export type ProjectWorkUploadUncheckedUpdateManyWithoutTrackingNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectWorkUploadCreateWithoutTrackingInput, Prisma.ProjectWorkUploadUncheckedCreateWithoutTrackingInput> | Prisma.ProjectWorkUploadCreateWithoutTrackingInput[] | Prisma.ProjectWorkUploadUncheckedCreateWithoutTrackingInput[]
+  connectOrCreate?: Prisma.ProjectWorkUploadCreateOrConnectWithoutTrackingInput | Prisma.ProjectWorkUploadCreateOrConnectWithoutTrackingInput[]
+  upsert?: Prisma.ProjectWorkUploadUpsertWithWhereUniqueWithoutTrackingInput | Prisma.ProjectWorkUploadUpsertWithWhereUniqueWithoutTrackingInput[]
+  createMany?: Prisma.ProjectWorkUploadCreateManyTrackingInputEnvelope
+  set?: Prisma.ProjectWorkUploadWhereUniqueInput | Prisma.ProjectWorkUploadWhereUniqueInput[]
+  disconnect?: Prisma.ProjectWorkUploadWhereUniqueInput | Prisma.ProjectWorkUploadWhereUniqueInput[]
+  delete?: Prisma.ProjectWorkUploadWhereUniqueInput | Prisma.ProjectWorkUploadWhereUniqueInput[]
+  connect?: Prisma.ProjectWorkUploadWhereUniqueInput | Prisma.ProjectWorkUploadWhereUniqueInput[]
+  update?: Prisma.ProjectWorkUploadUpdateWithWhereUniqueWithoutTrackingInput | Prisma.ProjectWorkUploadUpdateWithWhereUniqueWithoutTrackingInput[]
+  updateMany?: Prisma.ProjectWorkUploadUpdateManyWithWhereWithoutTrackingInput | Prisma.ProjectWorkUploadUpdateManyWithWhereWithoutTrackingInput[]
+  deleteMany?: Prisma.ProjectWorkUploadScalarWhereInput | Prisma.ProjectWorkUploadScalarWhereInput[]
+}
+
+export type ProjectWorkUploadCreateNestedManyWithoutMilestoneInput = {
+  create?: Prisma.XOR<Prisma.ProjectWorkUploadCreateWithoutMilestoneInput, Prisma.ProjectWorkUploadUncheckedCreateWithoutMilestoneInput> | Prisma.ProjectWorkUploadCreateWithoutMilestoneInput[] | Prisma.ProjectWorkUploadUncheckedCreateWithoutMilestoneInput[]
+  connectOrCreate?: Prisma.ProjectWorkUploadCreateOrConnectWithoutMilestoneInput | Prisma.ProjectWorkUploadCreateOrConnectWithoutMilestoneInput[]
+  createMany?: Prisma.ProjectWorkUploadCreateManyMilestoneInputEnvelope
+  connect?: Prisma.ProjectWorkUploadWhereUniqueInput | Prisma.ProjectWorkUploadWhereUniqueInput[]
+}
+
+export type ProjectWorkUploadUncheckedCreateNestedManyWithoutMilestoneInput = {
+  create?: Prisma.XOR<Prisma.ProjectWorkUploadCreateWithoutMilestoneInput, Prisma.ProjectWorkUploadUncheckedCreateWithoutMilestoneInput> | Prisma.ProjectWorkUploadCreateWithoutMilestoneInput[] | Prisma.ProjectWorkUploadUncheckedCreateWithoutMilestoneInput[]
+  connectOrCreate?: Prisma.ProjectWorkUploadCreateOrConnectWithoutMilestoneInput | Prisma.ProjectWorkUploadCreateOrConnectWithoutMilestoneInput[]
+  createMany?: Prisma.ProjectWorkUploadCreateManyMilestoneInputEnvelope
+  connect?: Prisma.ProjectWorkUploadWhereUniqueInput | Prisma.ProjectWorkUploadWhereUniqueInput[]
+}
+
+export type ProjectWorkUploadUpdateManyWithoutMilestoneNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectWorkUploadCreateWithoutMilestoneInput, Prisma.ProjectWorkUploadUncheckedCreateWithoutMilestoneInput> | Prisma.ProjectWorkUploadCreateWithoutMilestoneInput[] | Prisma.ProjectWorkUploadUncheckedCreateWithoutMilestoneInput[]
+  connectOrCreate?: Prisma.ProjectWorkUploadCreateOrConnectWithoutMilestoneInput | Prisma.ProjectWorkUploadCreateOrConnectWithoutMilestoneInput[]
+  upsert?: Prisma.ProjectWorkUploadUpsertWithWhereUniqueWithoutMilestoneInput | Prisma.ProjectWorkUploadUpsertWithWhereUniqueWithoutMilestoneInput[]
+  createMany?: Prisma.ProjectWorkUploadCreateManyMilestoneInputEnvelope
+  set?: Prisma.ProjectWorkUploadWhereUniqueInput | Prisma.ProjectWorkUploadWhereUniqueInput[]
+  disconnect?: Prisma.ProjectWorkUploadWhereUniqueInput | Prisma.ProjectWorkUploadWhereUniqueInput[]
+  delete?: Prisma.ProjectWorkUploadWhereUniqueInput | Prisma.ProjectWorkUploadWhereUniqueInput[]
+  connect?: Prisma.ProjectWorkUploadWhereUniqueInput | Prisma.ProjectWorkUploadWhereUniqueInput[]
+  update?: Prisma.ProjectWorkUploadUpdateWithWhereUniqueWithoutMilestoneInput | Prisma.ProjectWorkUploadUpdateWithWhereUniqueWithoutMilestoneInput[]
+  updateMany?: Prisma.ProjectWorkUploadUpdateManyWithWhereWithoutMilestoneInput | Prisma.ProjectWorkUploadUpdateManyWithWhereWithoutMilestoneInput[]
+  deleteMany?: Prisma.ProjectWorkUploadScalarWhereInput | Prisma.ProjectWorkUploadScalarWhereInput[]
+}
+
+export type ProjectWorkUploadUncheckedUpdateManyWithoutMilestoneNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectWorkUploadCreateWithoutMilestoneInput, Prisma.ProjectWorkUploadUncheckedCreateWithoutMilestoneInput> | Prisma.ProjectWorkUploadCreateWithoutMilestoneInput[] | Prisma.ProjectWorkUploadUncheckedCreateWithoutMilestoneInput[]
+  connectOrCreate?: Prisma.ProjectWorkUploadCreateOrConnectWithoutMilestoneInput | Prisma.ProjectWorkUploadCreateOrConnectWithoutMilestoneInput[]
+  upsert?: Prisma.ProjectWorkUploadUpsertWithWhereUniqueWithoutMilestoneInput | Prisma.ProjectWorkUploadUpsertWithWhereUniqueWithoutMilestoneInput[]
+  createMany?: Prisma.ProjectWorkUploadCreateManyMilestoneInputEnvelope
+  set?: Prisma.ProjectWorkUploadWhereUniqueInput | Prisma.ProjectWorkUploadWhereUniqueInput[]
+  disconnect?: Prisma.ProjectWorkUploadWhereUniqueInput | Prisma.ProjectWorkUploadWhereUniqueInput[]
+  delete?: Prisma.ProjectWorkUploadWhereUniqueInput | Prisma.ProjectWorkUploadWhereUniqueInput[]
+  connect?: Prisma.ProjectWorkUploadWhereUniqueInput | Prisma.ProjectWorkUploadWhereUniqueInput[]
+  update?: Prisma.ProjectWorkUploadUpdateWithWhereUniqueWithoutMilestoneInput | Prisma.ProjectWorkUploadUpdateWithWhereUniqueWithoutMilestoneInput[]
+  updateMany?: Prisma.ProjectWorkUploadUpdateManyWithWhereWithoutMilestoneInput | Prisma.ProjectWorkUploadUpdateManyWithWhereWithoutMilestoneInput[]
+  deleteMany?: Prisma.ProjectWorkUploadScalarWhereInput | Prisma.ProjectWorkUploadScalarWhereInput[]
+}
+
+export type ProjectWorkUploadCreateWithoutTrackingInput = {
+  status?: string
+  roundNumber?: number
+  title: string
+  note?: string | null
+  fileName?: string | null
+  fileUrl?: string | null
+  filesJson?: string | null
+  createdAt?: Date | string
+  milestone?: Prisma.ProjectMilestoneCreateNestedOneWithoutWorkUploadsInput
+}
+
+export type ProjectWorkUploadUncheckedCreateWithoutTrackingInput = {
+  id?: number
+  milestoneId?: number | null
+  status?: string
+  roundNumber?: number
+  title: string
+  note?: string | null
+  fileName?: string | null
+  fileUrl?: string | null
+  filesJson?: string | null
+  createdAt?: Date | string
+}
+
+export type ProjectWorkUploadCreateOrConnectWithoutTrackingInput = {
+  where: Prisma.ProjectWorkUploadWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProjectWorkUploadCreateWithoutTrackingInput, Prisma.ProjectWorkUploadUncheckedCreateWithoutTrackingInput>
+}
+
+export type ProjectWorkUploadCreateManyTrackingInputEnvelope = {
+  data: Prisma.ProjectWorkUploadCreateManyTrackingInput | Prisma.ProjectWorkUploadCreateManyTrackingInput[]
+  skipDuplicates?: boolean
+}
+
+export type ProjectWorkUploadUpsertWithWhereUniqueWithoutTrackingInput = {
+  where: Prisma.ProjectWorkUploadWhereUniqueInput
+  update: Prisma.XOR<Prisma.ProjectWorkUploadUpdateWithoutTrackingInput, Prisma.ProjectWorkUploadUncheckedUpdateWithoutTrackingInput>
+  create: Prisma.XOR<Prisma.ProjectWorkUploadCreateWithoutTrackingInput, Prisma.ProjectWorkUploadUncheckedCreateWithoutTrackingInput>
+}
+
+export type ProjectWorkUploadUpdateWithWhereUniqueWithoutTrackingInput = {
+  where: Prisma.ProjectWorkUploadWhereUniqueInput
+  data: Prisma.XOR<Prisma.ProjectWorkUploadUpdateWithoutTrackingInput, Prisma.ProjectWorkUploadUncheckedUpdateWithoutTrackingInput>
+}
+
+export type ProjectWorkUploadUpdateManyWithWhereWithoutTrackingInput = {
+  where: Prisma.ProjectWorkUploadScalarWhereInput
+  data: Prisma.XOR<Prisma.ProjectWorkUploadUpdateManyMutationInput, Prisma.ProjectWorkUploadUncheckedUpdateManyWithoutTrackingInput>
+}
+
+export type ProjectWorkUploadScalarWhereInput = {
+  AND?: Prisma.ProjectWorkUploadScalarWhereInput | Prisma.ProjectWorkUploadScalarWhereInput[]
+  OR?: Prisma.ProjectWorkUploadScalarWhereInput[]
+  NOT?: Prisma.ProjectWorkUploadScalarWhereInput | Prisma.ProjectWorkUploadScalarWhereInput[]
+  id?: Prisma.IntFilter<"ProjectWorkUpload"> | number
+  trackingId?: Prisma.IntFilter<"ProjectWorkUpload"> | number
+  milestoneId?: Prisma.IntNullableFilter<"ProjectWorkUpload"> | number | null
+  status?: Prisma.StringFilter<"ProjectWorkUpload"> | string
+  roundNumber?: Prisma.IntFilter<"ProjectWorkUpload"> | number
+  title?: Prisma.StringFilter<"ProjectWorkUpload"> | string
+  note?: Prisma.StringNullableFilter<"ProjectWorkUpload"> | string | null
+  fileName?: Prisma.StringNullableFilter<"ProjectWorkUpload"> | string | null
+  fileUrl?: Prisma.StringNullableFilter<"ProjectWorkUpload"> | string | null
+  filesJson?: Prisma.StringNullableFilter<"ProjectWorkUpload"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"ProjectWorkUpload"> | Date | string
+}
+
+export type ProjectWorkUploadCreateWithoutMilestoneInput = {
+  status?: string
+  roundNumber?: number
+  title: string
+  note?: string | null
+  fileName?: string | null
+  fileUrl?: string | null
+  filesJson?: string | null
+  createdAt?: Date | string
+  tracking: Prisma.ProjectTrackingCreateNestedOneWithoutWorkUploadsInput
+}
+
+export type ProjectWorkUploadUncheckedCreateWithoutMilestoneInput = {
+  id?: number
+  trackingId: number
+  status?: string
+  roundNumber?: number
+  title: string
+  note?: string | null
+  fileName?: string | null
+  fileUrl?: string | null
+  filesJson?: string | null
+  createdAt?: Date | string
+}
+
+export type ProjectWorkUploadCreateOrConnectWithoutMilestoneInput = {
+  where: Prisma.ProjectWorkUploadWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProjectWorkUploadCreateWithoutMilestoneInput, Prisma.ProjectWorkUploadUncheckedCreateWithoutMilestoneInput>
+}
+
+export type ProjectWorkUploadCreateManyMilestoneInputEnvelope = {
+  data: Prisma.ProjectWorkUploadCreateManyMilestoneInput | Prisma.ProjectWorkUploadCreateManyMilestoneInput[]
+  skipDuplicates?: boolean
+}
+
+export type ProjectWorkUploadUpsertWithWhereUniqueWithoutMilestoneInput = {
+  where: Prisma.ProjectWorkUploadWhereUniqueInput
+  update: Prisma.XOR<Prisma.ProjectWorkUploadUpdateWithoutMilestoneInput, Prisma.ProjectWorkUploadUncheckedUpdateWithoutMilestoneInput>
+  create: Prisma.XOR<Prisma.ProjectWorkUploadCreateWithoutMilestoneInput, Prisma.ProjectWorkUploadUncheckedCreateWithoutMilestoneInput>
+}
+
+export type ProjectWorkUploadUpdateWithWhereUniqueWithoutMilestoneInput = {
+  where: Prisma.ProjectWorkUploadWhereUniqueInput
+  data: Prisma.XOR<Prisma.ProjectWorkUploadUpdateWithoutMilestoneInput, Prisma.ProjectWorkUploadUncheckedUpdateWithoutMilestoneInput>
+}
+
+export type ProjectWorkUploadUpdateManyWithWhereWithoutMilestoneInput = {
+  where: Prisma.ProjectWorkUploadScalarWhereInput
+  data: Prisma.XOR<Prisma.ProjectWorkUploadUpdateManyMutationInput, Prisma.ProjectWorkUploadUncheckedUpdateManyWithoutMilestoneInput>
+}
+
+export type ProjectWorkUploadCreateManyTrackingInput = {
+  id?: number
+  milestoneId?: number | null
+  status?: string
+  roundNumber?: number
+  title: string
+  note?: string | null
+  fileName?: string | null
+  fileUrl?: string | null
+  filesJson?: string | null
+  createdAt?: Date | string
+}
+
+export type ProjectWorkUploadUpdateWithoutTrackingInput = {
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  roundNumber?: Prisma.IntFieldUpdateOperationsInput | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  filesJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  milestone?: Prisma.ProjectMilestoneUpdateOneWithoutWorkUploadsNestedInput
+}
+
+export type ProjectWorkUploadUncheckedUpdateWithoutTrackingInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  milestoneId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  roundNumber?: Prisma.IntFieldUpdateOperationsInput | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  filesJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ProjectWorkUploadUncheckedUpdateManyWithoutTrackingInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  milestoneId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  roundNumber?: Prisma.IntFieldUpdateOperationsInput | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  filesJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ProjectWorkUploadCreateManyMilestoneInput = {
+  id?: number
+  trackingId: number
+  status?: string
+  roundNumber?: number
+  title: string
+  note?: string | null
+  fileName?: string | null
+  fileUrl?: string | null
+  filesJson?: string | null
+  createdAt?: Date | string
+}
+
+export type ProjectWorkUploadUpdateWithoutMilestoneInput = {
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  roundNumber?: Prisma.IntFieldUpdateOperationsInput | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  filesJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tracking?: Prisma.ProjectTrackingUpdateOneRequiredWithoutWorkUploadsNestedInput
+}
+
+export type ProjectWorkUploadUncheckedUpdateWithoutMilestoneInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  trackingId?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  roundNumber?: Prisma.IntFieldUpdateOperationsInput | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  filesJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ProjectWorkUploadUncheckedUpdateManyWithoutMilestoneInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  trackingId?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  roundNumber?: Prisma.IntFieldUpdateOperationsInput | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  filesJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 
 
 export type ProjectWorkUploadSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -510,6 +829,8 @@ export type ProjectWorkUploadSelect<ExtArgs extends runtime.Types.Extensions.Int
   fileUrl?: boolean
   filesJson?: boolean
   createdAt?: boolean
+  tracking?: boolean | Prisma.ProjectTrackingDefaultArgs<ExtArgs>
+  milestone?: boolean | Prisma.ProjectWorkUpload$milestoneArgs<ExtArgs>
 }, ExtArgs["result"]["projectWorkUpload"]>
 
 export type ProjectWorkUploadSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -524,6 +845,8 @@ export type ProjectWorkUploadSelectCreateManyAndReturn<ExtArgs extends runtime.T
   fileUrl?: boolean
   filesJson?: boolean
   createdAt?: boolean
+  tracking?: boolean | Prisma.ProjectTrackingDefaultArgs<ExtArgs>
+  milestone?: boolean | Prisma.ProjectWorkUpload$milestoneArgs<ExtArgs>
 }, ExtArgs["result"]["projectWorkUpload"]>
 
 export type ProjectWorkUploadSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -538,6 +861,8 @@ export type ProjectWorkUploadSelectUpdateManyAndReturn<ExtArgs extends runtime.T
   fileUrl?: boolean
   filesJson?: boolean
   createdAt?: boolean
+  tracking?: boolean | Prisma.ProjectTrackingDefaultArgs<ExtArgs>
+  milestone?: boolean | Prisma.ProjectWorkUpload$milestoneArgs<ExtArgs>
 }, ExtArgs["result"]["projectWorkUpload"]>
 
 export type ProjectWorkUploadSelectScalar = {
@@ -555,10 +880,25 @@ export type ProjectWorkUploadSelectScalar = {
 }
 
 export type ProjectWorkUploadOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "trackingId" | "milestoneId" | "status" | "roundNumber" | "title" | "note" | "fileName" | "fileUrl" | "filesJson" | "createdAt", ExtArgs["result"]["projectWorkUpload"]>
+export type ProjectWorkUploadInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  tracking?: boolean | Prisma.ProjectTrackingDefaultArgs<ExtArgs>
+  milestone?: boolean | Prisma.ProjectWorkUpload$milestoneArgs<ExtArgs>
+}
+export type ProjectWorkUploadIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  tracking?: boolean | Prisma.ProjectTrackingDefaultArgs<ExtArgs>
+  milestone?: boolean | Prisma.ProjectWorkUpload$milestoneArgs<ExtArgs>
+}
+export type ProjectWorkUploadIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  tracking?: boolean | Prisma.ProjectTrackingDefaultArgs<ExtArgs>
+  milestone?: boolean | Prisma.ProjectWorkUpload$milestoneArgs<ExtArgs>
+}
 
 export type $ProjectWorkUploadPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "ProjectWorkUpload"
-  objects: {}
+  objects: {
+    tracking: Prisma.$ProjectTrackingPayload<ExtArgs>
+    milestone: Prisma.$ProjectMilestonePayload<ExtArgs> | null
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     trackingId: number
@@ -965,6 +1305,8 @@ readonly fields: ProjectWorkUploadFieldRefs;
  */
 export interface Prisma__ProjectWorkUploadClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  tracking<T extends Prisma.ProjectTrackingDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProjectTrackingDefaultArgs<ExtArgs>>): Prisma.Prisma__ProjectTrackingClient<runtime.Types.Result.GetResult<Prisma.$ProjectTrackingPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  milestone<T extends Prisma.ProjectWorkUpload$milestoneArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProjectWorkUpload$milestoneArgs<ExtArgs>>): Prisma.Prisma__ProjectMilestoneClient<runtime.Types.Result.GetResult<Prisma.$ProjectMilestonePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1022,6 +1364,10 @@ export type ProjectWorkUploadFindUniqueArgs<ExtArgs extends runtime.Types.Extens
    */
   omit?: Prisma.ProjectWorkUploadOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectWorkUploadInclude<ExtArgs> | null
+  /**
    * Filter, which ProjectWorkUpload to fetch.
    */
   where: Prisma.ProjectWorkUploadWhereUniqueInput
@@ -1040,6 +1386,10 @@ export type ProjectWorkUploadFindUniqueOrThrowArgs<ExtArgs extends runtime.Types
    */
   omit?: Prisma.ProjectWorkUploadOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectWorkUploadInclude<ExtArgs> | null
+  /**
    * Filter, which ProjectWorkUpload to fetch.
    */
   where: Prisma.ProjectWorkUploadWhereUniqueInput
@@ -1057,6 +1407,10 @@ export type ProjectWorkUploadFindFirstArgs<ExtArgs extends runtime.Types.Extensi
    * Omit specific fields from the ProjectWorkUpload
    */
   omit?: Prisma.ProjectWorkUploadOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectWorkUploadInclude<ExtArgs> | null
   /**
    * Filter, which ProjectWorkUpload to fetch.
    */
@@ -1106,6 +1460,10 @@ export type ProjectWorkUploadFindFirstOrThrowArgs<ExtArgs extends runtime.Types.
    */
   omit?: Prisma.ProjectWorkUploadOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectWorkUploadInclude<ExtArgs> | null
+  /**
    * Filter, which ProjectWorkUpload to fetch.
    */
   where?: Prisma.ProjectWorkUploadWhereInput
@@ -1153,6 +1511,10 @@ export type ProjectWorkUploadFindManyArgs<ExtArgs extends runtime.Types.Extensio
    * Omit specific fields from the ProjectWorkUpload
    */
   omit?: Prisma.ProjectWorkUploadOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectWorkUploadInclude<ExtArgs> | null
   /**
    * Filter, which ProjectWorkUploads to fetch.
    */
@@ -1202,6 +1564,10 @@ export type ProjectWorkUploadCreateArgs<ExtArgs extends runtime.Types.Extensions
    */
   omit?: Prisma.ProjectWorkUploadOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectWorkUploadInclude<ExtArgs> | null
+  /**
    * The data needed to create a ProjectWorkUpload.
    */
   data: Prisma.XOR<Prisma.ProjectWorkUploadCreateInput, Prisma.ProjectWorkUploadUncheckedCreateInput>
@@ -1235,6 +1601,10 @@ export type ProjectWorkUploadCreateManyAndReturnArgs<ExtArgs extends runtime.Typ
    */
   data: Prisma.ProjectWorkUploadCreateManyInput | Prisma.ProjectWorkUploadCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectWorkUploadIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1249,6 +1619,10 @@ export type ProjectWorkUploadUpdateArgs<ExtArgs extends runtime.Types.Extensions
    * Omit specific fields from the ProjectWorkUpload
    */
   omit?: Prisma.ProjectWorkUploadOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectWorkUploadInclude<ExtArgs> | null
   /**
    * The data needed to update a ProjectWorkUpload.
    */
@@ -1301,6 +1675,10 @@ export type ProjectWorkUploadUpdateManyAndReturnArgs<ExtArgs extends runtime.Typ
    * Limit how many ProjectWorkUploads to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectWorkUploadIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1315,6 +1693,10 @@ export type ProjectWorkUploadUpsertArgs<ExtArgs extends runtime.Types.Extensions
    * Omit specific fields from the ProjectWorkUpload
    */
   omit?: Prisma.ProjectWorkUploadOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectWorkUploadInclude<ExtArgs> | null
   /**
    * The filter to search for the ProjectWorkUpload to update in case it exists.
    */
@@ -1342,6 +1724,10 @@ export type ProjectWorkUploadDeleteArgs<ExtArgs extends runtime.Types.Extensions
    */
   omit?: Prisma.ProjectWorkUploadOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectWorkUploadInclude<ExtArgs> | null
+  /**
    * Filter which ProjectWorkUpload to delete.
    */
   where: Prisma.ProjectWorkUploadWhereUniqueInput
@@ -1362,6 +1748,25 @@ export type ProjectWorkUploadDeleteManyArgs<ExtArgs extends runtime.Types.Extens
 }
 
 /**
+ * ProjectWorkUpload.milestone
+ */
+export type ProjectWorkUpload$milestoneArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProjectMilestone
+   */
+  select?: Prisma.ProjectMilestoneSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ProjectMilestone
+   */
+  omit?: Prisma.ProjectMilestoneOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectMilestoneInclude<ExtArgs> | null
+  where?: Prisma.ProjectMilestoneWhereInput
+}
+
+/**
  * ProjectWorkUpload without action
  */
 export type ProjectWorkUploadDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1373,4 +1778,8 @@ export type ProjectWorkUploadDefaultArgs<ExtArgs extends runtime.Types.Extension
    * Omit specific fields from the ProjectWorkUpload
    */
   omit?: Prisma.ProjectWorkUploadOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectWorkUploadInclude<ExtArgs> | null
 }

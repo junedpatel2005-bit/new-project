@@ -401,11 +401,6 @@ export async function POST(
       },
       { status: 201 },
     );
-    response.cookies.set(
-      sessionCookie,
-      await createSession({ userId: user.id, role: user.role }),
-      sessionOptions,
-    );
     response.cookies.set(phoneProofCookie, "", { ...phoneProofCookieOptions, maxAge: 0 });
     return response;
   }
@@ -445,16 +440,11 @@ export async function POST(
     if (!user.emailVerifiedAt) {
       const response = NextResponse.json(
         {
-          error:
-            "You are registered, but your email is not confirmed. Please confirm your email before continuing.",
+          error: "EMAIL_NOT_VERIFIED",
+          message: "Please verify your email before signing in.",
           redirect: "/verify",
         },
         { status: 403 },
-      );
-      response.cookies.set(
-        sessionCookie,
-        await createSession({ userId: user.id, role: user.role }),
-        sessionOptions,
       );
       return response;
     }
@@ -548,16 +538,16 @@ export async function POST(
         : hasClientProfile
           ? "/dashboard"
           : "/client-profile?profileSetup=1";
-    const response = NextResponse.json(
-      !user.emailVerifiedAt
-        ? {
-            error:
-              "You are registered, but your email is not confirmed. Please confirm your email before continuing.",
-            redirect: nextRedirect,
-          }
-        : { success: true, redirect: nextRedirect },
-      !user.emailVerifiedAt ? { status: 403 } : undefined,
-    );
+    if (!user.emailVerifiedAt)
+      return NextResponse.json(
+        {
+          error: "EMAIL_NOT_VERIFIED",
+          message: "Please verify your email before signing in.",
+          redirect: "/verify",
+        },
+        { status: 403 },
+      );
+    const response = NextResponse.json({ success: true, redirect: nextRedirect });
     response.cookies.set(
       sessionCookie,
       await createSession({ userId: user.id, role: user.role }),

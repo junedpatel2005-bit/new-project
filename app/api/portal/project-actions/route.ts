@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { sessionCookie, verifySession } from "@/lib/auth";
 import { notifyDisputeRaised, notifyUsers } from "@/lib/marketplace-notifications";
 import { enqueueBackgroundJob } from "@/lib/background-jobs";
+import { emitRealtimeProjectUpdate } from "@/lib/realtime";
 
 const attachmentIds = z.array(z.number().int().positive()).min(1).max(10);
 
@@ -175,14 +176,20 @@ export async function POST(request: NextRequest) {
               ]
             : []),
         ];
-        await notifyUsers([project.clientId, project.professionalId], {
-          type: `PROJECT_ACTIVITY_${type}`,
-          title,
-          description: description ?? title,
-          href: `/project/${project.id}/tracking`,
-          emailDetails: activityDetails,
-        });
+        await notifyUsers(
+          [project.clientId, project.professionalId].filter((id) => id !== session.userId),
+          {
+            type: `PROJECT_ACTIVITY_${type}`,
+            title,
+            description: description ?? title,
+            href: `/project/${project.id}/tracking`,
+            emailDetails: activityDetails,
+          },
+        );
       }
+      emitRealtimeProjectUpdate([project.clientId, project.professionalId], {
+        projectId: project.id,
+      });
       return timelineEvent;
     };
     const attachmentsFor = async (ids: number[]) => {
@@ -213,10 +220,15 @@ export async function POST(request: NextRequest) {
         );
       if (project.status !== "READY_TO_START")
         return NextResponse.json({ error: "This project has already started." }, { status: 409 });
-      await db.projectTracking.update({
-        where: { id: project.id },
+      const started = await db.projectTracking.updateMany({
+        where: { id: project.id, clientId: session.userId, status: "READY_TO_START" },
         data: { status: "IN_PROGRESS", startedAt: new Date() },
       });
+      if (started.count !== 1)
+        return NextResponse.json(
+          { error: "This project changed before it could be started." },
+          { status: 409 },
+        );
       await event("WORK_STARTED", "Work started", "The client started work on this project.");
     }
     if (input.action === "update-progress") {
@@ -555,7 +567,7 @@ export async function POST(request: NextRequest) {
     }
     if (input.action === "request-client") {
       await event("PROFESSIONAL_REQUEST", input.title ?? "Request sent to client", input.note);
-      await notifyUsers([project.clientId, project.professionalId], {
+      await notifyUsers([project.clientId], {
         type: "PROJECT_REQUEST",
         title: input.title ?? "Request from your professional",
         description: input.note,
@@ -568,18 +580,27 @@ export async function POST(request: NextRequest) {
           { error: "This project is already closed or awaiting confirmation." },
           { status: 409 },
         );
-      await db.projectTracking.update({
-        where: { id: project.id },
+      const completed = await db.projectTracking.updateMany({
+        where: {
+          id: project.id,
+          clientId: session.userId,
+          status: project.status,
+        },
         data: { status: "AWAITING_PROFESSIONAL_CONFIRMATION" },
       });
+      if (completed.count !== 1)
+        return NextResponse.json(
+          { error: "This project changed before completion could be requested." },
+          { status: 409 },
+        );
       await event(
         "PROJECT_COMPLETION_REQUESTED",
         "Completion confirmation requested",
         "The client reviewed the final work and asked the professional to confirm project completion.",
       );
-      await notifyUsers([project.clientId, project.professionalId], {
+      await notifyUsers([project.professionalId], {
         type: "PROJECT_COMPLETION_REQUESTED",
-        title: "Confirm project completion",
+        title: "Completion request received",
         description: "The client reviewed the final work and is asking you to confirm completion.",
         href: `/project/${project.id}/tracking`,
       });
@@ -590,10 +611,19 @@ export async function POST(request: NextRequest) {
           { error: "This project is not waiting for your completion confirmation." },
           { status: 409 },
         );
-      await db.projectTracking.update({
-        where: { id: project.id },
+      const confirmed = await db.projectTracking.updateMany({
+        where: {
+          id: project.id,
+          professionalId: session.userId,
+          status: "AWAITING_PROFESSIONAL_CONFIRMATION",
+        },
         data: { status: "COMPLETED", progress: 100, completedAt: new Date() },
       });
+      if (confirmed.count !== 1)
+        return NextResponse.json(
+          { error: "This project changed before completion could be confirmed." },
+          { status: 409 },
+        );
       await db.clientJob.updateMany({
         where: { id: project.jobId, userId: project.clientId },
         data: { status: "CLOSED" },
@@ -604,7 +634,7 @@ export async function POST(request: NextRequest) {
         "The professional confirmed project completion after the client requested confirmation.",
         { progress: 100 },
       );
-      await notifyUsers([project.clientId, project.professionalId], {
+      await notifyUsers([project.clientId], {
         type: "PROJECT_COMPLETED",
         title: "Project completed",
         description: "The professional confirmed that your project is complete.",

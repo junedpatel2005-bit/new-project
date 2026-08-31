@@ -28,6 +28,8 @@ type Form = {
   locationLat: number | null;
   locationLng: number | null;
 };
+type PostingTiming = "TODAY" | "SCHEDULED";
+type SavedLocation = { id: number; label: string; address: string; isPrimary: boolean };
 const empty: Form = {
   title: "",
   category: "",
@@ -70,11 +72,15 @@ export default function PostJob() {
     [id, setId] = useState<number | null>(null),
     [categories, setCategories] = useState<MarketplaceCategory[]>([]),
     [primary, setPrimary] = useState<string>(""),
+    [savedLocations, setSavedLocations] = useState<SavedLocation[]>([]),
     [errors, setErrors] = useState<Record<string, string>>({}),
     [message, setMessage] = useState(""),
     [saving, setSaving] = useState(false),
     [segment, setSegment] = useState(""),
-    [hydrated, setHydrated] = useState(false);
+    [hydrated, setHydrated] = useState(false),
+    [postingTiming, setPostingTiming] = useState<PostingTiming>("TODAY");
+  const today = new Date().toISOString().slice(0, 10);
+  const tomorrow = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
   const update = <K extends keyof Form>(key: K, value: Form[K]) => {
     setForm((old) => ({ ...old, [key]: value }));
     setErrors((old) => {
@@ -87,9 +93,6 @@ export default function PostJob() {
     setForm((old) => ({
       ...old,
       paymentMethod,
-      ...(paymentMethod === "OFFLINE" && old.workMode === "REMOTE"
-        ? { workMode: "ON_SITE" as const }
-        : {}),
     }));
     setErrors((old) => {
       const next = { ...old };
@@ -114,15 +117,33 @@ export default function PostJob() {
           } | null,
         ) => {
           if (!data) return;
-          setPrimary(data.profile?.address ?? "");
+          const address = data.profile?.address ?? "";
+          setPrimary(address);
+          if (address) {
+            setForm((current) =>
+              current.locationAddress
+                ? current
+                : { ...current, locationLabel: "Primary address", locationAddress: address },
+            );
+          }
         },
       )
       .catch(() => {});
+    void fetch("/api/v1/profile/locations")
+      .then((r) => (r.ok ? r.json() : { locations: [] }))
+      .then((data: { locations?: SavedLocation[] }) => setSavedLocations(data.locations ?? []))
+      .catch(() => setSavedLocations([]));
     const edit = editJobId;
     if (!edit) {
       try {
         const draft = JSON.parse(localStorage.getItem(postJobDraftKey) ?? "null");
-        if (draft?.form) setForm({ ...empty, ...draft.form });
+        if (draft?.form) {
+          const draftForm = { ...empty, ...draft.form } as Form;
+          setForm({ ...draftForm, jobDate: draftForm.jobDate || today });
+          setPostingTiming(draftForm.jobDate && draftForm.jobDate > today ? "SCHEDULED" : "TODAY");
+        } else {
+          setForm((current) => ({ ...current, jobDate: today }));
+        }
         if (typeof draft?.step === "number") setStep(draft.step);
         if (typeof draft?.maxStep === "number") setMaxStep(draft.maxStep);
       } catch {
@@ -146,12 +167,9 @@ export default function PostJob() {
             budgetMax: job.budgetMax?.toString() ?? "",
             hourlyRate: job.hourlyRate?.toString() ?? "",
             urgency: job.urgency,
-            jobDate: asDate(job.jobDate),
+            jobDate: asDate(job.jobDate) || today,
             deadline: asDate(job.deadline),
-            workMode:
-              job.paymentMethod === "OFFLINE" && job.workMode === "REMOTE"
-                ? "ON_SITE"
-                : job.workMode,
+            workMode: job.workMode,
             locationLabel: job.locationLabel ?? "",
             locationAddress: job.locationAddress ?? "",
             locationState: job.locationState ?? "",
@@ -159,10 +177,11 @@ export default function PostJob() {
             locationLat: job.locationLat,
             locationLng: job.locationLng,
           });
+          setPostingTiming(job.jobDate && asDate(job.jobDate) > today ? "SCHEDULED" : "TODAY");
         })
         .catch(() => setMessage("This draft could not be opened."));
     }
-  }, [editJobId]);
+  }, [editJobId, today]);
   useEffect(() => {
     if (!hydrated || editJobId) return;
     localStorage.setItem(postJobDraftKey, JSON.stringify({ form, step, maxStep }));
@@ -186,6 +205,8 @@ export default function PostJob() {
       if (!form.description.trim()) e.description = "Describe the work needed.";
     }
     if (step === 1) {
+      if (postingTiming === "SCHEDULED" && (!form.jobDate || form.jobDate <= today))
+        e.jobDate = "Choose a future date for a scheduled job.";
       if (form.timingType === "HOURLY" && !form.hourlyRate) e.hourlyRate = "Enter an hourly rate.";
       if (form.timingType === "FIXED" && (!form.budgetMin || !form.budgetMax))
         e.budgetMin = "Enter a budget range.";
@@ -268,12 +289,40 @@ export default function PostJob() {
   useEffect(() => {
     if (!segment && activeTopCategory) setSegment(activeTopCategory.segment);
   }, [segment, activeTopCategory]);
-  const locationOptions = useMemo<
-    Array<{ label: string; address: string; lat: number | null; lng: number | null }>
-  >(
-    () => (primary ? [{ label: "Primary address", address: primary, lat: null, lng: null }] : []),
-    [primary],
+  const locationOptions = useMemo(
+    () => [
+      ...(primary ? [{ key: "primary", label: "Primary address", address: primary }] : []),
+      ...savedLocations
+        .filter((location) => !location.isPrimary && location.address !== primary)
+        .map((location) => ({
+          key: `saved-${location.id}`,
+          label: /^primary address$/i.test(location.label) ? "Saved address" : location.label,
+          address: location.address,
+        })),
+    ],
+    [primary, savedLocations],
   );
+  async function chooseLocation(key: string) {
+    const option = locationOptions.find((item) => item.key === key);
+    if (!option) return;
+    update("locationLabel", option.label);
+    update("locationAddress", option.address);
+    update("locationLat", null);
+    update("locationLng", null);
+    try {
+      const response = await fetch(`/api/geocode?q=${encodeURIComponent(option.address)}`);
+      const result = (await response.json()) as {
+        results?: Array<{ lat: number; lon: number }>;
+      };
+      const match = result.results?.[0];
+      if (match && Number.isFinite(match.lat) && Number.isFinite(match.lon)) {
+        update("locationLat", match.lat);
+        update("locationLng", match.lon);
+      }
+    } catch {
+      // The client can still place the map pin manually if lookup fails.
+    }
+  }
   return (
     <div className="max-w-3xl">
       <h1 className="text-3xl font-bold">Create a job</h1>
@@ -455,16 +504,42 @@ export default function PostJob() {
                 />
               </div>
             </Field>
+            <Field label="When should this job be posted?">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <Mode
+                  checked={postingTiming === "TODAY"}
+                  onClick={() => {
+                    setPostingTiming("TODAY");
+                    update("jobDate", today);
+                  }}
+                  title="Post today"
+                  text="Show this job to professionals today."
+                />
+                <Mode
+                  checked={postingTiming === "SCHEDULED"}
+                  onClick={() => {
+                    setPostingTiming("SCHEDULED");
+                    if (!form.jobDate || form.jobDate <= today) update("jobDate", tomorrow);
+                  }}
+                  title="Schedule for later"
+                  text="Choose when professionals can see it."
+                />
+              </div>
+            </Field>
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Preferred job date">
+              <Field label="Project start date" error={errors.jobDate}>
                 <Input
                   type="date"
-                  min={new Date().toISOString().slice(0, 10)}
+                  min={postingTiming === "SCHEDULED" ? tomorrow : today}
                   value={form.jobDate}
-                  onChange={(e) => update("jobDate", e.target.value)}
+                  disabled={postingTiming === "TODAY"}
+                  onChange={(e) => {
+                    setPostingTiming("SCHEDULED");
+                    update("jobDate", e.target.value);
+                  }}
                 />
               </Field>
-              <Field label="Deadline" error={errors.deadline}>
+              <Field label="Project end date" error={errors.deadline}>
                 <Input
                   type="date"
                   min={form.jobDate || new Date().toISOString().slice(0, 10)}
@@ -485,14 +560,12 @@ export default function PostJob() {
                 title="On-site"
                 text="A professional comes to the job location."
               />
-              {form.paymentMethod !== "OFFLINE" && (
-                <Mode
-                  checked={form.workMode === "REMOTE"}
-                  onClick={() => update("workMode", "REMOTE")}
-                  title="Remote"
-                  text="The work can be completed remotely."
-                />
-              )}
+              <Mode
+                checked={form.workMode === "REMOTE"}
+                onClick={() => update("workMode", "REMOTE")}
+                title="Remote"
+                text="The work can be completed remotely."
+              />
               <Mode
                 checked={form.workMode === "BOTH"}
                 onClick={() => update("workMode", "BOTH")}
@@ -513,22 +586,44 @@ export default function PostJob() {
               <>
                 {locationOptions.length > 0 && (
                   <div className="space-y-2">
-                    {locationOptions.map((option) => (
-                      <button
-                        key={`${option.label}-${option.address}`}
-                        type="button"
-                        className="w-full rounded-lg border p-3 text-left hover:border-primary"
-                        onClick={() => {
-                          update("locationLabel", option.label);
-                          update("locationAddress", option.address);
-                          update("locationLat", option.lat ?? null);
-                          update("locationLng", option.lng ?? null);
-                        }}
+                    <div className="hidden">
+                      {locationOptions.slice(1).map((option) => (
+                        <button
+                          key={option.key}
+                          type="button"
+                          className={`w-full rounded-xl border p-3 text-left ${
+                            form.locationAddress === option.address
+                              ? "border-primary bg-primary/5"
+                              : "border-input hover:border-primary"
+                          }`}
+                          onClick={() => void chooseLocation(option.key)}
+                        >
+                          <span className="block font-medium">Use {option.label}</span>
+                          <span className="text-sm text-muted-foreground">{option.address}</span>
+                        </button>
+                      ))}
+                    </div>
+                    <div className="space-y-1.5">
+                      <label htmlFor="saved-job-location" className="text-sm font-medium">
+                        Choose a saved location
+                      </label>
+                      <select
+                        id="saved-job-location"
+                        value={
+                          locationOptions.find((option) => option.address === form.locationAddress)
+                            ?.key ?? (primary ? "primary" : "")
+                        }
+                        onChange={(event) => void chooseLocation(event.target.value)}
+                        className="h-11 w-full rounded-md border border-input bg-background px-3"
                       >
-                        <span className="block font-medium">Use {option.label}</span>
-                        <span className="text-sm text-muted-foreground">{option.address}</span>
-                      </button>
-                    ))}
+                        <option value="">Select a saved address</option>
+                        {locationOptions.map((option) => (
+                          <option key={option.key} value={option.key}>
+                            {option.label} — {option.address}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
                 )}
                 <div
@@ -539,6 +634,11 @@ export default function PostJob() {
                   <AddressMapPicker
                     id="job-location"
                     value={form.locationAddress}
+                    coordinates={
+                      form.locationLat !== null && form.locationLng !== null
+                        ? [form.locationLat, form.locationLng]
+                        : null
+                    }
                     onChange={(value) => update("locationAddress", value)}
                     onCoordinatesChange={(lat, lng) => {
                       update("locationLat", lat);
@@ -553,13 +653,6 @@ export default function PostJob() {
                     <p className="mt-2 text-sm text-destructive">{errors.locationAddress}</p>
                   )}
                 </div>
-                <Field label="Add address manually">
-                  <Input
-                    value={form.locationLabel}
-                    onChange={(e) => update("locationLabel", e.target.value)}
-                    placeholder="Name this address, e.g. Home or Job site"
-                  />
-                </Field>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <Field label="State">
                     <select
@@ -586,6 +679,13 @@ export default function PostJob() {
                     />
                   </Field>
                 </div>
+                <Field label="Enter address manually">
+                  <Input
+                    value={form.locationAddress}
+                    onChange={(e) => update("locationAddress", e.target.value)}
+                    placeholder="Enter the complete address manually"
+                  />
+                </Field>
               </>
             )}
           </div>
@@ -619,11 +719,20 @@ export default function PostJob() {
               value={{ HIGH: "Urgent", MEDIUM: "Soon", LOW: "Flexible" }[form.urgency]}
               onEdit={() => setStep(1)}
             />
-            <Review label="Deadline" value={form.deadline || "Not set"} onEdit={() => setStep(1)} />
+            <Review
+              label="Project end date"
+              value={form.deadline || "Not set"}
+              onEdit={() => setStep(1)}
+            />
             <Review
               label="Job type"
               value={{ ON_SITE: "On-site", REMOTE: "Remote", BOTH: "Hybrid" }[form.workMode]}
               onEdit={() => setStep(2)}
+            />
+            <Review
+              label="Posting date"
+              value={postingTiming === "TODAY" ? "Today" : form.jobDate || "Not set"}
+              onEdit={() => setStep(1)}
             />
             {form.workMode !== "REMOTE" && (
               <Review

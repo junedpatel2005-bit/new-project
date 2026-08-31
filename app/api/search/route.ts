@@ -8,6 +8,10 @@ export async function GET(request: Request) {
   const jobs = await db.clientJob.findMany({
     where: {
       status: "OPEN",
+      AND: [
+        { OR: [{ jobDate: null }, { jobDate: { lte: new Date() } }] },
+        { OR: [{ deadline: null }, { deadline: { gte: new Date() } }] },
+      ],
       OR: [
         { title: { contains: query, mode: "insensitive" } },
         { description: { contains: query, mode: "insensitive" } },

@@ -253,6 +253,10 @@ export async function listOpenJobs(): Promise<MarketplaceJob[]> {
   const jobs = await db.clientJob.findMany({
     where: {
       status: "OPEN",
+      AND: [
+        { OR: [{ jobDate: null }, { jobDate: { lte: new Date() } }] },
+        { OR: [{ deadline: null }, { deadline: { gte: new Date() } }] },
+      ],
       id: { notIn: [...hiddenJobIds] },
     },
     select: {
@@ -441,7 +445,14 @@ export async function getOpenJob(id: number): Promise<MarketplaceJob | null> {
   if (runningProject) return null;
 
   const job = await db.clientJob.findFirst({
-    where: { id, status: "OPEN" },
+    where: {
+      id,
+      status: "OPEN",
+      AND: [
+        { OR: [{ jobDate: null }, { jobDate: { lte: new Date() } }] },
+        { OR: [{ deadline: null }, { deadline: { gte: new Date() } }] },
+      ],
+    },
     select: {
       id: true,
       title: true,

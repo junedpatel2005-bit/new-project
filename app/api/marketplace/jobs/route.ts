@@ -5,7 +5,13 @@ export const runtime = "nodejs";
 
 export async function GET() {
   const jobs = await db.clientJob.findMany({
-    where: { status: "OPEN" },
+    where: {
+      status: "OPEN",
+      AND: [
+        { OR: [{ jobDate: null }, { jobDate: { lte: new Date() } }] },
+        { OR: [{ deadline: null }, { deadline: { gte: new Date() } }] },
+      ],
+    },
     orderBy: { createdAt: "desc" },
     take: 100,
     select: {

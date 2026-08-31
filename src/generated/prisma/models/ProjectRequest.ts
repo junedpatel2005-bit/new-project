@@ -288,6 +288,10 @@ export type ProjectRequestWhereInput = {
   attachmentsJson?: Prisma.StringNullableFilter<"ProjectRequest"> | string | null
   createdAt?: Prisma.DateTimeFilter<"ProjectRequest"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ProjectRequest"> | Date | string
+  job?: Prisma.XOR<Prisma.ClientJobScalarRelationFilter, Prisma.ClientJobWhereInput>
+  client?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  professional?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  tracking?: Prisma.XOR<Prisma.ProjectTrackingNullableScalarRelationFilter, Prisma.ProjectTrackingWhereInput> | null
 }
 
 export type ProjectRequestOrderByWithRelationInput = {
@@ -303,6 +307,10 @@ export type ProjectRequestOrderByWithRelationInput = {
   attachmentsJson?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  job?: Prisma.ClientJobOrderByWithRelationInput
+  client?: Prisma.UserOrderByWithRelationInput
+  professional?: Prisma.UserOrderByWithRelationInput
+  tracking?: Prisma.ProjectTrackingOrderByWithRelationInput
 }
 
 export type ProjectRequestWhereUniqueInput = Prisma.AtLeast<{
@@ -321,6 +329,10 @@ export type ProjectRequestWhereUniqueInput = Prisma.AtLeast<{
   attachmentsJson?: Prisma.StringNullableFilter<"ProjectRequest"> | string | null
   createdAt?: Prisma.DateTimeFilter<"ProjectRequest"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ProjectRequest"> | Date | string
+  job?: Prisma.XOR<Prisma.ClientJobScalarRelationFilter, Prisma.ClientJobWhereInput>
+  client?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  professional?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  tracking?: Prisma.XOR<Prisma.ProjectTrackingNullableScalarRelationFilter, Prisma.ProjectTrackingWhereInput> | null
 }, "id">
 
 export type ProjectRequestOrderByWithAggregationInput = {
@@ -362,9 +374,6 @@ export type ProjectRequestScalarWhereWithAggregatesInput = {
 }
 
 export type ProjectRequestCreateInput = {
-  jobId: number
-  clientId: number
-  professionalId: number
   bidAmount: number
   duration: string
   coverLetter: string
@@ -373,6 +382,10 @@ export type ProjectRequestCreateInput = {
   attachmentsJson?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  job: Prisma.ClientJobCreateNestedOneWithoutProjectRequestsInput
+  client: Prisma.UserCreateNestedOneWithoutClientProjectRequestsInput
+  professional: Prisma.UserCreateNestedOneWithoutProfessionalProjectRequestsInput
+  tracking?: Prisma.ProjectTrackingCreateNestedOneWithoutRequestInput
 }
 
 export type ProjectRequestUncheckedCreateInput = {
@@ -388,12 +401,10 @@ export type ProjectRequestUncheckedCreateInput = {
   attachmentsJson?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  tracking?: Prisma.ProjectTrackingUncheckedCreateNestedOneWithoutRequestInput
 }
 
 export type ProjectRequestUpdateInput = {
-  jobId?: Prisma.IntFieldUpdateOperationsInput | number
-  clientId?: Prisma.IntFieldUpdateOperationsInput | number
-  professionalId?: Prisma.IntFieldUpdateOperationsInput | number
   bidAmount?: Prisma.IntFieldUpdateOperationsInput | number
   duration?: Prisma.StringFieldUpdateOperationsInput | string
   coverLetter?: Prisma.StringFieldUpdateOperationsInput | string
@@ -402,6 +413,10 @@ export type ProjectRequestUpdateInput = {
   attachmentsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  job?: Prisma.ClientJobUpdateOneRequiredWithoutProjectRequestsNestedInput
+  client?: Prisma.UserUpdateOneRequiredWithoutClientProjectRequestsNestedInput
+  professional?: Prisma.UserUpdateOneRequiredWithoutProfessionalProjectRequestsNestedInput
+  tracking?: Prisma.ProjectTrackingUpdateOneWithoutRequestNestedInput
 }
 
 export type ProjectRequestUncheckedUpdateInput = {
@@ -417,6 +432,7 @@ export type ProjectRequestUncheckedUpdateInput = {
   attachmentsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tracking?: Prisma.ProjectTrackingUncheckedUpdateOneWithoutRequestNestedInput
 }
 
 export type ProjectRequestCreateManyInput = {
@@ -435,9 +451,6 @@ export type ProjectRequestCreateManyInput = {
 }
 
 export type ProjectRequestUpdateManyMutationInput = {
-  jobId?: Prisma.IntFieldUpdateOperationsInput | number
-  clientId?: Prisma.IntFieldUpdateOperationsInput | number
-  professionalId?: Prisma.IntFieldUpdateOperationsInput | number
   bidAmount?: Prisma.IntFieldUpdateOperationsInput | number
   duration?: Prisma.StringFieldUpdateOperationsInput | string
   coverLetter?: Prisma.StringFieldUpdateOperationsInput | string
@@ -461,6 +474,16 @@ export type ProjectRequestUncheckedUpdateManyInput = {
   attachmentsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ProjectRequestListRelationFilter = {
+  every?: Prisma.ProjectRequestWhereInput
+  some?: Prisma.ProjectRequestWhereInput
+  none?: Prisma.ProjectRequestWhereInput
+}
+
+export type ProjectRequestOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type ProjectRequestCountOrderByAggregateInput = {
@@ -524,6 +547,579 @@ export type ProjectRequestSumOrderByAggregateInput = {
   bidAmount?: Prisma.SortOrder
 }
 
+export type ProjectRequestScalarRelationFilter = {
+  is?: Prisma.ProjectRequestWhereInput
+  isNot?: Prisma.ProjectRequestWhereInput
+}
+
+export type ProjectRequestCreateNestedManyWithoutClientInput = {
+  create?: Prisma.XOR<Prisma.ProjectRequestCreateWithoutClientInput, Prisma.ProjectRequestUncheckedCreateWithoutClientInput> | Prisma.ProjectRequestCreateWithoutClientInput[] | Prisma.ProjectRequestUncheckedCreateWithoutClientInput[]
+  connectOrCreate?: Prisma.ProjectRequestCreateOrConnectWithoutClientInput | Prisma.ProjectRequestCreateOrConnectWithoutClientInput[]
+  createMany?: Prisma.ProjectRequestCreateManyClientInputEnvelope
+  connect?: Prisma.ProjectRequestWhereUniqueInput | Prisma.ProjectRequestWhereUniqueInput[]
+}
+
+export type ProjectRequestCreateNestedManyWithoutProfessionalInput = {
+  create?: Prisma.XOR<Prisma.ProjectRequestCreateWithoutProfessionalInput, Prisma.ProjectRequestUncheckedCreateWithoutProfessionalInput> | Prisma.ProjectRequestCreateWithoutProfessionalInput[] | Prisma.ProjectRequestUncheckedCreateWithoutProfessionalInput[]
+  connectOrCreate?: Prisma.ProjectRequestCreateOrConnectWithoutProfessionalInput | Prisma.ProjectRequestCreateOrConnectWithoutProfessionalInput[]
+  createMany?: Prisma.ProjectRequestCreateManyProfessionalInputEnvelope
+  connect?: Prisma.ProjectRequestWhereUniqueInput | Prisma.ProjectRequestWhereUniqueInput[]
+}
+
+export type ProjectRequestUncheckedCreateNestedManyWithoutClientInput = {
+  create?: Prisma.XOR<Prisma.ProjectRequestCreateWithoutClientInput, Prisma.ProjectRequestUncheckedCreateWithoutClientInput> | Prisma.ProjectRequestCreateWithoutClientInput[] | Prisma.ProjectRequestUncheckedCreateWithoutClientInput[]
+  connectOrCreate?: Prisma.ProjectRequestCreateOrConnectWithoutClientInput | Prisma.ProjectRequestCreateOrConnectWithoutClientInput[]
+  createMany?: Prisma.ProjectRequestCreateManyClientInputEnvelope
+  connect?: Prisma.ProjectRequestWhereUniqueInput | Prisma.ProjectRequestWhereUniqueInput[]
+}
+
+export type ProjectRequestUncheckedCreateNestedManyWithoutProfessionalInput = {
+  create?: Prisma.XOR<Prisma.ProjectRequestCreateWithoutProfessionalInput, Prisma.ProjectRequestUncheckedCreateWithoutProfessionalInput> | Prisma.ProjectRequestCreateWithoutProfessionalInput[] | Prisma.ProjectRequestUncheckedCreateWithoutProfessionalInput[]
+  connectOrCreate?: Prisma.ProjectRequestCreateOrConnectWithoutProfessionalInput | Prisma.ProjectRequestCreateOrConnectWithoutProfessionalInput[]
+  createMany?: Prisma.ProjectRequestCreateManyProfessionalInputEnvelope
+  connect?: Prisma.ProjectRequestWhereUniqueInput | Prisma.ProjectRequestWhereUniqueInput[]
+}
+
+export type ProjectRequestUpdateManyWithoutClientNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectRequestCreateWithoutClientInput, Prisma.ProjectRequestUncheckedCreateWithoutClientInput> | Prisma.ProjectRequestCreateWithoutClientInput[] | Prisma.ProjectRequestUncheckedCreateWithoutClientInput[]
+  connectOrCreate?: Prisma.ProjectRequestCreateOrConnectWithoutClientInput | Prisma.ProjectRequestCreateOrConnectWithoutClientInput[]
+  upsert?: Prisma.ProjectRequestUpsertWithWhereUniqueWithoutClientInput | Prisma.ProjectRequestUpsertWithWhereUniqueWithoutClientInput[]
+  createMany?: Prisma.ProjectRequestCreateManyClientInputEnvelope
+  set?: Prisma.ProjectRequestWhereUniqueInput | Prisma.ProjectRequestWhereUniqueInput[]
+  disconnect?: Prisma.ProjectRequestWhereUniqueInput | Prisma.ProjectRequestWhereUniqueInput[]
+  delete?: Prisma.ProjectRequestWhereUniqueInput | Prisma.ProjectRequestWhereUniqueInput[]
+  connect?: Prisma.ProjectRequestWhereUniqueInput | Prisma.ProjectRequestWhereUniqueInput[]
+  update?: Prisma.ProjectRequestUpdateWithWhereUniqueWithoutClientInput | Prisma.ProjectRequestUpdateWithWhereUniqueWithoutClientInput[]
+  updateMany?: Prisma.ProjectRequestUpdateManyWithWhereWithoutClientInput | Prisma.ProjectRequestUpdateManyWithWhereWithoutClientInput[]
+  deleteMany?: Prisma.ProjectRequestScalarWhereInput | Prisma.ProjectRequestScalarWhereInput[]
+}
+
+export type ProjectRequestUpdateManyWithoutProfessionalNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectRequestCreateWithoutProfessionalInput, Prisma.ProjectRequestUncheckedCreateWithoutProfessionalInput> | Prisma.ProjectRequestCreateWithoutProfessionalInput[] | Prisma.ProjectRequestUncheckedCreateWithoutProfessionalInput[]
+  connectOrCreate?: Prisma.ProjectRequestCreateOrConnectWithoutProfessionalInput | Prisma.ProjectRequestCreateOrConnectWithoutProfessionalInput[]
+  upsert?: Prisma.ProjectRequestUpsertWithWhereUniqueWithoutProfessionalInput | Prisma.ProjectRequestUpsertWithWhereUniqueWithoutProfessionalInput[]
+  createMany?: Prisma.ProjectRequestCreateManyProfessionalInputEnvelope
+  set?: Prisma.ProjectRequestWhereUniqueInput | Prisma.ProjectRequestWhereUniqueInput[]
+  disconnect?: Prisma.ProjectRequestWhereUniqueInput | Prisma.ProjectRequestWhereUniqueInput[]
+  delete?: Prisma.ProjectRequestWhereUniqueInput | Prisma.ProjectRequestWhereUniqueInput[]
+  connect?: Prisma.ProjectRequestWhereUniqueInput | Prisma.ProjectRequestWhereUniqueInput[]
+  update?: Prisma.ProjectRequestUpdateWithWhereUniqueWithoutProfessionalInput | Prisma.ProjectRequestUpdateWithWhereUniqueWithoutProfessionalInput[]
+  updateMany?: Prisma.ProjectRequestUpdateManyWithWhereWithoutProfessionalInput | Prisma.ProjectRequestUpdateManyWithWhereWithoutProfessionalInput[]
+  deleteMany?: Prisma.ProjectRequestScalarWhereInput | Prisma.ProjectRequestScalarWhereInput[]
+}
+
+export type ProjectRequestUncheckedUpdateManyWithoutClientNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectRequestCreateWithoutClientInput, Prisma.ProjectRequestUncheckedCreateWithoutClientInput> | Prisma.ProjectRequestCreateWithoutClientInput[] | Prisma.ProjectRequestUncheckedCreateWithoutClientInput[]
+  connectOrCreate?: Prisma.ProjectRequestCreateOrConnectWithoutClientInput | Prisma.ProjectRequestCreateOrConnectWithoutClientInput[]
+  upsert?: Prisma.ProjectRequestUpsertWithWhereUniqueWithoutClientInput | Prisma.ProjectRequestUpsertWithWhereUniqueWithoutClientInput[]
+  createMany?: Prisma.ProjectRequestCreateManyClientInputEnvelope
+  set?: Prisma.ProjectRequestWhereUniqueInput | Prisma.ProjectRequestWhereUniqueInput[]
+  disconnect?: Prisma.ProjectRequestWhereUniqueInput | Prisma.ProjectRequestWhereUniqueInput[]
+  delete?: Prisma.ProjectRequestWhereUniqueInput | Prisma.ProjectRequestWhereUniqueInput[]
+  connect?: Prisma.ProjectRequestWhereUniqueInput | Prisma.ProjectRequestWhereUniqueInput[]
+  update?: Prisma.ProjectRequestUpdateWithWhereUniqueWithoutClientInput | Prisma.ProjectRequestUpdateWithWhereUniqueWithoutClientInput[]
+  updateMany?: Prisma.ProjectRequestUpdateManyWithWhereWithoutClientInput | Prisma.ProjectRequestUpdateManyWithWhereWithoutClientInput[]
+  deleteMany?: Prisma.ProjectRequestScalarWhereInput | Prisma.ProjectRequestScalarWhereInput[]
+}
+
+export type ProjectRequestUncheckedUpdateManyWithoutProfessionalNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectRequestCreateWithoutProfessionalInput, Prisma.ProjectRequestUncheckedCreateWithoutProfessionalInput> | Prisma.ProjectRequestCreateWithoutProfessionalInput[] | Prisma.ProjectRequestUncheckedCreateWithoutProfessionalInput[]
+  connectOrCreate?: Prisma.ProjectRequestCreateOrConnectWithoutProfessionalInput | Prisma.ProjectRequestCreateOrConnectWithoutProfessionalInput[]
+  upsert?: Prisma.ProjectRequestUpsertWithWhereUniqueWithoutProfessionalInput | Prisma.ProjectRequestUpsertWithWhereUniqueWithoutProfessionalInput[]
+  createMany?: Prisma.ProjectRequestCreateManyProfessionalInputEnvelope
+  set?: Prisma.ProjectRequestWhereUniqueInput | Prisma.ProjectRequestWhereUniqueInput[]
+  disconnect?: Prisma.ProjectRequestWhereUniqueInput | Prisma.ProjectRequestWhereUniqueInput[]
+  delete?: Prisma.ProjectRequestWhereUniqueInput | Prisma.ProjectRequestWhereUniqueInput[]
+  connect?: Prisma.ProjectRequestWhereUniqueInput | Prisma.ProjectRequestWhereUniqueInput[]
+  update?: Prisma.ProjectRequestUpdateWithWhereUniqueWithoutProfessionalInput | Prisma.ProjectRequestUpdateWithWhereUniqueWithoutProfessionalInput[]
+  updateMany?: Prisma.ProjectRequestUpdateManyWithWhereWithoutProfessionalInput | Prisma.ProjectRequestUpdateManyWithWhereWithoutProfessionalInput[]
+  deleteMany?: Prisma.ProjectRequestScalarWhereInput | Prisma.ProjectRequestScalarWhereInput[]
+}
+
+export type ProjectRequestCreateNestedManyWithoutJobInput = {
+  create?: Prisma.XOR<Prisma.ProjectRequestCreateWithoutJobInput, Prisma.ProjectRequestUncheckedCreateWithoutJobInput> | Prisma.ProjectRequestCreateWithoutJobInput[] | Prisma.ProjectRequestUncheckedCreateWithoutJobInput[]
+  connectOrCreate?: Prisma.ProjectRequestCreateOrConnectWithoutJobInput | Prisma.ProjectRequestCreateOrConnectWithoutJobInput[]
+  createMany?: Prisma.ProjectRequestCreateManyJobInputEnvelope
+  connect?: Prisma.ProjectRequestWhereUniqueInput | Prisma.ProjectRequestWhereUniqueInput[]
+}
+
+export type ProjectRequestUncheckedCreateNestedManyWithoutJobInput = {
+  create?: Prisma.XOR<Prisma.ProjectRequestCreateWithoutJobInput, Prisma.ProjectRequestUncheckedCreateWithoutJobInput> | Prisma.ProjectRequestCreateWithoutJobInput[] | Prisma.ProjectRequestUncheckedCreateWithoutJobInput[]
+  connectOrCreate?: Prisma.ProjectRequestCreateOrConnectWithoutJobInput | Prisma.ProjectRequestCreateOrConnectWithoutJobInput[]
+  createMany?: Prisma.ProjectRequestCreateManyJobInputEnvelope
+  connect?: Prisma.ProjectRequestWhereUniqueInput | Prisma.ProjectRequestWhereUniqueInput[]
+}
+
+export type ProjectRequestUpdateManyWithoutJobNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectRequestCreateWithoutJobInput, Prisma.ProjectRequestUncheckedCreateWithoutJobInput> | Prisma.ProjectRequestCreateWithoutJobInput[] | Prisma.ProjectRequestUncheckedCreateWithoutJobInput[]
+  connectOrCreate?: Prisma.ProjectRequestCreateOrConnectWithoutJobInput | Prisma.ProjectRequestCreateOrConnectWithoutJobInput[]
+  upsert?: Prisma.ProjectRequestUpsertWithWhereUniqueWithoutJobInput | Prisma.ProjectRequestUpsertWithWhereUniqueWithoutJobInput[]
+  createMany?: Prisma.ProjectRequestCreateManyJobInputEnvelope
+  set?: Prisma.ProjectRequestWhereUniqueInput | Prisma.ProjectRequestWhereUniqueInput[]
+  disconnect?: Prisma.ProjectRequestWhereUniqueInput | Prisma.ProjectRequestWhereUniqueInput[]
+  delete?: Prisma.ProjectRequestWhereUniqueInput | Prisma.ProjectRequestWhereUniqueInput[]
+  connect?: Prisma.ProjectRequestWhereUniqueInput | Prisma.ProjectRequestWhereUniqueInput[]
+  update?: Prisma.ProjectRequestUpdateWithWhereUniqueWithoutJobInput | Prisma.ProjectRequestUpdateWithWhereUniqueWithoutJobInput[]
+  updateMany?: Prisma.ProjectRequestUpdateManyWithWhereWithoutJobInput | Prisma.ProjectRequestUpdateManyWithWhereWithoutJobInput[]
+  deleteMany?: Prisma.ProjectRequestScalarWhereInput | Prisma.ProjectRequestScalarWhereInput[]
+}
+
+export type ProjectRequestUncheckedUpdateManyWithoutJobNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectRequestCreateWithoutJobInput, Prisma.ProjectRequestUncheckedCreateWithoutJobInput> | Prisma.ProjectRequestCreateWithoutJobInput[] | Prisma.ProjectRequestUncheckedCreateWithoutJobInput[]
+  connectOrCreate?: Prisma.ProjectRequestCreateOrConnectWithoutJobInput | Prisma.ProjectRequestCreateOrConnectWithoutJobInput[]
+  upsert?: Prisma.ProjectRequestUpsertWithWhereUniqueWithoutJobInput | Prisma.ProjectRequestUpsertWithWhereUniqueWithoutJobInput[]
+  createMany?: Prisma.ProjectRequestCreateManyJobInputEnvelope
+  set?: Prisma.ProjectRequestWhereUniqueInput | Prisma.ProjectRequestWhereUniqueInput[]
+  disconnect?: Prisma.ProjectRequestWhereUniqueInput | Prisma.ProjectRequestWhereUniqueInput[]
+  delete?: Prisma.ProjectRequestWhereUniqueInput | Prisma.ProjectRequestWhereUniqueInput[]
+  connect?: Prisma.ProjectRequestWhereUniqueInput | Prisma.ProjectRequestWhereUniqueInput[]
+  update?: Prisma.ProjectRequestUpdateWithWhereUniqueWithoutJobInput | Prisma.ProjectRequestUpdateWithWhereUniqueWithoutJobInput[]
+  updateMany?: Prisma.ProjectRequestUpdateManyWithWhereWithoutJobInput | Prisma.ProjectRequestUpdateManyWithWhereWithoutJobInput[]
+  deleteMany?: Prisma.ProjectRequestScalarWhereInput | Prisma.ProjectRequestScalarWhereInput[]
+}
+
+export type ProjectRequestCreateNestedOneWithoutTrackingInput = {
+  create?: Prisma.XOR<Prisma.ProjectRequestCreateWithoutTrackingInput, Prisma.ProjectRequestUncheckedCreateWithoutTrackingInput>
+  connectOrCreate?: Prisma.ProjectRequestCreateOrConnectWithoutTrackingInput
+  connect?: Prisma.ProjectRequestWhereUniqueInput
+}
+
+export type ProjectRequestUpdateOneRequiredWithoutTrackingNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectRequestCreateWithoutTrackingInput, Prisma.ProjectRequestUncheckedCreateWithoutTrackingInput>
+  connectOrCreate?: Prisma.ProjectRequestCreateOrConnectWithoutTrackingInput
+  upsert?: Prisma.ProjectRequestUpsertWithoutTrackingInput
+  connect?: Prisma.ProjectRequestWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectRequestUpdateToOneWithWhereWithoutTrackingInput, Prisma.ProjectRequestUpdateWithoutTrackingInput>, Prisma.ProjectRequestUncheckedUpdateWithoutTrackingInput>
+}
+
+export type ProjectRequestCreateWithoutClientInput = {
+  bidAmount: number
+  duration: string
+  coverLetter: string
+  status?: string
+  origin?: string
+  attachmentsJson?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  job: Prisma.ClientJobCreateNestedOneWithoutProjectRequestsInput
+  professional: Prisma.UserCreateNestedOneWithoutProfessionalProjectRequestsInput
+  tracking?: Prisma.ProjectTrackingCreateNestedOneWithoutRequestInput
+}
+
+export type ProjectRequestUncheckedCreateWithoutClientInput = {
+  id?: number
+  jobId: number
+  professionalId: number
+  bidAmount: number
+  duration: string
+  coverLetter: string
+  status?: string
+  origin?: string
+  attachmentsJson?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tracking?: Prisma.ProjectTrackingUncheckedCreateNestedOneWithoutRequestInput
+}
+
+export type ProjectRequestCreateOrConnectWithoutClientInput = {
+  where: Prisma.ProjectRequestWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProjectRequestCreateWithoutClientInput, Prisma.ProjectRequestUncheckedCreateWithoutClientInput>
+}
+
+export type ProjectRequestCreateManyClientInputEnvelope = {
+  data: Prisma.ProjectRequestCreateManyClientInput | Prisma.ProjectRequestCreateManyClientInput[]
+  skipDuplicates?: boolean
+}
+
+export type ProjectRequestCreateWithoutProfessionalInput = {
+  bidAmount: number
+  duration: string
+  coverLetter: string
+  status?: string
+  origin?: string
+  attachmentsJson?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  job: Prisma.ClientJobCreateNestedOneWithoutProjectRequestsInput
+  client: Prisma.UserCreateNestedOneWithoutClientProjectRequestsInput
+  tracking?: Prisma.ProjectTrackingCreateNestedOneWithoutRequestInput
+}
+
+export type ProjectRequestUncheckedCreateWithoutProfessionalInput = {
+  id?: number
+  jobId: number
+  clientId: number
+  bidAmount: number
+  duration: string
+  coverLetter: string
+  status?: string
+  origin?: string
+  attachmentsJson?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tracking?: Prisma.ProjectTrackingUncheckedCreateNestedOneWithoutRequestInput
+}
+
+export type ProjectRequestCreateOrConnectWithoutProfessionalInput = {
+  where: Prisma.ProjectRequestWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProjectRequestCreateWithoutProfessionalInput, Prisma.ProjectRequestUncheckedCreateWithoutProfessionalInput>
+}
+
+export type ProjectRequestCreateManyProfessionalInputEnvelope = {
+  data: Prisma.ProjectRequestCreateManyProfessionalInput | Prisma.ProjectRequestCreateManyProfessionalInput[]
+  skipDuplicates?: boolean
+}
+
+export type ProjectRequestUpsertWithWhereUniqueWithoutClientInput = {
+  where: Prisma.ProjectRequestWhereUniqueInput
+  update: Prisma.XOR<Prisma.ProjectRequestUpdateWithoutClientInput, Prisma.ProjectRequestUncheckedUpdateWithoutClientInput>
+  create: Prisma.XOR<Prisma.ProjectRequestCreateWithoutClientInput, Prisma.ProjectRequestUncheckedCreateWithoutClientInput>
+}
+
+export type ProjectRequestUpdateWithWhereUniqueWithoutClientInput = {
+  where: Prisma.ProjectRequestWhereUniqueInput
+  data: Prisma.XOR<Prisma.ProjectRequestUpdateWithoutClientInput, Prisma.ProjectRequestUncheckedUpdateWithoutClientInput>
+}
+
+export type ProjectRequestUpdateManyWithWhereWithoutClientInput = {
+  where: Prisma.ProjectRequestScalarWhereInput
+  data: Prisma.XOR<Prisma.ProjectRequestUpdateManyMutationInput, Prisma.ProjectRequestUncheckedUpdateManyWithoutClientInput>
+}
+
+export type ProjectRequestScalarWhereInput = {
+  AND?: Prisma.ProjectRequestScalarWhereInput | Prisma.ProjectRequestScalarWhereInput[]
+  OR?: Prisma.ProjectRequestScalarWhereInput[]
+  NOT?: Prisma.ProjectRequestScalarWhereInput | Prisma.ProjectRequestScalarWhereInput[]
+  id?: Prisma.IntFilter<"ProjectRequest"> | number
+  jobId?: Prisma.IntFilter<"ProjectRequest"> | number
+  clientId?: Prisma.IntFilter<"ProjectRequest"> | number
+  professionalId?: Prisma.IntFilter<"ProjectRequest"> | number
+  bidAmount?: Prisma.IntFilter<"ProjectRequest"> | number
+  duration?: Prisma.StringFilter<"ProjectRequest"> | string
+  coverLetter?: Prisma.StringFilter<"ProjectRequest"> | string
+  status?: Prisma.StringFilter<"ProjectRequest"> | string
+  origin?: Prisma.StringFilter<"ProjectRequest"> | string
+  attachmentsJson?: Prisma.StringNullableFilter<"ProjectRequest"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"ProjectRequest"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"ProjectRequest"> | Date | string
+}
+
+export type ProjectRequestUpsertWithWhereUniqueWithoutProfessionalInput = {
+  where: Prisma.ProjectRequestWhereUniqueInput
+  update: Prisma.XOR<Prisma.ProjectRequestUpdateWithoutProfessionalInput, Prisma.ProjectRequestUncheckedUpdateWithoutProfessionalInput>
+  create: Prisma.XOR<Prisma.ProjectRequestCreateWithoutProfessionalInput, Prisma.ProjectRequestUncheckedCreateWithoutProfessionalInput>
+}
+
+export type ProjectRequestUpdateWithWhereUniqueWithoutProfessionalInput = {
+  where: Prisma.ProjectRequestWhereUniqueInput
+  data: Prisma.XOR<Prisma.ProjectRequestUpdateWithoutProfessionalInput, Prisma.ProjectRequestUncheckedUpdateWithoutProfessionalInput>
+}
+
+export type ProjectRequestUpdateManyWithWhereWithoutProfessionalInput = {
+  where: Prisma.ProjectRequestScalarWhereInput
+  data: Prisma.XOR<Prisma.ProjectRequestUpdateManyMutationInput, Prisma.ProjectRequestUncheckedUpdateManyWithoutProfessionalInput>
+}
+
+export type ProjectRequestCreateWithoutJobInput = {
+  bidAmount: number
+  duration: string
+  coverLetter: string
+  status?: string
+  origin?: string
+  attachmentsJson?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  client: Prisma.UserCreateNestedOneWithoutClientProjectRequestsInput
+  professional: Prisma.UserCreateNestedOneWithoutProfessionalProjectRequestsInput
+  tracking?: Prisma.ProjectTrackingCreateNestedOneWithoutRequestInput
+}
+
+export type ProjectRequestUncheckedCreateWithoutJobInput = {
+  id?: number
+  clientId: number
+  professionalId: number
+  bidAmount: number
+  duration: string
+  coverLetter: string
+  status?: string
+  origin?: string
+  attachmentsJson?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tracking?: Prisma.ProjectTrackingUncheckedCreateNestedOneWithoutRequestInput
+}
+
+export type ProjectRequestCreateOrConnectWithoutJobInput = {
+  where: Prisma.ProjectRequestWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProjectRequestCreateWithoutJobInput, Prisma.ProjectRequestUncheckedCreateWithoutJobInput>
+}
+
+export type ProjectRequestCreateManyJobInputEnvelope = {
+  data: Prisma.ProjectRequestCreateManyJobInput | Prisma.ProjectRequestCreateManyJobInput[]
+  skipDuplicates?: boolean
+}
+
+export type ProjectRequestUpsertWithWhereUniqueWithoutJobInput = {
+  where: Prisma.ProjectRequestWhereUniqueInput
+  update: Prisma.XOR<Prisma.ProjectRequestUpdateWithoutJobInput, Prisma.ProjectRequestUncheckedUpdateWithoutJobInput>
+  create: Prisma.XOR<Prisma.ProjectRequestCreateWithoutJobInput, Prisma.ProjectRequestUncheckedCreateWithoutJobInput>
+}
+
+export type ProjectRequestUpdateWithWhereUniqueWithoutJobInput = {
+  where: Prisma.ProjectRequestWhereUniqueInput
+  data: Prisma.XOR<Prisma.ProjectRequestUpdateWithoutJobInput, Prisma.ProjectRequestUncheckedUpdateWithoutJobInput>
+}
+
+export type ProjectRequestUpdateManyWithWhereWithoutJobInput = {
+  where: Prisma.ProjectRequestScalarWhereInput
+  data: Prisma.XOR<Prisma.ProjectRequestUpdateManyMutationInput, Prisma.ProjectRequestUncheckedUpdateManyWithoutJobInput>
+}
+
+export type ProjectRequestCreateWithoutTrackingInput = {
+  bidAmount: number
+  duration: string
+  coverLetter: string
+  status?: string
+  origin?: string
+  attachmentsJson?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  job: Prisma.ClientJobCreateNestedOneWithoutProjectRequestsInput
+  client: Prisma.UserCreateNestedOneWithoutClientProjectRequestsInput
+  professional: Prisma.UserCreateNestedOneWithoutProfessionalProjectRequestsInput
+}
+
+export type ProjectRequestUncheckedCreateWithoutTrackingInput = {
+  id?: number
+  jobId: number
+  clientId: number
+  professionalId: number
+  bidAmount: number
+  duration: string
+  coverLetter: string
+  status?: string
+  origin?: string
+  attachmentsJson?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type ProjectRequestCreateOrConnectWithoutTrackingInput = {
+  where: Prisma.ProjectRequestWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProjectRequestCreateWithoutTrackingInput, Prisma.ProjectRequestUncheckedCreateWithoutTrackingInput>
+}
+
+export type ProjectRequestUpsertWithoutTrackingInput = {
+  update: Prisma.XOR<Prisma.ProjectRequestUpdateWithoutTrackingInput, Prisma.ProjectRequestUncheckedUpdateWithoutTrackingInput>
+  create: Prisma.XOR<Prisma.ProjectRequestCreateWithoutTrackingInput, Prisma.ProjectRequestUncheckedCreateWithoutTrackingInput>
+  where?: Prisma.ProjectRequestWhereInput
+}
+
+export type ProjectRequestUpdateToOneWithWhereWithoutTrackingInput = {
+  where?: Prisma.ProjectRequestWhereInput
+  data: Prisma.XOR<Prisma.ProjectRequestUpdateWithoutTrackingInput, Prisma.ProjectRequestUncheckedUpdateWithoutTrackingInput>
+}
+
+export type ProjectRequestUpdateWithoutTrackingInput = {
+  bidAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  duration?: Prisma.StringFieldUpdateOperationsInput | string
+  coverLetter?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  origin?: Prisma.StringFieldUpdateOperationsInput | string
+  attachmentsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  job?: Prisma.ClientJobUpdateOneRequiredWithoutProjectRequestsNestedInput
+  client?: Prisma.UserUpdateOneRequiredWithoutClientProjectRequestsNestedInput
+  professional?: Prisma.UserUpdateOneRequiredWithoutProfessionalProjectRequestsNestedInput
+}
+
+export type ProjectRequestUncheckedUpdateWithoutTrackingInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  jobId?: Prisma.IntFieldUpdateOperationsInput | number
+  clientId?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalId?: Prisma.IntFieldUpdateOperationsInput | number
+  bidAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  duration?: Prisma.StringFieldUpdateOperationsInput | string
+  coverLetter?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  origin?: Prisma.StringFieldUpdateOperationsInput | string
+  attachmentsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ProjectRequestCreateManyClientInput = {
+  id?: number
+  jobId: number
+  professionalId: number
+  bidAmount: number
+  duration: string
+  coverLetter: string
+  status?: string
+  origin?: string
+  attachmentsJson?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type ProjectRequestCreateManyProfessionalInput = {
+  id?: number
+  jobId: number
+  clientId: number
+  bidAmount: number
+  duration: string
+  coverLetter: string
+  status?: string
+  origin?: string
+  attachmentsJson?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type ProjectRequestUpdateWithoutClientInput = {
+  bidAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  duration?: Prisma.StringFieldUpdateOperationsInput | string
+  coverLetter?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  origin?: Prisma.StringFieldUpdateOperationsInput | string
+  attachmentsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  job?: Prisma.ClientJobUpdateOneRequiredWithoutProjectRequestsNestedInput
+  professional?: Prisma.UserUpdateOneRequiredWithoutProfessionalProjectRequestsNestedInput
+  tracking?: Prisma.ProjectTrackingUpdateOneWithoutRequestNestedInput
+}
+
+export type ProjectRequestUncheckedUpdateWithoutClientInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  jobId?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalId?: Prisma.IntFieldUpdateOperationsInput | number
+  bidAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  duration?: Prisma.StringFieldUpdateOperationsInput | string
+  coverLetter?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  origin?: Prisma.StringFieldUpdateOperationsInput | string
+  attachmentsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tracking?: Prisma.ProjectTrackingUncheckedUpdateOneWithoutRequestNestedInput
+}
+
+export type ProjectRequestUncheckedUpdateManyWithoutClientInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  jobId?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalId?: Prisma.IntFieldUpdateOperationsInput | number
+  bidAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  duration?: Prisma.StringFieldUpdateOperationsInput | string
+  coverLetter?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  origin?: Prisma.StringFieldUpdateOperationsInput | string
+  attachmentsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ProjectRequestUpdateWithoutProfessionalInput = {
+  bidAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  duration?: Prisma.StringFieldUpdateOperationsInput | string
+  coverLetter?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  origin?: Prisma.StringFieldUpdateOperationsInput | string
+  attachmentsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  job?: Prisma.ClientJobUpdateOneRequiredWithoutProjectRequestsNestedInput
+  client?: Prisma.UserUpdateOneRequiredWithoutClientProjectRequestsNestedInput
+  tracking?: Prisma.ProjectTrackingUpdateOneWithoutRequestNestedInput
+}
+
+export type ProjectRequestUncheckedUpdateWithoutProfessionalInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  jobId?: Prisma.IntFieldUpdateOperationsInput | number
+  clientId?: Prisma.IntFieldUpdateOperationsInput | number
+  bidAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  duration?: Prisma.StringFieldUpdateOperationsInput | string
+  coverLetter?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  origin?: Prisma.StringFieldUpdateOperationsInput | string
+  attachmentsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tracking?: Prisma.ProjectTrackingUncheckedUpdateOneWithoutRequestNestedInput
+}
+
+export type ProjectRequestUncheckedUpdateManyWithoutProfessionalInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  jobId?: Prisma.IntFieldUpdateOperationsInput | number
+  clientId?: Prisma.IntFieldUpdateOperationsInput | number
+  bidAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  duration?: Prisma.StringFieldUpdateOperationsInput | string
+  coverLetter?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  origin?: Prisma.StringFieldUpdateOperationsInput | string
+  attachmentsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ProjectRequestCreateManyJobInput = {
+  id?: number
+  clientId: number
+  professionalId: number
+  bidAmount: number
+  duration: string
+  coverLetter: string
+  status?: string
+  origin?: string
+  attachmentsJson?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type ProjectRequestUpdateWithoutJobInput = {
+  bidAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  duration?: Prisma.StringFieldUpdateOperationsInput | string
+  coverLetter?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  origin?: Prisma.StringFieldUpdateOperationsInput | string
+  attachmentsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  client?: Prisma.UserUpdateOneRequiredWithoutClientProjectRequestsNestedInput
+  professional?: Prisma.UserUpdateOneRequiredWithoutProfessionalProjectRequestsNestedInput
+  tracking?: Prisma.ProjectTrackingUpdateOneWithoutRequestNestedInput
+}
+
+export type ProjectRequestUncheckedUpdateWithoutJobInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  clientId?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalId?: Prisma.IntFieldUpdateOperationsInput | number
+  bidAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  duration?: Prisma.StringFieldUpdateOperationsInput | string
+  coverLetter?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  origin?: Prisma.StringFieldUpdateOperationsInput | string
+  attachmentsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tracking?: Prisma.ProjectTrackingUncheckedUpdateOneWithoutRequestNestedInput
+}
+
+export type ProjectRequestUncheckedUpdateManyWithoutJobInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  clientId?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalId?: Prisma.IntFieldUpdateOperationsInput | number
+  bidAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  duration?: Prisma.StringFieldUpdateOperationsInput | string
+  coverLetter?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  origin?: Prisma.StringFieldUpdateOperationsInput | string
+  attachmentsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 
 
 export type ProjectRequestSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -539,6 +1135,10 @@ export type ProjectRequestSelect<ExtArgs extends runtime.Types.Extensions.Intern
   attachmentsJson?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  job?: boolean | Prisma.ClientJobDefaultArgs<ExtArgs>
+  client?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  professional?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  tracking?: boolean | Prisma.ProjectRequest$trackingArgs<ExtArgs>
 }, ExtArgs["result"]["projectRequest"]>
 
 export type ProjectRequestSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -554,6 +1154,9 @@ export type ProjectRequestSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   attachmentsJson?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  job?: boolean | Prisma.ClientJobDefaultArgs<ExtArgs>
+  client?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  professional?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["projectRequest"]>
 
 export type ProjectRequestSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -569,6 +1172,9 @@ export type ProjectRequestSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   attachmentsJson?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  job?: boolean | Prisma.ClientJobDefaultArgs<ExtArgs>
+  client?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  professional?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["projectRequest"]>
 
 export type ProjectRequestSelectScalar = {
@@ -587,10 +1193,31 @@ export type ProjectRequestSelectScalar = {
 }
 
 export type ProjectRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "jobId" | "clientId" | "professionalId" | "bidAmount" | "duration" | "coverLetter" | "status" | "origin" | "attachmentsJson" | "createdAt" | "updatedAt", ExtArgs["result"]["projectRequest"]>
+export type ProjectRequestInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  job?: boolean | Prisma.ClientJobDefaultArgs<ExtArgs>
+  client?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  professional?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  tracking?: boolean | Prisma.ProjectRequest$trackingArgs<ExtArgs>
+}
+export type ProjectRequestIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  job?: boolean | Prisma.ClientJobDefaultArgs<ExtArgs>
+  client?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  professional?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+}
+export type ProjectRequestIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  job?: boolean | Prisma.ClientJobDefaultArgs<ExtArgs>
+  client?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  professional?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+}
 
 export type $ProjectRequestPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "ProjectRequest"
-  objects: {}
+  objects: {
+    job: Prisma.$ClientJobPayload<ExtArgs>
+    client: Prisma.$UserPayload<ExtArgs>
+    professional: Prisma.$UserPayload<ExtArgs>
+    tracking: Prisma.$ProjectTrackingPayload<ExtArgs> | null
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     jobId: number
@@ -998,6 +1625,10 @@ readonly fields: ProjectRequestFieldRefs;
  */
 export interface Prisma__ProjectRequestClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  job<T extends Prisma.ClientJobDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ClientJobDefaultArgs<ExtArgs>>): Prisma.Prisma__ClientJobClient<runtime.Types.Result.GetResult<Prisma.$ClientJobPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  client<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  professional<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  tracking<T extends Prisma.ProjectRequest$trackingArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProjectRequest$trackingArgs<ExtArgs>>): Prisma.Prisma__ProjectTrackingClient<runtime.Types.Result.GetResult<Prisma.$ProjectTrackingPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1056,6 +1687,10 @@ export type ProjectRequestFindUniqueArgs<ExtArgs extends runtime.Types.Extension
    */
   omit?: Prisma.ProjectRequestOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectRequestInclude<ExtArgs> | null
+  /**
    * Filter, which ProjectRequest to fetch.
    */
   where: Prisma.ProjectRequestWhereUniqueInput
@@ -1074,6 +1709,10 @@ export type ProjectRequestFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Ex
    */
   omit?: Prisma.ProjectRequestOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectRequestInclude<ExtArgs> | null
+  /**
    * Filter, which ProjectRequest to fetch.
    */
   where: Prisma.ProjectRequestWhereUniqueInput
@@ -1091,6 +1730,10 @@ export type ProjectRequestFindFirstArgs<ExtArgs extends runtime.Types.Extensions
    * Omit specific fields from the ProjectRequest
    */
   omit?: Prisma.ProjectRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectRequestInclude<ExtArgs> | null
   /**
    * Filter, which ProjectRequest to fetch.
    */
@@ -1140,6 +1783,10 @@ export type ProjectRequestFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Ext
    */
   omit?: Prisma.ProjectRequestOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectRequestInclude<ExtArgs> | null
+  /**
    * Filter, which ProjectRequest to fetch.
    */
   where?: Prisma.ProjectRequestWhereInput
@@ -1187,6 +1834,10 @@ export type ProjectRequestFindManyArgs<ExtArgs extends runtime.Types.Extensions.
    * Omit specific fields from the ProjectRequest
    */
   omit?: Prisma.ProjectRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectRequestInclude<ExtArgs> | null
   /**
    * Filter, which ProjectRequests to fetch.
    */
@@ -1236,6 +1887,10 @@ export type ProjectRequestCreateArgs<ExtArgs extends runtime.Types.Extensions.In
    */
   omit?: Prisma.ProjectRequestOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectRequestInclude<ExtArgs> | null
+  /**
    * The data needed to create a ProjectRequest.
    */
   data: Prisma.XOR<Prisma.ProjectRequestCreateInput, Prisma.ProjectRequestUncheckedCreateInput>
@@ -1269,6 +1924,10 @@ export type ProjectRequestCreateManyAndReturnArgs<ExtArgs extends runtime.Types.
    */
   data: Prisma.ProjectRequestCreateManyInput | Prisma.ProjectRequestCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectRequestIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1283,6 +1942,10 @@ export type ProjectRequestUpdateArgs<ExtArgs extends runtime.Types.Extensions.In
    * Omit specific fields from the ProjectRequest
    */
   omit?: Prisma.ProjectRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectRequestInclude<ExtArgs> | null
   /**
    * The data needed to update a ProjectRequest.
    */
@@ -1335,6 +1998,10 @@ export type ProjectRequestUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.
    * Limit how many ProjectRequests to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectRequestIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1349,6 +2016,10 @@ export type ProjectRequestUpsertArgs<ExtArgs extends runtime.Types.Extensions.In
    * Omit specific fields from the ProjectRequest
    */
   omit?: Prisma.ProjectRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectRequestInclude<ExtArgs> | null
   /**
    * The filter to search for the ProjectRequest to update in case it exists.
    */
@@ -1376,6 +2047,10 @@ export type ProjectRequestDeleteArgs<ExtArgs extends runtime.Types.Extensions.In
    */
   omit?: Prisma.ProjectRequestOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectRequestInclude<ExtArgs> | null
+  /**
    * Filter which ProjectRequest to delete.
    */
   where: Prisma.ProjectRequestWhereUniqueInput
@@ -1396,6 +2071,25 @@ export type ProjectRequestDeleteManyArgs<ExtArgs extends runtime.Types.Extension
 }
 
 /**
+ * ProjectRequest.tracking
+ */
+export type ProjectRequest$trackingArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProjectTracking
+   */
+  select?: Prisma.ProjectTrackingSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ProjectTracking
+   */
+  omit?: Prisma.ProjectTrackingOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectTrackingInclude<ExtArgs> | null
+  where?: Prisma.ProjectTrackingWhereInput
+}
+
+/**
  * ProjectRequest without action
  */
 export type ProjectRequestDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1407,4 +2101,8 @@ export type ProjectRequestDefaultArgs<ExtArgs extends runtime.Types.Extensions.I
    * Omit specific fields from the ProjectRequest
    */
   omit?: Prisma.ProjectRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectRequestInclude<ExtArgs> | null
 }

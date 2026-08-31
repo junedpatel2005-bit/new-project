@@ -300,6 +300,14 @@ export type ProjectTrackingWhereInput = {
   completedAt?: Prisma.DateTimeNullableFilter<"ProjectTracking"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"ProjectTracking"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ProjectTracking"> | Date | string
+  request?: Prisma.XOR<Prisma.ProjectRequestScalarRelationFilter, Prisma.ProjectRequestWhereInput>
+  job?: Prisma.XOR<Prisma.ClientJobScalarRelationFilter, Prisma.ClientJobWhereInput>
+  client?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  professional?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  milestones?: Prisma.ProjectMilestoneListRelationFilter
+  timelineEvents?: Prisma.ProjectTimelineEventListRelationFilter
+  workUploads?: Prisma.ProjectWorkUploadListRelationFilter
+  payments?: Prisma.PaymentListRelationFilter
 }
 
 export type ProjectTrackingOrderByWithRelationInput = {
@@ -316,6 +324,14 @@ export type ProjectTrackingOrderByWithRelationInput = {
   completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  request?: Prisma.ProjectRequestOrderByWithRelationInput
+  job?: Prisma.ClientJobOrderByWithRelationInput
+  client?: Prisma.UserOrderByWithRelationInput
+  professional?: Prisma.UserOrderByWithRelationInput
+  milestones?: Prisma.ProjectMilestoneOrderByRelationAggregateInput
+  timelineEvents?: Prisma.ProjectTimelineEventOrderByRelationAggregateInput
+  workUploads?: Prisma.ProjectWorkUploadOrderByRelationAggregateInput
+  payments?: Prisma.PaymentOrderByRelationAggregateInput
 }
 
 export type ProjectTrackingWhereUniqueInput = Prisma.AtLeast<{
@@ -335,6 +351,14 @@ export type ProjectTrackingWhereUniqueInput = Prisma.AtLeast<{
   completedAt?: Prisma.DateTimeNullableFilter<"ProjectTracking"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"ProjectTracking"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ProjectTracking"> | Date | string
+  request?: Prisma.XOR<Prisma.ProjectRequestScalarRelationFilter, Prisma.ProjectRequestWhereInput>
+  job?: Prisma.XOR<Prisma.ClientJobScalarRelationFilter, Prisma.ClientJobWhereInput>
+  client?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  professional?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  milestones?: Prisma.ProjectMilestoneListRelationFilter
+  timelineEvents?: Prisma.ProjectTimelineEventListRelationFilter
+  workUploads?: Prisma.ProjectWorkUploadListRelationFilter
+  payments?: Prisma.PaymentListRelationFilter
 }, "id" | "requestId">
 
 export type ProjectTrackingOrderByWithAggregationInput = {
@@ -378,10 +402,6 @@ export type ProjectTrackingScalarWhereWithAggregatesInput = {
 }
 
 export type ProjectTrackingCreateInput = {
-  requestId: number
-  jobId: number
-  clientId: number
-  professionalId: number
   status?: string
   progress?: number
   currentStage?: string | null
@@ -390,6 +410,14 @@ export type ProjectTrackingCreateInput = {
   completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  request: Prisma.ProjectRequestCreateNestedOneWithoutTrackingInput
+  job: Prisma.ClientJobCreateNestedOneWithoutProjectTrackingsInput
+  client: Prisma.UserCreateNestedOneWithoutClientProjectTrackingsInput
+  professional: Prisma.UserCreateNestedOneWithoutProfessionalProjectTrackingsInput
+  milestones?: Prisma.ProjectMilestoneCreateNestedManyWithoutTrackingInput
+  timelineEvents?: Prisma.ProjectTimelineEventCreateNestedManyWithoutTrackingInput
+  workUploads?: Prisma.ProjectWorkUploadCreateNestedManyWithoutTrackingInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutProjectTrackingInput
 }
 
 export type ProjectTrackingUncheckedCreateInput = {
@@ -406,13 +434,13 @@ export type ProjectTrackingUncheckedCreateInput = {
   completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  milestones?: Prisma.ProjectMilestoneUncheckedCreateNestedManyWithoutTrackingInput
+  timelineEvents?: Prisma.ProjectTimelineEventUncheckedCreateNestedManyWithoutTrackingInput
+  workUploads?: Prisma.ProjectWorkUploadUncheckedCreateNestedManyWithoutTrackingInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutProjectTrackingInput
 }
 
 export type ProjectTrackingUpdateInput = {
-  requestId?: Prisma.IntFieldUpdateOperationsInput | number
-  jobId?: Prisma.IntFieldUpdateOperationsInput | number
-  clientId?: Prisma.IntFieldUpdateOperationsInput | number
-  professionalId?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
   progress?: Prisma.IntFieldUpdateOperationsInput | number
   currentStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -421,6 +449,14 @@ export type ProjectTrackingUpdateInput = {
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  request?: Prisma.ProjectRequestUpdateOneRequiredWithoutTrackingNestedInput
+  job?: Prisma.ClientJobUpdateOneRequiredWithoutProjectTrackingsNestedInput
+  client?: Prisma.UserUpdateOneRequiredWithoutClientProjectTrackingsNestedInput
+  professional?: Prisma.UserUpdateOneRequiredWithoutProfessionalProjectTrackingsNestedInput
+  milestones?: Prisma.ProjectMilestoneUpdateManyWithoutTrackingNestedInput
+  timelineEvents?: Prisma.ProjectTimelineEventUpdateManyWithoutTrackingNestedInput
+  workUploads?: Prisma.ProjectWorkUploadUpdateManyWithoutTrackingNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutProjectTrackingNestedInput
 }
 
 export type ProjectTrackingUncheckedUpdateInput = {
@@ -437,6 +473,10 @@ export type ProjectTrackingUncheckedUpdateInput = {
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  milestones?: Prisma.ProjectMilestoneUncheckedUpdateManyWithoutTrackingNestedInput
+  timelineEvents?: Prisma.ProjectTimelineEventUncheckedUpdateManyWithoutTrackingNestedInput
+  workUploads?: Prisma.ProjectWorkUploadUncheckedUpdateManyWithoutTrackingNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutProjectTrackingNestedInput
 }
 
 export type ProjectTrackingCreateManyInput = {
@@ -456,10 +496,6 @@ export type ProjectTrackingCreateManyInput = {
 }
 
 export type ProjectTrackingUpdateManyMutationInput = {
-  requestId?: Prisma.IntFieldUpdateOperationsInput | number
-  jobId?: Prisma.IntFieldUpdateOperationsInput | number
-  clientId?: Prisma.IntFieldUpdateOperationsInput | number
-  professionalId?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
   progress?: Prisma.IntFieldUpdateOperationsInput | number
   currentStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -484,6 +520,21 @@ export type ProjectTrackingUncheckedUpdateManyInput = {
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ProjectTrackingListRelationFilter = {
+  every?: Prisma.ProjectTrackingWhereInput
+  some?: Prisma.ProjectTrackingWhereInput
+  none?: Prisma.ProjectTrackingWhereInput
+}
+
+export type ProjectTrackingOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
+}
+
+export type ProjectTrackingNullableScalarRelationFilter = {
+  is?: Prisma.ProjectTrackingWhereInput | null
+  isNot?: Prisma.ProjectTrackingWhereInput | null
 }
 
 export type ProjectTrackingCountOrderByAggregateInput = {
@@ -552,6 +603,1142 @@ export type ProjectTrackingSumOrderByAggregateInput = {
   progress?: Prisma.SortOrder
 }
 
+export type ProjectTrackingScalarRelationFilter = {
+  is?: Prisma.ProjectTrackingWhereInput
+  isNot?: Prisma.ProjectTrackingWhereInput
+}
+
+export type ProjectTrackingCreateNestedManyWithoutClientInput = {
+  create?: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutClientInput, Prisma.ProjectTrackingUncheckedCreateWithoutClientInput> | Prisma.ProjectTrackingCreateWithoutClientInput[] | Prisma.ProjectTrackingUncheckedCreateWithoutClientInput[]
+  connectOrCreate?: Prisma.ProjectTrackingCreateOrConnectWithoutClientInput | Prisma.ProjectTrackingCreateOrConnectWithoutClientInput[]
+  createMany?: Prisma.ProjectTrackingCreateManyClientInputEnvelope
+  connect?: Prisma.ProjectTrackingWhereUniqueInput | Prisma.ProjectTrackingWhereUniqueInput[]
+}
+
+export type ProjectTrackingCreateNestedManyWithoutProfessionalInput = {
+  create?: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutProfessionalInput, Prisma.ProjectTrackingUncheckedCreateWithoutProfessionalInput> | Prisma.ProjectTrackingCreateWithoutProfessionalInput[] | Prisma.ProjectTrackingUncheckedCreateWithoutProfessionalInput[]
+  connectOrCreate?: Prisma.ProjectTrackingCreateOrConnectWithoutProfessionalInput | Prisma.ProjectTrackingCreateOrConnectWithoutProfessionalInput[]
+  createMany?: Prisma.ProjectTrackingCreateManyProfessionalInputEnvelope
+  connect?: Prisma.ProjectTrackingWhereUniqueInput | Prisma.ProjectTrackingWhereUniqueInput[]
+}
+
+export type ProjectTrackingUncheckedCreateNestedManyWithoutClientInput = {
+  create?: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutClientInput, Prisma.ProjectTrackingUncheckedCreateWithoutClientInput> | Prisma.ProjectTrackingCreateWithoutClientInput[] | Prisma.ProjectTrackingUncheckedCreateWithoutClientInput[]
+  connectOrCreate?: Prisma.ProjectTrackingCreateOrConnectWithoutClientInput | Prisma.ProjectTrackingCreateOrConnectWithoutClientInput[]
+  createMany?: Prisma.ProjectTrackingCreateManyClientInputEnvelope
+  connect?: Prisma.ProjectTrackingWhereUniqueInput | Prisma.ProjectTrackingWhereUniqueInput[]
+}
+
+export type ProjectTrackingUncheckedCreateNestedManyWithoutProfessionalInput = {
+  create?: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutProfessionalInput, Prisma.ProjectTrackingUncheckedCreateWithoutProfessionalInput> | Prisma.ProjectTrackingCreateWithoutProfessionalInput[] | Prisma.ProjectTrackingUncheckedCreateWithoutProfessionalInput[]
+  connectOrCreate?: Prisma.ProjectTrackingCreateOrConnectWithoutProfessionalInput | Prisma.ProjectTrackingCreateOrConnectWithoutProfessionalInput[]
+  createMany?: Prisma.ProjectTrackingCreateManyProfessionalInputEnvelope
+  connect?: Prisma.ProjectTrackingWhereUniqueInput | Prisma.ProjectTrackingWhereUniqueInput[]
+}
+
+export type ProjectTrackingUpdateManyWithoutClientNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutClientInput, Prisma.ProjectTrackingUncheckedCreateWithoutClientInput> | Prisma.ProjectTrackingCreateWithoutClientInput[] | Prisma.ProjectTrackingUncheckedCreateWithoutClientInput[]
+  connectOrCreate?: Prisma.ProjectTrackingCreateOrConnectWithoutClientInput | Prisma.ProjectTrackingCreateOrConnectWithoutClientInput[]
+  upsert?: Prisma.ProjectTrackingUpsertWithWhereUniqueWithoutClientInput | Prisma.ProjectTrackingUpsertWithWhereUniqueWithoutClientInput[]
+  createMany?: Prisma.ProjectTrackingCreateManyClientInputEnvelope
+  set?: Prisma.ProjectTrackingWhereUniqueInput | Prisma.ProjectTrackingWhereUniqueInput[]
+  disconnect?: Prisma.ProjectTrackingWhereUniqueInput | Prisma.ProjectTrackingWhereUniqueInput[]
+  delete?: Prisma.ProjectTrackingWhereUniqueInput | Prisma.ProjectTrackingWhereUniqueInput[]
+  connect?: Prisma.ProjectTrackingWhereUniqueInput | Prisma.ProjectTrackingWhereUniqueInput[]
+  update?: Prisma.ProjectTrackingUpdateWithWhereUniqueWithoutClientInput | Prisma.ProjectTrackingUpdateWithWhereUniqueWithoutClientInput[]
+  updateMany?: Prisma.ProjectTrackingUpdateManyWithWhereWithoutClientInput | Prisma.ProjectTrackingUpdateManyWithWhereWithoutClientInput[]
+  deleteMany?: Prisma.ProjectTrackingScalarWhereInput | Prisma.ProjectTrackingScalarWhereInput[]
+}
+
+export type ProjectTrackingUpdateManyWithoutProfessionalNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutProfessionalInput, Prisma.ProjectTrackingUncheckedCreateWithoutProfessionalInput> | Prisma.ProjectTrackingCreateWithoutProfessionalInput[] | Prisma.ProjectTrackingUncheckedCreateWithoutProfessionalInput[]
+  connectOrCreate?: Prisma.ProjectTrackingCreateOrConnectWithoutProfessionalInput | Prisma.ProjectTrackingCreateOrConnectWithoutProfessionalInput[]
+  upsert?: Prisma.ProjectTrackingUpsertWithWhereUniqueWithoutProfessionalInput | Prisma.ProjectTrackingUpsertWithWhereUniqueWithoutProfessionalInput[]
+  createMany?: Prisma.ProjectTrackingCreateManyProfessionalInputEnvelope
+  set?: Prisma.ProjectTrackingWhereUniqueInput | Prisma.ProjectTrackingWhereUniqueInput[]
+  disconnect?: Prisma.ProjectTrackingWhereUniqueInput | Prisma.ProjectTrackingWhereUniqueInput[]
+  delete?: Prisma.ProjectTrackingWhereUniqueInput | Prisma.ProjectTrackingWhereUniqueInput[]
+  connect?: Prisma.ProjectTrackingWhereUniqueInput | Prisma.ProjectTrackingWhereUniqueInput[]
+  update?: Prisma.ProjectTrackingUpdateWithWhereUniqueWithoutProfessionalInput | Prisma.ProjectTrackingUpdateWithWhereUniqueWithoutProfessionalInput[]
+  updateMany?: Prisma.ProjectTrackingUpdateManyWithWhereWithoutProfessionalInput | Prisma.ProjectTrackingUpdateManyWithWhereWithoutProfessionalInput[]
+  deleteMany?: Prisma.ProjectTrackingScalarWhereInput | Prisma.ProjectTrackingScalarWhereInput[]
+}
+
+export type ProjectTrackingUncheckedUpdateManyWithoutClientNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutClientInput, Prisma.ProjectTrackingUncheckedCreateWithoutClientInput> | Prisma.ProjectTrackingCreateWithoutClientInput[] | Prisma.ProjectTrackingUncheckedCreateWithoutClientInput[]
+  connectOrCreate?: Prisma.ProjectTrackingCreateOrConnectWithoutClientInput | Prisma.ProjectTrackingCreateOrConnectWithoutClientInput[]
+  upsert?: Prisma.ProjectTrackingUpsertWithWhereUniqueWithoutClientInput | Prisma.ProjectTrackingUpsertWithWhereUniqueWithoutClientInput[]
+  createMany?: Prisma.ProjectTrackingCreateManyClientInputEnvelope
+  set?: Prisma.ProjectTrackingWhereUniqueInput | Prisma.ProjectTrackingWhereUniqueInput[]
+  disconnect?: Prisma.ProjectTrackingWhereUniqueInput | Prisma.ProjectTrackingWhereUniqueInput[]
+  delete?: Prisma.ProjectTrackingWhereUniqueInput | Prisma.ProjectTrackingWhereUniqueInput[]
+  connect?: Prisma.ProjectTrackingWhereUniqueInput | Prisma.ProjectTrackingWhereUniqueInput[]
+  update?: Prisma.ProjectTrackingUpdateWithWhereUniqueWithoutClientInput | Prisma.ProjectTrackingUpdateWithWhereUniqueWithoutClientInput[]
+  updateMany?: Prisma.ProjectTrackingUpdateManyWithWhereWithoutClientInput | Prisma.ProjectTrackingUpdateManyWithWhereWithoutClientInput[]
+  deleteMany?: Prisma.ProjectTrackingScalarWhereInput | Prisma.ProjectTrackingScalarWhereInput[]
+}
+
+export type ProjectTrackingUncheckedUpdateManyWithoutProfessionalNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutProfessionalInput, Prisma.ProjectTrackingUncheckedCreateWithoutProfessionalInput> | Prisma.ProjectTrackingCreateWithoutProfessionalInput[] | Prisma.ProjectTrackingUncheckedCreateWithoutProfessionalInput[]
+  connectOrCreate?: Prisma.ProjectTrackingCreateOrConnectWithoutProfessionalInput | Prisma.ProjectTrackingCreateOrConnectWithoutProfessionalInput[]
+  upsert?: Prisma.ProjectTrackingUpsertWithWhereUniqueWithoutProfessionalInput | Prisma.ProjectTrackingUpsertWithWhereUniqueWithoutProfessionalInput[]
+  createMany?: Prisma.ProjectTrackingCreateManyProfessionalInputEnvelope
+  set?: Prisma.ProjectTrackingWhereUniqueInput | Prisma.ProjectTrackingWhereUniqueInput[]
+  disconnect?: Prisma.ProjectTrackingWhereUniqueInput | Prisma.ProjectTrackingWhereUniqueInput[]
+  delete?: Prisma.ProjectTrackingWhereUniqueInput | Prisma.ProjectTrackingWhereUniqueInput[]
+  connect?: Prisma.ProjectTrackingWhereUniqueInput | Prisma.ProjectTrackingWhereUniqueInput[]
+  update?: Prisma.ProjectTrackingUpdateWithWhereUniqueWithoutProfessionalInput | Prisma.ProjectTrackingUpdateWithWhereUniqueWithoutProfessionalInput[]
+  updateMany?: Prisma.ProjectTrackingUpdateManyWithWhereWithoutProfessionalInput | Prisma.ProjectTrackingUpdateManyWithWhereWithoutProfessionalInput[]
+  deleteMany?: Prisma.ProjectTrackingScalarWhereInput | Prisma.ProjectTrackingScalarWhereInput[]
+}
+
+export type ProjectTrackingCreateNestedManyWithoutJobInput = {
+  create?: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutJobInput, Prisma.ProjectTrackingUncheckedCreateWithoutJobInput> | Prisma.ProjectTrackingCreateWithoutJobInput[] | Prisma.ProjectTrackingUncheckedCreateWithoutJobInput[]
+  connectOrCreate?: Prisma.ProjectTrackingCreateOrConnectWithoutJobInput | Prisma.ProjectTrackingCreateOrConnectWithoutJobInput[]
+  createMany?: Prisma.ProjectTrackingCreateManyJobInputEnvelope
+  connect?: Prisma.ProjectTrackingWhereUniqueInput | Prisma.ProjectTrackingWhereUniqueInput[]
+}
+
+export type ProjectTrackingUncheckedCreateNestedManyWithoutJobInput = {
+  create?: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutJobInput, Prisma.ProjectTrackingUncheckedCreateWithoutJobInput> | Prisma.ProjectTrackingCreateWithoutJobInput[] | Prisma.ProjectTrackingUncheckedCreateWithoutJobInput[]
+  connectOrCreate?: Prisma.ProjectTrackingCreateOrConnectWithoutJobInput | Prisma.ProjectTrackingCreateOrConnectWithoutJobInput[]
+  createMany?: Prisma.ProjectTrackingCreateManyJobInputEnvelope
+  connect?: Prisma.ProjectTrackingWhereUniqueInput | Prisma.ProjectTrackingWhereUniqueInput[]
+}
+
+export type ProjectTrackingUpdateManyWithoutJobNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutJobInput, Prisma.ProjectTrackingUncheckedCreateWithoutJobInput> | Prisma.ProjectTrackingCreateWithoutJobInput[] | Prisma.ProjectTrackingUncheckedCreateWithoutJobInput[]
+  connectOrCreate?: Prisma.ProjectTrackingCreateOrConnectWithoutJobInput | Prisma.ProjectTrackingCreateOrConnectWithoutJobInput[]
+  upsert?: Prisma.ProjectTrackingUpsertWithWhereUniqueWithoutJobInput | Prisma.ProjectTrackingUpsertWithWhereUniqueWithoutJobInput[]
+  createMany?: Prisma.ProjectTrackingCreateManyJobInputEnvelope
+  set?: Prisma.ProjectTrackingWhereUniqueInput | Prisma.ProjectTrackingWhereUniqueInput[]
+  disconnect?: Prisma.ProjectTrackingWhereUniqueInput | Prisma.ProjectTrackingWhereUniqueInput[]
+  delete?: Prisma.ProjectTrackingWhereUniqueInput | Prisma.ProjectTrackingWhereUniqueInput[]
+  connect?: Prisma.ProjectTrackingWhereUniqueInput | Prisma.ProjectTrackingWhereUniqueInput[]
+  update?: Prisma.ProjectTrackingUpdateWithWhereUniqueWithoutJobInput | Prisma.ProjectTrackingUpdateWithWhereUniqueWithoutJobInput[]
+  updateMany?: Prisma.ProjectTrackingUpdateManyWithWhereWithoutJobInput | Prisma.ProjectTrackingUpdateManyWithWhereWithoutJobInput[]
+  deleteMany?: Prisma.ProjectTrackingScalarWhereInput | Prisma.ProjectTrackingScalarWhereInput[]
+}
+
+export type ProjectTrackingUncheckedUpdateManyWithoutJobNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutJobInput, Prisma.ProjectTrackingUncheckedCreateWithoutJobInput> | Prisma.ProjectTrackingCreateWithoutJobInput[] | Prisma.ProjectTrackingUncheckedCreateWithoutJobInput[]
+  connectOrCreate?: Prisma.ProjectTrackingCreateOrConnectWithoutJobInput | Prisma.ProjectTrackingCreateOrConnectWithoutJobInput[]
+  upsert?: Prisma.ProjectTrackingUpsertWithWhereUniqueWithoutJobInput | Prisma.ProjectTrackingUpsertWithWhereUniqueWithoutJobInput[]
+  createMany?: Prisma.ProjectTrackingCreateManyJobInputEnvelope
+  set?: Prisma.ProjectTrackingWhereUniqueInput | Prisma.ProjectTrackingWhereUniqueInput[]
+  disconnect?: Prisma.ProjectTrackingWhereUniqueInput | Prisma.ProjectTrackingWhereUniqueInput[]
+  delete?: Prisma.ProjectTrackingWhereUniqueInput | Prisma.ProjectTrackingWhereUniqueInput[]
+  connect?: Prisma.ProjectTrackingWhereUniqueInput | Prisma.ProjectTrackingWhereUniqueInput[]
+  update?: Prisma.ProjectTrackingUpdateWithWhereUniqueWithoutJobInput | Prisma.ProjectTrackingUpdateWithWhereUniqueWithoutJobInput[]
+  updateMany?: Prisma.ProjectTrackingUpdateManyWithWhereWithoutJobInput | Prisma.ProjectTrackingUpdateManyWithWhereWithoutJobInput[]
+  deleteMany?: Prisma.ProjectTrackingScalarWhereInput | Prisma.ProjectTrackingScalarWhereInput[]
+}
+
+export type ProjectTrackingCreateNestedOneWithoutRequestInput = {
+  create?: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutRequestInput, Prisma.ProjectTrackingUncheckedCreateWithoutRequestInput>
+  connectOrCreate?: Prisma.ProjectTrackingCreateOrConnectWithoutRequestInput
+  connect?: Prisma.ProjectTrackingWhereUniqueInput
+}
+
+export type ProjectTrackingUncheckedCreateNestedOneWithoutRequestInput = {
+  create?: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutRequestInput, Prisma.ProjectTrackingUncheckedCreateWithoutRequestInput>
+  connectOrCreate?: Prisma.ProjectTrackingCreateOrConnectWithoutRequestInput
+  connect?: Prisma.ProjectTrackingWhereUniqueInput
+}
+
+export type ProjectTrackingUpdateOneWithoutRequestNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutRequestInput, Prisma.ProjectTrackingUncheckedCreateWithoutRequestInput>
+  connectOrCreate?: Prisma.ProjectTrackingCreateOrConnectWithoutRequestInput
+  upsert?: Prisma.ProjectTrackingUpsertWithoutRequestInput
+  disconnect?: Prisma.ProjectTrackingWhereInput | boolean
+  delete?: Prisma.ProjectTrackingWhereInput | boolean
+  connect?: Prisma.ProjectTrackingWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectTrackingUpdateToOneWithWhereWithoutRequestInput, Prisma.ProjectTrackingUpdateWithoutRequestInput>, Prisma.ProjectTrackingUncheckedUpdateWithoutRequestInput>
+}
+
+export type ProjectTrackingUncheckedUpdateOneWithoutRequestNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutRequestInput, Prisma.ProjectTrackingUncheckedCreateWithoutRequestInput>
+  connectOrCreate?: Prisma.ProjectTrackingCreateOrConnectWithoutRequestInput
+  upsert?: Prisma.ProjectTrackingUpsertWithoutRequestInput
+  disconnect?: Prisma.ProjectTrackingWhereInput | boolean
+  delete?: Prisma.ProjectTrackingWhereInput | boolean
+  connect?: Prisma.ProjectTrackingWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectTrackingUpdateToOneWithWhereWithoutRequestInput, Prisma.ProjectTrackingUpdateWithoutRequestInput>, Prisma.ProjectTrackingUncheckedUpdateWithoutRequestInput>
+}
+
+export type ProjectTrackingCreateNestedOneWithoutTimelineEventsInput = {
+  create?: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutTimelineEventsInput, Prisma.ProjectTrackingUncheckedCreateWithoutTimelineEventsInput>
+  connectOrCreate?: Prisma.ProjectTrackingCreateOrConnectWithoutTimelineEventsInput
+  connect?: Prisma.ProjectTrackingWhereUniqueInput
+}
+
+export type ProjectTrackingUpdateOneRequiredWithoutTimelineEventsNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutTimelineEventsInput, Prisma.ProjectTrackingUncheckedCreateWithoutTimelineEventsInput>
+  connectOrCreate?: Prisma.ProjectTrackingCreateOrConnectWithoutTimelineEventsInput
+  upsert?: Prisma.ProjectTrackingUpsertWithoutTimelineEventsInput
+  connect?: Prisma.ProjectTrackingWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectTrackingUpdateToOneWithWhereWithoutTimelineEventsInput, Prisma.ProjectTrackingUpdateWithoutTimelineEventsInput>, Prisma.ProjectTrackingUncheckedUpdateWithoutTimelineEventsInput>
+}
+
+export type ProjectTrackingCreateNestedOneWithoutMilestonesInput = {
+  create?: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutMilestonesInput, Prisma.ProjectTrackingUncheckedCreateWithoutMilestonesInput>
+  connectOrCreate?: Prisma.ProjectTrackingCreateOrConnectWithoutMilestonesInput
+  connect?: Prisma.ProjectTrackingWhereUniqueInput
+}
+
+export type ProjectTrackingUpdateOneRequiredWithoutMilestonesNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutMilestonesInput, Prisma.ProjectTrackingUncheckedCreateWithoutMilestonesInput>
+  connectOrCreate?: Prisma.ProjectTrackingCreateOrConnectWithoutMilestonesInput
+  upsert?: Prisma.ProjectTrackingUpsertWithoutMilestonesInput
+  connect?: Prisma.ProjectTrackingWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectTrackingUpdateToOneWithWhereWithoutMilestonesInput, Prisma.ProjectTrackingUpdateWithoutMilestonesInput>, Prisma.ProjectTrackingUncheckedUpdateWithoutMilestonesInput>
+}
+
+export type ProjectTrackingCreateNestedOneWithoutWorkUploadsInput = {
+  create?: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutWorkUploadsInput, Prisma.ProjectTrackingUncheckedCreateWithoutWorkUploadsInput>
+  connectOrCreate?: Prisma.ProjectTrackingCreateOrConnectWithoutWorkUploadsInput
+  connect?: Prisma.ProjectTrackingWhereUniqueInput
+}
+
+export type ProjectTrackingUpdateOneRequiredWithoutWorkUploadsNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutWorkUploadsInput, Prisma.ProjectTrackingUncheckedCreateWithoutWorkUploadsInput>
+  connectOrCreate?: Prisma.ProjectTrackingCreateOrConnectWithoutWorkUploadsInput
+  upsert?: Prisma.ProjectTrackingUpsertWithoutWorkUploadsInput
+  connect?: Prisma.ProjectTrackingWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectTrackingUpdateToOneWithWhereWithoutWorkUploadsInput, Prisma.ProjectTrackingUpdateWithoutWorkUploadsInput>, Prisma.ProjectTrackingUncheckedUpdateWithoutWorkUploadsInput>
+}
+
+export type ProjectTrackingCreateNestedOneWithoutPaymentsInput = {
+  create?: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutPaymentsInput, Prisma.ProjectTrackingUncheckedCreateWithoutPaymentsInput>
+  connectOrCreate?: Prisma.ProjectTrackingCreateOrConnectWithoutPaymentsInput
+  connect?: Prisma.ProjectTrackingWhereUniqueInput
+}
+
+export type ProjectTrackingUpdateOneWithoutPaymentsNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutPaymentsInput, Prisma.ProjectTrackingUncheckedCreateWithoutPaymentsInput>
+  connectOrCreate?: Prisma.ProjectTrackingCreateOrConnectWithoutPaymentsInput
+  upsert?: Prisma.ProjectTrackingUpsertWithoutPaymentsInput
+  disconnect?: Prisma.ProjectTrackingWhereInput | boolean
+  delete?: Prisma.ProjectTrackingWhereInput | boolean
+  connect?: Prisma.ProjectTrackingWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectTrackingUpdateToOneWithWhereWithoutPaymentsInput, Prisma.ProjectTrackingUpdateWithoutPaymentsInput>, Prisma.ProjectTrackingUncheckedUpdateWithoutPaymentsInput>
+}
+
+export type ProjectTrackingCreateWithoutClientInput = {
+  status?: string
+  progress?: number
+  currentStage?: string | null
+  acceptedAt?: Date | string
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  request: Prisma.ProjectRequestCreateNestedOneWithoutTrackingInput
+  job: Prisma.ClientJobCreateNestedOneWithoutProjectTrackingsInput
+  professional: Prisma.UserCreateNestedOneWithoutProfessionalProjectTrackingsInput
+  milestones?: Prisma.ProjectMilestoneCreateNestedManyWithoutTrackingInput
+  timelineEvents?: Prisma.ProjectTimelineEventCreateNestedManyWithoutTrackingInput
+  workUploads?: Prisma.ProjectWorkUploadCreateNestedManyWithoutTrackingInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutProjectTrackingInput
+}
+
+export type ProjectTrackingUncheckedCreateWithoutClientInput = {
+  id?: number
+  requestId: number
+  jobId: number
+  professionalId: number
+  status?: string
+  progress?: number
+  currentStage?: string | null
+  acceptedAt?: Date | string
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  milestones?: Prisma.ProjectMilestoneUncheckedCreateNestedManyWithoutTrackingInput
+  timelineEvents?: Prisma.ProjectTimelineEventUncheckedCreateNestedManyWithoutTrackingInput
+  workUploads?: Prisma.ProjectWorkUploadUncheckedCreateNestedManyWithoutTrackingInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutProjectTrackingInput
+}
+
+export type ProjectTrackingCreateOrConnectWithoutClientInput = {
+  where: Prisma.ProjectTrackingWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutClientInput, Prisma.ProjectTrackingUncheckedCreateWithoutClientInput>
+}
+
+export type ProjectTrackingCreateManyClientInputEnvelope = {
+  data: Prisma.ProjectTrackingCreateManyClientInput | Prisma.ProjectTrackingCreateManyClientInput[]
+  skipDuplicates?: boolean
+}
+
+export type ProjectTrackingCreateWithoutProfessionalInput = {
+  status?: string
+  progress?: number
+  currentStage?: string | null
+  acceptedAt?: Date | string
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  request: Prisma.ProjectRequestCreateNestedOneWithoutTrackingInput
+  job: Prisma.ClientJobCreateNestedOneWithoutProjectTrackingsInput
+  client: Prisma.UserCreateNestedOneWithoutClientProjectTrackingsInput
+  milestones?: Prisma.ProjectMilestoneCreateNestedManyWithoutTrackingInput
+  timelineEvents?: Prisma.ProjectTimelineEventCreateNestedManyWithoutTrackingInput
+  workUploads?: Prisma.ProjectWorkUploadCreateNestedManyWithoutTrackingInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutProjectTrackingInput
+}
+
+export type ProjectTrackingUncheckedCreateWithoutProfessionalInput = {
+  id?: number
+  requestId: number
+  jobId: number
+  clientId: number
+  status?: string
+  progress?: number
+  currentStage?: string | null
+  acceptedAt?: Date | string
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  milestones?: Prisma.ProjectMilestoneUncheckedCreateNestedManyWithoutTrackingInput
+  timelineEvents?: Prisma.ProjectTimelineEventUncheckedCreateNestedManyWithoutTrackingInput
+  workUploads?: Prisma.ProjectWorkUploadUncheckedCreateNestedManyWithoutTrackingInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutProjectTrackingInput
+}
+
+export type ProjectTrackingCreateOrConnectWithoutProfessionalInput = {
+  where: Prisma.ProjectTrackingWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutProfessionalInput, Prisma.ProjectTrackingUncheckedCreateWithoutProfessionalInput>
+}
+
+export type ProjectTrackingCreateManyProfessionalInputEnvelope = {
+  data: Prisma.ProjectTrackingCreateManyProfessionalInput | Prisma.ProjectTrackingCreateManyProfessionalInput[]
+  skipDuplicates?: boolean
+}
+
+export type ProjectTrackingUpsertWithWhereUniqueWithoutClientInput = {
+  where: Prisma.ProjectTrackingWhereUniqueInput
+  update: Prisma.XOR<Prisma.ProjectTrackingUpdateWithoutClientInput, Prisma.ProjectTrackingUncheckedUpdateWithoutClientInput>
+  create: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutClientInput, Prisma.ProjectTrackingUncheckedCreateWithoutClientInput>
+}
+
+export type ProjectTrackingUpdateWithWhereUniqueWithoutClientInput = {
+  where: Prisma.ProjectTrackingWhereUniqueInput
+  data: Prisma.XOR<Prisma.ProjectTrackingUpdateWithoutClientInput, Prisma.ProjectTrackingUncheckedUpdateWithoutClientInput>
+}
+
+export type ProjectTrackingUpdateManyWithWhereWithoutClientInput = {
+  where: Prisma.ProjectTrackingScalarWhereInput
+  data: Prisma.XOR<Prisma.ProjectTrackingUpdateManyMutationInput, Prisma.ProjectTrackingUncheckedUpdateManyWithoutClientInput>
+}
+
+export type ProjectTrackingScalarWhereInput = {
+  AND?: Prisma.ProjectTrackingScalarWhereInput | Prisma.ProjectTrackingScalarWhereInput[]
+  OR?: Prisma.ProjectTrackingScalarWhereInput[]
+  NOT?: Prisma.ProjectTrackingScalarWhereInput | Prisma.ProjectTrackingScalarWhereInput[]
+  id?: Prisma.IntFilter<"ProjectTracking"> | number
+  requestId?: Prisma.IntFilter<"ProjectTracking"> | number
+  jobId?: Prisma.IntFilter<"ProjectTracking"> | number
+  clientId?: Prisma.IntFilter<"ProjectTracking"> | number
+  professionalId?: Prisma.IntFilter<"ProjectTracking"> | number
+  status?: Prisma.StringFilter<"ProjectTracking"> | string
+  progress?: Prisma.IntFilter<"ProjectTracking"> | number
+  currentStage?: Prisma.StringNullableFilter<"ProjectTracking"> | string | null
+  acceptedAt?: Prisma.DateTimeFilter<"ProjectTracking"> | Date | string
+  startedAt?: Prisma.DateTimeNullableFilter<"ProjectTracking"> | Date | string | null
+  completedAt?: Prisma.DateTimeNullableFilter<"ProjectTracking"> | Date | string | null
+  createdAt?: Prisma.DateTimeFilter<"ProjectTracking"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"ProjectTracking"> | Date | string
+}
+
+export type ProjectTrackingUpsertWithWhereUniqueWithoutProfessionalInput = {
+  where: Prisma.ProjectTrackingWhereUniqueInput
+  update: Prisma.XOR<Prisma.ProjectTrackingUpdateWithoutProfessionalInput, Prisma.ProjectTrackingUncheckedUpdateWithoutProfessionalInput>
+  create: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutProfessionalInput, Prisma.ProjectTrackingUncheckedCreateWithoutProfessionalInput>
+}
+
+export type ProjectTrackingUpdateWithWhereUniqueWithoutProfessionalInput = {
+  where: Prisma.ProjectTrackingWhereUniqueInput
+  data: Prisma.XOR<Prisma.ProjectTrackingUpdateWithoutProfessionalInput, Prisma.ProjectTrackingUncheckedUpdateWithoutProfessionalInput>
+}
+
+export type ProjectTrackingUpdateManyWithWhereWithoutProfessionalInput = {
+  where: Prisma.ProjectTrackingScalarWhereInput
+  data: Prisma.XOR<Prisma.ProjectTrackingUpdateManyMutationInput, Prisma.ProjectTrackingUncheckedUpdateManyWithoutProfessionalInput>
+}
+
+export type ProjectTrackingCreateWithoutJobInput = {
+  status?: string
+  progress?: number
+  currentStage?: string | null
+  acceptedAt?: Date | string
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  request: Prisma.ProjectRequestCreateNestedOneWithoutTrackingInput
+  client: Prisma.UserCreateNestedOneWithoutClientProjectTrackingsInput
+  professional: Prisma.UserCreateNestedOneWithoutProfessionalProjectTrackingsInput
+  milestones?: Prisma.ProjectMilestoneCreateNestedManyWithoutTrackingInput
+  timelineEvents?: Prisma.ProjectTimelineEventCreateNestedManyWithoutTrackingInput
+  workUploads?: Prisma.ProjectWorkUploadCreateNestedManyWithoutTrackingInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutProjectTrackingInput
+}
+
+export type ProjectTrackingUncheckedCreateWithoutJobInput = {
+  id?: number
+  requestId: number
+  clientId: number
+  professionalId: number
+  status?: string
+  progress?: number
+  currentStage?: string | null
+  acceptedAt?: Date | string
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  milestones?: Prisma.ProjectMilestoneUncheckedCreateNestedManyWithoutTrackingInput
+  timelineEvents?: Prisma.ProjectTimelineEventUncheckedCreateNestedManyWithoutTrackingInput
+  workUploads?: Prisma.ProjectWorkUploadUncheckedCreateNestedManyWithoutTrackingInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutProjectTrackingInput
+}
+
+export type ProjectTrackingCreateOrConnectWithoutJobInput = {
+  where: Prisma.ProjectTrackingWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutJobInput, Prisma.ProjectTrackingUncheckedCreateWithoutJobInput>
+}
+
+export type ProjectTrackingCreateManyJobInputEnvelope = {
+  data: Prisma.ProjectTrackingCreateManyJobInput | Prisma.ProjectTrackingCreateManyJobInput[]
+  skipDuplicates?: boolean
+}
+
+export type ProjectTrackingUpsertWithWhereUniqueWithoutJobInput = {
+  where: Prisma.ProjectTrackingWhereUniqueInput
+  update: Prisma.XOR<Prisma.ProjectTrackingUpdateWithoutJobInput, Prisma.ProjectTrackingUncheckedUpdateWithoutJobInput>
+  create: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutJobInput, Prisma.ProjectTrackingUncheckedCreateWithoutJobInput>
+}
+
+export type ProjectTrackingUpdateWithWhereUniqueWithoutJobInput = {
+  where: Prisma.ProjectTrackingWhereUniqueInput
+  data: Prisma.XOR<Prisma.ProjectTrackingUpdateWithoutJobInput, Prisma.ProjectTrackingUncheckedUpdateWithoutJobInput>
+}
+
+export type ProjectTrackingUpdateManyWithWhereWithoutJobInput = {
+  where: Prisma.ProjectTrackingScalarWhereInput
+  data: Prisma.XOR<Prisma.ProjectTrackingUpdateManyMutationInput, Prisma.ProjectTrackingUncheckedUpdateManyWithoutJobInput>
+}
+
+export type ProjectTrackingCreateWithoutRequestInput = {
+  status?: string
+  progress?: number
+  currentStage?: string | null
+  acceptedAt?: Date | string
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  job: Prisma.ClientJobCreateNestedOneWithoutProjectTrackingsInput
+  client: Prisma.UserCreateNestedOneWithoutClientProjectTrackingsInput
+  professional: Prisma.UserCreateNestedOneWithoutProfessionalProjectTrackingsInput
+  milestones?: Prisma.ProjectMilestoneCreateNestedManyWithoutTrackingInput
+  timelineEvents?: Prisma.ProjectTimelineEventCreateNestedManyWithoutTrackingInput
+  workUploads?: Prisma.ProjectWorkUploadCreateNestedManyWithoutTrackingInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutProjectTrackingInput
+}
+
+export type ProjectTrackingUncheckedCreateWithoutRequestInput = {
+  id?: number
+  jobId: number
+  clientId: number
+  professionalId: number
+  status?: string
+  progress?: number
+  currentStage?: string | null
+  acceptedAt?: Date | string
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  milestones?: Prisma.ProjectMilestoneUncheckedCreateNestedManyWithoutTrackingInput
+  timelineEvents?: Prisma.ProjectTimelineEventUncheckedCreateNestedManyWithoutTrackingInput
+  workUploads?: Prisma.ProjectWorkUploadUncheckedCreateNestedManyWithoutTrackingInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutProjectTrackingInput
+}
+
+export type ProjectTrackingCreateOrConnectWithoutRequestInput = {
+  where: Prisma.ProjectTrackingWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutRequestInput, Prisma.ProjectTrackingUncheckedCreateWithoutRequestInput>
+}
+
+export type ProjectTrackingUpsertWithoutRequestInput = {
+  update: Prisma.XOR<Prisma.ProjectTrackingUpdateWithoutRequestInput, Prisma.ProjectTrackingUncheckedUpdateWithoutRequestInput>
+  create: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutRequestInput, Prisma.ProjectTrackingUncheckedCreateWithoutRequestInput>
+  where?: Prisma.ProjectTrackingWhereInput
+}
+
+export type ProjectTrackingUpdateToOneWithWhereWithoutRequestInput = {
+  where?: Prisma.ProjectTrackingWhereInput
+  data: Prisma.XOR<Prisma.ProjectTrackingUpdateWithoutRequestInput, Prisma.ProjectTrackingUncheckedUpdateWithoutRequestInput>
+}
+
+export type ProjectTrackingUpdateWithoutRequestInput = {
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
+  currentStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  job?: Prisma.ClientJobUpdateOneRequiredWithoutProjectTrackingsNestedInput
+  client?: Prisma.UserUpdateOneRequiredWithoutClientProjectTrackingsNestedInput
+  professional?: Prisma.UserUpdateOneRequiredWithoutProfessionalProjectTrackingsNestedInput
+  milestones?: Prisma.ProjectMilestoneUpdateManyWithoutTrackingNestedInput
+  timelineEvents?: Prisma.ProjectTimelineEventUpdateManyWithoutTrackingNestedInput
+  workUploads?: Prisma.ProjectWorkUploadUpdateManyWithoutTrackingNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutProjectTrackingNestedInput
+}
+
+export type ProjectTrackingUncheckedUpdateWithoutRequestInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  jobId?: Prisma.IntFieldUpdateOperationsInput | number
+  clientId?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalId?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
+  currentStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  milestones?: Prisma.ProjectMilestoneUncheckedUpdateManyWithoutTrackingNestedInput
+  timelineEvents?: Prisma.ProjectTimelineEventUncheckedUpdateManyWithoutTrackingNestedInput
+  workUploads?: Prisma.ProjectWorkUploadUncheckedUpdateManyWithoutTrackingNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutProjectTrackingNestedInput
+}
+
+export type ProjectTrackingCreateWithoutTimelineEventsInput = {
+  status?: string
+  progress?: number
+  currentStage?: string | null
+  acceptedAt?: Date | string
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  request: Prisma.ProjectRequestCreateNestedOneWithoutTrackingInput
+  job: Prisma.ClientJobCreateNestedOneWithoutProjectTrackingsInput
+  client: Prisma.UserCreateNestedOneWithoutClientProjectTrackingsInput
+  professional: Prisma.UserCreateNestedOneWithoutProfessionalProjectTrackingsInput
+  milestones?: Prisma.ProjectMilestoneCreateNestedManyWithoutTrackingInput
+  workUploads?: Prisma.ProjectWorkUploadCreateNestedManyWithoutTrackingInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutProjectTrackingInput
+}
+
+export type ProjectTrackingUncheckedCreateWithoutTimelineEventsInput = {
+  id?: number
+  requestId: number
+  jobId: number
+  clientId: number
+  professionalId: number
+  status?: string
+  progress?: number
+  currentStage?: string | null
+  acceptedAt?: Date | string
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  milestones?: Prisma.ProjectMilestoneUncheckedCreateNestedManyWithoutTrackingInput
+  workUploads?: Prisma.ProjectWorkUploadUncheckedCreateNestedManyWithoutTrackingInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutProjectTrackingInput
+}
+
+export type ProjectTrackingCreateOrConnectWithoutTimelineEventsInput = {
+  where: Prisma.ProjectTrackingWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutTimelineEventsInput, Prisma.ProjectTrackingUncheckedCreateWithoutTimelineEventsInput>
+}
+
+export type ProjectTrackingUpsertWithoutTimelineEventsInput = {
+  update: Prisma.XOR<Prisma.ProjectTrackingUpdateWithoutTimelineEventsInput, Prisma.ProjectTrackingUncheckedUpdateWithoutTimelineEventsInput>
+  create: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutTimelineEventsInput, Prisma.ProjectTrackingUncheckedCreateWithoutTimelineEventsInput>
+  where?: Prisma.ProjectTrackingWhereInput
+}
+
+export type ProjectTrackingUpdateToOneWithWhereWithoutTimelineEventsInput = {
+  where?: Prisma.ProjectTrackingWhereInput
+  data: Prisma.XOR<Prisma.ProjectTrackingUpdateWithoutTimelineEventsInput, Prisma.ProjectTrackingUncheckedUpdateWithoutTimelineEventsInput>
+}
+
+export type ProjectTrackingUpdateWithoutTimelineEventsInput = {
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
+  currentStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  request?: Prisma.ProjectRequestUpdateOneRequiredWithoutTrackingNestedInput
+  job?: Prisma.ClientJobUpdateOneRequiredWithoutProjectTrackingsNestedInput
+  client?: Prisma.UserUpdateOneRequiredWithoutClientProjectTrackingsNestedInput
+  professional?: Prisma.UserUpdateOneRequiredWithoutProfessionalProjectTrackingsNestedInput
+  milestones?: Prisma.ProjectMilestoneUpdateManyWithoutTrackingNestedInput
+  workUploads?: Prisma.ProjectWorkUploadUpdateManyWithoutTrackingNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutProjectTrackingNestedInput
+}
+
+export type ProjectTrackingUncheckedUpdateWithoutTimelineEventsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  requestId?: Prisma.IntFieldUpdateOperationsInput | number
+  jobId?: Prisma.IntFieldUpdateOperationsInput | number
+  clientId?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalId?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
+  currentStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  milestones?: Prisma.ProjectMilestoneUncheckedUpdateManyWithoutTrackingNestedInput
+  workUploads?: Prisma.ProjectWorkUploadUncheckedUpdateManyWithoutTrackingNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutProjectTrackingNestedInput
+}
+
+export type ProjectTrackingCreateWithoutMilestonesInput = {
+  status?: string
+  progress?: number
+  currentStage?: string | null
+  acceptedAt?: Date | string
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  request: Prisma.ProjectRequestCreateNestedOneWithoutTrackingInput
+  job: Prisma.ClientJobCreateNestedOneWithoutProjectTrackingsInput
+  client: Prisma.UserCreateNestedOneWithoutClientProjectTrackingsInput
+  professional: Prisma.UserCreateNestedOneWithoutProfessionalProjectTrackingsInput
+  timelineEvents?: Prisma.ProjectTimelineEventCreateNestedManyWithoutTrackingInput
+  workUploads?: Prisma.ProjectWorkUploadCreateNestedManyWithoutTrackingInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutProjectTrackingInput
+}
+
+export type ProjectTrackingUncheckedCreateWithoutMilestonesInput = {
+  id?: number
+  requestId: number
+  jobId: number
+  clientId: number
+  professionalId: number
+  status?: string
+  progress?: number
+  currentStage?: string | null
+  acceptedAt?: Date | string
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  timelineEvents?: Prisma.ProjectTimelineEventUncheckedCreateNestedManyWithoutTrackingInput
+  workUploads?: Prisma.ProjectWorkUploadUncheckedCreateNestedManyWithoutTrackingInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutProjectTrackingInput
+}
+
+export type ProjectTrackingCreateOrConnectWithoutMilestonesInput = {
+  where: Prisma.ProjectTrackingWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutMilestonesInput, Prisma.ProjectTrackingUncheckedCreateWithoutMilestonesInput>
+}
+
+export type ProjectTrackingUpsertWithoutMilestonesInput = {
+  update: Prisma.XOR<Prisma.ProjectTrackingUpdateWithoutMilestonesInput, Prisma.ProjectTrackingUncheckedUpdateWithoutMilestonesInput>
+  create: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutMilestonesInput, Prisma.ProjectTrackingUncheckedCreateWithoutMilestonesInput>
+  where?: Prisma.ProjectTrackingWhereInput
+}
+
+export type ProjectTrackingUpdateToOneWithWhereWithoutMilestonesInput = {
+  where?: Prisma.ProjectTrackingWhereInput
+  data: Prisma.XOR<Prisma.ProjectTrackingUpdateWithoutMilestonesInput, Prisma.ProjectTrackingUncheckedUpdateWithoutMilestonesInput>
+}
+
+export type ProjectTrackingUpdateWithoutMilestonesInput = {
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
+  currentStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  request?: Prisma.ProjectRequestUpdateOneRequiredWithoutTrackingNestedInput
+  job?: Prisma.ClientJobUpdateOneRequiredWithoutProjectTrackingsNestedInput
+  client?: Prisma.UserUpdateOneRequiredWithoutClientProjectTrackingsNestedInput
+  professional?: Prisma.UserUpdateOneRequiredWithoutProfessionalProjectTrackingsNestedInput
+  timelineEvents?: Prisma.ProjectTimelineEventUpdateManyWithoutTrackingNestedInput
+  workUploads?: Prisma.ProjectWorkUploadUpdateManyWithoutTrackingNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutProjectTrackingNestedInput
+}
+
+export type ProjectTrackingUncheckedUpdateWithoutMilestonesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  requestId?: Prisma.IntFieldUpdateOperationsInput | number
+  jobId?: Prisma.IntFieldUpdateOperationsInput | number
+  clientId?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalId?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
+  currentStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  timelineEvents?: Prisma.ProjectTimelineEventUncheckedUpdateManyWithoutTrackingNestedInput
+  workUploads?: Prisma.ProjectWorkUploadUncheckedUpdateManyWithoutTrackingNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutProjectTrackingNestedInput
+}
+
+export type ProjectTrackingCreateWithoutWorkUploadsInput = {
+  status?: string
+  progress?: number
+  currentStage?: string | null
+  acceptedAt?: Date | string
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  request: Prisma.ProjectRequestCreateNestedOneWithoutTrackingInput
+  job: Prisma.ClientJobCreateNestedOneWithoutProjectTrackingsInput
+  client: Prisma.UserCreateNestedOneWithoutClientProjectTrackingsInput
+  professional: Prisma.UserCreateNestedOneWithoutProfessionalProjectTrackingsInput
+  milestones?: Prisma.ProjectMilestoneCreateNestedManyWithoutTrackingInput
+  timelineEvents?: Prisma.ProjectTimelineEventCreateNestedManyWithoutTrackingInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutProjectTrackingInput
+}
+
+export type ProjectTrackingUncheckedCreateWithoutWorkUploadsInput = {
+  id?: number
+  requestId: number
+  jobId: number
+  clientId: number
+  professionalId: number
+  status?: string
+  progress?: number
+  currentStage?: string | null
+  acceptedAt?: Date | string
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  milestones?: Prisma.ProjectMilestoneUncheckedCreateNestedManyWithoutTrackingInput
+  timelineEvents?: Prisma.ProjectTimelineEventUncheckedCreateNestedManyWithoutTrackingInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutProjectTrackingInput
+}
+
+export type ProjectTrackingCreateOrConnectWithoutWorkUploadsInput = {
+  where: Prisma.ProjectTrackingWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutWorkUploadsInput, Prisma.ProjectTrackingUncheckedCreateWithoutWorkUploadsInput>
+}
+
+export type ProjectTrackingUpsertWithoutWorkUploadsInput = {
+  update: Prisma.XOR<Prisma.ProjectTrackingUpdateWithoutWorkUploadsInput, Prisma.ProjectTrackingUncheckedUpdateWithoutWorkUploadsInput>
+  create: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutWorkUploadsInput, Prisma.ProjectTrackingUncheckedCreateWithoutWorkUploadsInput>
+  where?: Prisma.ProjectTrackingWhereInput
+}
+
+export type ProjectTrackingUpdateToOneWithWhereWithoutWorkUploadsInput = {
+  where?: Prisma.ProjectTrackingWhereInput
+  data: Prisma.XOR<Prisma.ProjectTrackingUpdateWithoutWorkUploadsInput, Prisma.ProjectTrackingUncheckedUpdateWithoutWorkUploadsInput>
+}
+
+export type ProjectTrackingUpdateWithoutWorkUploadsInput = {
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
+  currentStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  request?: Prisma.ProjectRequestUpdateOneRequiredWithoutTrackingNestedInput
+  job?: Prisma.ClientJobUpdateOneRequiredWithoutProjectTrackingsNestedInput
+  client?: Prisma.UserUpdateOneRequiredWithoutClientProjectTrackingsNestedInput
+  professional?: Prisma.UserUpdateOneRequiredWithoutProfessionalProjectTrackingsNestedInput
+  milestones?: Prisma.ProjectMilestoneUpdateManyWithoutTrackingNestedInput
+  timelineEvents?: Prisma.ProjectTimelineEventUpdateManyWithoutTrackingNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutProjectTrackingNestedInput
+}
+
+export type ProjectTrackingUncheckedUpdateWithoutWorkUploadsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  requestId?: Prisma.IntFieldUpdateOperationsInput | number
+  jobId?: Prisma.IntFieldUpdateOperationsInput | number
+  clientId?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalId?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
+  currentStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  milestones?: Prisma.ProjectMilestoneUncheckedUpdateManyWithoutTrackingNestedInput
+  timelineEvents?: Prisma.ProjectTimelineEventUncheckedUpdateManyWithoutTrackingNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutProjectTrackingNestedInput
+}
+
+export type ProjectTrackingCreateWithoutPaymentsInput = {
+  status?: string
+  progress?: number
+  currentStage?: string | null
+  acceptedAt?: Date | string
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  request: Prisma.ProjectRequestCreateNestedOneWithoutTrackingInput
+  job: Prisma.ClientJobCreateNestedOneWithoutProjectTrackingsInput
+  client: Prisma.UserCreateNestedOneWithoutClientProjectTrackingsInput
+  professional: Prisma.UserCreateNestedOneWithoutProfessionalProjectTrackingsInput
+  milestones?: Prisma.ProjectMilestoneCreateNestedManyWithoutTrackingInput
+  timelineEvents?: Prisma.ProjectTimelineEventCreateNestedManyWithoutTrackingInput
+  workUploads?: Prisma.ProjectWorkUploadCreateNestedManyWithoutTrackingInput
+}
+
+export type ProjectTrackingUncheckedCreateWithoutPaymentsInput = {
+  id?: number
+  requestId: number
+  jobId: number
+  clientId: number
+  professionalId: number
+  status?: string
+  progress?: number
+  currentStage?: string | null
+  acceptedAt?: Date | string
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  milestones?: Prisma.ProjectMilestoneUncheckedCreateNestedManyWithoutTrackingInput
+  timelineEvents?: Prisma.ProjectTimelineEventUncheckedCreateNestedManyWithoutTrackingInput
+  workUploads?: Prisma.ProjectWorkUploadUncheckedCreateNestedManyWithoutTrackingInput
+}
+
+export type ProjectTrackingCreateOrConnectWithoutPaymentsInput = {
+  where: Prisma.ProjectTrackingWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutPaymentsInput, Prisma.ProjectTrackingUncheckedCreateWithoutPaymentsInput>
+}
+
+export type ProjectTrackingUpsertWithoutPaymentsInput = {
+  update: Prisma.XOR<Prisma.ProjectTrackingUpdateWithoutPaymentsInput, Prisma.ProjectTrackingUncheckedUpdateWithoutPaymentsInput>
+  create: Prisma.XOR<Prisma.ProjectTrackingCreateWithoutPaymentsInput, Prisma.ProjectTrackingUncheckedCreateWithoutPaymentsInput>
+  where?: Prisma.ProjectTrackingWhereInput
+}
+
+export type ProjectTrackingUpdateToOneWithWhereWithoutPaymentsInput = {
+  where?: Prisma.ProjectTrackingWhereInput
+  data: Prisma.XOR<Prisma.ProjectTrackingUpdateWithoutPaymentsInput, Prisma.ProjectTrackingUncheckedUpdateWithoutPaymentsInput>
+}
+
+export type ProjectTrackingUpdateWithoutPaymentsInput = {
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
+  currentStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  request?: Prisma.ProjectRequestUpdateOneRequiredWithoutTrackingNestedInput
+  job?: Prisma.ClientJobUpdateOneRequiredWithoutProjectTrackingsNestedInput
+  client?: Prisma.UserUpdateOneRequiredWithoutClientProjectTrackingsNestedInput
+  professional?: Prisma.UserUpdateOneRequiredWithoutProfessionalProjectTrackingsNestedInput
+  milestones?: Prisma.ProjectMilestoneUpdateManyWithoutTrackingNestedInput
+  timelineEvents?: Prisma.ProjectTimelineEventUpdateManyWithoutTrackingNestedInput
+  workUploads?: Prisma.ProjectWorkUploadUpdateManyWithoutTrackingNestedInput
+}
+
+export type ProjectTrackingUncheckedUpdateWithoutPaymentsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  requestId?: Prisma.IntFieldUpdateOperationsInput | number
+  jobId?: Prisma.IntFieldUpdateOperationsInput | number
+  clientId?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalId?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
+  currentStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  milestones?: Prisma.ProjectMilestoneUncheckedUpdateManyWithoutTrackingNestedInput
+  timelineEvents?: Prisma.ProjectTimelineEventUncheckedUpdateManyWithoutTrackingNestedInput
+  workUploads?: Prisma.ProjectWorkUploadUncheckedUpdateManyWithoutTrackingNestedInput
+}
+
+export type ProjectTrackingCreateManyClientInput = {
+  id?: number
+  requestId: number
+  jobId: number
+  professionalId: number
+  status?: string
+  progress?: number
+  currentStage?: string | null
+  acceptedAt?: Date | string
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type ProjectTrackingCreateManyProfessionalInput = {
+  id?: number
+  requestId: number
+  jobId: number
+  clientId: number
+  status?: string
+  progress?: number
+  currentStage?: string | null
+  acceptedAt?: Date | string
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type ProjectTrackingUpdateWithoutClientInput = {
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
+  currentStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  request?: Prisma.ProjectRequestUpdateOneRequiredWithoutTrackingNestedInput
+  job?: Prisma.ClientJobUpdateOneRequiredWithoutProjectTrackingsNestedInput
+  professional?: Prisma.UserUpdateOneRequiredWithoutProfessionalProjectTrackingsNestedInput
+  milestones?: Prisma.ProjectMilestoneUpdateManyWithoutTrackingNestedInput
+  timelineEvents?: Prisma.ProjectTimelineEventUpdateManyWithoutTrackingNestedInput
+  workUploads?: Prisma.ProjectWorkUploadUpdateManyWithoutTrackingNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutProjectTrackingNestedInput
+}
+
+export type ProjectTrackingUncheckedUpdateWithoutClientInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  requestId?: Prisma.IntFieldUpdateOperationsInput | number
+  jobId?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalId?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
+  currentStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  milestones?: Prisma.ProjectMilestoneUncheckedUpdateManyWithoutTrackingNestedInput
+  timelineEvents?: Prisma.ProjectTimelineEventUncheckedUpdateManyWithoutTrackingNestedInput
+  workUploads?: Prisma.ProjectWorkUploadUncheckedUpdateManyWithoutTrackingNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutProjectTrackingNestedInput
+}
+
+export type ProjectTrackingUncheckedUpdateManyWithoutClientInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  requestId?: Prisma.IntFieldUpdateOperationsInput | number
+  jobId?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalId?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
+  currentStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ProjectTrackingUpdateWithoutProfessionalInput = {
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
+  currentStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  request?: Prisma.ProjectRequestUpdateOneRequiredWithoutTrackingNestedInput
+  job?: Prisma.ClientJobUpdateOneRequiredWithoutProjectTrackingsNestedInput
+  client?: Prisma.UserUpdateOneRequiredWithoutClientProjectTrackingsNestedInput
+  milestones?: Prisma.ProjectMilestoneUpdateManyWithoutTrackingNestedInput
+  timelineEvents?: Prisma.ProjectTimelineEventUpdateManyWithoutTrackingNestedInput
+  workUploads?: Prisma.ProjectWorkUploadUpdateManyWithoutTrackingNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutProjectTrackingNestedInput
+}
+
+export type ProjectTrackingUncheckedUpdateWithoutProfessionalInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  requestId?: Prisma.IntFieldUpdateOperationsInput | number
+  jobId?: Prisma.IntFieldUpdateOperationsInput | number
+  clientId?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
+  currentStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  milestones?: Prisma.ProjectMilestoneUncheckedUpdateManyWithoutTrackingNestedInput
+  timelineEvents?: Prisma.ProjectTimelineEventUncheckedUpdateManyWithoutTrackingNestedInput
+  workUploads?: Prisma.ProjectWorkUploadUncheckedUpdateManyWithoutTrackingNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutProjectTrackingNestedInput
+}
+
+export type ProjectTrackingUncheckedUpdateManyWithoutProfessionalInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  requestId?: Prisma.IntFieldUpdateOperationsInput | number
+  jobId?: Prisma.IntFieldUpdateOperationsInput | number
+  clientId?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
+  currentStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ProjectTrackingCreateManyJobInput = {
+  id?: number
+  requestId: number
+  clientId: number
+  professionalId: number
+  status?: string
+  progress?: number
+  currentStage?: string | null
+  acceptedAt?: Date | string
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type ProjectTrackingUpdateWithoutJobInput = {
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
+  currentStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  request?: Prisma.ProjectRequestUpdateOneRequiredWithoutTrackingNestedInput
+  client?: Prisma.UserUpdateOneRequiredWithoutClientProjectTrackingsNestedInput
+  professional?: Prisma.UserUpdateOneRequiredWithoutProfessionalProjectTrackingsNestedInput
+  milestones?: Prisma.ProjectMilestoneUpdateManyWithoutTrackingNestedInput
+  timelineEvents?: Prisma.ProjectTimelineEventUpdateManyWithoutTrackingNestedInput
+  workUploads?: Prisma.ProjectWorkUploadUpdateManyWithoutTrackingNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutProjectTrackingNestedInput
+}
+
+export type ProjectTrackingUncheckedUpdateWithoutJobInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  requestId?: Prisma.IntFieldUpdateOperationsInput | number
+  clientId?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalId?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
+  currentStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  milestones?: Prisma.ProjectMilestoneUncheckedUpdateManyWithoutTrackingNestedInput
+  timelineEvents?: Prisma.ProjectTimelineEventUncheckedUpdateManyWithoutTrackingNestedInput
+  workUploads?: Prisma.ProjectWorkUploadUncheckedUpdateManyWithoutTrackingNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutProjectTrackingNestedInput
+}
+
+export type ProjectTrackingUncheckedUpdateManyWithoutJobInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  requestId?: Prisma.IntFieldUpdateOperationsInput | number
+  clientId?: Prisma.IntFieldUpdateOperationsInput | number
+  professionalId?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
+  currentStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+
+/**
+ * Count Type ProjectTrackingCountOutputType
+ */
+
+export type ProjectTrackingCountOutputType = {
+  milestones: number
+  timelineEvents: number
+  workUploads: number
+  payments: number
+}
+
+export type ProjectTrackingCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  milestones?: boolean | ProjectTrackingCountOutputTypeCountMilestonesArgs
+  timelineEvents?: boolean | ProjectTrackingCountOutputTypeCountTimelineEventsArgs
+  workUploads?: boolean | ProjectTrackingCountOutputTypeCountWorkUploadsArgs
+  payments?: boolean | ProjectTrackingCountOutputTypeCountPaymentsArgs
+}
+
+/**
+ * ProjectTrackingCountOutputType without action
+ */
+export type ProjectTrackingCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProjectTrackingCountOutputType
+   */
+  select?: Prisma.ProjectTrackingCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * ProjectTrackingCountOutputType without action
+ */
+export type ProjectTrackingCountOutputTypeCountMilestonesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ProjectMilestoneWhereInput
+}
+
+/**
+ * ProjectTrackingCountOutputType without action
+ */
+export type ProjectTrackingCountOutputTypeCountTimelineEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ProjectTimelineEventWhereInput
+}
+
+/**
+ * ProjectTrackingCountOutputType without action
+ */
+export type ProjectTrackingCountOutputTypeCountWorkUploadsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ProjectWorkUploadWhereInput
+}
+
+/**
+ * ProjectTrackingCountOutputType without action
+ */
+export type ProjectTrackingCountOutputTypeCountPaymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PaymentWhereInput
+}
 
 
 export type ProjectTrackingSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -568,6 +1755,15 @@ export type ProjectTrackingSelect<ExtArgs extends runtime.Types.Extensions.Inter
   completedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  request?: boolean | Prisma.ProjectRequestDefaultArgs<ExtArgs>
+  job?: boolean | Prisma.ClientJobDefaultArgs<ExtArgs>
+  client?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  professional?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  milestones?: boolean | Prisma.ProjectTracking$milestonesArgs<ExtArgs>
+  timelineEvents?: boolean | Prisma.ProjectTracking$timelineEventsArgs<ExtArgs>
+  workUploads?: boolean | Prisma.ProjectTracking$workUploadsArgs<ExtArgs>
+  payments?: boolean | Prisma.ProjectTracking$paymentsArgs<ExtArgs>
+  _count?: boolean | Prisma.ProjectTrackingCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["projectTracking"]>
 
 export type ProjectTrackingSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -584,6 +1780,10 @@ export type ProjectTrackingSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   completedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  request?: boolean | Prisma.ProjectRequestDefaultArgs<ExtArgs>
+  job?: boolean | Prisma.ClientJobDefaultArgs<ExtArgs>
+  client?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  professional?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["projectTracking"]>
 
 export type ProjectTrackingSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -600,6 +1800,10 @@ export type ProjectTrackingSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   completedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  request?: boolean | Prisma.ProjectRequestDefaultArgs<ExtArgs>
+  job?: boolean | Prisma.ClientJobDefaultArgs<ExtArgs>
+  client?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  professional?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["projectTracking"]>
 
 export type ProjectTrackingSelectScalar = {
@@ -619,10 +1823,42 @@ export type ProjectTrackingSelectScalar = {
 }
 
 export type ProjectTrackingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "requestId" | "jobId" | "clientId" | "professionalId" | "status" | "progress" | "currentStage" | "acceptedAt" | "startedAt" | "completedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["projectTracking"]>
+export type ProjectTrackingInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  request?: boolean | Prisma.ProjectRequestDefaultArgs<ExtArgs>
+  job?: boolean | Prisma.ClientJobDefaultArgs<ExtArgs>
+  client?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  professional?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  milestones?: boolean | Prisma.ProjectTracking$milestonesArgs<ExtArgs>
+  timelineEvents?: boolean | Prisma.ProjectTracking$timelineEventsArgs<ExtArgs>
+  workUploads?: boolean | Prisma.ProjectTracking$workUploadsArgs<ExtArgs>
+  payments?: boolean | Prisma.ProjectTracking$paymentsArgs<ExtArgs>
+  _count?: boolean | Prisma.ProjectTrackingCountOutputTypeDefaultArgs<ExtArgs>
+}
+export type ProjectTrackingIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  request?: boolean | Prisma.ProjectRequestDefaultArgs<ExtArgs>
+  job?: boolean | Prisma.ClientJobDefaultArgs<ExtArgs>
+  client?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  professional?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+}
+export type ProjectTrackingIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  request?: boolean | Prisma.ProjectRequestDefaultArgs<ExtArgs>
+  job?: boolean | Prisma.ClientJobDefaultArgs<ExtArgs>
+  client?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  professional?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+}
 
 export type $ProjectTrackingPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "ProjectTracking"
-  objects: {}
+  objects: {
+    request: Prisma.$ProjectRequestPayload<ExtArgs>
+    job: Prisma.$ClientJobPayload<ExtArgs>
+    client: Prisma.$UserPayload<ExtArgs>
+    professional: Prisma.$UserPayload<ExtArgs>
+    milestones: Prisma.$ProjectMilestonePayload<ExtArgs>[]
+    timelineEvents: Prisma.$ProjectTimelineEventPayload<ExtArgs>[]
+    workUploads: Prisma.$ProjectWorkUploadPayload<ExtArgs>[]
+    payments: Prisma.$PaymentPayload<ExtArgs>[]
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     requestId: number
@@ -1031,6 +2267,14 @@ readonly fields: ProjectTrackingFieldRefs;
  */
 export interface Prisma__ProjectTrackingClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  request<T extends Prisma.ProjectRequestDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProjectRequestDefaultArgs<ExtArgs>>): Prisma.Prisma__ProjectRequestClient<runtime.Types.Result.GetResult<Prisma.$ProjectRequestPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  job<T extends Prisma.ClientJobDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ClientJobDefaultArgs<ExtArgs>>): Prisma.Prisma__ClientJobClient<runtime.Types.Result.GetResult<Prisma.$ClientJobPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  client<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  professional<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  milestones<T extends Prisma.ProjectTracking$milestonesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProjectTracking$milestonesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProjectMilestonePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  timelineEvents<T extends Prisma.ProjectTracking$timelineEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProjectTracking$timelineEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProjectTimelineEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  workUploads<T extends Prisma.ProjectTracking$workUploadsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProjectTracking$workUploadsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProjectWorkUploadPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  payments<T extends Prisma.ProjectTracking$paymentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProjectTracking$paymentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1090,6 +2334,10 @@ export type ProjectTrackingFindUniqueArgs<ExtArgs extends runtime.Types.Extensio
    */
   omit?: Prisma.ProjectTrackingOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectTrackingInclude<ExtArgs> | null
+  /**
    * Filter, which ProjectTracking to fetch.
    */
   where: Prisma.ProjectTrackingWhereUniqueInput
@@ -1108,6 +2356,10 @@ export type ProjectTrackingFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.E
    */
   omit?: Prisma.ProjectTrackingOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectTrackingInclude<ExtArgs> | null
+  /**
    * Filter, which ProjectTracking to fetch.
    */
   where: Prisma.ProjectTrackingWhereUniqueInput
@@ -1125,6 +2377,10 @@ export type ProjectTrackingFindFirstArgs<ExtArgs extends runtime.Types.Extension
    * Omit specific fields from the ProjectTracking
    */
   omit?: Prisma.ProjectTrackingOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectTrackingInclude<ExtArgs> | null
   /**
    * Filter, which ProjectTracking to fetch.
    */
@@ -1174,6 +2430,10 @@ export type ProjectTrackingFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Ex
    */
   omit?: Prisma.ProjectTrackingOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectTrackingInclude<ExtArgs> | null
+  /**
    * Filter, which ProjectTracking to fetch.
    */
   where?: Prisma.ProjectTrackingWhereInput
@@ -1221,6 +2481,10 @@ export type ProjectTrackingFindManyArgs<ExtArgs extends runtime.Types.Extensions
    * Omit specific fields from the ProjectTracking
    */
   omit?: Prisma.ProjectTrackingOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectTrackingInclude<ExtArgs> | null
   /**
    * Filter, which ProjectTrackings to fetch.
    */
@@ -1270,6 +2534,10 @@ export type ProjectTrackingCreateArgs<ExtArgs extends runtime.Types.Extensions.I
    */
   omit?: Prisma.ProjectTrackingOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectTrackingInclude<ExtArgs> | null
+  /**
    * The data needed to create a ProjectTracking.
    */
   data: Prisma.XOR<Prisma.ProjectTrackingCreateInput, Prisma.ProjectTrackingUncheckedCreateInput>
@@ -1303,6 +2571,10 @@ export type ProjectTrackingCreateManyAndReturnArgs<ExtArgs extends runtime.Types
    */
   data: Prisma.ProjectTrackingCreateManyInput | Prisma.ProjectTrackingCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectTrackingIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1317,6 +2589,10 @@ export type ProjectTrackingUpdateArgs<ExtArgs extends runtime.Types.Extensions.I
    * Omit specific fields from the ProjectTracking
    */
   omit?: Prisma.ProjectTrackingOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectTrackingInclude<ExtArgs> | null
   /**
    * The data needed to update a ProjectTracking.
    */
@@ -1369,6 +2645,10 @@ export type ProjectTrackingUpdateManyAndReturnArgs<ExtArgs extends runtime.Types
    * Limit how many ProjectTrackings to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectTrackingIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1383,6 +2663,10 @@ export type ProjectTrackingUpsertArgs<ExtArgs extends runtime.Types.Extensions.I
    * Omit specific fields from the ProjectTracking
    */
   omit?: Prisma.ProjectTrackingOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectTrackingInclude<ExtArgs> | null
   /**
    * The filter to search for the ProjectTracking to update in case it exists.
    */
@@ -1410,6 +2694,10 @@ export type ProjectTrackingDeleteArgs<ExtArgs extends runtime.Types.Extensions.I
    */
   omit?: Prisma.ProjectTrackingOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectTrackingInclude<ExtArgs> | null
+  /**
    * Filter which ProjectTracking to delete.
    */
   where: Prisma.ProjectTrackingWhereUniqueInput
@@ -1430,6 +2718,102 @@ export type ProjectTrackingDeleteManyArgs<ExtArgs extends runtime.Types.Extensio
 }
 
 /**
+ * ProjectTracking.milestones
+ */
+export type ProjectTracking$milestonesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProjectMilestone
+   */
+  select?: Prisma.ProjectMilestoneSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ProjectMilestone
+   */
+  omit?: Prisma.ProjectMilestoneOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectMilestoneInclude<ExtArgs> | null
+  where?: Prisma.ProjectMilestoneWhereInput
+  orderBy?: Prisma.ProjectMilestoneOrderByWithRelationInput | Prisma.ProjectMilestoneOrderByWithRelationInput[]
+  cursor?: Prisma.ProjectMilestoneWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ProjectMilestoneScalarFieldEnum | Prisma.ProjectMilestoneScalarFieldEnum[]
+}
+
+/**
+ * ProjectTracking.timelineEvents
+ */
+export type ProjectTracking$timelineEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProjectTimelineEvent
+   */
+  select?: Prisma.ProjectTimelineEventSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ProjectTimelineEvent
+   */
+  omit?: Prisma.ProjectTimelineEventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectTimelineEventInclude<ExtArgs> | null
+  where?: Prisma.ProjectTimelineEventWhereInput
+  orderBy?: Prisma.ProjectTimelineEventOrderByWithRelationInput | Prisma.ProjectTimelineEventOrderByWithRelationInput[]
+  cursor?: Prisma.ProjectTimelineEventWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ProjectTimelineEventScalarFieldEnum | Prisma.ProjectTimelineEventScalarFieldEnum[]
+}
+
+/**
+ * ProjectTracking.workUploads
+ */
+export type ProjectTracking$workUploadsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProjectWorkUpload
+   */
+  select?: Prisma.ProjectWorkUploadSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ProjectWorkUpload
+   */
+  omit?: Prisma.ProjectWorkUploadOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectWorkUploadInclude<ExtArgs> | null
+  where?: Prisma.ProjectWorkUploadWhereInput
+  orderBy?: Prisma.ProjectWorkUploadOrderByWithRelationInput | Prisma.ProjectWorkUploadOrderByWithRelationInput[]
+  cursor?: Prisma.ProjectWorkUploadWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ProjectWorkUploadScalarFieldEnum | Prisma.ProjectWorkUploadScalarFieldEnum[]
+}
+
+/**
+ * ProjectTracking.payments
+ */
+export type ProjectTracking$paymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Payment
+   */
+  select?: Prisma.PaymentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Payment
+   */
+  omit?: Prisma.PaymentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PaymentInclude<ExtArgs> | null
+  where?: Prisma.PaymentWhereInput
+  orderBy?: Prisma.PaymentOrderByWithRelationInput | Prisma.PaymentOrderByWithRelationInput[]
+  cursor?: Prisma.PaymentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PaymentScalarFieldEnum | Prisma.PaymentScalarFieldEnum[]
+}
+
+/**
  * ProjectTracking without action
  */
 export type ProjectTrackingDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1441,4 +2825,8 @@ export type ProjectTrackingDefaultArgs<ExtArgs extends runtime.Types.Extensions.
    * Omit specific fields from the ProjectTracking
    */
   omit?: Prisma.ProjectTrackingOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectTrackingInclude<ExtArgs> | null
 }

@@ -5,6 +5,7 @@ import { sessionCookie, verifySession } from "@/lib/auth";
 import { notifyAdminsOfNewProposal, notifyUsers } from "@/lib/marketplace-notifications";
 import { enqueueBackgroundJob } from "@/lib/background-jobs";
 import { attachLastActorRole } from "@/lib/project-request-actions";
+import { emitRealtimeProposalNew } from "@/lib/realtime";
 
 const proposalSchema = z.object({
   jobId: z.number().int().positive(),
@@ -66,7 +67,12 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       );
     const job = await db.clientJob.findUnique({ where: { id: parsed.data.jobId } });
-    if (!job || job.status !== "OPEN")
+    if (
+      !job ||
+      job.status !== "OPEN" ||
+      (job.jobDate != null && job.jobDate > new Date()) ||
+      (job.deadline != null && job.deadline < new Date())
+    )
       return NextResponse.json(
         { error: "This job is no longer accepting proposals." },
         { status: 409 },
@@ -101,6 +107,7 @@ export async function POST(request: NextRequest) {
         description: `A professional updated their proposal for ${job.title ?? "your job"}.`,
         href: `/job/${job.id}`,
       });
+      emitRealtimeProposalNew([job.userId], { jobId: job.id });
       return NextResponse.json({ proposal: updated });
     }
 
@@ -126,6 +133,7 @@ export async function POST(request: NextRequest) {
       description: `${professional ? `${professional.firstName} ${professional.lastName}` : "A professional"} sent a proposal for ${job.title ?? "your job"}.`,
       href: `/job/${job.id}`,
     });
+    emitRealtimeProposalNew([job.userId], { jobId: job.id });
     enqueueBackgroundJob(
       "proposal.created.notifications",
       () =>

@@ -27,7 +27,16 @@ export async function POST(
   if (!professionalId || !jobId)
     return NextResponse.json({ error: "Job not found." }, { status: 404 });
 
-  const job = await db.clientJob.findFirst({ where: { id: jobId, status: "OPEN" } });
+  const job = await db.clientJob.findFirst({
+    where: {
+      id: jobId,
+      status: "OPEN",
+      AND: [
+        { OR: [{ jobDate: null }, { jobDate: { lte: new Date() } }] },
+        { OR: [{ deadline: null }, { deadline: { gte: new Date() } }] },
+      ],
+    },
+  });
   if (!job) return NextResponse.json({ error: "This job is no longer open." }, { status: 404 });
 
   await db.favoriteJob.upsert({

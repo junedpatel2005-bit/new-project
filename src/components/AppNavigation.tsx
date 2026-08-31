@@ -44,7 +44,7 @@ function useUnreadNotifications() {
   const [count, setCount] = useState(0);
   useEffect(() => {
     const load = () => {
-      void fetch("/api/v1/portal/notifications", { cache: "no-store" })
+      void fetch("/api/portal/notifications", { cache: "no-store" })
         .then((response) => (response.ok ? response.json() : null))
         .then((data: { readAt?: string | null }[] | null) =>
           setCount(data?.filter((notification) => !notification.readAt).length ?? 0),

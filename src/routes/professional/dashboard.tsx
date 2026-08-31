@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { io } from "socket.io-client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -66,10 +67,38 @@ export default function ProfessionalDashboard() {
       })
       .then(setData)
       .catch(() => setError("Unable to load your professional dashboard."));
-    void fetch("/api/v1/portal/notifications")
+    void fetch("/api/portal/notifications")
       .then((response) => (response.ok ? response.json() : []))
       .then((items: Notification[]) => setNotifications(items.slice(0, 4)))
       .catch(() => setNotifications([]));
+  }, []);
+
+  useEffect(() => {
+    const socket = io({
+      path: "/api/realtime",
+      withCredentials: true,
+      transports: ["websocket", "polling"],
+    });
+    const refreshDashboard = () => {
+      void fetch("/api/v1/portal/professional-jobs", { cache: "no-store" })
+        .then(async (response) => {
+          if (!response.ok) throw new Error();
+          return response.json() as Promise<DashboardData>;
+        })
+        .then(setData)
+        .catch(() => undefined);
+      void fetch("/api/portal/notifications", { cache: "no-store" })
+        .then((response) => (response.ok ? response.json() : []))
+        .then((items: Notification[]) => setNotifications(items.slice(0, 4)))
+        .catch(() => setNotifications([]));
+    };
+    socket.on("notification:new", refreshDashboard);
+    socket.on("project:updated", refreshDashboard);
+    return () => {
+      socket.off("notification:new", refreshDashboard);
+      socket.off("project:updated", refreshDashboard);
+      socket.disconnect();
+    };
   }, []);
 
   const stats = useMemo(

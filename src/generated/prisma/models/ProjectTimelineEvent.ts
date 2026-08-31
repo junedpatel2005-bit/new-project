@@ -288,6 +288,7 @@ export type ProjectTimelineEventWhereInput = {
   stage?: Prisma.StringNullableFilter<"ProjectTimelineEvent"> | string | null
   attachmentJson?: Prisma.StringNullableFilter<"ProjectTimelineEvent"> | string | null
   createdAt?: Prisma.DateTimeFilter<"ProjectTimelineEvent"> | Date | string
+  tracking?: Prisma.XOR<Prisma.ProjectTrackingScalarRelationFilter, Prisma.ProjectTrackingWhereInput>
 }
 
 export type ProjectTimelineEventOrderByWithRelationInput = {
@@ -303,6 +304,7 @@ export type ProjectTimelineEventOrderByWithRelationInput = {
   stage?: Prisma.SortOrderInput | Prisma.SortOrder
   attachmentJson?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  tracking?: Prisma.ProjectTrackingOrderByWithRelationInput
 }
 
 export type ProjectTimelineEventWhereUniqueInput = Prisma.AtLeast<{
@@ -321,6 +323,7 @@ export type ProjectTimelineEventWhereUniqueInput = Prisma.AtLeast<{
   stage?: Prisma.StringNullableFilter<"ProjectTimelineEvent"> | string | null
   attachmentJson?: Prisma.StringNullableFilter<"ProjectTimelineEvent"> | string | null
   createdAt?: Prisma.DateTimeFilter<"ProjectTimelineEvent"> | Date | string
+  tracking?: Prisma.XOR<Prisma.ProjectTrackingScalarRelationFilter, Prisma.ProjectTrackingWhereInput>
 }, "id">
 
 export type ProjectTimelineEventOrderByWithAggregationInput = {
@@ -362,7 +365,6 @@ export type ProjectTimelineEventScalarWhereWithAggregatesInput = {
 }
 
 export type ProjectTimelineEventCreateInput = {
-  trackingId: number
   milestoneId?: number | null
   actorId: number
   actorRole: string
@@ -373,6 +375,7 @@ export type ProjectTimelineEventCreateInput = {
   stage?: string | null
   attachmentJson?: string | null
   createdAt?: Date | string
+  tracking: Prisma.ProjectTrackingCreateNestedOneWithoutTimelineEventsInput
 }
 
 export type ProjectTimelineEventUncheckedCreateInput = {
@@ -391,7 +394,6 @@ export type ProjectTimelineEventUncheckedCreateInput = {
 }
 
 export type ProjectTimelineEventUpdateInput = {
-  trackingId?: Prisma.IntFieldUpdateOperationsInput | number
   milestoneId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   actorId?: Prisma.IntFieldUpdateOperationsInput | number
   actorRole?: Prisma.StringFieldUpdateOperationsInput | string
@@ -402,6 +404,7 @@ export type ProjectTimelineEventUpdateInput = {
   stage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   attachmentJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tracking?: Prisma.ProjectTrackingUpdateOneRequiredWithoutTimelineEventsNestedInput
 }
 
 export type ProjectTimelineEventUncheckedUpdateInput = {
@@ -435,7 +438,6 @@ export type ProjectTimelineEventCreateManyInput = {
 }
 
 export type ProjectTimelineEventUpdateManyMutationInput = {
-  trackingId?: Prisma.IntFieldUpdateOperationsInput | number
   milestoneId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   actorId?: Prisma.IntFieldUpdateOperationsInput | number
   actorRole?: Prisma.StringFieldUpdateOperationsInput | string
@@ -461,6 +463,16 @@ export type ProjectTimelineEventUncheckedUpdateManyInput = {
   stage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   attachmentJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ProjectTimelineEventListRelationFilter = {
+  every?: Prisma.ProjectTimelineEventWhereInput
+  some?: Prisma.ProjectTimelineEventWhereInput
+  none?: Prisma.ProjectTimelineEventWhereInput
+}
+
+export type ProjectTimelineEventOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type ProjectTimelineEventCountOrderByAggregateInput = {
@@ -524,6 +536,174 @@ export type ProjectTimelineEventSumOrderByAggregateInput = {
   progress?: Prisma.SortOrder
 }
 
+export type ProjectTimelineEventCreateNestedManyWithoutTrackingInput = {
+  create?: Prisma.XOR<Prisma.ProjectTimelineEventCreateWithoutTrackingInput, Prisma.ProjectTimelineEventUncheckedCreateWithoutTrackingInput> | Prisma.ProjectTimelineEventCreateWithoutTrackingInput[] | Prisma.ProjectTimelineEventUncheckedCreateWithoutTrackingInput[]
+  connectOrCreate?: Prisma.ProjectTimelineEventCreateOrConnectWithoutTrackingInput | Prisma.ProjectTimelineEventCreateOrConnectWithoutTrackingInput[]
+  createMany?: Prisma.ProjectTimelineEventCreateManyTrackingInputEnvelope
+  connect?: Prisma.ProjectTimelineEventWhereUniqueInput | Prisma.ProjectTimelineEventWhereUniqueInput[]
+}
+
+export type ProjectTimelineEventUncheckedCreateNestedManyWithoutTrackingInput = {
+  create?: Prisma.XOR<Prisma.ProjectTimelineEventCreateWithoutTrackingInput, Prisma.ProjectTimelineEventUncheckedCreateWithoutTrackingInput> | Prisma.ProjectTimelineEventCreateWithoutTrackingInput[] | Prisma.ProjectTimelineEventUncheckedCreateWithoutTrackingInput[]
+  connectOrCreate?: Prisma.ProjectTimelineEventCreateOrConnectWithoutTrackingInput | Prisma.ProjectTimelineEventCreateOrConnectWithoutTrackingInput[]
+  createMany?: Prisma.ProjectTimelineEventCreateManyTrackingInputEnvelope
+  connect?: Prisma.ProjectTimelineEventWhereUniqueInput | Prisma.ProjectTimelineEventWhereUniqueInput[]
+}
+
+export type ProjectTimelineEventUpdateManyWithoutTrackingNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectTimelineEventCreateWithoutTrackingInput, Prisma.ProjectTimelineEventUncheckedCreateWithoutTrackingInput> | Prisma.ProjectTimelineEventCreateWithoutTrackingInput[] | Prisma.ProjectTimelineEventUncheckedCreateWithoutTrackingInput[]
+  connectOrCreate?: Prisma.ProjectTimelineEventCreateOrConnectWithoutTrackingInput | Prisma.ProjectTimelineEventCreateOrConnectWithoutTrackingInput[]
+  upsert?: Prisma.ProjectTimelineEventUpsertWithWhereUniqueWithoutTrackingInput | Prisma.ProjectTimelineEventUpsertWithWhereUniqueWithoutTrackingInput[]
+  createMany?: Prisma.ProjectTimelineEventCreateManyTrackingInputEnvelope
+  set?: Prisma.ProjectTimelineEventWhereUniqueInput | Prisma.ProjectTimelineEventWhereUniqueInput[]
+  disconnect?: Prisma.ProjectTimelineEventWhereUniqueInput | Prisma.ProjectTimelineEventWhereUniqueInput[]
+  delete?: Prisma.ProjectTimelineEventWhereUniqueInput | Prisma.ProjectTimelineEventWhereUniqueInput[]
+  connect?: Prisma.ProjectTimelineEventWhereUniqueInput | Prisma.ProjectTimelineEventWhereUniqueInput[]
+  update?: Prisma.ProjectTimelineEventUpdateWithWhereUniqueWithoutTrackingInput | Prisma.ProjectTimelineEventUpdateWithWhereUniqueWithoutTrackingInput[]
+  updateMany?: Prisma.ProjectTimelineEventUpdateManyWithWhereWithoutTrackingInput | Prisma.ProjectTimelineEventUpdateManyWithWhereWithoutTrackingInput[]
+  deleteMany?: Prisma.ProjectTimelineEventScalarWhereInput | Prisma.ProjectTimelineEventScalarWhereInput[]
+}
+
+export type ProjectTimelineEventUncheckedUpdateManyWithoutTrackingNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectTimelineEventCreateWithoutTrackingInput, Prisma.ProjectTimelineEventUncheckedCreateWithoutTrackingInput> | Prisma.ProjectTimelineEventCreateWithoutTrackingInput[] | Prisma.ProjectTimelineEventUncheckedCreateWithoutTrackingInput[]
+  connectOrCreate?: Prisma.ProjectTimelineEventCreateOrConnectWithoutTrackingInput | Prisma.ProjectTimelineEventCreateOrConnectWithoutTrackingInput[]
+  upsert?: Prisma.ProjectTimelineEventUpsertWithWhereUniqueWithoutTrackingInput | Prisma.ProjectTimelineEventUpsertWithWhereUniqueWithoutTrackingInput[]
+  createMany?: Prisma.ProjectTimelineEventCreateManyTrackingInputEnvelope
+  set?: Prisma.ProjectTimelineEventWhereUniqueInput | Prisma.ProjectTimelineEventWhereUniqueInput[]
+  disconnect?: Prisma.ProjectTimelineEventWhereUniqueInput | Prisma.ProjectTimelineEventWhereUniqueInput[]
+  delete?: Prisma.ProjectTimelineEventWhereUniqueInput | Prisma.ProjectTimelineEventWhereUniqueInput[]
+  connect?: Prisma.ProjectTimelineEventWhereUniqueInput | Prisma.ProjectTimelineEventWhereUniqueInput[]
+  update?: Prisma.ProjectTimelineEventUpdateWithWhereUniqueWithoutTrackingInput | Prisma.ProjectTimelineEventUpdateWithWhereUniqueWithoutTrackingInput[]
+  updateMany?: Prisma.ProjectTimelineEventUpdateManyWithWhereWithoutTrackingInput | Prisma.ProjectTimelineEventUpdateManyWithWhereWithoutTrackingInput[]
+  deleteMany?: Prisma.ProjectTimelineEventScalarWhereInput | Prisma.ProjectTimelineEventScalarWhereInput[]
+}
+
+export type ProjectTimelineEventCreateWithoutTrackingInput = {
+  milestoneId?: number | null
+  actorId: number
+  actorRole: string
+  type: string
+  title: string
+  description?: string | null
+  progress?: number | null
+  stage?: string | null
+  attachmentJson?: string | null
+  createdAt?: Date | string
+}
+
+export type ProjectTimelineEventUncheckedCreateWithoutTrackingInput = {
+  id?: number
+  milestoneId?: number | null
+  actorId: number
+  actorRole: string
+  type: string
+  title: string
+  description?: string | null
+  progress?: number | null
+  stage?: string | null
+  attachmentJson?: string | null
+  createdAt?: Date | string
+}
+
+export type ProjectTimelineEventCreateOrConnectWithoutTrackingInput = {
+  where: Prisma.ProjectTimelineEventWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProjectTimelineEventCreateWithoutTrackingInput, Prisma.ProjectTimelineEventUncheckedCreateWithoutTrackingInput>
+}
+
+export type ProjectTimelineEventCreateManyTrackingInputEnvelope = {
+  data: Prisma.ProjectTimelineEventCreateManyTrackingInput | Prisma.ProjectTimelineEventCreateManyTrackingInput[]
+  skipDuplicates?: boolean
+}
+
+export type ProjectTimelineEventUpsertWithWhereUniqueWithoutTrackingInput = {
+  where: Prisma.ProjectTimelineEventWhereUniqueInput
+  update: Prisma.XOR<Prisma.ProjectTimelineEventUpdateWithoutTrackingInput, Prisma.ProjectTimelineEventUncheckedUpdateWithoutTrackingInput>
+  create: Prisma.XOR<Prisma.ProjectTimelineEventCreateWithoutTrackingInput, Prisma.ProjectTimelineEventUncheckedCreateWithoutTrackingInput>
+}
+
+export type ProjectTimelineEventUpdateWithWhereUniqueWithoutTrackingInput = {
+  where: Prisma.ProjectTimelineEventWhereUniqueInput
+  data: Prisma.XOR<Prisma.ProjectTimelineEventUpdateWithoutTrackingInput, Prisma.ProjectTimelineEventUncheckedUpdateWithoutTrackingInput>
+}
+
+export type ProjectTimelineEventUpdateManyWithWhereWithoutTrackingInput = {
+  where: Prisma.ProjectTimelineEventScalarWhereInput
+  data: Prisma.XOR<Prisma.ProjectTimelineEventUpdateManyMutationInput, Prisma.ProjectTimelineEventUncheckedUpdateManyWithoutTrackingInput>
+}
+
+export type ProjectTimelineEventScalarWhereInput = {
+  AND?: Prisma.ProjectTimelineEventScalarWhereInput | Prisma.ProjectTimelineEventScalarWhereInput[]
+  OR?: Prisma.ProjectTimelineEventScalarWhereInput[]
+  NOT?: Prisma.ProjectTimelineEventScalarWhereInput | Prisma.ProjectTimelineEventScalarWhereInput[]
+  id?: Prisma.IntFilter<"ProjectTimelineEvent"> | number
+  trackingId?: Prisma.IntFilter<"ProjectTimelineEvent"> | number
+  milestoneId?: Prisma.IntNullableFilter<"ProjectTimelineEvent"> | number | null
+  actorId?: Prisma.IntFilter<"ProjectTimelineEvent"> | number
+  actorRole?: Prisma.StringFilter<"ProjectTimelineEvent"> | string
+  type?: Prisma.StringFilter<"ProjectTimelineEvent"> | string
+  title?: Prisma.StringFilter<"ProjectTimelineEvent"> | string
+  description?: Prisma.StringNullableFilter<"ProjectTimelineEvent"> | string | null
+  progress?: Prisma.IntNullableFilter<"ProjectTimelineEvent"> | number | null
+  stage?: Prisma.StringNullableFilter<"ProjectTimelineEvent"> | string | null
+  attachmentJson?: Prisma.StringNullableFilter<"ProjectTimelineEvent"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"ProjectTimelineEvent"> | Date | string
+}
+
+export type ProjectTimelineEventCreateManyTrackingInput = {
+  id?: number
+  milestoneId?: number | null
+  actorId: number
+  actorRole: string
+  type: string
+  title: string
+  description?: string | null
+  progress?: number | null
+  stage?: string | null
+  attachmentJson?: string | null
+  createdAt?: Date | string
+}
+
+export type ProjectTimelineEventUpdateWithoutTrackingInput = {
+  milestoneId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  actorId?: Prisma.IntFieldUpdateOperationsInput | number
+  actorRole?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  stage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attachmentJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ProjectTimelineEventUncheckedUpdateWithoutTrackingInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  milestoneId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  actorId?: Prisma.IntFieldUpdateOperationsInput | number
+  actorRole?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  stage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attachmentJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ProjectTimelineEventUncheckedUpdateManyWithoutTrackingInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  milestoneId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  actorId?: Prisma.IntFieldUpdateOperationsInput | number
+  actorRole?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  progress?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  stage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attachmentJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 
 
 export type ProjectTimelineEventSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -539,6 +719,7 @@ export type ProjectTimelineEventSelect<ExtArgs extends runtime.Types.Extensions.
   stage?: boolean
   attachmentJson?: boolean
   createdAt?: boolean
+  tracking?: boolean | Prisma.ProjectTrackingDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["projectTimelineEvent"]>
 
 export type ProjectTimelineEventSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -554,6 +735,7 @@ export type ProjectTimelineEventSelectCreateManyAndReturn<ExtArgs extends runtim
   stage?: boolean
   attachmentJson?: boolean
   createdAt?: boolean
+  tracking?: boolean | Prisma.ProjectTrackingDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["projectTimelineEvent"]>
 
 export type ProjectTimelineEventSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -569,6 +751,7 @@ export type ProjectTimelineEventSelectUpdateManyAndReturn<ExtArgs extends runtim
   stage?: boolean
   attachmentJson?: boolean
   createdAt?: boolean
+  tracking?: boolean | Prisma.ProjectTrackingDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["projectTimelineEvent"]>
 
 export type ProjectTimelineEventSelectScalar = {
@@ -587,10 +770,21 @@ export type ProjectTimelineEventSelectScalar = {
 }
 
 export type ProjectTimelineEventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "trackingId" | "milestoneId" | "actorId" | "actorRole" | "type" | "title" | "description" | "progress" | "stage" | "attachmentJson" | "createdAt", ExtArgs["result"]["projectTimelineEvent"]>
+export type ProjectTimelineEventInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  tracking?: boolean | Prisma.ProjectTrackingDefaultArgs<ExtArgs>
+}
+export type ProjectTimelineEventIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  tracking?: boolean | Prisma.ProjectTrackingDefaultArgs<ExtArgs>
+}
+export type ProjectTimelineEventIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  tracking?: boolean | Prisma.ProjectTrackingDefaultArgs<ExtArgs>
+}
 
 export type $ProjectTimelineEventPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "ProjectTimelineEvent"
-  objects: {}
+  objects: {
+    tracking: Prisma.$ProjectTrackingPayload<ExtArgs>
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     trackingId: number
@@ -998,6 +1192,7 @@ readonly fields: ProjectTimelineEventFieldRefs;
  */
 export interface Prisma__ProjectTimelineEventClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  tracking<T extends Prisma.ProjectTrackingDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProjectTrackingDefaultArgs<ExtArgs>>): Prisma.Prisma__ProjectTrackingClient<runtime.Types.Result.GetResult<Prisma.$ProjectTrackingPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1056,6 +1251,10 @@ export type ProjectTimelineEventFindUniqueArgs<ExtArgs extends runtime.Types.Ext
    */
   omit?: Prisma.ProjectTimelineEventOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectTimelineEventInclude<ExtArgs> | null
+  /**
    * Filter, which ProjectTimelineEvent to fetch.
    */
   where: Prisma.ProjectTimelineEventWhereUniqueInput
@@ -1074,6 +1273,10 @@ export type ProjectTimelineEventFindUniqueOrThrowArgs<ExtArgs extends runtime.Ty
    */
   omit?: Prisma.ProjectTimelineEventOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectTimelineEventInclude<ExtArgs> | null
+  /**
    * Filter, which ProjectTimelineEvent to fetch.
    */
   where: Prisma.ProjectTimelineEventWhereUniqueInput
@@ -1091,6 +1294,10 @@ export type ProjectTimelineEventFindFirstArgs<ExtArgs extends runtime.Types.Exte
    * Omit specific fields from the ProjectTimelineEvent
    */
   omit?: Prisma.ProjectTimelineEventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectTimelineEventInclude<ExtArgs> | null
   /**
    * Filter, which ProjectTimelineEvent to fetch.
    */
@@ -1140,6 +1347,10 @@ export type ProjectTimelineEventFindFirstOrThrowArgs<ExtArgs extends runtime.Typ
    */
   omit?: Prisma.ProjectTimelineEventOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectTimelineEventInclude<ExtArgs> | null
+  /**
    * Filter, which ProjectTimelineEvent to fetch.
    */
   where?: Prisma.ProjectTimelineEventWhereInput
@@ -1187,6 +1398,10 @@ export type ProjectTimelineEventFindManyArgs<ExtArgs extends runtime.Types.Exten
    * Omit specific fields from the ProjectTimelineEvent
    */
   omit?: Prisma.ProjectTimelineEventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectTimelineEventInclude<ExtArgs> | null
   /**
    * Filter, which ProjectTimelineEvents to fetch.
    */
@@ -1236,6 +1451,10 @@ export type ProjectTimelineEventCreateArgs<ExtArgs extends runtime.Types.Extensi
    */
   omit?: Prisma.ProjectTimelineEventOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectTimelineEventInclude<ExtArgs> | null
+  /**
    * The data needed to create a ProjectTimelineEvent.
    */
   data: Prisma.XOR<Prisma.ProjectTimelineEventCreateInput, Prisma.ProjectTimelineEventUncheckedCreateInput>
@@ -1269,6 +1488,10 @@ export type ProjectTimelineEventCreateManyAndReturnArgs<ExtArgs extends runtime.
    */
   data: Prisma.ProjectTimelineEventCreateManyInput | Prisma.ProjectTimelineEventCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectTimelineEventIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1283,6 +1506,10 @@ export type ProjectTimelineEventUpdateArgs<ExtArgs extends runtime.Types.Extensi
    * Omit specific fields from the ProjectTimelineEvent
    */
   omit?: Prisma.ProjectTimelineEventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectTimelineEventInclude<ExtArgs> | null
   /**
    * The data needed to update a ProjectTimelineEvent.
    */
@@ -1335,6 +1562,10 @@ export type ProjectTimelineEventUpdateManyAndReturnArgs<ExtArgs extends runtime.
    * Limit how many ProjectTimelineEvents to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectTimelineEventIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1349,6 +1580,10 @@ export type ProjectTimelineEventUpsertArgs<ExtArgs extends runtime.Types.Extensi
    * Omit specific fields from the ProjectTimelineEvent
    */
   omit?: Prisma.ProjectTimelineEventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectTimelineEventInclude<ExtArgs> | null
   /**
    * The filter to search for the ProjectTimelineEvent to update in case it exists.
    */
@@ -1375,6 +1610,10 @@ export type ProjectTimelineEventDeleteArgs<ExtArgs extends runtime.Types.Extensi
    * Omit specific fields from the ProjectTimelineEvent
    */
   omit?: Prisma.ProjectTimelineEventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectTimelineEventInclude<ExtArgs> | null
   /**
    * Filter which ProjectTimelineEvent to delete.
    */
@@ -1407,4 +1646,8 @@ export type ProjectTimelineEventDefaultArgs<ExtArgs extends runtime.Types.Extens
    * Omit specific fields from the ProjectTimelineEvent
    */
   omit?: Prisma.ProjectTimelineEventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectTimelineEventInclude<ExtArgs> | null
 }
