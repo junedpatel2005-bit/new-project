@@ -5,6 +5,9 @@ import { searchProfessionals } from "@/lib/queries/professional-discovery";
 const querySchema = z.object({
   query: z.string().trim().max(200).optional(),
   segment: z.string().trim().max(50).optional(),
+  parentCategoryId: z.coerce.number().int().positive().optional(),
+  categoryId: z.coerce.number().int().positive().optional(),
+  subcategoryId: z.coerce.number().int().positive().optional(),
   category: z.string().trim().max(100).optional(),
   city: z.string().trim().max(100).optional(),
   state: z.string().trim().max(100).optional(),

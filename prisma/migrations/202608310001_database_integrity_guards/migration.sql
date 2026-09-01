@@ -6,7 +6,7 @@ BEGIN
   IF EXISTS (SELECT 1 FROM "Payment" p LEFT JOIN "User" u ON u.id = p."clientId" WHERE u.id IS NULL)
     OR EXISTS (SELECT 1 FROM "Payment" p LEFT JOIN "User" u ON u.id = p."professionalId" WHERE u.id IS NULL)
     OR EXISTS (SELECT 1 FROM "Payment" p LEFT JOIN "ClientJob" j ON j.id = p."jobId" WHERE p."jobId" IS NOT NULL AND j.id IS NULL)
-    OR EXISTS (SELECT 1 FROM "Payment" p LEFT JOIN "ProjectTracking" t ON t.id = p."projectTrackingId" WHERE p."projectTrackingId" IS NOT NULL AND t.id IS NULL)
+    OR EXISTS (SELECT 1 FROM "Payment" p LEFT JOIN "ProjectTracking" t ON t.id = p."project_tracking_id" WHERE p."project_tracking_id" IS NOT NULL AND t.id IS NULL)
     OR EXISTS (SELECT 1 FROM "ProjectRequest" r LEFT JOIN "ClientJob" j ON j.id = r."jobId" WHERE j.id IS NULL)
     OR EXISTS (SELECT 1 FROM "ProjectRequest" r LEFT JOIN "User" u ON u.id = r."clientId" WHERE u.id IS NULL)
     OR EXISTS (SELECT 1 FROM "ProjectRequest" r LEFT JOIN "User" u ON u.id = r."professionalId" WHERE u.id IS NULL)
@@ -43,7 +43,7 @@ ALTER TABLE "Payment"
   ADD CONSTRAINT "Payment_clientId_fkey" FOREIGN KEY ("clientId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE,
   ADD CONSTRAINT "Payment_professionalId_fkey" FOREIGN KEY ("professionalId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE,
   ADD CONSTRAINT "Payment_jobId_fkey" FOREIGN KEY ("jobId") REFERENCES "ClientJob"("id") ON DELETE RESTRICT ON UPDATE CASCADE,
-  ADD CONSTRAINT "Payment_projectTrackingId_fkey" FOREIGN KEY ("projectTrackingId") REFERENCES "ProjectTracking"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+  ADD CONSTRAINT "Payment_projectTrackingId_fkey" FOREIGN KEY ("project_tracking_id") REFERENCES "ProjectTracking"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "ProjectRequest"
   ADD CONSTRAINT "ProjectRequest_jobId_fkey" FOREIGN KEY ("jobId") REFERENCES "ClientJob"("id") ON DELETE RESTRICT ON UPDATE CASCADE,

@@ -4,7 +4,8 @@ import { db } from "@/lib/db";
 import { sessionCookie, verifySession } from "@/lib/auth";
 
 const profileSchema = z.object({
-  category: z.string().trim().min(2).max(100),
+  categoryId: z.coerce.number().int().positive().optional(),
+  category: z.string().trim().min(2).max(100).optional(),
   experienceYears: z.coerce.number().int().min(0).max(80).nullable(),
   hourlyRate: z.coerce.number().int().min(0).max(1_000_000).nullable(),
   serviceRadiusKm: z.coerce.number().int().min(1).max(500).nullable().optional(),
@@ -63,16 +64,24 @@ export async function POST(request: NextRequest) {
       { error: "Complete the required professional details." },
       { status: 400 },
     );
-  const validCategory = await db.serviceCategory.findFirst({
-    where: { name: parsed.data.category },
-    select: { id: true },
-  });
+  const validCategory = parsed.data.categoryId
+    ? await db.serviceCategory.findUnique({
+        where: { id: parsed.data.categoryId },
+        select: { id: true, name: true },
+      })
+    : parsed.data.category
+      ? await db.serviceCategory.findFirst({
+          where: { name: parsed.data.category },
+          select: { id: true, name: true },
+        })
+      : null;
   if (!validCategory)
     return NextResponse.json({ error: "Choose a valid service category." }, { status: 400 });
   const profile = await db.user.update({
     where: { id: userId },
     data: {
-      professionalCategory: parsed.data.category,
+      professionalCategory: validCategory.name,
+      professionalCategoryId: validCategory.id,
       experienceYears: parsed.data.experienceYears,
       hourlyRate: parsed.data.hourlyRate,
       serviceRadiusKm: parsed.data.serviceRadiusKm,

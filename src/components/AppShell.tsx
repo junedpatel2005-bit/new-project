@@ -19,35 +19,45 @@ type PortalUser = {
   avatarUrl: string | null;
 };
 
-export function AppShell({ children, title }: { children: React.ReactNode; title?: string }) {
+export function AppShell({
+  children,
+  title,
+  initialUser,
+}: {
+  children: React.ReactNode;
+  title?: string;
+  initialUser?: PortalUser | null;
+}) {
   const pathname = usePathname();
   const router = useRouter();
-  const [user, setUser] = useState<PortalUser | null>(null);
-  const [items, setItems] = useState<NavigationItem[]>(clientItems);
-  const [mobileItems, setMobileItems] = useState<NavigationItem[]>(clientMobileItems);
+  const [user, setUser] = useState<PortalUser | null>(initialUser ?? null);
 
   useEffect(() => {
-    fetch("/api/v1/auth/me")
-      .then((response) => (response.ok ? response.json() : null))
-      .then((data: { user?: PortalUser } | null) => {
-        const nextUser = data?.user ?? null;
-        setUser(nextUser);
-        const professional = nextUser?.role === "PROFESSIONAL";
-        setItems(professional ? professionalItems : clientItems);
-        setMobileItems(professional ? professionalMobileItems : clientMobileItems);
-      })
-      .catch(() => {
-        setUser(null);
-        setItems(clientItems);
-        setMobileItems(clientMobileItems);
-      });
-  }, []);
+    if (!initialUser) {
+      fetch("/api/v1/auth/me")
+        .then((response) => (response.ok ? response.json() : null))
+        .then((data: { user?: PortalUser } | null) => {
+          if (data?.user) setUser(data.user);
+        })
+        .catch(() => {});
+    }
+  }, [initialUser]);
+
+  const activeUser = user ?? initialUser;
+  const isProfessional = activeUser
+    ? activeUser.role === "PROFESSIONAL"
+    : Boolean(pathname?.startsWith("/professional") || pathname?.startsWith("/professional-profile"));
+
+  const items = isProfessional ? professionalItems : clientItems;
+  const mobileItems = isProfessional ? professionalMobileItems : clientMobileItems;
+
+  const navigationUser = activeUser ?? (isProfessional ? { firstName: "", lastName: "", role: "PROFESSIONAL", avatarUrl: null } : null);
 
   return (
     <div className="min-h-screen bg-background pb-16 lg:pb-0">
-      {user && <AppSidebar items={items} pathname={pathname} user={user} />}
-      <div className={user ? "lg:pl-64" : ""}>
-        <AppHeader role={user?.role} />
+      {navigationUser && <AppSidebar items={items} pathname={pathname} user={navigationUser} />}
+      <div className={navigationUser ? "lg:pl-64" : ""}>
+        <AppHeader role={activeUser?.role ?? (isProfessional ? "PROFESSIONAL" : "CLIENT")} />
         <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <button
             type="button"

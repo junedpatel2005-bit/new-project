@@ -78,6 +78,9 @@ export default function ProfessionalDashboard() {
       path: "/api/realtime",
       withCredentials: true,
       transports: ["websocket", "polling"],
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
     });
     const refreshDashboard = () => {
       void fetch("/api/v1/portal/professional-jobs", { cache: "no-store" })
@@ -94,10 +97,18 @@ export default function ProfessionalDashboard() {
     };
     socket.on("notification:new", refreshDashboard);
     socket.on("project:updated", refreshDashboard);
+    socket.on("proposal:new", refreshDashboard);
+
+    window.addEventListener("servio:notification", refreshDashboard);
+    window.addEventListener("servio:project-update", refreshDashboard);
+
     return () => {
       socket.off("notification:new", refreshDashboard);
       socket.off("project:updated", refreshDashboard);
+      socket.off("proposal:new", refreshDashboard);
       socket.disconnect();
+      window.removeEventListener("servio:notification", refreshDashboard);
+      window.removeEventListener("servio:project-update", refreshDashboard);
     };
   }, []);
 

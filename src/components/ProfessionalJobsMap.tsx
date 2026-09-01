@@ -41,13 +41,22 @@ export default function ProfessionalJobsMap({
 }) {
   const { isLoaded, isConfigured } = useGoogleMaps();
   const mapCenter = useMemo(() => ({ lat: center[0], lng: center[1] }), [center[0], center[1]]);
-  const [activeJobId, setActiveJobId] = useState<number | null>(null);
+  const [activeJobId, setActiveJobId] = useState<number | null>(() => (jobs.length === 1 ? jobs[0]?.id ?? null : null));
   const mapRef = useRef<google.maps.Map | null>(null);
-  const activeJob = jobs.find((job) => job.id === activeJobId) ?? null;
+  const activeJob = jobs.find((job) => job.id === activeJobId) ?? (jobs.length === 1 ? jobs[0] : null);
 
   useEffect(() => {
-    if (mapRef.current) mapRef.current.setCenter(mapCenter);
-  }, [mapCenter]);
+    if (jobs.length === 1 && jobs[0]) {
+      setActiveJobId(jobs[0].id);
+    }
+  }, [jobs]);
+
+  useEffect(() => {
+    if (mapRef.current) {
+      mapRef.current.setCenter(mapCenter);
+      mapRef.current.setZoom(jobs.length === 1 ? 13 : 6);
+    }
+  }, [mapCenter, jobs.length]);
 
   if (!isConfigured) {
     return (
@@ -65,10 +74,11 @@ export default function ProfessionalJobsMap({
     <GoogleMap
       onLoad={(map) => {
         mapRef.current = map;
+        map.setZoom(jobs.length === 1 ? 13 : 6);
       }}
       mapContainerStyle={{ width: "100%", height: "100%" }}
       center={mapCenter}
-      zoom={6}
+      zoom={jobs.length === 1 ? 13 : 6}
       options={{ mapTypeControl: false, streetViewControl: false }}
     >
       {jobs.map((job) => (

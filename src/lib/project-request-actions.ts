@@ -1,6 +1,7 @@
 import "server-only";
 import { db } from "@/lib/db";
 import { notifyUsers } from "@/lib/marketplace-notifications";
+import { emitRealtimeProjectUpdate, emitRealtimeProposalNew } from "@/lib/realtime";
 
 type Actor = { userId: number; role: "CLIENT" | "PROFESSIONAL" };
 type CounterInput = { bidAmount: number; duration: string; message: string };
@@ -38,6 +39,9 @@ export async function respondToProjectRequest(
       description: `Your request for ${job?.title ?? "the job"} was declined.`,
       href: `/job/${hireRequest.jobId}`,
     });
+    emitRealtimeProposalNew([hireRequest.clientId, hireRequest.professionalId], {
+      jobId: hireRequest.jobId,
+    });
     return { ok: true, status: "REJECTED" as const };
   }
 
@@ -73,6 +77,9 @@ export async function respondToProjectRequest(
       title: "New Counter-Offer",
       description: `New terms proposed for ${job?.title ?? "the job"}: ₹${counterInput.bidAmount.toLocaleString()}.`,
       href: `/job/${hireRequest.jobId}`,
+    });
+    emitRealtimeProposalNew([hireRequest.clientId, hireRequest.professionalId], {
+      jobId: hireRequest.jobId,
     });
     return { ok: true, request: updated };
   }
@@ -117,6 +124,13 @@ export async function respondToProjectRequest(
     title: "Request Accepted",
     description: `Your request for ${job.title ?? "the job"} was accepted.`,
     href: `/project/${tracking.id}/tracking`,
+  });
+
+  emitRealtimeProposalNew([hireRequest.clientId, hireRequest.professionalId], {
+    jobId: hireRequest.jobId,
+  });
+  emitRealtimeProjectUpdate([hireRequest.clientId, hireRequest.professionalId], {
+    projectId: tracking.id,
   });
 
   return { ok: true, project: tracking };

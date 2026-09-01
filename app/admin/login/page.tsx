@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { LockKeyhole, ShieldCheck } from "lucide-react";
+import { LockKeyhole, ShieldCheck, Loader2 } from "lucide-react";
 
 export default function AdminLogin() {
   const router = useRouter();
@@ -13,17 +13,25 @@ export default function AdminLogin() {
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
+    if (pending) return;
     setPending(true);
     setError("");
-    const response = await fetch("/api/v1/admin/login", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ username, password }),
-    });
-    const data = await response.json();
-    setPending(false);
-    if (!response.ok) return setError(data.error ?? "Unable to sign in.");
-    router.replace("/admin");
+    try {
+      const response = await fetch("/api/v1/admin/login", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        setPending(false);
+        return setError(data.error ?? "Unable to sign in.");
+      }
+      router.replace("/admin");
+    } catch {
+      setPending(false);
+      setError("Unable to sign in. Please check your connection.");
+    }
   }
 
   return (
@@ -63,8 +71,9 @@ export default function AdminLogin() {
                   type="text"
                   autoComplete="username"
                   value={username}
+                  disabled={pending}
                   onChange={(event) => setUsername(event.target.value)}
-                  className="mt-2 h-11 w-full rounded-xl border border-white/10 bg-[#070b16] px-3 text-sm outline-none focus:border-indigo-400"
+                  className="mt-2 h-11 w-full rounded-xl border border-white/10 bg-[#070b16] px-3 text-sm outline-none focus:border-indigo-400 disabled:opacity-50"
                   placeholder="admin"
                 />
               </label>
@@ -74,28 +83,38 @@ export default function AdminLogin() {
                   type="password"
                   autoComplete="current-password"
                   value={password}
+                  disabled={pending}
                   onChange={(event) => setPassword(event.target.value)}
-                  className="mt-2 h-11 w-full rounded-xl border border-white/10 bg-[#070b16] px-3 text-sm outline-none focus:border-indigo-400"
+                  className="mt-2 h-11 w-full rounded-xl border border-white/10 bg-[#070b16] px-3 text-sm outline-none focus:border-indigo-400 disabled:opacity-50"
                   placeholder="Password"
                 />
               </label>
               <button
                 type="button"
+                disabled={pending}
                 onClick={() => {
                   setUsername("seed-admin");
                   setPassword("ServioSeed#2026");
                   setError("");
                 }}
-                className="text-left text-xs font-medium text-indigo-300 hover:text-indigo-200"
+                className="text-left text-xs font-medium text-indigo-300 hover:text-indigo-200 disabled:opacity-50"
               >
                 Use demo admin credentials
               </button>
               {error && <p className="text-sm text-rose-400">{error}</p>}
               <button
+                type="submit"
                 disabled={pending}
-                className="h-11 w-full rounded-xl bg-indigo-500 text-sm font-semibold text-white transition hover:bg-indigo-400 disabled:opacity-60"
+                className="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-indigo-500 text-sm font-semibold text-white transition hover:bg-indigo-400 disabled:opacity-60"
               >
-                {pending ? "Signing in…" : "Open admin portal"}
+                {pending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin text-white" />
+                    Signing in…
+                  </>
+                ) : (
+                  "Open admin portal"
+                )}
               </button>
             </form>
           </div>

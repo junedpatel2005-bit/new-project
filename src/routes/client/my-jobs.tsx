@@ -112,6 +112,9 @@ export default function MyJobs() {
       path: "/api/realtime",
       withCredentials: true,
       transports: ["websocket", "polling"],
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
     });
     const refresh = () => {
       void fetch("/api/v1/client/jobs", { cache: "no-store" })
@@ -120,11 +123,19 @@ export default function MyJobs() {
         .catch(() => undefined);
     };
     socket.on("proposal:new", refresh);
+    socket.on("project:updated", refresh);
     socket.on("notification:new", refresh);
+
+    window.addEventListener("servio:notification", refresh);
+    window.addEventListener("servio:project-update", refresh);
+
     return () => {
       socket.off("proposal:new", refresh);
+      socket.off("project:updated", refresh);
       socket.off("notification:new", refresh);
       socket.disconnect();
+      window.removeEventListener("servio:notification", refresh);
+      window.removeEventListener("servio:project-update", refresh);
     };
   }, []);
 

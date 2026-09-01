@@ -235,15 +235,28 @@ export default function SharedProjectTrackingPage() {
       path: "/api/realtime",
       withCredentials: true,
       transports: ["websocket", "polling"],
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
     });
-    const onProjectUpdated = (payload: { projectId: number | string }) => {
-      if (String(payload.projectId) !== String(projectId)) return;
-      void refresh().catch(() => undefined);
+    const onProjectUpdated = (payload?: { projectId?: number | string }) => {
+      if (!payload?.projectId || String(payload.projectId) === String(projectId)) {
+        void refresh().catch(() => undefined);
+      }
     };
     socket.on("project:updated", onProjectUpdated);
+    socket.on("notification:new", () => void refresh().catch(() => undefined));
+
+    const onCustomNotification = () => void refresh().catch(() => undefined);
+    window.addEventListener("servio:notification", onCustomNotification);
+    window.addEventListener("servio:project-update", onCustomNotification);
+
     return () => {
       socket.off("project:updated", onProjectUpdated);
+      socket.off("notification:new");
       socket.disconnect();
+      window.removeEventListener("servio:notification", onCustomNotification);
+      window.removeEventListener("servio:project-update", onCustomNotification);
     };
   }, [projectId, refresh]);
 
@@ -257,7 +270,7 @@ export default function SharedProjectTrackingPage() {
         setApprovalWalletBalance(wallet.wallet?.balance ?? 0),
       )
       .catch(() => setApprovalWalletBalance(null));
-  }, [approvalMilestone]);
+  }, [approvalMilestone, data]);
 
   const action = async (
     key: string,

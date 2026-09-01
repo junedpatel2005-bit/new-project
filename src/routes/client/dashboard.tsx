@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { io } from "socket.io-client";
 import {
   ArrowRight,
   BellRing,
@@ -67,17 +68,53 @@ export default function Dashboard() {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"proposals" | "hireRequests">("proposals");
   const [phoneReminderDismissed, setPhoneReminderDismissed] = useState(false);
+
+  const loadDashboard = useCallback(async () => {
+    try {
+      const response = await fetch("/api/v1/dashboard", { cache: "no-store" });
+      if (!response.ok) throw new Error();
+      const nextData = (await response.json()) as DashboardData;
+      setData(nextData);
+      setError(null);
+    } catch {
+      setError("Sign in as a client to view your dashboard.");
+    }
+  }, []);
+
   useEffect(() => {
     setPhoneReminderDismissed(
       window.localStorage.getItem("servio-phone-reminder-dismissed") === "1",
     );
-    void fetch("/api/v1/dashboard", { cache: "no-store" })
-      .then((response) =>
-        response.ok ? (response.json() as Promise<DashboardData>) : Promise.reject(),
-      )
-      .then(setData)
-      .catch(() => setError("Sign in as a client to view your dashboard."));
-  }, []);
+    void loadDashboard();
+  }, [loadDashboard]);
+
+  useEffect(() => {
+    const socket = io({
+      path: "/api/realtime",
+      withCredentials: true,
+      transports: ["websocket", "polling"],
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+    });
+    const onUpdate = () => void loadDashboard();
+    socket.on("proposal:new", onUpdate);
+    socket.on("project:updated", onUpdate);
+    socket.on("notification:new", onUpdate);
+
+    const onCustomUpdate = () => void loadDashboard();
+    window.addEventListener("servio:notification", onCustomUpdate);
+    window.addEventListener("servio:project-update", onCustomUpdate);
+
+    return () => {
+      socket.off("proposal:new", onUpdate);
+      socket.off("project:updated", onUpdate);
+      socket.off("notification:new", onUpdate);
+      socket.disconnect();
+      window.removeEventListener("servio:notification", onCustomUpdate);
+      window.removeEventListener("servio:project-update", onCustomUpdate);
+    };
+  }, [loadDashboard]);
   return (
     <>
       {error ? (

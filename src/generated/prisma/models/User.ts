@@ -28,6 +28,7 @@ export type AggregateUser = {
 
 export type UserAvgAggregateOutputType = {
   id: number | null
+  professionalCategoryId: number | null
   experienceYears: number | null
   hourlyRate: number | null
   fixedRate: number | null
@@ -40,6 +41,7 @@ export type UserAvgAggregateOutputType = {
 
 export type UserSumAggregateOutputType = {
   id: number | null
+  professionalCategoryId: number | null
   experienceYears: number | null
   hourlyRate: number | null
   fixedRate: number | null
@@ -68,6 +70,7 @@ export type UserMinAggregateOutputType = {
   companyDescription: string | null
   address: string | null
   professionalCategory: string | null
+  professionalCategoryId: number | null
   professionalCity: string | null
   professionalState: string | null
   professionalDistrict: string | null
@@ -123,6 +126,7 @@ export type UserMaxAggregateOutputType = {
   companyDescription: string | null
   address: string | null
   professionalCategory: string | null
+  professionalCategoryId: number | null
   professionalCity: string | null
   professionalState: string | null
   professionalDistrict: string | null
@@ -178,6 +182,7 @@ export type UserCountAggregateOutputType = {
   companyDescription: number
   address: number
   professionalCategory: number
+  professionalCategoryId: number
   professionalCity: number
   professionalState: number
   professionalDistrict: number
@@ -219,6 +224,7 @@ export type UserCountAggregateOutputType = {
 
 export type UserAvgAggregateInputType = {
   id?: true
+  professionalCategoryId?: true
   experienceYears?: true
   hourlyRate?: true
   fixedRate?: true
@@ -231,6 +237,7 @@ export type UserAvgAggregateInputType = {
 
 export type UserSumAggregateInputType = {
   id?: true
+  professionalCategoryId?: true
   experienceYears?: true
   hourlyRate?: true
   fixedRate?: true
@@ -259,6 +266,7 @@ export type UserMinAggregateInputType = {
   companyDescription?: true
   address?: true
   professionalCategory?: true
+  professionalCategoryId?: true
   professionalCity?: true
   professionalState?: true
   professionalDistrict?: true
@@ -314,6 +322,7 @@ export type UserMaxAggregateInputType = {
   companyDescription?: true
   address?: true
   professionalCategory?: true
+  professionalCategoryId?: true
   professionalCity?: true
   professionalState?: true
   professionalDistrict?: true
@@ -369,6 +378,7 @@ export type UserCountAggregateInputType = {
   companyDescription?: true
   address?: true
   professionalCategory?: true
+  professionalCategoryId?: true
   professionalCity?: true
   professionalState?: true
   professionalDistrict?: true
@@ -511,6 +521,7 @@ export type UserGroupByOutputType = {
   companyDescription: string | null
   address: string | null
   professionalCategory: string | null
+  professionalCategoryId: number | null
   professionalCity: string | null
   professionalState: string | null
   professionalDistrict: string | null
@@ -589,6 +600,7 @@ export type UserWhereInput = {
   companyDescription?: Prisma.StringNullableFilter<"User"> | string | null
   address?: Prisma.StringNullableFilter<"User"> | string | null
   professionalCategory?: Prisma.StringNullableFilter<"User"> | string | null
+  professionalCategoryId?: Prisma.IntNullableFilter<"User"> | number | null
   professionalCity?: Prisma.StringNullableFilter<"User"> | string | null
   professionalState?: Prisma.StringNullableFilter<"User"> | string | null
   professionalDistrict?: Prisma.StringNullableFilter<"User"> | string | null
@@ -631,6 +643,7 @@ export type UserWhereInput = {
   verification?: Prisma.XOR<Prisma.ProfessionalVerificationNullableScalarRelationFilter, Prisma.ProfessionalVerificationWhereInput> | null
   personaVerifications?: Prisma.PersonaVerificationListRelationFilter
   services?: Prisma.ServiceListRelationFilter
+  professionalCategoryRecord?: Prisma.XOR<Prisma.ServiceCategoryNullableScalarRelationFilter, Prisma.ServiceCategoryWhereInput> | null
   auditLogs?: Prisma.AuditLogListRelationFilter
   clientPayments?: Prisma.PaymentListRelationFilter
   professionalPayments?: Prisma.PaymentListRelationFilter
@@ -659,6 +672,7 @@ export type UserOrderByWithRelationInput = {
   companyDescription?: Prisma.SortOrderInput | Prisma.SortOrder
   address?: Prisma.SortOrderInput | Prisma.SortOrder
   professionalCategory?: Prisma.SortOrderInput | Prisma.SortOrder
+  professionalCategoryId?: Prisma.SortOrderInput | Prisma.SortOrder
   professionalCity?: Prisma.SortOrderInput | Prisma.SortOrder
   professionalState?: Prisma.SortOrderInput | Prisma.SortOrder
   professionalDistrict?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -701,6 +715,7 @@ export type UserOrderByWithRelationInput = {
   verification?: Prisma.ProfessionalVerificationOrderByWithRelationInput
   personaVerifications?: Prisma.PersonaVerificationOrderByRelationAggregateInput
   services?: Prisma.ServiceOrderByRelationAggregateInput
+  professionalCategoryRecord?: Prisma.ServiceCategoryOrderByWithRelationInput
   auditLogs?: Prisma.AuditLogOrderByRelationAggregateInput
   clientPayments?: Prisma.PaymentOrderByRelationAggregateInput
   professionalPayments?: Prisma.PaymentOrderByRelationAggregateInput
@@ -733,6 +748,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   companyDescription?: Prisma.StringNullableFilter<"User"> | string | null
   address?: Prisma.StringNullableFilter<"User"> | string | null
   professionalCategory?: Prisma.StringNullableFilter<"User"> | string | null
+  professionalCategoryId?: Prisma.IntNullableFilter<"User"> | number | null
   professionalCity?: Prisma.StringNullableFilter<"User"> | string | null
   professionalState?: Prisma.StringNullableFilter<"User"> | string | null
   professionalDistrict?: Prisma.StringNullableFilter<"User"> | string | null
@@ -774,6 +790,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   verification?: Prisma.XOR<Prisma.ProfessionalVerificationNullableScalarRelationFilter, Prisma.ProfessionalVerificationWhereInput> | null
   personaVerifications?: Prisma.PersonaVerificationListRelationFilter
   services?: Prisma.ServiceListRelationFilter
+  professionalCategoryRecord?: Prisma.XOR<Prisma.ServiceCategoryNullableScalarRelationFilter, Prisma.ServiceCategoryWhereInput> | null
   auditLogs?: Prisma.AuditLogListRelationFilter
   clientPayments?: Prisma.PaymentListRelationFilter
   professionalPayments?: Prisma.PaymentListRelationFilter
@@ -802,6 +819,7 @@ export type UserOrderByWithAggregationInput = {
   companyDescription?: Prisma.SortOrderInput | Prisma.SortOrder
   address?: Prisma.SortOrderInput | Prisma.SortOrder
   professionalCategory?: Prisma.SortOrderInput | Prisma.SortOrder
+  professionalCategoryId?: Prisma.SortOrderInput | Prisma.SortOrder
   professionalCity?: Prisma.SortOrderInput | Prisma.SortOrder
   professionalState?: Prisma.SortOrderInput | Prisma.SortOrder
   professionalDistrict?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -865,6 +883,7 @@ export type UserScalarWhereWithAggregatesInput = {
   companyDescription?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   address?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   professionalCategory?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  professionalCategoryId?: Prisma.IntNullableWithAggregatesFilter<"User"> | number | null
   professionalCity?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   professionalState?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   professionalDistrict?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
@@ -961,6 +980,7 @@ export type UserCreateInput = {
   verification?: Prisma.ProfessionalVerificationCreateNestedOneWithoutUserInput
   personaVerifications?: Prisma.PersonaVerificationCreateNestedManyWithoutUserInput
   services?: Prisma.ServiceCreateNestedManyWithoutProfessionalInput
+  professionalCategoryRecord?: Prisma.ServiceCategoryCreateNestedOneWithoutProfessionalUsersInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   clientPayments?: Prisma.PaymentCreateNestedManyWithoutClientInput
   professionalPayments?: Prisma.PaymentCreateNestedManyWithoutProfessionalInput
@@ -989,6 +1009,7 @@ export type UserUncheckedCreateInput = {
   companyDescription?: string | null
   address?: string | null
   professionalCategory?: string | null
+  professionalCategoryId?: number | null
   professionalCity?: string | null
   professionalState?: string | null
   professionalDistrict?: string | null
@@ -1100,6 +1121,7 @@ export type UserUpdateInput = {
   verification?: Prisma.ProfessionalVerificationUpdateOneWithoutUserNestedInput
   personaVerifications?: Prisma.PersonaVerificationUpdateManyWithoutUserNestedInput
   services?: Prisma.ServiceUpdateManyWithoutProfessionalNestedInput
+  professionalCategoryRecord?: Prisma.ServiceCategoryUpdateOneWithoutProfessionalUsersNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   clientPayments?: Prisma.PaymentUpdateManyWithoutClientNestedInput
   professionalPayments?: Prisma.PaymentUpdateManyWithoutProfessionalNestedInput
@@ -1128,6 +1150,7 @@ export type UserUncheckedUpdateInput = {
   companyDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalCategoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1198,6 +1221,7 @@ export type UserCreateManyInput = {
   companyDescription?: string | null
   address?: string | null
   professionalCategory?: string | null
+  professionalCategoryId?: number | null
   professionalCity?: string | null
   professionalState?: string | null
   professionalDistrict?: string | null
@@ -1307,6 +1331,7 @@ export type UserUncheckedUpdateManyInput = {
   companyDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalCategoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1344,6 +1369,16 @@ export type UserUncheckedUpdateManyInput = {
   projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
+export type UserListRelationFilter = {
+  every?: Prisma.UserWhereInput
+  some?: Prisma.UserWhereInput
+  none?: Prisma.UserWhereInput
+}
+
+export type UserOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
+}
+
 export type UserCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   role?: Prisma.SortOrder
@@ -1362,6 +1397,7 @@ export type UserCountOrderByAggregateInput = {
   companyDescription?: Prisma.SortOrder
   address?: Prisma.SortOrder
   professionalCategory?: Prisma.SortOrder
+  professionalCategoryId?: Prisma.SortOrder
   professionalCity?: Prisma.SortOrder
   professionalState?: Prisma.SortOrder
   professionalDistrict?: Prisma.SortOrder
@@ -1401,6 +1437,7 @@ export type UserCountOrderByAggregateInput = {
 
 export type UserAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  professionalCategoryId?: Prisma.SortOrder
   experienceYears?: Prisma.SortOrder
   hourlyRate?: Prisma.SortOrder
   fixedRate?: Prisma.SortOrder
@@ -1429,6 +1466,7 @@ export type UserMaxOrderByAggregateInput = {
   companyDescription?: Prisma.SortOrder
   address?: Prisma.SortOrder
   professionalCategory?: Prisma.SortOrder
+  professionalCategoryId?: Prisma.SortOrder
   professionalCity?: Prisma.SortOrder
   professionalState?: Prisma.SortOrder
   professionalDistrict?: Prisma.SortOrder
@@ -1484,6 +1522,7 @@ export type UserMinOrderByAggregateInput = {
   companyDescription?: Prisma.SortOrder
   address?: Prisma.SortOrder
   professionalCategory?: Prisma.SortOrder
+  professionalCategoryId?: Prisma.SortOrder
   professionalCity?: Prisma.SortOrder
   professionalState?: Prisma.SortOrder
   professionalDistrict?: Prisma.SortOrder
@@ -1523,6 +1562,7 @@ export type UserMinOrderByAggregateInput = {
 
 export type UserSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  professionalCategoryId?: Prisma.SortOrder
   experienceYears?: Prisma.SortOrder
   hourlyRate?: Prisma.SortOrder
   fixedRate?: Prisma.SortOrder
@@ -1541,6 +1581,48 @@ export type UserScalarRelationFilter = {
 export type UserNullableScalarRelationFilter = {
   is?: Prisma.UserWhereInput | null
   isNot?: Prisma.UserWhereInput | null
+}
+
+export type UserCreateNestedManyWithoutProfessionalCategoryRecordInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutProfessionalCategoryRecordInput, Prisma.UserUncheckedCreateWithoutProfessionalCategoryRecordInput> | Prisma.UserCreateWithoutProfessionalCategoryRecordInput[] | Prisma.UserUncheckedCreateWithoutProfessionalCategoryRecordInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutProfessionalCategoryRecordInput | Prisma.UserCreateOrConnectWithoutProfessionalCategoryRecordInput[]
+  createMany?: Prisma.UserCreateManyProfessionalCategoryRecordInputEnvelope
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+}
+
+export type UserUncheckedCreateNestedManyWithoutProfessionalCategoryRecordInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutProfessionalCategoryRecordInput, Prisma.UserUncheckedCreateWithoutProfessionalCategoryRecordInput> | Prisma.UserCreateWithoutProfessionalCategoryRecordInput[] | Prisma.UserUncheckedCreateWithoutProfessionalCategoryRecordInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutProfessionalCategoryRecordInput | Prisma.UserCreateOrConnectWithoutProfessionalCategoryRecordInput[]
+  createMany?: Prisma.UserCreateManyProfessionalCategoryRecordInputEnvelope
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+}
+
+export type UserUpdateManyWithoutProfessionalCategoryRecordNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutProfessionalCategoryRecordInput, Prisma.UserUncheckedCreateWithoutProfessionalCategoryRecordInput> | Prisma.UserCreateWithoutProfessionalCategoryRecordInput[] | Prisma.UserUncheckedCreateWithoutProfessionalCategoryRecordInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutProfessionalCategoryRecordInput | Prisma.UserCreateOrConnectWithoutProfessionalCategoryRecordInput[]
+  upsert?: Prisma.UserUpsertWithWhereUniqueWithoutProfessionalCategoryRecordInput | Prisma.UserUpsertWithWhereUniqueWithoutProfessionalCategoryRecordInput[]
+  createMany?: Prisma.UserCreateManyProfessionalCategoryRecordInputEnvelope
+  set?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  disconnect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  delete?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  update?: Prisma.UserUpdateWithWhereUniqueWithoutProfessionalCategoryRecordInput | Prisma.UserUpdateWithWhereUniqueWithoutProfessionalCategoryRecordInput[]
+  updateMany?: Prisma.UserUpdateManyWithWhereWithoutProfessionalCategoryRecordInput | Prisma.UserUpdateManyWithWhereWithoutProfessionalCategoryRecordInput[]
+  deleteMany?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
+}
+
+export type UserUncheckedUpdateManyWithoutProfessionalCategoryRecordNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutProfessionalCategoryRecordInput, Prisma.UserUncheckedCreateWithoutProfessionalCategoryRecordInput> | Prisma.UserCreateWithoutProfessionalCategoryRecordInput[] | Prisma.UserUncheckedCreateWithoutProfessionalCategoryRecordInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutProfessionalCategoryRecordInput | Prisma.UserCreateOrConnectWithoutProfessionalCategoryRecordInput[]
+  upsert?: Prisma.UserUpsertWithWhereUniqueWithoutProfessionalCategoryRecordInput | Prisma.UserUpsertWithWhereUniqueWithoutProfessionalCategoryRecordInput[]
+  createMany?: Prisma.UserCreateManyProfessionalCategoryRecordInputEnvelope
+  set?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  disconnect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  delete?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  update?: Prisma.UserUpdateWithWhereUniqueWithoutProfessionalCategoryRecordInput | Prisma.UserUpdateWithWhereUniqueWithoutProfessionalCategoryRecordInput[]
+  updateMany?: Prisma.UserUpdateManyWithWhereWithoutProfessionalCategoryRecordInput | Prisma.UserUpdateManyWithWhereWithoutProfessionalCategoryRecordInput[]
+  deleteMany?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
 }
 
 export type EnumUserRoleFieldUpdateOperationsInput = {
@@ -1787,7 +1869,7 @@ export type UserUpdateOneRequiredWithoutServicesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutServicesInput, Prisma.UserUpdateWithoutServicesInput>, Prisma.UserUncheckedUpdateWithoutServicesInput>
 }
 
-export type UserCreateWithoutSessionsInput = {
+export type UserCreateWithoutProfessionalCategoryRecordInput = {
   role?: $Enums.UserRole
   firstName: string
   lastName: string
@@ -1853,6 +1935,231 @@ export type UserCreateWithoutSessionsInput = {
   professionalProjectRequests?: Prisma.ProjectRequestCreateNestedManyWithoutProfessionalInput
   clientProjectTrackings?: Prisma.ProjectTrackingCreateNestedManyWithoutClientInput
   professionalProjectTrackings?: Prisma.ProjectTrackingCreateNestedManyWithoutProfessionalInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutProfessionalCategoryRecordInput = {
+  id?: number
+  role?: $Enums.UserRole
+  firstName: string
+  lastName: string
+  email: string
+  username?: string | null
+  phone?: string | null
+  passwordHash?: string | null
+  googleId?: string | null
+  avatarUrl?: string | null
+  companyName?: string | null
+  companyWebsite?: string | null
+  industry?: string | null
+  teamSize?: string | null
+  companyDescription?: string | null
+  address?: string | null
+  professionalCategory?: string | null
+  professionalCity?: string | null
+  professionalState?: string | null
+  professionalDistrict?: string | null
+  professionalSkillsJson?: string | null
+  experienceYears?: number | null
+  hourlyRate?: number | null
+  fixedRate?: number | null
+  portfolioUrl?: string | null
+  workPhotosJson?: string | null
+  certificationsJson?: string | null
+  tradeLicenseUrl?: string | null
+  serviceArea?: string | null
+  workMode?: string
+  serviceRadiusKm?: number | null
+  averageRating?: number
+  reviewCount?: number
+  isVerified?: boolean
+  availabilityStatus?: string
+  savedLocationsJson?: string | null
+  hiringNeedsJson?: string | null
+  authProvider?: string
+  isActive?: boolean
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  professionalLatitude?: number | null
+  professionalLongitude?: number | null
+  biometricEnabled?: boolean
+  biometricType?: string | null
+  browserNotificationsEnabled?: boolean
+  emailNotificationsEnabled?: boolean
+  razorpayAccountId?: string | null
+  emailVerifiedAt?: Date | string | null
+  phoneVerifiedAt?: Date | string | null
+  projectActivityNotificationsEnabled?: boolean
+  clientJobs?: Prisma.ClientJobUncheckedCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  clientProfiles?: Prisma.ClientProfileUncheckedCreateNestedManyWithoutUserInput
+  favoriteJobs?: Prisma.FavoriteJobUncheckedCreateNestedManyWithoutUserInput
+  verification?: Prisma.ProfessionalVerificationUncheckedCreateNestedOneWithoutUserInput
+  personaVerifications?: Prisma.PersonaVerificationUncheckedCreateNestedManyWithoutUserInput
+  services?: Prisma.ServiceUncheckedCreateNestedManyWithoutProfessionalInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  clientPayments?: Prisma.PaymentUncheckedCreateNestedManyWithoutClientInput
+  professionalPayments?: Prisma.PaymentUncheckedCreateNestedManyWithoutProfessionalInput
+  clientProjectRequests?: Prisma.ProjectRequestUncheckedCreateNestedManyWithoutClientInput
+  professionalProjectRequests?: Prisma.ProjectRequestUncheckedCreateNestedManyWithoutProfessionalInput
+  clientProjectTrackings?: Prisma.ProjectTrackingUncheckedCreateNestedManyWithoutClientInput
+  professionalProjectTrackings?: Prisma.ProjectTrackingUncheckedCreateNestedManyWithoutProfessionalInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutProfessionalCategoryRecordInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutProfessionalCategoryRecordInput, Prisma.UserUncheckedCreateWithoutProfessionalCategoryRecordInput>
+}
+
+export type UserCreateManyProfessionalCategoryRecordInputEnvelope = {
+  data: Prisma.UserCreateManyProfessionalCategoryRecordInput | Prisma.UserCreateManyProfessionalCategoryRecordInput[]
+  skipDuplicates?: boolean
+}
+
+export type UserUpsertWithWhereUniqueWithoutProfessionalCategoryRecordInput = {
+  where: Prisma.UserWhereUniqueInput
+  update: Prisma.XOR<Prisma.UserUpdateWithoutProfessionalCategoryRecordInput, Prisma.UserUncheckedUpdateWithoutProfessionalCategoryRecordInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutProfessionalCategoryRecordInput, Prisma.UserUncheckedCreateWithoutProfessionalCategoryRecordInput>
+}
+
+export type UserUpdateWithWhereUniqueWithoutProfessionalCategoryRecordInput = {
+  where: Prisma.UserWhereUniqueInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutProfessionalCategoryRecordInput, Prisma.UserUncheckedUpdateWithoutProfessionalCategoryRecordInput>
+}
+
+export type UserUpdateManyWithWhereWithoutProfessionalCategoryRecordInput = {
+  where: Prisma.UserScalarWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateManyMutationInput, Prisma.UserUncheckedUpdateManyWithoutProfessionalCategoryRecordInput>
+}
+
+export type UserScalarWhereInput = {
+  AND?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
+  OR?: Prisma.UserScalarWhereInput[]
+  NOT?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
+  id?: Prisma.IntFilter<"User"> | number
+  role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole
+  firstName?: Prisma.StringFilter<"User"> | string
+  lastName?: Prisma.StringFilter<"User"> | string
+  email?: Prisma.StringFilter<"User"> | string
+  username?: Prisma.StringNullableFilter<"User"> | string | null
+  phone?: Prisma.StringNullableFilter<"User"> | string | null
+  passwordHash?: Prisma.StringNullableFilter<"User"> | string | null
+  googleId?: Prisma.StringNullableFilter<"User"> | string | null
+  avatarUrl?: Prisma.StringNullableFilter<"User"> | string | null
+  companyName?: Prisma.StringNullableFilter<"User"> | string | null
+  companyWebsite?: Prisma.StringNullableFilter<"User"> | string | null
+  industry?: Prisma.StringNullableFilter<"User"> | string | null
+  teamSize?: Prisma.StringNullableFilter<"User"> | string | null
+  companyDescription?: Prisma.StringNullableFilter<"User"> | string | null
+  address?: Prisma.StringNullableFilter<"User"> | string | null
+  professionalCategory?: Prisma.StringNullableFilter<"User"> | string | null
+  professionalCategoryId?: Prisma.IntNullableFilter<"User"> | number | null
+  professionalCity?: Prisma.StringNullableFilter<"User"> | string | null
+  professionalState?: Prisma.StringNullableFilter<"User"> | string | null
+  professionalDistrict?: Prisma.StringNullableFilter<"User"> | string | null
+  professionalSkillsJson?: Prisma.StringNullableFilter<"User"> | string | null
+  experienceYears?: Prisma.IntNullableFilter<"User"> | number | null
+  hourlyRate?: Prisma.IntNullableFilter<"User"> | number | null
+  fixedRate?: Prisma.IntNullableFilter<"User"> | number | null
+  portfolioUrl?: Prisma.StringNullableFilter<"User"> | string | null
+  workPhotosJson?: Prisma.StringNullableFilter<"User"> | string | null
+  certificationsJson?: Prisma.StringNullableFilter<"User"> | string | null
+  tradeLicenseUrl?: Prisma.StringNullableFilter<"User"> | string | null
+  serviceArea?: Prisma.StringNullableFilter<"User"> | string | null
+  workMode?: Prisma.StringFilter<"User"> | string
+  serviceRadiusKm?: Prisma.IntNullableFilter<"User"> | number | null
+  averageRating?: Prisma.FloatFilter<"User"> | number
+  reviewCount?: Prisma.IntFilter<"User"> | number
+  isVerified?: Prisma.BoolFilter<"User"> | boolean
+  availabilityStatus?: Prisma.StringFilter<"User"> | string
+  savedLocationsJson?: Prisma.StringNullableFilter<"User"> | string | null
+  hiringNeedsJson?: Prisma.StringNullableFilter<"User"> | string | null
+  authProvider?: Prisma.StringFilter<"User"> | string
+  isActive?: Prisma.BoolFilter<"User"> | boolean
+  lastLoginAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
+  professionalLatitude?: Prisma.FloatNullableFilter<"User"> | number | null
+  professionalLongitude?: Prisma.FloatNullableFilter<"User"> | number | null
+  biometricEnabled?: Prisma.BoolFilter<"User"> | boolean
+  biometricType?: Prisma.StringNullableFilter<"User"> | string | null
+  browserNotificationsEnabled?: Prisma.BoolFilter<"User"> | boolean
+  emailNotificationsEnabled?: Prisma.BoolFilter<"User"> | boolean
+  razorpayAccountId?: Prisma.StringNullableFilter<"User"> | string | null
+  emailVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  phoneVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  projectActivityNotificationsEnabled?: Prisma.BoolFilter<"User"> | boolean
+}
+
+export type UserCreateWithoutSessionsInput = {
+  role?: $Enums.UserRole
+  firstName: string
+  lastName: string
+  email: string
+  username?: string | null
+  phone?: string | null
+  passwordHash?: string | null
+  googleId?: string | null
+  avatarUrl?: string | null
+  companyName?: string | null
+  companyWebsite?: string | null
+  industry?: string | null
+  teamSize?: string | null
+  companyDescription?: string | null
+  address?: string | null
+  professionalCategory?: string | null
+  professionalCity?: string | null
+  professionalState?: string | null
+  professionalDistrict?: string | null
+  professionalSkillsJson?: string | null
+  experienceYears?: number | null
+  hourlyRate?: number | null
+  fixedRate?: number | null
+  portfolioUrl?: string | null
+  workPhotosJson?: string | null
+  certificationsJson?: string | null
+  tradeLicenseUrl?: string | null
+  serviceArea?: string | null
+  workMode?: string
+  serviceRadiusKm?: number | null
+  averageRating?: number
+  reviewCount?: number
+  isVerified?: boolean
+  availabilityStatus?: string
+  savedLocationsJson?: string | null
+  hiringNeedsJson?: string | null
+  authProvider?: string
+  isActive?: boolean
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  professionalLatitude?: number | null
+  professionalLongitude?: number | null
+  biometricEnabled?: boolean
+  biometricType?: string | null
+  browserNotificationsEnabled?: boolean
+  emailNotificationsEnabled?: boolean
+  razorpayAccountId?: string | null
+  emailVerifiedAt?: Date | string | null
+  phoneVerifiedAt?: Date | string | null
+  projectActivityNotificationsEnabled?: boolean
+  clientJobs?: Prisma.ClientJobCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  clientProfiles?: Prisma.ClientProfileCreateNestedManyWithoutUserInput
+  favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutUserInput
+  verification?: Prisma.ProfessionalVerificationCreateNestedOneWithoutUserInput
+  personaVerifications?: Prisma.PersonaVerificationCreateNestedManyWithoutUserInput
+  services?: Prisma.ServiceCreateNestedManyWithoutProfessionalInput
+  professionalCategoryRecord?: Prisma.ServiceCategoryCreateNestedOneWithoutProfessionalUsersInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  clientPayments?: Prisma.PaymentCreateNestedManyWithoutClientInput
+  professionalPayments?: Prisma.PaymentCreateNestedManyWithoutProfessionalInput
+  clientProjectRequests?: Prisma.ProjectRequestCreateNestedManyWithoutClientInput
+  professionalProjectRequests?: Prisma.ProjectRequestCreateNestedManyWithoutProfessionalInput
+  clientProjectTrackings?: Prisma.ProjectTrackingCreateNestedManyWithoutClientInput
+  professionalProjectTrackings?: Prisma.ProjectTrackingCreateNestedManyWithoutProfessionalInput
 }
 
 export type UserUncheckedCreateWithoutSessionsInput = {
@@ -1873,6 +2180,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   companyDescription?: string | null
   address?: string | null
   professionalCategory?: string | null
+  professionalCategoryId?: number | null
   professionalCity?: string | null
   professionalState?: string | null
   professionalDistrict?: string | null
@@ -1999,6 +2307,7 @@ export type UserUpdateWithoutSessionsInput = {
   verification?: Prisma.ProfessionalVerificationUpdateOneWithoutUserNestedInput
   personaVerifications?: Prisma.PersonaVerificationUpdateManyWithoutUserNestedInput
   services?: Prisma.ServiceUpdateManyWithoutProfessionalNestedInput
+  professionalCategoryRecord?: Prisma.ServiceCategoryUpdateOneWithoutProfessionalUsersNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   clientPayments?: Prisma.PaymentUpdateManyWithoutClientNestedInput
   professionalPayments?: Prisma.PaymentUpdateManyWithoutProfessionalNestedInput
@@ -2026,6 +2335,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   companyDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalCategoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2135,6 +2445,7 @@ export type UserCreateWithoutClientProfilesInput = {
   verification?: Prisma.ProfessionalVerificationCreateNestedOneWithoutUserInput
   personaVerifications?: Prisma.PersonaVerificationCreateNestedManyWithoutUserInput
   services?: Prisma.ServiceCreateNestedManyWithoutProfessionalInput
+  professionalCategoryRecord?: Prisma.ServiceCategoryCreateNestedOneWithoutProfessionalUsersInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   clientPayments?: Prisma.PaymentCreateNestedManyWithoutClientInput
   professionalPayments?: Prisma.PaymentCreateNestedManyWithoutProfessionalInput
@@ -2163,6 +2474,7 @@ export type UserUncheckedCreateWithoutClientProfilesInput = {
   companyDescription?: string | null
   address?: string | null
   professionalCategory?: string | null
+  professionalCategoryId?: number | null
   professionalCity?: string | null
   professionalState?: string | null
   professionalDistrict?: string | null
@@ -2288,6 +2600,7 @@ export type UserUpdateWithoutClientProfilesInput = {
   verification?: Prisma.ProfessionalVerificationUpdateOneWithoutUserNestedInput
   personaVerifications?: Prisma.PersonaVerificationUpdateManyWithoutUserNestedInput
   services?: Prisma.ServiceUpdateManyWithoutProfessionalNestedInput
+  professionalCategoryRecord?: Prisma.ServiceCategoryUpdateOneWithoutProfessionalUsersNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   clientPayments?: Prisma.PaymentUpdateManyWithoutClientNestedInput
   professionalPayments?: Prisma.PaymentUpdateManyWithoutProfessionalNestedInput
@@ -2316,6 +2629,7 @@ export type UserUncheckedUpdateWithoutClientProfilesInput = {
   companyDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalCategoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2425,6 +2739,7 @@ export type UserCreateWithoutClientJobsInput = {
   verification?: Prisma.ProfessionalVerificationCreateNestedOneWithoutUserInput
   personaVerifications?: Prisma.PersonaVerificationCreateNestedManyWithoutUserInput
   services?: Prisma.ServiceCreateNestedManyWithoutProfessionalInput
+  professionalCategoryRecord?: Prisma.ServiceCategoryCreateNestedOneWithoutProfessionalUsersInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   clientPayments?: Prisma.PaymentCreateNestedManyWithoutClientInput
   professionalPayments?: Prisma.PaymentCreateNestedManyWithoutProfessionalInput
@@ -2453,6 +2768,7 @@ export type UserUncheckedCreateWithoutClientJobsInput = {
   companyDescription?: string | null
   address?: string | null
   professionalCategory?: string | null
+  professionalCategoryId?: number | null
   professionalCity?: string | null
   professionalState?: string | null
   professionalDistrict?: string | null
@@ -2578,6 +2894,7 @@ export type UserUpdateWithoutClientJobsInput = {
   verification?: Prisma.ProfessionalVerificationUpdateOneWithoutUserNestedInput
   personaVerifications?: Prisma.PersonaVerificationUpdateManyWithoutUserNestedInput
   services?: Prisma.ServiceUpdateManyWithoutProfessionalNestedInput
+  professionalCategoryRecord?: Prisma.ServiceCategoryUpdateOneWithoutProfessionalUsersNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   clientPayments?: Prisma.PaymentUpdateManyWithoutClientNestedInput
   professionalPayments?: Prisma.PaymentUpdateManyWithoutProfessionalNestedInput
@@ -2606,6 +2923,7 @@ export type UserUncheckedUpdateWithoutClientJobsInput = {
   companyDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalCategoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2715,6 +3033,7 @@ export type UserCreateWithoutFavoriteJobsInput = {
   verification?: Prisma.ProfessionalVerificationCreateNestedOneWithoutUserInput
   personaVerifications?: Prisma.PersonaVerificationCreateNestedManyWithoutUserInput
   services?: Prisma.ServiceCreateNestedManyWithoutProfessionalInput
+  professionalCategoryRecord?: Prisma.ServiceCategoryCreateNestedOneWithoutProfessionalUsersInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   clientPayments?: Prisma.PaymentCreateNestedManyWithoutClientInput
   professionalPayments?: Prisma.PaymentCreateNestedManyWithoutProfessionalInput
@@ -2743,6 +3062,7 @@ export type UserUncheckedCreateWithoutFavoriteJobsInput = {
   companyDescription?: string | null
   address?: string | null
   professionalCategory?: string | null
+  professionalCategoryId?: number | null
   professionalCity?: string | null
   professionalState?: string | null
   professionalDistrict?: string | null
@@ -2868,6 +3188,7 @@ export type UserUpdateWithoutFavoriteJobsInput = {
   verification?: Prisma.ProfessionalVerificationUpdateOneWithoutUserNestedInput
   personaVerifications?: Prisma.PersonaVerificationUpdateManyWithoutUserNestedInput
   services?: Prisma.ServiceUpdateManyWithoutProfessionalNestedInput
+  professionalCategoryRecord?: Prisma.ServiceCategoryUpdateOneWithoutProfessionalUsersNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   clientPayments?: Prisma.PaymentUpdateManyWithoutClientNestedInput
   professionalPayments?: Prisma.PaymentUpdateManyWithoutProfessionalNestedInput
@@ -2896,6 +3217,7 @@ export type UserUncheckedUpdateWithoutFavoriteJobsInput = {
   companyDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalCategoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3006,6 +3328,7 @@ export type UserCreateWithoutClientProjectRequestsInput = {
   verification?: Prisma.ProfessionalVerificationCreateNestedOneWithoutUserInput
   personaVerifications?: Prisma.PersonaVerificationCreateNestedManyWithoutUserInput
   services?: Prisma.ServiceCreateNestedManyWithoutProfessionalInput
+  professionalCategoryRecord?: Prisma.ServiceCategoryCreateNestedOneWithoutProfessionalUsersInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   clientPayments?: Prisma.PaymentCreateNestedManyWithoutClientInput
   professionalPayments?: Prisma.PaymentCreateNestedManyWithoutProfessionalInput
@@ -3033,6 +3356,7 @@ export type UserUncheckedCreateWithoutClientProjectRequestsInput = {
   companyDescription?: string | null
   address?: string | null
   professionalCategory?: string | null
+  professionalCategoryId?: number | null
   professionalCity?: string | null
   professionalState?: string | null
   professionalDistrict?: string | null
@@ -3148,6 +3472,7 @@ export type UserCreateWithoutProfessionalProjectRequestsInput = {
   verification?: Prisma.ProfessionalVerificationCreateNestedOneWithoutUserInput
   personaVerifications?: Prisma.PersonaVerificationCreateNestedManyWithoutUserInput
   services?: Prisma.ServiceCreateNestedManyWithoutProfessionalInput
+  professionalCategoryRecord?: Prisma.ServiceCategoryCreateNestedOneWithoutProfessionalUsersInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   clientPayments?: Prisma.PaymentCreateNestedManyWithoutClientInput
   professionalPayments?: Prisma.PaymentCreateNestedManyWithoutProfessionalInput
@@ -3175,6 +3500,7 @@ export type UserUncheckedCreateWithoutProfessionalProjectRequestsInput = {
   companyDescription?: string | null
   address?: string | null
   professionalCategory?: string | null
+  professionalCategoryId?: number | null
   professionalCity?: string | null
   professionalState?: string | null
   professionalDistrict?: string | null
@@ -3301,6 +3627,7 @@ export type UserUpdateWithoutClientProjectRequestsInput = {
   verification?: Prisma.ProfessionalVerificationUpdateOneWithoutUserNestedInput
   personaVerifications?: Prisma.PersonaVerificationUpdateManyWithoutUserNestedInput
   services?: Prisma.ServiceUpdateManyWithoutProfessionalNestedInput
+  professionalCategoryRecord?: Prisma.ServiceCategoryUpdateOneWithoutProfessionalUsersNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   clientPayments?: Prisma.PaymentUpdateManyWithoutClientNestedInput
   professionalPayments?: Prisma.PaymentUpdateManyWithoutProfessionalNestedInput
@@ -3328,6 +3655,7 @@ export type UserUncheckedUpdateWithoutClientProjectRequestsInput = {
   companyDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalCategoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3449,6 +3777,7 @@ export type UserUpdateWithoutProfessionalProjectRequestsInput = {
   verification?: Prisma.ProfessionalVerificationUpdateOneWithoutUserNestedInput
   personaVerifications?: Prisma.PersonaVerificationUpdateManyWithoutUserNestedInput
   services?: Prisma.ServiceUpdateManyWithoutProfessionalNestedInput
+  professionalCategoryRecord?: Prisma.ServiceCategoryUpdateOneWithoutProfessionalUsersNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   clientPayments?: Prisma.PaymentUpdateManyWithoutClientNestedInput
   professionalPayments?: Prisma.PaymentUpdateManyWithoutProfessionalNestedInput
@@ -3476,6 +3805,7 @@ export type UserUncheckedUpdateWithoutProfessionalProjectRequestsInput = {
   companyDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalCategoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3586,6 +3916,7 @@ export type UserCreateWithoutClientProjectTrackingsInput = {
   verification?: Prisma.ProfessionalVerificationCreateNestedOneWithoutUserInput
   personaVerifications?: Prisma.PersonaVerificationCreateNestedManyWithoutUserInput
   services?: Prisma.ServiceCreateNestedManyWithoutProfessionalInput
+  professionalCategoryRecord?: Prisma.ServiceCategoryCreateNestedOneWithoutProfessionalUsersInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   clientPayments?: Prisma.PaymentCreateNestedManyWithoutClientInput
   professionalPayments?: Prisma.PaymentCreateNestedManyWithoutProfessionalInput
@@ -3613,6 +3944,7 @@ export type UserUncheckedCreateWithoutClientProjectTrackingsInput = {
   companyDescription?: string | null
   address?: string | null
   professionalCategory?: string | null
+  professionalCategoryId?: number | null
   professionalCity?: string | null
   professionalState?: string | null
   professionalDistrict?: string | null
@@ -3728,6 +4060,7 @@ export type UserCreateWithoutProfessionalProjectTrackingsInput = {
   verification?: Prisma.ProfessionalVerificationCreateNestedOneWithoutUserInput
   personaVerifications?: Prisma.PersonaVerificationCreateNestedManyWithoutUserInput
   services?: Prisma.ServiceCreateNestedManyWithoutProfessionalInput
+  professionalCategoryRecord?: Prisma.ServiceCategoryCreateNestedOneWithoutProfessionalUsersInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   clientPayments?: Prisma.PaymentCreateNestedManyWithoutClientInput
   professionalPayments?: Prisma.PaymentCreateNestedManyWithoutProfessionalInput
@@ -3755,6 +4088,7 @@ export type UserUncheckedCreateWithoutProfessionalProjectTrackingsInput = {
   companyDescription?: string | null
   address?: string | null
   professionalCategory?: string | null
+  professionalCategoryId?: number | null
   professionalCity?: string | null
   professionalState?: string | null
   professionalDistrict?: string | null
@@ -3881,6 +4215,7 @@ export type UserUpdateWithoutClientProjectTrackingsInput = {
   verification?: Prisma.ProfessionalVerificationUpdateOneWithoutUserNestedInput
   personaVerifications?: Prisma.PersonaVerificationUpdateManyWithoutUserNestedInput
   services?: Prisma.ServiceUpdateManyWithoutProfessionalNestedInput
+  professionalCategoryRecord?: Prisma.ServiceCategoryUpdateOneWithoutProfessionalUsersNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   clientPayments?: Prisma.PaymentUpdateManyWithoutClientNestedInput
   professionalPayments?: Prisma.PaymentUpdateManyWithoutProfessionalNestedInput
@@ -3908,6 +4243,7 @@ export type UserUncheckedUpdateWithoutClientProjectTrackingsInput = {
   companyDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalCategoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4029,6 +4365,7 @@ export type UserUpdateWithoutProfessionalProjectTrackingsInput = {
   verification?: Prisma.ProfessionalVerificationUpdateOneWithoutUserNestedInput
   personaVerifications?: Prisma.PersonaVerificationUpdateManyWithoutUserNestedInput
   services?: Prisma.ServiceUpdateManyWithoutProfessionalNestedInput
+  professionalCategoryRecord?: Prisma.ServiceCategoryUpdateOneWithoutProfessionalUsersNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   clientPayments?: Prisma.PaymentUpdateManyWithoutClientNestedInput
   professionalPayments?: Prisma.PaymentUpdateManyWithoutProfessionalNestedInput
@@ -4056,6 +4393,7 @@ export type UserUncheckedUpdateWithoutProfessionalProjectTrackingsInput = {
   companyDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalCategoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4166,6 +4504,7 @@ export type UserCreateWithoutClientPaymentsInput = {
   verification?: Prisma.ProfessionalVerificationCreateNestedOneWithoutUserInput
   personaVerifications?: Prisma.PersonaVerificationCreateNestedManyWithoutUserInput
   services?: Prisma.ServiceCreateNestedManyWithoutProfessionalInput
+  professionalCategoryRecord?: Prisma.ServiceCategoryCreateNestedOneWithoutProfessionalUsersInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   professionalPayments?: Prisma.PaymentCreateNestedManyWithoutProfessionalInput
   clientProjectRequests?: Prisma.ProjectRequestCreateNestedManyWithoutClientInput
@@ -4193,6 +4532,7 @@ export type UserUncheckedCreateWithoutClientPaymentsInput = {
   companyDescription?: string | null
   address?: string | null
   professionalCategory?: string | null
+  professionalCategoryId?: number | null
   professionalCity?: string | null
   professionalState?: string | null
   professionalDistrict?: string | null
@@ -4308,6 +4648,7 @@ export type UserCreateWithoutProfessionalPaymentsInput = {
   verification?: Prisma.ProfessionalVerificationCreateNestedOneWithoutUserInput
   personaVerifications?: Prisma.PersonaVerificationCreateNestedManyWithoutUserInput
   services?: Prisma.ServiceCreateNestedManyWithoutProfessionalInput
+  professionalCategoryRecord?: Prisma.ServiceCategoryCreateNestedOneWithoutProfessionalUsersInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   clientPayments?: Prisma.PaymentCreateNestedManyWithoutClientInput
   clientProjectRequests?: Prisma.ProjectRequestCreateNestedManyWithoutClientInput
@@ -4335,6 +4676,7 @@ export type UserUncheckedCreateWithoutProfessionalPaymentsInput = {
   companyDescription?: string | null
   address?: string | null
   professionalCategory?: string | null
+  professionalCategoryId?: number | null
   professionalCity?: string | null
   professionalState?: string | null
   professionalDistrict?: string | null
@@ -4461,6 +4803,7 @@ export type UserUpdateWithoutClientPaymentsInput = {
   verification?: Prisma.ProfessionalVerificationUpdateOneWithoutUserNestedInput
   personaVerifications?: Prisma.PersonaVerificationUpdateManyWithoutUserNestedInput
   services?: Prisma.ServiceUpdateManyWithoutProfessionalNestedInput
+  professionalCategoryRecord?: Prisma.ServiceCategoryUpdateOneWithoutProfessionalUsersNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   professionalPayments?: Prisma.PaymentUpdateManyWithoutProfessionalNestedInput
   clientProjectRequests?: Prisma.ProjectRequestUpdateManyWithoutClientNestedInput
@@ -4488,6 +4831,7 @@ export type UserUncheckedUpdateWithoutClientPaymentsInput = {
   companyDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalCategoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4609,6 +4953,7 @@ export type UserUpdateWithoutProfessionalPaymentsInput = {
   verification?: Prisma.ProfessionalVerificationUpdateOneWithoutUserNestedInput
   personaVerifications?: Prisma.PersonaVerificationUpdateManyWithoutUserNestedInput
   services?: Prisma.ServiceUpdateManyWithoutProfessionalNestedInput
+  professionalCategoryRecord?: Prisma.ServiceCategoryUpdateOneWithoutProfessionalUsersNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   clientPayments?: Prisma.PaymentUpdateManyWithoutClientNestedInput
   clientProjectRequests?: Prisma.ProjectRequestUpdateManyWithoutClientNestedInput
@@ -4636,6 +4981,7 @@ export type UserUncheckedUpdateWithoutProfessionalPaymentsInput = {
   companyDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalCategoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4745,6 +5091,7 @@ export type UserCreateWithoutWalletInput = {
   verification?: Prisma.ProfessionalVerificationCreateNestedOneWithoutUserInput
   personaVerifications?: Prisma.PersonaVerificationCreateNestedManyWithoutUserInput
   services?: Prisma.ServiceCreateNestedManyWithoutProfessionalInput
+  professionalCategoryRecord?: Prisma.ServiceCategoryCreateNestedOneWithoutProfessionalUsersInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   clientPayments?: Prisma.PaymentCreateNestedManyWithoutClientInput
   professionalPayments?: Prisma.PaymentCreateNestedManyWithoutProfessionalInput
@@ -4773,6 +5120,7 @@ export type UserUncheckedCreateWithoutWalletInput = {
   companyDescription?: string | null
   address?: string | null
   professionalCategory?: string | null
+  professionalCategoryId?: number | null
   professionalCity?: string | null
   professionalState?: string | null
   professionalDistrict?: string | null
@@ -4898,6 +5246,7 @@ export type UserUpdateWithoutWalletInput = {
   verification?: Prisma.ProfessionalVerificationUpdateOneWithoutUserNestedInput
   personaVerifications?: Prisma.PersonaVerificationUpdateManyWithoutUserNestedInput
   services?: Prisma.ServiceUpdateManyWithoutProfessionalNestedInput
+  professionalCategoryRecord?: Prisma.ServiceCategoryUpdateOneWithoutProfessionalUsersNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   clientPayments?: Prisma.PaymentUpdateManyWithoutClientNestedInput
   professionalPayments?: Prisma.PaymentUpdateManyWithoutProfessionalNestedInput
@@ -4926,6 +5275,7 @@ export type UserUncheckedUpdateWithoutWalletInput = {
   companyDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalCategoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5035,6 +5385,7 @@ export type UserCreateWithoutVerificationInput = {
   favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutUserInput
   personaVerifications?: Prisma.PersonaVerificationCreateNestedManyWithoutUserInput
   services?: Prisma.ServiceCreateNestedManyWithoutProfessionalInput
+  professionalCategoryRecord?: Prisma.ServiceCategoryCreateNestedOneWithoutProfessionalUsersInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   clientPayments?: Prisma.PaymentCreateNestedManyWithoutClientInput
   professionalPayments?: Prisma.PaymentCreateNestedManyWithoutProfessionalInput
@@ -5063,6 +5414,7 @@ export type UserUncheckedCreateWithoutVerificationInput = {
   companyDescription?: string | null
   address?: string | null
   professionalCategory?: string | null
+  professionalCategoryId?: number | null
   professionalCity?: string | null
   professionalState?: string | null
   professionalDistrict?: string | null
@@ -5188,6 +5540,7 @@ export type UserUpdateWithoutVerificationInput = {
   favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutUserNestedInput
   personaVerifications?: Prisma.PersonaVerificationUpdateManyWithoutUserNestedInput
   services?: Prisma.ServiceUpdateManyWithoutProfessionalNestedInput
+  professionalCategoryRecord?: Prisma.ServiceCategoryUpdateOneWithoutProfessionalUsersNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   clientPayments?: Prisma.PaymentUpdateManyWithoutClientNestedInput
   professionalPayments?: Prisma.PaymentUpdateManyWithoutProfessionalNestedInput
@@ -5216,6 +5569,7 @@ export type UserUncheckedUpdateWithoutVerificationInput = {
   companyDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalCategoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5325,6 +5679,7 @@ export type UserCreateWithoutPersonaVerificationsInput = {
   favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutUserInput
   verification?: Prisma.ProfessionalVerificationCreateNestedOneWithoutUserInput
   services?: Prisma.ServiceCreateNestedManyWithoutProfessionalInput
+  professionalCategoryRecord?: Prisma.ServiceCategoryCreateNestedOneWithoutProfessionalUsersInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   clientPayments?: Prisma.PaymentCreateNestedManyWithoutClientInput
   professionalPayments?: Prisma.PaymentCreateNestedManyWithoutProfessionalInput
@@ -5353,6 +5708,7 @@ export type UserUncheckedCreateWithoutPersonaVerificationsInput = {
   companyDescription?: string | null
   address?: string | null
   professionalCategory?: string | null
+  professionalCategoryId?: number | null
   professionalCity?: string | null
   professionalState?: string | null
   professionalDistrict?: string | null
@@ -5478,6 +5834,7 @@ export type UserUpdateWithoutPersonaVerificationsInput = {
   favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutUserNestedInput
   verification?: Prisma.ProfessionalVerificationUpdateOneWithoutUserNestedInput
   services?: Prisma.ServiceUpdateManyWithoutProfessionalNestedInput
+  professionalCategoryRecord?: Prisma.ServiceCategoryUpdateOneWithoutProfessionalUsersNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   clientPayments?: Prisma.PaymentUpdateManyWithoutClientNestedInput
   professionalPayments?: Prisma.PaymentUpdateManyWithoutProfessionalNestedInput
@@ -5506,6 +5863,7 @@ export type UserUncheckedUpdateWithoutPersonaVerificationsInput = {
   companyDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalCategoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5616,6 +5974,7 @@ export type UserCreateWithoutAuditLogsInput = {
   verification?: Prisma.ProfessionalVerificationCreateNestedOneWithoutUserInput
   personaVerifications?: Prisma.PersonaVerificationCreateNestedManyWithoutUserInput
   services?: Prisma.ServiceCreateNestedManyWithoutProfessionalInput
+  professionalCategoryRecord?: Prisma.ServiceCategoryCreateNestedOneWithoutProfessionalUsersInput
   clientPayments?: Prisma.PaymentCreateNestedManyWithoutClientInput
   professionalPayments?: Prisma.PaymentCreateNestedManyWithoutProfessionalInput
   clientProjectRequests?: Prisma.ProjectRequestCreateNestedManyWithoutClientInput
@@ -5643,6 +6002,7 @@ export type UserUncheckedCreateWithoutAuditLogsInput = {
   companyDescription?: string | null
   address?: string | null
   professionalCategory?: string | null
+  professionalCategoryId?: number | null
   professionalCity?: string | null
   professionalState?: string | null
   professionalDistrict?: string | null
@@ -5769,6 +6129,7 @@ export type UserUpdateWithoutAuditLogsInput = {
   verification?: Prisma.ProfessionalVerificationUpdateOneWithoutUserNestedInput
   personaVerifications?: Prisma.PersonaVerificationUpdateManyWithoutUserNestedInput
   services?: Prisma.ServiceUpdateManyWithoutProfessionalNestedInput
+  professionalCategoryRecord?: Prisma.ServiceCategoryUpdateOneWithoutProfessionalUsersNestedInput
   clientPayments?: Prisma.PaymentUpdateManyWithoutClientNestedInput
   professionalPayments?: Prisma.PaymentUpdateManyWithoutProfessionalNestedInput
   clientProjectRequests?: Prisma.ProjectRequestUpdateManyWithoutClientNestedInput
@@ -5796,6 +6157,7 @@ export type UserUncheckedUpdateWithoutAuditLogsInput = {
   companyDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalCategoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5905,6 +6267,7 @@ export type UserCreateWithoutServicesInput = {
   favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutUserInput
   verification?: Prisma.ProfessionalVerificationCreateNestedOneWithoutUserInput
   personaVerifications?: Prisma.PersonaVerificationCreateNestedManyWithoutUserInput
+  professionalCategoryRecord?: Prisma.ServiceCategoryCreateNestedOneWithoutProfessionalUsersInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   clientPayments?: Prisma.PaymentCreateNestedManyWithoutClientInput
   professionalPayments?: Prisma.PaymentCreateNestedManyWithoutProfessionalInput
@@ -5933,6 +6296,7 @@ export type UserUncheckedCreateWithoutServicesInput = {
   companyDescription?: string | null
   address?: string | null
   professionalCategory?: string | null
+  professionalCategoryId?: number | null
   professionalCity?: string | null
   professionalState?: string | null
   professionalDistrict?: string | null
@@ -6058,6 +6422,7 @@ export type UserUpdateWithoutServicesInput = {
   favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutUserNestedInput
   verification?: Prisma.ProfessionalVerificationUpdateOneWithoutUserNestedInput
   personaVerifications?: Prisma.PersonaVerificationUpdateManyWithoutUserNestedInput
+  professionalCategoryRecord?: Prisma.ServiceCategoryUpdateOneWithoutProfessionalUsersNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   clientPayments?: Prisma.PaymentUpdateManyWithoutClientNestedInput
   professionalPayments?: Prisma.PaymentUpdateManyWithoutProfessionalNestedInput
@@ -6069,6 +6434,200 @@ export type UserUpdateWithoutServicesInput = {
 }
 
 export type UserUncheckedUpdateWithoutServicesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyWebsite?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  teamSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalCategoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalSkillsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  fixedRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  portfolioUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workPhotosJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  certificationsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tradeLicenseUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workMode?: Prisma.StringFieldUpdateOperationsInput | string
+  serviceRadiusKm?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  averageRating?: Prisma.FloatFieldUpdateOperationsInput | number
+  reviewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  availabilityStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  savedLocationsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hiringNeedsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  authProvider?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  professionalLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  professionalLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  razorpayAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clientJobs?: Prisma.ClientJobUncheckedUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  clientProfiles?: Prisma.ClientProfileUncheckedUpdateManyWithoutUserNestedInput
+  favoriteJobs?: Prisma.FavoriteJobUncheckedUpdateManyWithoutUserNestedInput
+  verification?: Prisma.ProfessionalVerificationUncheckedUpdateOneWithoutUserNestedInput
+  personaVerifications?: Prisma.PersonaVerificationUncheckedUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  clientPayments?: Prisma.PaymentUncheckedUpdateManyWithoutClientNestedInput
+  professionalPayments?: Prisma.PaymentUncheckedUpdateManyWithoutProfessionalNestedInput
+  clientProjectRequests?: Prisma.ProjectRequestUncheckedUpdateManyWithoutClientNestedInput
+  professionalProjectRequests?: Prisma.ProjectRequestUncheckedUpdateManyWithoutProfessionalNestedInput
+  clientProjectTrackings?: Prisma.ProjectTrackingUncheckedUpdateManyWithoutClientNestedInput
+  professionalProjectTrackings?: Prisma.ProjectTrackingUncheckedUpdateManyWithoutProfessionalNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateManyProfessionalCategoryRecordInput = {
+  id?: number
+  role?: $Enums.UserRole
+  firstName: string
+  lastName: string
+  email: string
+  username?: string | null
+  phone?: string | null
+  passwordHash?: string | null
+  googleId?: string | null
+  avatarUrl?: string | null
+  companyName?: string | null
+  companyWebsite?: string | null
+  industry?: string | null
+  teamSize?: string | null
+  companyDescription?: string | null
+  address?: string | null
+  professionalCategory?: string | null
+  professionalCity?: string | null
+  professionalState?: string | null
+  professionalDistrict?: string | null
+  professionalSkillsJson?: string | null
+  experienceYears?: number | null
+  hourlyRate?: number | null
+  fixedRate?: number | null
+  portfolioUrl?: string | null
+  workPhotosJson?: string | null
+  certificationsJson?: string | null
+  tradeLicenseUrl?: string | null
+  serviceArea?: string | null
+  workMode?: string
+  serviceRadiusKm?: number | null
+  averageRating?: number
+  reviewCount?: number
+  isVerified?: boolean
+  availabilityStatus?: string
+  savedLocationsJson?: string | null
+  hiringNeedsJson?: string | null
+  authProvider?: string
+  isActive?: boolean
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  professionalLatitude?: number | null
+  professionalLongitude?: number | null
+  biometricEnabled?: boolean
+  biometricType?: string | null
+  browserNotificationsEnabled?: boolean
+  emailNotificationsEnabled?: boolean
+  razorpayAccountId?: string | null
+  emailVerifiedAt?: Date | string | null
+  phoneVerifiedAt?: Date | string | null
+  projectActivityNotificationsEnabled?: boolean
+}
+
+export type UserUpdateWithoutProfessionalCategoryRecordInput = {
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyWebsite?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  teamSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalSkillsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  fixedRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  portfolioUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workPhotosJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  certificationsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tradeLicenseUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workMode?: Prisma.StringFieldUpdateOperationsInput | string
+  serviceRadiusKm?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  averageRating?: Prisma.FloatFieldUpdateOperationsInput | number
+  reviewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  availabilityStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  savedLocationsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hiringNeedsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  authProvider?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  professionalLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  professionalLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  razorpayAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clientJobs?: Prisma.ClientJobUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  clientProfiles?: Prisma.ClientProfileUpdateManyWithoutUserNestedInput
+  favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutUserNestedInput
+  verification?: Prisma.ProfessionalVerificationUpdateOneWithoutUserNestedInput
+  personaVerifications?: Prisma.PersonaVerificationUpdateManyWithoutUserNestedInput
+  services?: Prisma.ServiceUpdateManyWithoutProfessionalNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  clientPayments?: Prisma.PaymentUpdateManyWithoutClientNestedInput
+  professionalPayments?: Prisma.PaymentUpdateManyWithoutProfessionalNestedInput
+  clientProjectRequests?: Prisma.ProjectRequestUpdateManyWithoutClientNestedInput
+  professionalProjectRequests?: Prisma.ProjectRequestUpdateManyWithoutProfessionalNestedInput
+  clientProjectTrackings?: Prisma.ProjectTrackingUpdateManyWithoutClientNestedInput
+  professionalProjectTrackings?: Prisma.ProjectTrackingUpdateManyWithoutProfessionalNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutProfessionalCategoryRecordInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
@@ -6127,6 +6686,7 @@ export type UserUncheckedUpdateWithoutServicesInput = {
   favoriteJobs?: Prisma.FavoriteJobUncheckedUpdateManyWithoutUserNestedInput
   verification?: Prisma.ProfessionalVerificationUncheckedUpdateOneWithoutUserNestedInput
   personaVerifications?: Prisma.PersonaVerificationUncheckedUpdateManyWithoutUserNestedInput
+  services?: Prisma.ServiceUncheckedUpdateManyWithoutProfessionalNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   clientPayments?: Prisma.PaymentUncheckedUpdateManyWithoutClientNestedInput
   professionalPayments?: Prisma.PaymentUncheckedUpdateManyWithoutProfessionalNestedInput
@@ -6135,6 +6695,61 @@ export type UserUncheckedUpdateWithoutServicesInput = {
   clientProjectTrackings?: Prisma.ProjectTrackingUncheckedUpdateManyWithoutClientNestedInput
   professionalProjectTrackings?: Prisma.ProjectTrackingUncheckedUpdateManyWithoutProfessionalNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateManyWithoutProfessionalCategoryRecordInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyWebsite?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  teamSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalSkillsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  experienceYears?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  fixedRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  portfolioUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workPhotosJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  certificationsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tradeLicenseUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workMode?: Prisma.StringFieldUpdateOperationsInput | string
+  serviceRadiusKm?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  averageRating?: Prisma.FloatFieldUpdateOperationsInput | number
+  reviewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  availabilityStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  savedLocationsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hiringNeedsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  authProvider?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  professionalLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  professionalLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  biometricType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  browserNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  razorpayAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  projectActivityNotificationsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 
@@ -6294,6 +6909,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   companyDescription?: boolean
   address?: boolean
   professionalCategory?: boolean
+  professionalCategoryId?: boolean
   professionalCity?: boolean
   professionalState?: boolean
   professionalDistrict?: boolean
@@ -6336,6 +6952,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   verification?: boolean | Prisma.User$verificationArgs<ExtArgs>
   personaVerifications?: boolean | Prisma.User$personaVerificationsArgs<ExtArgs>
   services?: boolean | Prisma.User$servicesArgs<ExtArgs>
+  professionalCategoryRecord?: boolean | Prisma.User$professionalCategoryRecordArgs<ExtArgs>
   auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
   clientPayments?: boolean | Prisma.User$clientPaymentsArgs<ExtArgs>
   professionalPayments?: boolean | Prisma.User$professionalPaymentsArgs<ExtArgs>
@@ -6365,6 +6982,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   companyDescription?: boolean
   address?: boolean
   professionalCategory?: boolean
+  professionalCategoryId?: boolean
   professionalCity?: boolean
   professionalState?: boolean
   professionalDistrict?: boolean
@@ -6400,6 +7018,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   emailVerifiedAt?: boolean
   phoneVerifiedAt?: boolean
   projectActivityNotificationsEnabled?: boolean
+  professionalCategoryRecord?: boolean | Prisma.User$professionalCategoryRecordArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -6420,6 +7039,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   companyDescription?: boolean
   address?: boolean
   professionalCategory?: boolean
+  professionalCategoryId?: boolean
   professionalCity?: boolean
   professionalState?: boolean
   professionalDistrict?: boolean
@@ -6455,6 +7075,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   emailVerifiedAt?: boolean
   phoneVerifiedAt?: boolean
   projectActivityNotificationsEnabled?: boolean
+  professionalCategoryRecord?: boolean | Prisma.User$professionalCategoryRecordArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
@@ -6475,6 +7096,7 @@ export type UserSelectScalar = {
   companyDescription?: boolean
   address?: boolean
   professionalCategory?: boolean
+  professionalCategoryId?: boolean
   professionalCity?: boolean
   professionalState?: boolean
   professionalDistrict?: boolean
@@ -6512,7 +7134,7 @@ export type UserSelectScalar = {
   projectActivityNotificationsEnabled?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "role" | "firstName" | "lastName" | "email" | "username" | "phone" | "passwordHash" | "googleId" | "avatarUrl" | "companyName" | "companyWebsite" | "industry" | "teamSize" | "companyDescription" | "address" | "professionalCategory" | "professionalCity" | "professionalState" | "professionalDistrict" | "professionalSkillsJson" | "experienceYears" | "hourlyRate" | "fixedRate" | "portfolioUrl" | "workPhotosJson" | "certificationsJson" | "tradeLicenseUrl" | "serviceArea" | "workMode" | "serviceRadiusKm" | "averageRating" | "reviewCount" | "isVerified" | "availabilityStatus" | "savedLocationsJson" | "hiringNeedsJson" | "authProvider" | "isActive" | "lastLoginAt" | "createdAt" | "updatedAt" | "professionalLatitude" | "professionalLongitude" | "biometricEnabled" | "biometricType" | "browserNotificationsEnabled" | "emailNotificationsEnabled" | "razorpayAccountId" | "emailVerifiedAt" | "phoneVerifiedAt" | "projectActivityNotificationsEnabled", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "role" | "firstName" | "lastName" | "email" | "username" | "phone" | "passwordHash" | "googleId" | "avatarUrl" | "companyName" | "companyWebsite" | "industry" | "teamSize" | "companyDescription" | "address" | "professionalCategory" | "professionalCategoryId" | "professionalCity" | "professionalState" | "professionalDistrict" | "professionalSkillsJson" | "experienceYears" | "hourlyRate" | "fixedRate" | "portfolioUrl" | "workPhotosJson" | "certificationsJson" | "tradeLicenseUrl" | "serviceArea" | "workMode" | "serviceRadiusKm" | "averageRating" | "reviewCount" | "isVerified" | "availabilityStatus" | "savedLocationsJson" | "hiringNeedsJson" | "authProvider" | "isActive" | "lastLoginAt" | "createdAt" | "updatedAt" | "professionalLatitude" | "professionalLongitude" | "biometricEnabled" | "biometricType" | "browserNotificationsEnabled" | "emailNotificationsEnabled" | "razorpayAccountId" | "emailVerifiedAt" | "phoneVerifiedAt" | "projectActivityNotificationsEnabled", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   clientJobs?: boolean | Prisma.User$clientJobsArgs<ExtArgs>
   wallet?: boolean | Prisma.User$walletArgs<ExtArgs>
@@ -6521,6 +7143,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   verification?: boolean | Prisma.User$verificationArgs<ExtArgs>
   personaVerifications?: boolean | Prisma.User$personaVerificationsArgs<ExtArgs>
   services?: boolean | Prisma.User$servicesArgs<ExtArgs>
+  professionalCategoryRecord?: boolean | Prisma.User$professionalCategoryRecordArgs<ExtArgs>
   auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
   clientPayments?: boolean | Prisma.User$clientPaymentsArgs<ExtArgs>
   professionalPayments?: boolean | Prisma.User$professionalPaymentsArgs<ExtArgs>
@@ -6531,8 +7154,12 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  professionalCategoryRecord?: boolean | Prisma.User$professionalCategoryRecordArgs<ExtArgs>
+}
+export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  professionalCategoryRecord?: boolean | Prisma.User$professionalCategoryRecordArgs<ExtArgs>
+}
 
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "User"
@@ -6544,6 +7171,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     verification: Prisma.$ProfessionalVerificationPayload<ExtArgs> | null
     personaVerifications: Prisma.$PersonaVerificationPayload<ExtArgs>[]
     services: Prisma.$ServicePayload<ExtArgs>[]
+    professionalCategoryRecord: Prisma.$ServiceCategoryPayload<ExtArgs> | null
     auditLogs: Prisma.$AuditLogPayload<ExtArgs>[]
     clientPayments: Prisma.$PaymentPayload<ExtArgs>[]
     professionalPayments: Prisma.$PaymentPayload<ExtArgs>[]
@@ -6571,6 +7199,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     companyDescription: string | null
     address: string | null
     professionalCategory: string | null
+    professionalCategoryId: number | null
     professionalCity: string | null
     professionalState: string | null
     professionalDistrict: string | null
@@ -7007,6 +7636,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   verification<T extends Prisma.User$verificationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$verificationArgs<ExtArgs>>): Prisma.Prisma__ProfessionalVerificationClient<runtime.Types.Result.GetResult<Prisma.$ProfessionalVerificationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   personaVerifications<T extends Prisma.User$personaVerificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$personaVerificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PersonaVerificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   services<T extends Prisma.User$servicesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$servicesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ServicePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  professionalCategoryRecord<T extends Prisma.User$professionalCategoryRecordArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$professionalCategoryRecordArgs<ExtArgs>>): Prisma.Prisma__ServiceCategoryClient<runtime.Types.Result.GetResult<Prisma.$ServiceCategoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   auditLogs<T extends Prisma.User$auditLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$auditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   clientPayments<T extends Prisma.User$clientPaymentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$clientPaymentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   professionalPayments<T extends Prisma.User$professionalPaymentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$professionalPaymentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -7061,6 +7691,7 @@ export interface UserFieldRefs {
   readonly companyDescription: Prisma.FieldRef<"User", 'String'>
   readonly address: Prisma.FieldRef<"User", 'String'>
   readonly professionalCategory: Prisma.FieldRef<"User", 'String'>
+  readonly professionalCategoryId: Prisma.FieldRef<"User", 'Int'>
   readonly professionalCity: Prisma.FieldRef<"User", 'String'>
   readonly professionalState: Prisma.FieldRef<"User", 'String'>
   readonly professionalDistrict: Prisma.FieldRef<"User", 'String'>
@@ -7350,6 +7981,10 @@ export type UserCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions
    */
   data: Prisma.UserCreateManyInput | Prisma.UserCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -7420,6 +8055,10 @@ export type UserUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions
    * Limit how many Users to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -7644,6 +8283,25 @@ export type User$servicesArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.ServiceScalarFieldEnum | Prisma.ServiceScalarFieldEnum[]
+}
+
+/**
+ * User.professionalCategoryRecord
+ */
+export type User$professionalCategoryRecordArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ServiceCategory
+   */
+  select?: Prisma.ServiceCategorySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ServiceCategory
+   */
+  omit?: Prisma.ServiceCategoryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ServiceCategoryInclude<ExtArgs> | null
+  where?: Prisma.ServiceCategoryWhereInput
 }
 
 /**

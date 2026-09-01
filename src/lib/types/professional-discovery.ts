@@ -40,6 +40,9 @@ export type ProfessionalDiscoveryResponse = {
 export type ProfessionalDiscoveryFilters = {
   query?: string;
   segment?: string;
+  parentCategoryId?: number;
+  categoryId?: number;
+  subcategoryId?: number;
   category?: string;
   city?: string;
   state?: string;

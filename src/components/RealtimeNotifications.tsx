@@ -93,11 +93,22 @@ export function RealtimeNotifications() {
       if (message.receiverId !== userId) return;
       window.dispatchEvent(new CustomEvent("servio:message"));
     };
+    const onProject = (payload?: unknown) => {
+      window.dispatchEvent(new CustomEvent("servio:project-update", { detail: payload }));
+    };
+    const onProposal = (payload?: unknown) => {
+      window.dispatchEvent(new CustomEvent("servio:proposal", { detail: payload }));
+      window.dispatchEvent(new CustomEvent("servio:notification"));
+    };
     socket.on("notification:new", onNotification);
     socket.on("message:new", onMessage);
+    socket.on("project:updated", onProject);
+    socket.on("proposal:new", onProposal);
     return () => {
       socket.off("notification:new", onNotification);
       socket.off("message:new", onMessage);
+      socket.off("project:updated", onProject);
+      socket.off("proposal:new", onProposal);
       socket.disconnect();
       window.clearInterval(poll);
       window.removeEventListener("focus", onFocus);

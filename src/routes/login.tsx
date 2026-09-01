@@ -68,10 +68,13 @@ export default function Login() {
     return nextPath ?? resultRedirect ?? "/dashboard";
   }
 
-  async function submit(formData: FormData) {
+  const [googleLoading, setGoogleLoading] = useState(false);
+
+  async function submit(event?: React.FormEvent<HTMLFormElement>) {
+    if (event) event.preventDefault();
     if (pending) return;
-    const email = String(formData.get("email") ?? "").trim();
-    const password = String(formData.get("password") ?? "");
+    const email = (emailRef.current?.value ?? "").trim();
+    const password = passwordRef.current?.value ?? "";
     const nextFieldErrors = {
       email: !email
         ? "Email is required."
@@ -128,22 +131,28 @@ export default function Login() {
       return;
     }
     setPending(true);
-    const response = await fetch("/api/v1/auth/send-phone-login-otp", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ phone: `${countryCode}${phone.replace(/\D/g, "")}` }),
-    });
-    const result = (await response.json()) as { error?: string };
-    setPending(false);
-    if (!response.ok) {
-      setError(result.error ?? "Unable to send the verification code.");
-      return;
+    try {
+      const response = await fetch("/api/v1/auth/send-phone-login-otp", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ phone: `${countryCode}${phone.replace(/\D/g, "")}` }),
+      });
+      const result = (await response.json()) as { error?: string };
+      if (!response.ok) {
+        setError(result.error ?? "Unable to send the verification code.");
+        return;
+      }
+      setPhoneCodeSent(true);
+      setError("Verification code sent to your phone.");
+    } catch {
+      setError("Unable to send verification code. Please check your connection.");
+    } finally {
+      setPending(false);
     }
-    setPhoneCodeSent(true);
-    setError("Verification code sent to your phone.");
   }
 
-  async function submitPhone() {
+  async function submitPhone(event?: React.FormEvent<HTMLFormElement>) {
+    if (event) event.preventDefault();
     if (pending) return;
     setError(null);
     if (!isValidPhoneNumber(phone, countryCode)) {
@@ -159,23 +168,28 @@ export default function Login() {
       return;
     }
     setPending(true);
-    const response = await fetch("/api/v1/auth/login-phone", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        phone: `${countryCode}${phone.replace(/\D/g, "")}`,
-        code: phoneCode,
-      }),
-    });
-    const result = (await response.json()) as { error?: string; redirect?: string };
-    setPending(false);
-    if (!response.ok) {
-      setError(result.error ?? "Unable to sign in with your phone.");
-      if (result.redirect === "/verify")
-        window.setTimeout(() => window.location.assign("/verify"), 900);
-      return;
+    try {
+      const response = await fetch("/api/v1/auth/login-phone", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          phone: `${countryCode}${phone.replace(/\D/g, "")}`,
+          code: phoneCode,
+        }),
+      });
+      const result = (await response.json()) as { error?: string; redirect?: string };
+      if (!response.ok) {
+        setError(result.error ?? "Unable to sign in with your phone.");
+        if (result.redirect === "/verify")
+          window.setTimeout(() => window.location.assign("/verify"), 900);
+        return;
+      }
+      window.location.assign(getPostLoginRedirect(result.redirect));
+    } catch {
+      setError("Unable to sign in. Please check your connection and try again.");
+    } finally {
+      setPending(false);
     }
-    window.location.assign(getPostLoginRedirect(result.redirect));
   }
 
   return (
@@ -230,16 +244,25 @@ export default function Login() {
         </button>
       </div>
       {loginMode === "email" ? (
-        <form action={submit} className="space-y-5">
+        <form onSubmit={submit} noValidate className="space-y-5">
           <Button
             type="button"
             variant="outline"
+            disabled={pending || googleLoading}
             className="h-11 w-full"
             onClick={() => {
+              setGoogleLoading(true);
               window.location.href = "/api/v1/auth/google";
             }}
           >
-            Continue with Google
+            {googleLoading ? (
+              <span className="inline-flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                Connecting to Google…
+              </span>
+            ) : (
+              "Continue with Google"
+            )}
           </Button>
           {oauthError === "google-not-configured" ? (
             <p className="text-sm text-destructive">Google sign-in has not been configured yet.</p>
@@ -260,11 +283,12 @@ export default function Login() {
             <select
               id="quickFill"
               defaultValue=""
+              disabled={pending}
               onChange={(event) => {
                 quickFill(event.target.value as "" | keyof typeof DEMO_ACCOUNTS);
                 event.target.value = "";
               }}
-              className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
+              className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm disabled:opacity-50"
             >
               <option value="">Select a demo account…</option>
               <option value="client">Client</option>
@@ -281,6 +305,7 @@ export default function Login() {
               name="email"
               type="email"
               required
+              disabled={pending}
               ref={emailRef}
               placeholder="you@example.com"
               aria-invalid={Boolean(fieldErrors.email)}
@@ -302,6 +327,7 @@ export default function Login() {
               name="password"
               type="password"
               required
+              disabled={pending}
               ref={passwordRef}
               placeholder="••••••••"
               aria-invalid={Boolean(fieldErrors.password)}
@@ -317,45 +343,36 @@ export default function Login() {
             disabled={pending}
             aria-busy={pending}
             className={cn(
-              "relative w-full overflow-hidden transition-transform duration-150",
-              pending && "cursor-wait",
+              "relative h-11 w-full overflow-hidden transition-all duration-200",
+              pending && "cursor-wait opacity-90",
             )}
             style={{ transform: `scale(${buttonScale})` }}
           >
             {pending ? (
-              <>
-                <span
-                  aria-hidden
-                  className="absolute inset-y-0 -left-1/2 w-1/3 -skew-x-12 bg-white/25 animate-login-button-shimmer"
-                />
-                <span className="relative inline-flex items-center gap-2">
-                  <Loader2 className="h-4 w-4 animate-spin" /> Signing in
-                  <span className="inline-flex gap-0.5">
-                    <i className="h-1 w-1 animate-login-dot rounded-full bg-current" />
-                    <i className="h-1 w-1 animate-login-dot rounded-full bg-current [animation-delay:140ms]" />
-                    <i className="h-1 w-1 animate-login-dot rounded-full bg-current [animation-delay:280ms]" />
-                  </span>
-                </span>
-              </>
+              <span className="inline-flex items-center justify-center gap-2 text-sm font-semibold">
+                <Loader2 className="h-4 w-4 animate-spin text-white" />
+                Signing in…
+              </span>
             ) : (
-              <span className="inline-flex items-center gap-2">
+              <span className="inline-flex items-center justify-center gap-2 text-sm font-semibold">
                 Log in <ArrowRight className="h-4 w-4" />
               </span>
             )}
           </Button>
         </form>
       ) : (
-        <form action={() => void submitPhone()} className="space-y-5">
+        <form onSubmit={submitPhone} noValidate className="space-y-5">
           <div className="space-y-1.5">
             <Label htmlFor="login-phone">Phone number</Label>
             <div className="flex gap-2">
               <select
                 value={countryCode}
+                disabled={pending}
                 onChange={(event) => {
                   setCountryCode(event.target.value);
                   setPhoneCodeSent(false);
                 }}
-                className="h-11 w-[108px] rounded-lg border border-input bg-background px-2.5 text-sm shadow-sm outline-none transition focus:border-ring focus:ring-1 focus:ring-ring"
+                className="h-11 w-[108px] rounded-lg border border-input bg-background px-2.5 text-sm shadow-sm outline-none transition focus:border-ring focus:ring-1 focus:ring-ring disabled:opacity-50"
               >
                 {countryCodes.map((country) => (
                   <option key={country.code} value={country.code}>
@@ -366,6 +383,7 @@ export default function Login() {
               <Input
                 id="login-phone"
                 value={phone}
+                disabled={pending}
                 onChange={(event) => {
                   setPhone(event.target.value.replace(/[^\d\s-]/g, ""));
                   setPhoneCodeSent(false);
@@ -384,6 +402,7 @@ export default function Login() {
               <Input
                 id="phone-code"
                 value={phoneCode}
+                disabled={pending}
                 onChange={(event) =>
                   setPhoneCode(event.target.value.replace(/\D/g, "").slice(0, 4))
                 }
@@ -404,8 +423,21 @@ export default function Login() {
               {error}
             </p>
           ) : null}
-          <Button type="submit" disabled={pending} className="h-11 w-full">
-            {pending ? "Please wait…" : phoneCodeSent ? "Log in with OTP" : "Send OTP"}
+          <Button
+            type="submit"
+            disabled={pending}
+            className="h-11 w-full transition-all duration-200"
+          >
+            {pending ? (
+              <span className="inline-flex items-center justify-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin text-white" />
+                {phoneCodeSent ? "Signing in…" : "Sending OTP…"}
+              </span>
+            ) : phoneCodeSent ? (
+              "Log in with OTP"
+            ) : (
+              "Send OTP"
+            )}
           </Button>
         </form>
       )}

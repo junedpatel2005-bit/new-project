@@ -27,6 +27,8 @@ function SignupContent() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  const [googleLoading, setGoogleLoading] = useState(false);
+
   useEffect(() => {
     const rawRole = searchParams.get("role")?.toLowerCase();
     if (rawRole === "pro" || rawRole === "professional") {
@@ -37,6 +39,7 @@ function SignupContent() {
   }, [searchParams]);
 
   function chooseRole(nextRole: "client" | "pro") {
+    if (pending) return;
     setRole(nextRole);
     setError(null);
   }
@@ -68,6 +71,7 @@ function SignupContent() {
   }
 
   async function submit() {
+    if (pending) return;
     setError(null);
     const nextErrors: Record<string, string> = {};
     const firstName = draft.firstName.trim();
@@ -144,8 +148,9 @@ function SignupContent() {
           <button
             key={choice}
             type="button"
+            disabled={pending}
             onClick={() => chooseRole(choice)}
-            className={`rounded-lg px-3 py-2.5 text-sm font-semibold transition-all ${role === choice ? "bg-card text-foreground shadow-soft" : "text-muted-foreground"}`}
+            className={`rounded-lg px-3 py-2.5 text-sm font-semibold transition-all ${role === choice ? "bg-card text-foreground shadow-soft" : "text-muted-foreground"} ${pending ? "opacity-60 cursor-not-allowed" : ""}`}
           >
             I&apos;m a {choice === "client" ? "client" : "professional"}
           </button>
@@ -159,12 +164,21 @@ function SignupContent() {
       <Button
         type="button"
         variant="outline"
+        disabled={pending || googleLoading}
         className="mb-5 h-11 w-full"
         onClick={() => {
+          setGoogleLoading(true);
           window.location.href = `/api/v1/auth/google?role=${role === "pro" ? "PROFESSIONAL" : "CLIENT"}`;
         }}
       >
-        Continue with Google
+        {googleLoading ? (
+          <span className="inline-flex items-center gap-2">
+            <Loader2 className="h-4 w-4 animate-spin text-primary" />
+            Connecting to Google…
+          </span>
+        ) : (
+          "Continue with Google"
+        )}
       </Button>
 
       <form onSubmit={handleSubmit} noValidate className="space-y-5">
@@ -175,6 +189,7 @@ function SignupContent() {
             label="First name"
             placeholder="First name"
             required
+            disabled={pending}
             error={fieldErrors.firstName}
             value={draft.firstName}
             onValueChange={(value) => setDraft({ ...draft, firstName: value })}
@@ -185,6 +200,7 @@ function SignupContent() {
             label="Last name"
             placeholder="Last name"
             required
+            disabled={pending}
             error={fieldErrors.lastName}
             value={draft.lastName}
             onValueChange={(value) => setDraft({ ...draft, lastName: value })}
@@ -197,6 +213,7 @@ function SignupContent() {
           placeholder="you@company.com"
           type="email"
           required
+          disabled={pending}
           error={fieldErrors.email}
           value={draft.email}
           onValueChange={(value) => {
@@ -216,6 +233,7 @@ function SignupContent() {
           placeholder="At least 8 characters"
           type={showPassword ? "text" : "password"}
           required
+          disabled={pending}
           error={fieldErrors.password}
           value={draft.password}
           onValueChange={(value) => setDraft({ ...draft, password: value })}
@@ -231,6 +249,7 @@ function SignupContent() {
           placeholder="Repeat your password"
           type={showConfirmPassword ? "text" : "password"}
           required
+          disabled={pending}
           error={fieldErrors.confirmPassword}
           value={draft.confirmPassword}
           onValueChange={(value) => setDraft({ ...draft, confirmPassword: value })}
@@ -244,6 +263,7 @@ function SignupContent() {
             name="terms"
             type="checkbox"
             required
+            disabled={pending}
             checked={draft.terms}
             onChange={(event) => setDraft({ ...draft, terms: event.target.checked })}
             className="mt-0.5 h-4 w-4 accent-primary"
@@ -252,10 +272,15 @@ function SignupContent() {
         </label>
         {fieldErrors.terms && <p className="text-sm text-destructive">{fieldErrors.terms}</p>}
         {error && <p className="text-sm text-destructive">{error}</p>}
-        <Button type="submit" className="h-11 w-full" disabled={pending}>
+        <Button
+          type="submit"
+          className="h-11 w-full transition-all duration-200"
+          disabled={pending}
+          aria-busy={pending}
+        >
           {pending ? (
-            <span className="flex items-center justify-center gap-2">
-              <Loader2 className="h-4 w-4 animate-spin" />
+            <span className="flex items-center justify-center gap-2 font-semibold">
+              <Loader2 className="h-4 w-4 animate-spin text-white" />
               Creating account…
             </span>
           ) : (
@@ -282,6 +307,7 @@ function Field({
   placeholder,
   type = "text",
   required = false,
+  disabled = false,
   error,
   value,
   onValueChange,
@@ -294,6 +320,7 @@ function Field({
   placeholder: string;
   type?: string;
   required?: boolean;
+  disabled?: boolean;
   error?: string;
   value?: string;
   onValueChange?: (value: string) => void;
@@ -309,6 +336,7 @@ function Field({
           name={name}
           type={type}
           required={required}
+          disabled={disabled}
           placeholder={placeholder}
           value={value}
           onChange={(event) => onValueChange?.(event.target.value)}

@@ -193,20 +193,56 @@ export async function listCategories(): Promise<MarketplaceCategory[]> {
         segment: true,
         parentId: true,
       },
-      orderBy: { sortOrder: "asc" },
+      orderBy: [{ segment: "asc" }, { sortOrder: "asc" }, { id: "asc" }],
     }),
-    db.user.groupBy({
-      by: ["professionalCategory"],
-      where: { role: "PROFESSIONAL", isActive: true },
-      _count: { _all: true },
+    db.user.findMany({
+      where: {
+        role: "PROFESSIONAL",
+        isActive: true,
+      },
+      select: {
+        id: true,
+        professionalCategory: true,
+        professionalCategoryId: true,
+        services: { where: { isActive: true }, select: { categoryId: true } },
+      },
     }),
   ]);
-  const counts = new Map(
-    professionals.map((entry) => [entry.professionalCategory, entry._count._all]),
-  );
+  const categoryByName = new Map<string, number>();
+  const childrenByParent = new Map<number, number[]>();
+  for (const category of categories) {
+    categoryByName.set(category.name.toLowerCase(), category.id);
+    if (category.parentId === null) continue;
+    const children = childrenByParent.get(category.parentId) ?? [];
+    children.push(category.id);
+    childrenByParent.set(category.parentId, children);
+  }
+  const categoryIdsForBranch = (categoryId: number) => {
+    const ids = [categoryId];
+    for (const childId of childrenByParent.get(categoryId) ?? []) {
+      ids.push(...categoryIdsForBranch(childId));
+    }
+    return ids;
+  };
+  const counts = new Map<number, number>();
+  for (const category of categories) {
+    const branchIds = new Set(categoryIdsForBranch(category.id));
+    const count = professionals.filter((professional) => {
+      const catId =
+        professional.professionalCategoryId ??
+        (professional.professionalCategory
+          ? categoryByName.get(professional.professionalCategory.toLowerCase())
+          : null);
+      return (
+        (catId !== null && catId !== undefined && branchIds.has(catId)) ||
+        professional.services.some((service) => branchIds.has(service.categoryId))
+      );
+    }).length;
+    counts.set(category.id, count);
+  }
   return categories.map((category) => ({
     ...category,
-    professionalCount: counts.get(category.name) ?? 0,
+    professionalCount: counts.get(category.id) ?? 0,
   }));
 }
 

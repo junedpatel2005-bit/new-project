@@ -38,40 +38,49 @@ export function usePortalTitle() {
   return useContext(PortalTitleContext);
 }
 
-export function PortalShell({ children }: { children: React.ReactNode }) {
+export function PortalShell({
+  children,
+  initialUser,
+}: {
+  children: React.ReactNode;
+  initialUser?: PortalUser | null;
+}) {
   const pathname = usePathname();
   const router = useRouter();
   const { title } = usePortalTitle();
-  const [user, setUser] = useState<PortalUser | null>(null);
-  const [items, setItems] = useState<NavigationItem[]>(clientItems);
-  const [mobileItems, setMobileItems] = useState<NavigationItem[]>(clientMobileItems);
-  // Keep the shared portal chrome mounted while auth data refreshes during navigation. The
-  // protected portal layout has already authorized the request, so a placeholder prevents the
-  // sidebar/header from disappearing while /auth/me resolves.
-  const navigationUser = user ?? { firstName: "", lastName: "", role: "CLIENT", avatarUrl: null };
+  const [user, setUser] = useState<PortalUser | null>(initialUser ?? null);
 
   useEffect(() => {
-    fetch("/api/v1/auth/me")
-      .then((response) => (response.ok ? response.json() : null))
-      .then((data: { user?: PortalUser } | null) => {
-        const nextUser = data?.user ?? null;
-        setUser(nextUser);
-        const professional = nextUser?.role === "PROFESSIONAL";
-        setItems(professional ? professionalItems : clientItems);
-        setMobileItems(professional ? professionalMobileItems : clientMobileItems);
-      })
-      .catch(() => {
-        setUser(null);
-        setItems(clientItems);
-        setMobileItems(clientMobileItems);
-      });
-  }, []);
+    if (!initialUser) {
+      fetch("/api/v1/auth/me")
+        .then((response) => (response.ok ? response.json() : null))
+        .then((data: { user?: PortalUser } | null) => {
+          if (data?.user) setUser(data.user);
+        })
+        .catch(() => {});
+    }
+  }, [initialUser]);
+
+  const activeUser = user ?? initialUser;
+  const isProfessional = activeUser
+    ? activeUser.role === "PROFESSIONAL"
+    : Boolean(pathname?.startsWith("/professional") || pathname?.startsWith("/professional-profile"));
+
+  const items = isProfessional ? professionalItems : clientItems;
+  const mobileItems = isProfessional ? professionalMobileItems : clientMobileItems;
+
+  const navigationUser = activeUser ?? {
+    firstName: "",
+    lastName: "",
+    role: isProfessional ? "PROFESSIONAL" : "CLIENT",
+    avatarUrl: null,
+  };
 
   return (
     <div className="min-h-screen bg-background pb-16 lg:pb-0">
       <AppSidebar items={items} pathname={pathname} user={navigationUser} />
       <div className="lg:pl-64">
-        <AppHeader role={user?.role} />
+        <AppHeader role={activeUser?.role ?? (isProfessional ? "PROFESSIONAL" : "CLIENT")} />
         <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           {pathname !== "/dashboard" && pathname !== "/professional/dashboard" && (
             <button

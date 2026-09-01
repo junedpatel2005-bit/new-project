@@ -3,6 +3,7 @@ import { z } from "zod";
 import { db, releaseMilestoneToProfessional } from "@/lib/wallet-ledger";
 import { sessionCookie, verifySession } from "@/lib/auth";
 import { notifyMilestonePayoutApproved } from "@/lib/marketplace-notifications";
+import { emitRealtimeProjectUpdate } from "@/lib/realtime";
 
 const schema = z.object({ paymentId: z.number().int().positive() });
 
@@ -116,6 +117,11 @@ export async function POST(request: NextRequest) {
       clientId: payment.clientId,
       professionalId: payment.professionalId,
     });
+    if (payment.projectTrackingId) {
+      emitRealtimeProjectUpdate([payment.clientId, payment.professionalId], {
+        projectId: payment.projectTrackingId,
+      });
+    }
     return NextResponse.json({
       ok: true,
       paidToProfessional: result.professionalPayoutAmount,

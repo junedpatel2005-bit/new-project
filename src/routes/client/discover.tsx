@@ -55,7 +55,9 @@ function DiscoverContent() {
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [query, setQuery] = useState("");
   const [segment, setSegment] = useState("");
-  const [category, setCategory] = useState("");
+  const [parentCategoryId, setParentCategoryId] = useState<number | null>(null);
+  const [categoryId, setCategoryId] = useState<number | null>(null);
+  const [subcategoryId, setSubcategoryId] = useState<number | null>(null);
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
   const [district, setDistrict] = useState("");
@@ -157,7 +159,9 @@ function DiscoverContent() {
     const params = new URLSearchParams();
     if (query.trim()) params.set("query", query.trim());
     if (segment) params.set("segment", segment);
-    if (category) params.set("category", category);
+    if (parentCategoryId !== null) params.set("parentCategoryId", String(parentCategoryId));
+    if (categoryId !== null) params.set("categoryId", String(categoryId));
+    if (subcategoryId !== null) params.set("subcategoryId", String(subcategoryId));
     if (city) params.set("city", city);
     if (state) params.set("state", state);
     if (district) params.set("district", district);
@@ -194,7 +198,9 @@ function DiscoverContent() {
   }, [
     query,
     segment,
-    category,
+    parentCategoryId,
+    categoryId,
+    subcategoryId,
     city,
     state,
     district,
@@ -209,26 +215,24 @@ function DiscoverContent() {
   ]);
 
   const totalProfessionals = results?.total ?? 0;
+  const parentCategories = useMemo(
+    () => categories.filter((item) => item.parentId === null),
+    [categories],
+  );
   const topCategories = useMemo(
     () =>
-      segment
-        ? categories.filter((item) => item.parentId === null && item.segment === segment)
-        : [],
-    [categories, segment],
+      parentCategoryId === null
+        ? []
+        : categories.filter((item) => item.parentId === parentCategoryId),
+    [categories, parentCategoryId],
   );
   const selectedCategory = useMemo(
-    () => categories.find((item) => item.name === category) ?? null,
-    [categories, category],
+    () => categories.find((item) => item.id === categoryId) ?? null,
+    [categories, categoryId],
   );
-  const activeTopCategory = useMemo(() => {
-    if (!selectedCategory) return null;
-    if (selectedCategory.parentId === null) return selectedCategory;
-    return categories.find((item) => item.id === selectedCategory.parentId) ?? null;
-  }, [categories, selectedCategory]);
   const subCategories = useMemo(
-    () =>
-      activeTopCategory ? categories.filter((item) => item.parentId === activeTopCategory.id) : [],
-    [categories, activeTopCategory],
+    () => (categoryId === null ? [] : categories.filter((item) => item.parentId === categoryId)),
+    [categories, categoryId],
   );
 
   return (
@@ -268,7 +272,9 @@ function DiscoverContent() {
               onClick={() => {
                 setQuery("");
                 setSegment("");
-                setCategory("");
+                setParentCategoryId(null);
+                setCategoryId(null);
+                setSubcategoryId(null);
                 setCity("");
                 setState("");
                 setDistrict("");
@@ -285,15 +291,19 @@ function DiscoverContent() {
             </button>
           </div>
 
-          <FilterSection title="Category">
+          <FilterSection title="Service type">
             <div className="mb-3 flex flex-wrap gap-2">
               {segmentOptions.map(([value, label]) => (
                 <button
                   key={value}
                   type="button"
                   onClick={() => {
-                    setSegment((current) => (current === value ? "" : value));
-                    setCategory("");
+                    const nextSegment = segment === value ? "" : value;
+                    const parent = parentCategories.find((item) => item.segment === nextSegment);
+                    setSegment(nextSegment);
+                    setParentCategoryId(parent?.id ?? null);
+                    setCategoryId(null);
+                    setSubcategoryId(null);
                     setPage(1);
                   }}
                   className={`whitespace-nowrap rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors duration-200 ${
@@ -312,23 +322,29 @@ function DiscoverContent() {
                   <input
                     type="radio"
                     name="category"
-                    checked={category === ""}
+                    checked={categoryId === null}
                     onChange={() => {
-                      setCategory("");
+                      setCategoryId(null);
+                      setSubcategoryId(null);
                       setPage(1);
                     }}
                     className="h-4 w-4 accent-primary"
                   />
-                  <span>All categories</span>
+                  <span>
+                    All{" "}
+                    {parentCategories.find((item) => item.id === parentCategoryId)?.name ??
+                      "categories"}
+                  </span>
                 </label>
                 {topCategories.map((item) => (
                   <label key={item.id} className="flex items-center gap-2 text-sm">
                     <input
                       type="radio"
                       name="category"
-                      checked={category === item.name}
+                      checked={categoryId === item.id}
                       onChange={() => {
-                        setCategory(item.name);
+                        setCategoryId(item.id);
+                        setSubcategoryId(null);
                         setPage(1);
                       }}
                       className="h-4 w-4 accent-primary"
@@ -346,29 +362,29 @@ function DiscoverContent() {
             {subCategories.length > 0 && (
               <div className="mt-3 space-y-2 border-t border-border pt-3">
                 <p className="text-xs font-medium text-muted-foreground">
-                  Sub-category of {activeTopCategory?.name}
+                  Subcategory{selectedCategory ? ` · ${selectedCategory.name}` : ""}
                 </p>
                 <label className="flex items-center gap-2 text-sm">
                   <input
                     type="radio"
                     name="subcategory"
-                    checked={category === activeTopCategory?.name}
+                    checked={subcategoryId === null}
                     onChange={() => {
-                      setCategory(activeTopCategory?.name ?? "");
+                      setSubcategoryId(null);
                       setPage(1);
                     }}
                     className="h-4 w-4 accent-primary"
                   />
-                  <span>General {activeTopCategory?.name}</span>
+                  <span>All {selectedCategory?.name}</span>
                 </label>
                 {subCategories.map((item) => (
                   <label key={item.id} className="flex items-center gap-2 text-sm">
                     <input
                       type="radio"
                       name="subcategory"
-                      checked={category === item.name}
+                      checked={subcategoryId === item.id}
                       onChange={() => {
-                        setCategory(item.name);
+                        setSubcategoryId(item.id);
                         setPage(1);
                       }}
                       className="h-4 w-4 accent-primary"

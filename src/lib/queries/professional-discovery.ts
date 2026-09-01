@@ -6,6 +6,9 @@ import type { ProfessionalDiscoveryResult } from "@/lib/types/professional-disco
 export type ProfessionalDiscoveryFilter = {
   query?: string;
   segment?: string;
+  parentCategoryId?: number;
+  categoryId?: number;
+  subcategoryId?: number;
   category?: string;
   city?: string;
   state?: string;
@@ -49,44 +52,71 @@ async function buildSearchWhere(filter: ProfessionalDiscoveryFilter) {
     role: "PROFESSIONAL",
     isActive: true,
   };
-  let categoryNames: string[] | undefined;
-
   if (filter.verified) {
     where.isVerified = true;
   }
 
-  if (filter.category) {
-    const category = await db.serviceCategory.findFirst({
-      where: { name: filter.category },
-      select: {
-        name: true,
-        parentId: true,
-        parent: { select: { name: true } },
-        children: { select: { name: true } },
-      },
+  let parentCategoryId = filter.parentCategoryId;
+  if (filter.segment && !parentCategoryId) {
+    const parent = await db.serviceCategory.findFirst({
+      where: { segment: filter.segment, parentId: null },
+      select: { id: true },
     });
-
-    // A job can target either a main category or a subcategory. A main
-    // category includes its children; a subcategory also accepts a pro who
-    // selected the parent category as a general service.
-    categoryNames = category
-      ? category.parentId === null
-        ? [category.name, ...category.children.map((child) => child.name)]
-        : [category.name, category.parent?.name].filter((name): name is string => Boolean(name))
-      : [filter.category];
-    where.professionalCategory = { in: categoryNames };
+    parentCategoryId = parent?.id;
   }
 
-  if (filter.segment) {
-    const segmentCategories = await db.serviceCategory.findMany({
-      where: { segment: filter.segment },
-      select: { name: true },
-    });
-    const segmentNames = segmentCategories.map((category) => category.name);
-    categoryNames = categoryNames
-      ? categoryNames.filter((name) => segmentNames.includes(name))
-      : segmentNames;
-    where.professionalCategory = { in: categoryNames };
+  if (filter.categoryId || filter.subcategoryId || parentCategoryId) {
+    const parent = parentCategoryId
+      ? await db.serviceCategory.findFirst({
+          where: { id: parentCategoryId, parentId: null },
+          select: { id: true },
+        })
+      : null;
+    const category = filter.categoryId
+      ? await db.serviceCategory.findFirst({
+          where: { id: filter.categoryId, parentId: parent?.id },
+          select: { id: true },
+        })
+      : null;
+    const subcategory = filter.subcategoryId
+      ? await db.serviceCategory.findFirst({
+          where: { id: filter.subcategoryId, parentId: category?.id },
+          select: { id: true },
+        })
+      : null;
+
+    if (!parent || (filter.categoryId && !category) || (filter.subcategoryId && !subcategory)) {
+      where.AND = [{ id: -1 }];
+    } else {
+      const selectedId = subcategory?.id ?? category?.id ?? parent.id;
+      const hierarchy = await db.serviceCategory.findMany({ select: { id: true, parentId: true } });
+      const childrenByParent = new Map<number, number[]>();
+      for (const item of hierarchy) {
+        if (item.parentId === null) continue;
+        const children = childrenByParent.get(item.parentId) ?? [];
+        children.push(item.id);
+        childrenByParent.set(item.parentId, children);
+      }
+      const branchIds: number[] = [];
+      const collectBranch = (id: number) => {
+        branchIds.push(id);
+        for (const childId of childrenByParent.get(id) ?? []) collectBranch(childId);
+      };
+      collectBranch(selectedId);
+      where.AND = [
+        ...(Array.isArray(where.AND) ? where.AND : []),
+        {
+          OR: [
+            { professionalCategoryId: { in: branchIds } },
+            { services: { some: { isActive: true, categoryId: { in: branchIds } } } },
+          ],
+        },
+      ];
+    }
+  } else if (filter.category) {
+    // Backward-compatible name filtering for older API consumers. New clients
+    // should use parentCategoryId/categoryId/subcategoryId.
+    where.professionalCategory = filter.category;
   }
 
   if (filter.city) {

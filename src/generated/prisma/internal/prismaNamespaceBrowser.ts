@@ -261,6 +261,7 @@ export const UserScalarFieldEnum = {
   companyDescription: 'companyDescription',
   address: 'address',
   professionalCategory: 'professionalCategory',
+  professionalCategoryId: 'professionalCategoryId',
   professionalCity: 'professionalCity',
   professionalState: 'professionalState',
   professionalDistrict: 'professionalDistrict',

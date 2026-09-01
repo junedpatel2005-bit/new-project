@@ -16,7 +16,7 @@ import {
   Home,
   LocateFixed,
   Search,
-  Map,
+  Map as MapIcon,
   MapPin,
   SlidersHorizontal,
   Star,
@@ -239,8 +239,11 @@ function ProfessionalJobsContent() {
     }
   }
 
+  const [focusedJobId, setFocusedJobId] = useState<number | null>(null);
+
   function showJobLocation(jobId: number) {
     setSelectedJobId(jobId);
+    setFocusedJobId(jobId);
     setShowMap(true);
   }
 
@@ -366,38 +369,92 @@ function ProfessionalJobsContent() {
     }
   }
 
-  const topCategories = useMemo(
-    () => (segment ? categories.filter((c) => c.parentId === null && c.segment === segment) : []),
+  const segmentCategory = useMemo(
+    () =>
+      segment ? categories.find((c) => c.parentId === null && c.segment === segment) ?? null : null,
     [categories, segment],
   );
+
+  const topCategories = useMemo(() => {
+    if (!segment) return [];
+    if (segmentCategory) {
+      return categories.filter((c) => c.parentId === segmentCategory.id);
+    }
+    return categories.filter((c) => c.parentId === null && c.segment === segment);
+  }, [categories, segment, segmentCategory]);
+
   const selectedCategory = useMemo(
     () => categories.find((c) => c.name === category) ?? null,
     [categories, category],
   );
+
   const activeTopCategory = useMemo(() => {
     if (!selectedCategory) return null;
+    if (segmentCategory && selectedCategory.parentId === segmentCategory.id) return selectedCategory;
     if (selectedCategory.parentId === null) return selectedCategory;
     return categories.find((c) => c.id === selectedCategory.parentId) ?? null;
-  }, [categories, selectedCategory]);
+  }, [categories, selectedCategory, segmentCategory]);
+
   const subCategories = useMemo(
-    () => (activeTopCategory ? categories.filter((c) => c.parentId === activeTopCategory.id) : []),
-    [categories, activeTopCategory],
+    () =>
+      activeTopCategory && activeTopCategory.id !== segmentCategory?.id
+        ? categories.filter((c) => c.parentId === activeTopCategory.id)
+        : [],
+    [categories, activeTopCategory, segmentCategory],
   );
+
+  const matchingCategoryNames = useMemo(() => {
+    if (!category) return null;
+    const match = categories.find((c) => c.name === category);
+    if (!match) return new Set([category]);
+    const names = new Set<string>([match.name]);
+    const addChildren = (catId: number) => {
+      for (const c of categories) {
+        if (c.parentId === catId) {
+          names.add(c.name);
+          addChildren(c.id);
+        }
+      }
+    };
+    addChildren(match.id);
+    return names;
+  }, [categories, category]);
+
   const segmentCategoryNames = useMemo(
     () =>
       new Set(
-        categories.filter((item) => !segment || item.segment === segment).map((item) => item.name),
+        categories
+          .filter((item) => !segment || item.segment === segment)
+          .map((item) => item.name),
       ),
     [categories, segment],
   );
+
   const jobCountByCategory = useMemo(() => {
     const counts: Record<string, number> = {};
-    for (const job of jobs) {
-      if (!job.category) continue;
-      counts[job.category] = (counts[job.category] ?? 0) + 1;
+    const childrenMap = new Map<number, number[]>();
+    for (const c of categories) {
+      if (c.parentId !== null) {
+        const list = childrenMap.get(c.parentId) ?? [];
+        list.push(c.id);
+        childrenMap.set(c.parentId, list);
+      }
+    }
+    const getSubtreeNames = (catId: number): string[] => {
+      const cat = categories.find((c) => c.id === catId);
+      if (!cat) return [];
+      const names = [cat.name];
+      for (const childId of childrenMap.get(catId) ?? []) {
+        names.push(...getSubtreeNames(childId));
+      }
+      return names;
+    };
+    for (const cat of categories) {
+      const allNames = new Set(getSubtreeNames(cat.id));
+      counts[cat.name] = jobs.filter((j) => j.category && allNames.has(j.category)).length;
     }
     return counts;
-  }, [jobs]);
+  }, [categories, jobs]);
 
   const filteredJobs = useMemo(() => {
     const value = query.trim().toLowerCase();
@@ -414,7 +471,8 @@ function ProfessionalJobsContent() {
           .filter(Boolean)
           .some((field) => String(field).toLowerCase().includes(value));
       const matchesSegment = !segment || segmentCategoryNames.has(job.category ?? "");
-      const matchesCategory = !category || job.category === category;
+      const matchesCategory =
+        !matchingCategoryNames || matchingCategoryNames.has(job.category ?? "");
       const matchesCity =
         !city || (job.locationAddress ?? "").toLowerCase().includes(city.toLowerCase());
       const matchesState = !state || job.locationState === state;
@@ -488,7 +546,20 @@ function ProfessionalJobsContent() {
     [visibleJobs],
   );
 
-  const selectedJob = mapJobs.find((job) => job.id === selectedJobId) ?? mapJobs[0] ?? null;
+  const displayedMapJobs = useMemo(() => {
+    if (focusedJobId != null) {
+      const matched = mapJobs.filter((j) => j.id === focusedJobId);
+      if (matched.length > 0) return matched;
+    }
+    return mapJobs;
+  }, [mapJobs, focusedJobId]);
+
+  const focusedJob = useMemo(
+    () => (focusedJobId != null ? mapJobs.find((j) => j.id === focusedJobId) ?? null : null),
+    [mapJobs, focusedJobId],
+  );
+
+  const selectedJob = displayedMapJobs.find((job) => job.id === selectedJobId) ?? displayedMapJobs[0] ?? null;
   const mapCenter: [number, number] = selectedJob
     ? [selectedJob.locationLat, selectedJob.locationLng]
     : [20, 0];
@@ -511,13 +582,15 @@ function ProfessionalJobsContent() {
                     ? "Hire requests"
                     : "Find jobs"}
             </h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {view === "proposals"
-                ? `${proposals.length} proposal${proposals.length === 1 ? "" : "s"} sent`
-                : view === "offers"
-                  ? `${offers.length} hire request${offers.length === 1 ? "" : "s"} received`
-                  : `${visibleJobs.length} jobs available${jobs.length ? ` across ${jobs.length} listings` : ""}`}
-            </p>
+            {view === "proposals" ? (
+              <p className="mt-1 text-sm text-muted-foreground">
+                {`${proposals.length} proposal${proposals.length === 1 ? "" : "s"} sent`}
+              </p>
+            ) : view === "offers" ? (
+              <p className="mt-1 text-sm text-muted-foreground">
+                {`${offers.length} hire request${offers.length === 1 ? "" : "s"} received`}
+              </p>
+            ) : null}
           </div>
           <div className="flex flex-wrap gap-1 rounded-xl border border-border bg-muted/50 p-1">
             <button
@@ -728,7 +801,7 @@ function ProfessionalJobsContent() {
                           <input
                             type="radio"
                             name="category"
-                            checked={category === item.name}
+                            checked={activeTopCategory?.name === item.name}
                             onChange={() => setCategory(item.name)}
                             className="h-4 w-4 accent-primary"
                           />
@@ -749,7 +822,7 @@ function ProfessionalJobsContent() {
                   {subCategories.length > 0 && (
                     <div className="mt-3 space-y-2 border-t border-border pt-3">
                       <p className="text-xs font-medium text-muted-foreground">
-                        Sub-category of {activeTopCategory?.name}
+                        Sub-categories of {activeTopCategory?.name}
                       </p>
                       <label className="flex items-center gap-2 text-sm">
                         <input
@@ -759,7 +832,7 @@ function ProfessionalJobsContent() {
                           onChange={() => setCategory(activeTopCategory?.name ?? "")}
                           className="h-4 w-4 accent-primary"
                         />
-                        <span>General {activeTopCategory?.name}</span>
+                        <span>All {activeTopCategory?.name}</span>
                       </label>
                       {subCategories.map((item) => (
                         <label key={item.id} className="flex items-center gap-2 text-sm">
@@ -901,10 +974,15 @@ function ProfessionalJobsContent() {
                   </div>
                   <Button
                     variant="outline"
-                    onClick={() => setShowMap((current) => !current)}
+                    onClick={() => {
+                      setShowMap((current) => {
+                        if (current) setFocusedJobId(null);
+                        return !current;
+                      });
+                    }}
                     className="gap-2"
                   >
-                    <Map className="h-4 w-4" />
+                    <MapIcon className="h-4 w-4" />
                     {showMap ? "Hide map" : "Show map"}
                   </Button>
                 </div>
@@ -915,6 +993,7 @@ function ProfessionalJobsContent() {
                   role="button"
                   tabIndex={0}
                   onClick={() => {
+                    setFocusedJobId(null);
                     setShowMap(true);
                     window.requestAnimationFrame(() => {
                       mapSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -973,14 +1052,31 @@ function ProfessionalJobsContent() {
 
                 {showMap && (
                   <div className="mb-4">
+                    {focusedJob && (
+                      <div className="mb-2 flex items-center justify-between rounded-xl border border-primary/20 bg-primary/5 px-3.5 py-2 text-xs">
+                        <span className="flex items-center gap-1.5 font-medium text-foreground truncate">
+                          <MapPin className="h-3.5 w-3.5 text-primary shrink-0" />
+                          <span>
+                            Showing location for: <strong className="font-semibold text-primary">{focusedJob.title}</strong>
+                          </span>
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setFocusedJobId(null)}
+                          className="ml-2 whitespace-nowrap rounded-md border border-border bg-background px-2.5 py-1 text-[11px] font-semibold text-muted-foreground shadow-sm hover:bg-muted hover:text-foreground"
+                        >
+                          Show all on map ({mapJobs.length})
+                        </button>
+                      </div>
+                    )}
                     <div
                       ref={mapSectionRef}
                       className="relative h-[320px] overflow-hidden rounded-2xl border border-border"
                     >
-                      {mapJobs.length > 0 ? (
+                      {displayedMapJobs.length > 0 ? (
                         <ProfessionalJobsMap
                           center={mapCenter}
-                          jobs={mapJobs}
+                          jobs={displayedMapJobs}
                           onSelectJob={setSelectedJobId}
                         />
                       ) : (
@@ -989,7 +1085,7 @@ function ProfessionalJobsContent() {
                         </div>
                       )}
                     </div>
-                    {mapJobs.length > 0 && (
+                    {displayedMapJobs.length > 0 && (
                       <p className="mt-1.5 text-[11px] text-muted-foreground">
                         Approximate location — shown for privacy
                       </p>

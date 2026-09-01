@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { sessionCookie, verifySession } from "@/lib/auth";
 import { calculateMilestoneMoney, fundMilestoneFromWallet } from "@/lib/wallet-ledger";
 import { notifyMilestoneFunded } from "@/lib/marketplace-notifications";
+import { emitRealtimeProjectUpdate } from "@/lib/realtime";
 
 const schema = z.object({
   projectId: z.number().int().positive(),
@@ -139,6 +140,9 @@ export async function POST(request: NextRequest) {
       amount: money.baseAmount,
       clientId: project.clientId,
       professionalId: project.professionalId,
+    });
+    emitRealtimeProjectUpdate([project.clientId, project.professionalId], {
+      projectId: project.id,
     });
     return NextResponse.json({
       ok: true,

@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { io } from "socket.io-client";
 import {
   ArrowRight,
   BriefcaseBusiness,
@@ -83,32 +84,58 @@ export default function RunningProjectsPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
   const [view, setView] = useState<"active" | "completed">("active");
 
-  useEffect(() => {
-    let active = true;
-    void fetch("/api/v1/portal/professional-jobs", { cache: "no-store" })
-      .then((response) => (response.ok ? response.json() : Promise.reject()))
-      .then(
-        (data: {
-          activeProjects?: RunningProject[];
-          completedProjects?: CompletedProject[];
-          savedJobs?: { id: number }[];
-        }) => {
-          if (!active) return;
-          setProjects(data.activeProjects ?? []);
-          setCompletedProjects(data.completedProjects ?? []);
-          setSavedJobsCount(data.savedJobs?.length ?? 0);
-        },
-      )
-      .catch(() => {
-        if (active) setError("Your active projects could not be loaded.");
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
-    return () => {
-      active = false;
-    };
+  const loadProjects = useCallback(async (silent = false) => {
+    if (!silent) setLoading(true);
+    try {
+      const response = await fetch("/api/v1/portal/professional-jobs", { cache: "no-store" });
+      if (!response.ok) throw new Error();
+      const data = (await response.json()) as {
+        activeProjects?: RunningProject[];
+        completedProjects?: CompletedProject[];
+        savedJobs?: { id: number }[];
+      };
+      setProjects(data.activeProjects ?? []);
+      setCompletedProjects(data.completedProjects ?? []);
+      setSavedJobsCount(data.savedJobs?.length ?? 0);
+      setError("");
+    } catch {
+      if (!silent) setError("Your active projects could not be loaded.");
+    } finally {
+      if (!silent) setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    void loadProjects();
+  }, [loadProjects]);
+
+  useEffect(() => {
+    const socket = io({
+      path: "/api/realtime",
+      withCredentials: true,
+      transports: ["websocket", "polling"],
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+    });
+    const onUpdate = () => void loadProjects(true);
+    socket.on("project:updated", onUpdate);
+    socket.on("notification:new", onUpdate);
+    socket.on("proposal:new", onUpdate);
+
+    const onCustomUpdate = () => void loadProjects(true);
+    window.addEventListener("servio:notification", onCustomUpdate);
+    window.addEventListener("servio:project-update", onCustomUpdate);
+
+    return () => {
+      socket.off("project:updated", onUpdate);
+      socket.off("notification:new", onUpdate);
+      socket.off("proposal:new", onUpdate);
+      socket.disconnect();
+      window.removeEventListener("servio:notification", onCustomUpdate);
+      window.removeEventListener("servio:project-update", onCustomUpdate);
+    };
+  }, [loadProjects]);
 
   const visibleProjects = useMemo(() => {
     const term = search.trim().toLowerCase();
