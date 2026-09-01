@@ -45,9 +45,9 @@ const segmentLabel = (segment: Segment | undefined) => {
   return value[0] + value.slice(1).toLowerCase();
 };
 const segmentStyles: Record<Segment, string> = {
-  RESIDENTIAL: "bg-indigo-400/10 text-indigo-300",
-  COMMERCIAL: "bg-cyan-400/10 text-cyan-300",
-  INDUSTRIAL: "bg-amber-400/10 text-amber-300",
+  RESIDENTIAL: "bg-indigo-50 text-indigo-700 border border-indigo-200",
+  COMMERCIAL: "bg-sky-50 text-sky-700 border border-sky-200",
+  INDUSTRIAL: "bg-amber-50 text-amber-700 border border-amber-200",
 };
 
 export default function AdminServicesPage() {
@@ -181,17 +181,17 @@ export default function AdminServicesPage() {
     <div>
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[.2em] text-indigo-400">
+          <p className="text-xs font-bold uppercase tracking-[.2em] text-indigo-600">
             Admin module
           </p>
-          <h1 className="mt-2 font-display text-3xl font-bold">Service catalog</h1>
-          <p className="mt-2 max-w-xl text-slate-400">
+          <h1 className="mt-2 font-display text-3xl font-bold text-slate-900">Service catalog</h1>
+          <p className="mt-2 max-w-xl text-slate-500">
             Shape the service catalog your marketplace runs on. Keep categories focused, searchable,
             and easy for customers to understand.
           </p>
         </div>
-        <span className="inline-flex w-fit items-center gap-2 rounded-full bg-emerald-400/10 px-3 py-1.5 text-xs font-semibold text-emerald-300">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+        <span className="inline-flex w-fit items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-800">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
           Live on marketplace
         </span>
       </div>
@@ -204,7 +204,11 @@ export default function AdminServicesPage() {
 
       {message && (
         <p
-          className={`mt-5 rounded-xl px-4 py-3 text-sm ${message.tone === "success" ? "bg-emerald-500/10 text-emerald-300" : "bg-rose-500/10 text-rose-300"}`}
+          className={`mt-5 rounded-xl border px-4 py-3 text-sm font-medium ${
+            message.tone === "success"
+              ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+              : "border-rose-200 bg-rose-50 text-rose-800"
+          }`}
         >
           {message.text}
         </p>
@@ -213,35 +217,35 @@ export default function AdminServicesPage() {
       <div className="mt-6 grid items-start gap-6 xl:grid-cols-[320px_minmax(0,1fr)]">
         <form
           onSubmit={(event) => void add(event)}
-          className="rounded-2xl border border-white/10 bg-white/[.035] p-5"
+          className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs"
         >
-          <h2 className="font-semibold text-white">Create a category</h2>
-          <p className="mt-1 text-sm text-slate-400">
+          <h2 className="font-semibold text-slate-900">Create a category</h2>
+          <p className="mt-1 text-sm text-slate-500">
             Add a new top-level service to your marketplace.
           </p>
-          <label className="mt-5 block text-xs font-semibold text-slate-300">
+          <label className="mt-5 block text-xs font-semibold text-slate-700">
             Name
             <input
               required
               value={form.name}
               onChange={(event) => setForm({ ...form, name: event.target.value })}
               placeholder="e.g. Home Cleaning"
-              className="mt-2 h-11 w-full rounded-xl border border-white/10 bg-white/[.035] px-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-400/50"
+              className="mt-1.5 h-11 w-full rounded-xl border border-slate-200 bg-slate-50/70 px-3 text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 shadow-2xs"
             />
           </label>
-          <label className="mt-4 block text-xs font-semibold text-slate-300">
-            Description <span className="font-normal text-slate-500">(optional)</span>
+          <label className="mt-4 block text-xs font-semibold text-slate-700">
+            Description <span className="font-normal text-slate-400">(optional)</span>
             <textarea
               value={form.description}
               onChange={(event) => setForm({ ...form, description: event.target.value })}
               placeholder="Describe this service for admins and clients"
               rows={3}
-              className="mt-2 w-full resize-none rounded-xl border border-white/10 bg-white/[.035] p-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-400/50"
+              className="mt-1.5 w-full resize-none rounded-xl border border-slate-200 bg-slate-50/70 p-3 text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 shadow-2xs"
             />
           </label>
           <fieldset className="mt-4">
-            <legend className="text-xs font-semibold text-slate-300">Segment</legend>
-            <div className="mt-2 grid grid-cols-3 gap-1 rounded-xl border border-white/10 bg-white/[.035] p-1">
+            <legend className="text-xs font-semibold text-slate-700">Segment</legend>
+            <div className="mt-1.5 grid grid-cols-3 gap-1 rounded-xl border border-slate-200 bg-slate-50 p-1">
               {segments.slice(1).map((segment) => (
                 <button
                   key={segment.value}
@@ -249,50 +253,54 @@ export default function AdminServicesPage() {
                   onClick={() =>
                     setForm({ ...form, segment: segment.value as Segment, parentId: null })
                   }
-                  className={`rounded-lg px-1.5 py-2 text-[11px] font-semibold transition ${form.segment === segment.value ? "bg-indigo-500 text-white" : "text-slate-400 hover:text-slate-200"}`}
+                  className={`rounded-lg px-1.5 py-2 text-[11px] font-semibold transition ${
+                    form.segment === segment.value
+                      ? "bg-white text-indigo-600 shadow-2xs font-bold"
+                      : "text-slate-600 hover:text-slate-900"
+                  }`}
                 >
                   {segment.label}
                 </button>
               ))}
             </div>
           </fieldset>
-          <Button type="submit" disabled={saving} className="mt-5 w-full">
+          <Button type="submit" disabled={saving} className="mt-5 w-full bg-indigo-600 text-white hover:bg-indigo-500 shadow-xs">
             <Plus className="mr-2 h-4 w-4" />
             {saving ? "Adding category…" : "Add category"}
           </Button>
         </form>
 
-        <section className="min-w-0 rounded-2xl border border-white/10 bg-white/[.035]">
-          <div className="flex flex-col gap-4 border-b border-white/10 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <section className="min-w-0 rounded-2xl border border-slate-200 bg-white shadow-xs">
+          <div className="flex flex-col gap-4 border-b border-slate-200 bg-slate-50/70 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="font-semibold text-white">Service taxonomy</h2>
-                <span className="rounded-full bg-white/[.06] px-2 py-0.5 text-[10px] font-semibold text-slate-400">
+                <h2 className="font-semibold text-slate-900">Service taxonomy</h2>
+                <span className="rounded-full bg-slate-200/70 px-2 py-0.5 text-[10px] font-semibold text-slate-700">
                   {counts.parents} roots
                 </span>
               </div>
-              <p className="mt-1 text-xs text-slate-400">
+              <p className="mt-0.5 text-xs text-slate-500">
                 Changes publish to the public Services page immediately.
               </p>
             </div>
             <div className="relative w-full sm:w-64">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Search categories"
-                className="h-10 w-full rounded-xl border border-white/10 bg-white/[.035] pl-9 pr-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-400/50"
+                className="h-10 w-full rounded-xl border border-slate-200 bg-white pl-9 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 shadow-2xs"
               />
             </div>
           </div>
           {loading ? (
             <div className="space-y-2 p-5">
               {[1, 2, 3, 4].map((item) => (
-                <div key={item} className="h-20 animate-pulse rounded-xl bg-white/[.04]" />
+                <div key={item} className="h-20 animate-pulse rounded-xl bg-slate-100" />
               ))}
             </div>
           ) : visibleCategories.length ? (
-            <div className="divide-y divide-white/10">
+            <div className="divide-y divide-slate-100">
               {visibleCategories.map(({ category, children }) => (
                 <CategoryRow
                   key={category.id}
@@ -306,8 +314,8 @@ export default function AdminServicesPage() {
             </div>
           ) : (
             <div className="py-16 text-center">
-              <FolderTree className="mx-auto h-8 w-8 text-slate-600" />
-              <p className="mt-3 text-sm text-slate-400">No categories match this view.</p>
+              <FolderTree className="mx-auto h-8 w-8 text-slate-400" />
+              <p className="mt-3 text-sm text-slate-500">No categories match this view.</p>
             </div>
           )}
         </section>
@@ -317,7 +325,7 @@ export default function AdminServicesPage() {
           title={`${selectedSegment.name} categories`}
           onClose={() => setSelectedSegment(null)}
         >
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-slate-500">
             All categories and subcategories in this section.
           </p>
           <div className="mt-5 space-y-3">
@@ -328,11 +336,11 @@ export default function AdminServicesPage() {
                   key={category.id}
                   type="button"
                   onClick={() => void openCategory(category)}
-                  className="w-full rounded-xl bg-white/[.035] p-4 text-left transition hover:bg-white/[.07]"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50/70 p-4 text-left transition hover:bg-slate-100"
                 >
                   <div className="flex items-center justify-between gap-3">
-                    <span className="font-semibold text-white">{category.name}</span>
-                    <Pencil className="h-4 w-4 text-indigo-300" />
+                    <span className="font-semibold text-slate-900">{category.name}</span>
+                    <Pencil className="h-4 w-4 text-indigo-600" />
                   </div>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {services
@@ -340,7 +348,7 @@ export default function AdminServicesPage() {
                       .map((subCategory) => (
                         <span
                           key={subCategory.id}
-                          className="rounded-lg bg-white/[.06] px-2.5 py-1 text-xs text-slate-300"
+                          className="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-700"
                         >
                           {subCategory.name}
                         </span>
@@ -355,44 +363,46 @@ export default function AdminServicesPage() {
         <Modal title={selectedCategory.name} onClose={() => setSelectedCategory(null)}>
           {editing ? (
             <div className="space-y-4">
-              <label className="block text-sm text-slate-300">
+              <label className="block text-sm font-semibold text-slate-700">
                 Category name
                 <input
                   value={editForm.name}
                   onChange={(event) => setEditForm({ ...editForm, name: event.target.value })}
-                  className="mt-2 h-10 w-full rounded-lg border border-white/10 bg-white/[.035] px-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-indigo-400/50"
+                  className="mt-1.5 h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 shadow-2xs"
                 />
               </label>
-              <label className="block text-sm text-slate-300">
+              <label className="block text-sm font-semibold text-slate-700">
                 Description
                 <textarea
                   value={editForm.description}
                   onChange={(event) =>
                     setEditForm({ ...editForm, description: event.target.value })
                   }
-                  className="mt-2 w-full rounded-lg border border-white/10 bg-white/[.035] p-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-indigo-400/50"
+                  className="mt-1.5 w-full rounded-lg border border-slate-200 bg-white p-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 shadow-2xs"
                   rows={3}
                 />
               </label>
-              <div className="flex justify-end gap-2">
+              <div className="flex justify-end gap-2 pt-2">
                 <Button
                   variant="outline"
-                  className="border-white/10 bg-transparent text-slate-300 hover:bg-white/10 hover:text-white"
+                  className="border-slate-200 bg-white text-slate-700 hover:bg-slate-100"
                   onClick={() => setEditing(false)}
                 >
                   Cancel
                 </Button>
-                <Button onClick={() => void saveEdit()}>Save changes</Button>
+                <Button onClick={() => void saveEdit()} className="bg-indigo-600 text-white hover:bg-indigo-500">
+                  Save changes
+                </Button>
               </div>
             </div>
           ) : (
             <>
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <p className="text-sm text-slate-400">
+                  <p className="text-sm text-slate-600">
                     {selectedCategory.description || "No description added."}
                   </p>
-                  <p className="mt-2 text-xs text-slate-500">
+                  <p className="mt-1.5 text-xs font-semibold text-indigo-600">
                     {categoryDescendants.length - 1} subcategories
                   </p>
                 </div>
@@ -400,13 +410,13 @@ export default function AdminServicesPage() {
                   variant="outline"
                   size="sm"
                   onClick={() => setEditing(true)}
-                  className="border-white/10 bg-transparent text-slate-300 hover:bg-white/10 hover:text-white"
+                  className="border-slate-200 bg-white text-slate-700 hover:bg-slate-100"
                 >
                   <Pencil className="mr-2 h-3.5 w-3.5" /> Edit
                 </Button>
               </div>
-              <div className="mt-5 border-t border-white/10 pt-4">
-                <h3 className="font-semibold text-white">Subcategories</h3>
+              <div className="mt-5 border-t border-slate-200 pt-4">
+                <h3 className="font-semibold text-slate-900">Subcategories</h3>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {categoryDescendants
                     .filter((item) => item.id !== selectedCategory.id)
@@ -415,22 +425,22 @@ export default function AdminServicesPage() {
                         key={item.id}
                         type="button"
                         onClick={() => void openCategory(item)}
-                        className="rounded-lg bg-white/[.04] px-3 py-2 text-xs text-slate-300 hover:bg-white/[.08]"
+                        className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-indigo-50 hover:border-indigo-200 hover:text-indigo-700 transition"
                       >
                         {item.name}
                       </button>
                     ))}
                 </div>
               </div>
-              <div className="mt-5 border-t border-white/10 pt-4">
-                <h3 className="font-semibold text-white">
+              <div className="mt-5 border-t border-slate-200 pt-4">
+                <h3 className="font-semibold text-slate-900">
                   Jobs in this category{" "}
                   <span className="text-sm font-normal text-slate-500">
                     ({detailLoading ? "…" : categoryJobs.length})
                   </span>
                 </h3>
                 {!detailLoading && !categoryJobs.length ? (
-                  <p className="mt-3 text-sm text-slate-500">
+                  <p className="mt-3 text-sm text-slate-500 bg-slate-50 p-4 rounded-xl border border-slate-200">
                     No jobs are currently assigned to this category.
                   </p>
                 ) : (
@@ -439,9 +449,9 @@ export default function AdminServicesPage() {
                       <a
                         key={job.id}
                         href={`/job/${job.id}`}
-                        className="block rounded-xl bg-white/[.035] p-3 hover:bg-white/[.07]"
+                        className="block rounded-xl border border-slate-200 bg-slate-50/70 p-3 hover:bg-slate-100 transition"
                       >
-                        <p className="font-medium text-white">{job.title || `Job #${job.id}`}</p>
+                        <p className="font-semibold text-slate-900">{job.title || `Job #${job.id}`}</p>
                         <p className="mt-1 text-xs text-slate-500">
                           {job.category} · {job.status}
                           {job.locationLabel ? ` · ${job.locationLabel}` : ""}
@@ -469,10 +479,12 @@ function Metric({
   value: number;
 }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[.035] p-5 transition hover:-translate-y-0.5 hover:bg-white/[.07]">
-      <Icon className="h-5 w-5 text-indigo-400" />
-      <p className="mt-5 text-3xl font-bold">{value}</p>
-      <p className="mt-1 text-sm text-slate-400">{label}</p>
+    <div className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-xs transition hover:-translate-y-0.5 hover:shadow-md hover:border-indigo-200">
+      <div className="grid h-10 w-10 place-items-center rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100 group-hover:bg-indigo-600 group-hover:text-white transition">
+        <Icon className="h-5 w-5" />
+      </div>
+      <p className="mt-4 text-3xl font-bold text-slate-900">{value}</p>
+      <p className="mt-1 text-sm font-medium text-slate-500">{label}</p>
     </div>
   );
 }
@@ -494,24 +506,24 @@ function CategoryRow({
   return (
     <article
       onClick={onOpen}
-      className="flex cursor-pointer flex-wrap items-start gap-4 px-5 py-4 transition hover:bg-white/[.045]"
+      className="flex cursor-pointer flex-wrap items-start gap-4 px-5 py-4 transition hover:bg-slate-50/80"
     >
-      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-indigo-500/15 text-indigo-300">
+      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-indigo-50 text-indigo-700 border border-indigo-100">
         <FolderTree className="h-5 w-5" />
       </span>
       <div className="min-w-48 flex-1">
         <div className="flex flex-wrap items-center gap-2">
-          <p className="font-semibold text-white">{category.name}</p>
+          <p className="font-semibold text-slate-900">{category.name}</p>
           <span
             className={`rounded-full px-2 py-0.5 text-xs font-semibold ${segmentStyles[segment]}`}
           >
             {segmentLabel(segment)}
           </span>
         </div>
-        <p className="mt-0.5 text-sm text-slate-400">
+        <p className="mt-0.5 text-sm text-slate-500">
           {category.description || "No description added."}
         </p>
-        <p className="mt-1 text-xs text-slate-500">
+        <p className="mt-1 text-xs text-slate-400 font-medium">
           /{category.slug} · {category.jobCount ?? 0} live{" "}
           {category.jobCount === 1 ? "job" : "jobs"} · {children.length} subcategor
           {children.length === 1 ? "y" : "ies"}
@@ -521,9 +533,9 @@ function CategoryRow({
             {children.map((child) => (
               <span
                 key={child.id}
-                className="inline-flex items-center gap-1.5 rounded-full bg-white/[.06] py-1 pl-2.5 pr-1.5 text-xs text-slate-300"
+                className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 py-1 pl-2.5 pr-1.5 text-xs font-medium text-slate-700"
               >
-                <Check className="h-3 w-3 shrink-0 text-emerald-400" />
+                <Check className="h-3 w-3 shrink-0 text-emerald-600" />
                 {child.name}
                 <button
                   type="button"
@@ -531,7 +543,7 @@ function CategoryRow({
                     event.stopPropagation();
                     onOpenCategory(child);
                   }}
-                  className="rounded p-0.5 text-slate-500 hover:bg-white/10 hover:text-indigo-300"
+                  className="rounded p-0.5 text-slate-400 hover:bg-slate-200 hover:text-indigo-600"
                   aria-label={`Edit ${child.name}`}
                 >
                   <Pencil className="h-3 w-3" />
@@ -548,7 +560,7 @@ function CategoryRow({
         }}
         variant="outline"
         size="sm"
-        className="border-white/10 bg-transparent text-slate-400 hover:border-rose-400/30 hover:bg-rose-500/10 hover:text-rose-200"
+        className="border-slate-200 bg-white text-slate-600 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700"
       >
         <Trash2 className="mr-2 h-4 w-4" />
         Delete
@@ -568,17 +580,17 @@ function Modal({
 }) {
   return (
     <div
-      className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-4"
+      className="fixed inset-0 z-50 grid place-items-center bg-slate-900/40 backdrop-blur-xs p-4"
       role="dialog"
       aria-modal="true"
     >
-      <div className="max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-white/10 bg-[#11182b] p-6 shadow-2xl">
-        <div className="flex items-start justify-between gap-4">
-          <h2 className="text-xl font-semibold text-white">{title}</h2>
+      <div className="max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl">
+        <div className="flex items-start justify-between gap-4 border-b border-slate-100 pb-3">
+          <h2 className="text-xl font-bold text-slate-900">{title}</h2>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-2 text-slate-400 hover:bg-white/[.06] hover:text-white"
+            className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
             aria-label="Close dialog"
           >
             <X className="h-5 w-5" />

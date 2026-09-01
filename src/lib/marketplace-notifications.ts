@@ -2,7 +2,14 @@ import "server-only";
 
 import { db } from "@/lib/db";
 import { logServerError } from "@/lib/server-logger";
-import { emitRealtimeNotification } from "@/lib/realtime";
+import {
+  emitRealtimeNotification,
+  emitAdminNotification,
+  emitAdminOverviewUpdate,
+  emitAdminUsersUpdate,
+  emitAdminOperationsUpdate,
+  emitAdminVerificationsUpdate,
+} from "@/lib/realtime";
 import { sendNotificationEmail } from "@/lib/email";
 
 type BroadcastNotification = {
@@ -111,6 +118,19 @@ async function notifyRole(
         createdAt: notification.createdAt.toISOString(),
       }),
     );
+    if (role === "ADMIN") {
+      emitAdminNotification(storedNotification);
+      emitAdminOverviewUpdate();
+      if (storedNotification.type.includes("ACCOUNT") || storedNotification.type.includes("USER")) {
+        emitAdminUsersUpdate();
+      }
+      if (storedNotification.type.includes("JOB") || storedNotification.type.includes("DISPUTE") || storedNotification.type.includes("PROJECT")) {
+        emitAdminOperationsUpdate();
+      }
+      if (storedNotification.type.includes("VERIFICATION")) {
+        emitAdminVerificationsUpdate();
+      }
+    }
     const configuredAdminEmail =
       role === "ADMIN" && process.env.ADMIN_EMAIL?.includes("@")
         ? process.env.ADMIN_EMAIL.trim().toLowerCase()
@@ -160,7 +180,7 @@ export function notifyAdminsOfNewAccount(user: {
     type: "NEW_ACCOUNT",
     title: `New ${roleLabel} registration`,
     description: `${name} registered as a ${roleLabel}.`,
-    href: `/admin/users/${user.id}`,
+    href: `/admin/users?id=${user.id}`,
   });
 }
 

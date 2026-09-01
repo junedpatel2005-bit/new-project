@@ -111,6 +111,10 @@ export function AppHeader({ role }: { role?: string }) {
   }, []);
 
   const loadNotifications = useCallback(async () => {
+    if (pathname.startsWith("/notifications")) {
+      setUnreadNotifications(0);
+      return;
+    }
     try {
       const response = await fetch("/api/portal/notifications", { cache: "no-store" });
       if (!response.ok) return;
@@ -119,7 +123,7 @@ export function AppHeader({ role }: { role?: string }) {
     } catch {
       setUnreadNotifications(0);
     }
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
     void loadNotifications();

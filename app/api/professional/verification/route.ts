@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { sessionCookie, verifySession } from "@/lib/auth";
+import { emitAdminNotification, emitAdminVerificationsUpdate } from "@/lib/realtime";
 
 const input = z.object({
   governmentIdUrl: z.string().max(500).nullable().optional(),
@@ -52,5 +53,14 @@ export async function PUT(request: NextRequest) {
     update: { ...parsed.data, status: hasDocument ? "PENDING" : "PENDING" },
     create: { userId, ...parsed.data, status: "PENDING" },
   });
+  if (hasDocument) {
+    emitAdminNotification({
+      title: "New Verification Submitted",
+      description: "A professional has uploaded documents for verification review.",
+      href: "/admin/verifications",
+      type: "VERIFICATION_SUBMITTED",
+    });
+    emitAdminVerificationsUpdate({ userId });
+  }
   return NextResponse.json({ verification });
 }

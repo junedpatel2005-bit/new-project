@@ -26,30 +26,30 @@ export function AdminDataPage({
   const columns = Object.keys(rows[0] ?? {}).slice(0, 6);
   return (
     <div>
-      <p className="text-xs font-bold uppercase tracking-[.2em] text-indigo-400">Admin module</p>
-      <h1 className="mt-2 font-display text-3xl font-bold">{title}</h1>
-      <p className="mt-2 text-slate-400">{description}</p>
-      <section className="mt-8 overflow-hidden rounded-2xl border border-white/10 bg-white/[.035]">
-        <div className="border-b border-white/10 px-5 py-4 text-sm font-semibold text-slate-300">
+      <p className="text-xs font-bold uppercase tracking-[.2em] text-indigo-600">Admin module</p>
+      <h1 className="mt-2 font-display text-3xl font-bold text-slate-900">{title}</h1>
+      <p className="mt-2 text-slate-500">{description}</p>
+      <section className="mt-8 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs">
+        <div className="border-b border-slate-200 bg-slate-50/70 px-5 py-4 text-sm font-semibold text-slate-800">
           Live database records · {rows.length}
         </div>
         {!data ? (
-          <div className="h-52 animate-pulse bg-white/5" />
+          <div className="h-52 animate-pulse bg-slate-100" />
         ) : rows.length ? (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[700px] text-left text-sm">
-              <thead className="bg-white/[.03] text-xs uppercase tracking-wide text-slate-400">
+              <thead className="bg-slate-50 text-xs uppercase tracking-wider font-semibold text-slate-500">
                 <tr>
                   {columns.map((k) => (
-                    <th key={k} className="px-5 py-3 font-medium">
+                    <th key={k} className="px-5 py-3.5">
                       {k}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-slate-100">
                 {rows.map((row, i) => (
-                  <tr key={i} className="border-t border-white/10 text-slate-300">
+                  <tr key={i} className="text-slate-700 hover:bg-slate-50/70 transition">
                     {columns.map((k) => (
                       <td key={k} className="max-w-56 truncate px-5 py-4">
                         {typeof row[k] === "object"
@@ -63,7 +63,7 @@ export function AdminDataPage({
             </table>
           </div>
         ) : (
-          <p className="p-8 text-sm text-slate-400">No records found.</p>
+          <p className="p-8 text-sm text-slate-500">No records found.</p>
         )}
       </section>
     </div>

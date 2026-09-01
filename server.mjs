@@ -37,13 +37,20 @@ io.use(async (socket, nextSocket) => {
     const userId = Number(payload.userId);
     if (!Number.isSafeInteger(userId) || userId < 1) throw new Error("Invalid session");
     socket.data.userId = userId;
+    socket.data.role = payload.role;
     nextSocket();
   } catch {
     nextSocket(new Error("Unauthorized realtime connection"));
   }
 });
 
-io.on("connection", (socket) => socket.join(`user:${socket.data.userId}`));
+io.on("connection", (socket) => {
+  socket.join(`user:${socket.data.userId}`);
+  if (socket.data.role === "ADMIN") {
+    socket.join("admins");
+    socket.join("admin:room");
+  }
+});
 globalThis.__servioIo = io;
 
 httpServer.listen(port, hostname, () => {

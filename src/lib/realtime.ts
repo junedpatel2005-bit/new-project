@@ -56,3 +56,47 @@ export function emitRealtimeProposalNew(userIds: number[], payload: { jobId: num
   if (!io) return;
   for (const userId of userIds) io.to(`user:${userId}`).emit("proposal:new", payload);
 }
+
+export function emitAdminEvent(event: string, payload: unknown = {}) {
+  const io = globalThis.__servioIo;
+  if (!io) return;
+  io.to("admins").emit(event, payload);
+}
+
+export function emitAdminNotification(notification: {
+  id?: number;
+  type?: string;
+  title: string;
+  description?: string;
+  href?: string;
+  createdAt?: string;
+}) {
+  const io = globalThis.__servioIo;
+  if (!io) return;
+  const payload = {
+    ...notification,
+    type: notification.type ?? "ADMIN_ALERT",
+    createdAt: notification.createdAt ?? new Date().toISOString(),
+  };
+  io.to("admins").emit("admin:notification", payload);
+  io.to("admins").emit("notification:new", payload);
+}
+
+export function emitAdminOverviewUpdate(payload: unknown = {}) {
+  emitAdminEvent("admin:overview-update", payload);
+}
+
+export function emitAdminVerificationsUpdate(payload: unknown = {}) {
+  emitAdminEvent("admin:verifications-update", payload);
+  emitAdminEvent("admin:overview-update", payload);
+}
+
+export function emitAdminOperationsUpdate(payload: unknown = {}) {
+  emitAdminEvent("admin:operations-update", payload);
+  emitAdminEvent("admin:overview-update", payload);
+}
+
+export function emitAdminUsersUpdate(payload: unknown = {}) {
+  emitAdminEvent("admin:users-update", payload);
+  emitAdminEvent("admin:overview-update", payload);
+}

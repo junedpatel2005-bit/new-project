@@ -252,7 +252,7 @@ export default function ProfessionalDashboard() {
                 </div>
                 <Badge variant="secondary">{project.status}</Badge>
                 <Button asChild size="sm">
-                  <Link href={`/project/${project.id}`}>Open</Link>
+                  <Link href={`/project/${project.id}/tracking`}>Open</Link>
                 </Button>
               </div>
             ))}

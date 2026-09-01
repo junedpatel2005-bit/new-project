@@ -109,62 +109,62 @@ export default function AdminSupportPage() {
 
   return (
     <div>
-      <p className="text-xs font-bold uppercase tracking-[.2em] text-indigo-400">Support</p>
-      <h1 className="mt-2 font-display text-3xl font-bold">FAQ & contact requests</h1>
-      <p className="mt-2 text-slate-400">
+      <p className="text-xs font-bold uppercase tracking-[.2em] text-indigo-600">Support</p>
+      <h1 className="mt-2 font-display text-3xl font-bold text-slate-900">FAQ & contact requests</h1>
+      <p className="mt-1.5 text-slate-500">
         Manage public FAQs and review incoming messages sent through the contact form.
       </p>
 
       <div className="mt-8 grid gap-6 xl:grid-cols-[420px_1fr]">
         <form
           onSubmit={(event) => void addFaq(event)}
-          className="h-fit rounded-2xl border border-white/10 bg-white/[.035] p-5"
+          className="h-fit rounded-2xl border border-slate-200 bg-white p-5 shadow-xs"
         >
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
             {editingId ? (
-              <Pencil className="h-5 w-5 text-indigo-400" />
+              <Pencil className="h-5 w-5 text-indigo-600" />
             ) : (
-              <Plus className="h-5 w-5 text-indigo-400" />
+              <Plus className="h-5 w-5 text-indigo-600" />
             )}
-            <h2 className="font-semibold">{editingId ? "Edit FAQ" : "Add FAQ"}</h2>
+            <h2 className="font-semibold text-slate-900">{editingId ? "Edit FAQ" : "Add FAQ"}</h2>
           </div>
 
-          <label className="mt-5 block text-sm text-slate-300">
+          <label className="mt-4 block text-sm font-semibold text-slate-700">
             Question
             <input
               value={question}
               onChange={(event) => setQuestion(event.target.value)}
-              className="mt-2 h-11 w-full rounded-xl border border-white/10 bg-[#0b1020] px-3 text-white outline-none focus:ring-2 focus:ring-indigo-500"
+              className="mt-1.5 h-11 w-full rounded-xl border border-slate-200 bg-slate-50/70 px-3 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 shadow-2xs"
               placeholder="How do I update my profile?"
             />
           </label>
 
-          <label className="mt-4 block text-sm text-slate-300">
+          <label className="mt-4 block text-sm font-semibold text-slate-700">
             Answer
             <textarea
               value={answer}
               onChange={(event) => setAnswer(event.target.value)}
               rows={5}
-              className="mt-2 w-full rounded-xl border border-white/10 bg-[#0b1020] p-3 text-white outline-none focus:ring-2 focus:ring-indigo-500"
+              className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50/70 p-3 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 shadow-2xs"
               placeholder="Write the help answer here..."
             />
           </label>
 
-          <label className="mt-4 block text-sm text-slate-300">
+          <label className="mt-4 block text-sm font-semibold text-slate-700">
             Category
             <input
               value={category}
               onChange={(event) => setCategory(event.target.value)}
-              className="mt-2 h-11 w-full rounded-xl border border-white/10 bg-[#0b1020] px-3 text-white outline-none focus:ring-2 focus:ring-indigo-500"
+              className="mt-1.5 h-11 w-full rounded-xl border border-slate-200 bg-slate-50/70 px-3 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 shadow-2xs"
               placeholder="General"
             />
-            <span className="mt-1 block text-xs text-slate-500">
+            <span className="mt-1 block text-xs text-slate-400">
               Groups items on the public FAQ page. Leave blank for "General".
             </span>
           </label>
 
           <div className="mt-5 flex gap-2">
-            <Button disabled={saving} className="flex-1 bg-indigo-500 hover:bg-indigo-400">
+            <Button disabled={saving} className="flex-1 bg-indigo-600 text-white hover:bg-indigo-500 shadow-xs">
               {saving ? "Saving..." : editingId ? "Save changes" : "Add FAQ item"}
             </Button>
             {editingId && (
@@ -172,22 +172,22 @@ export default function AdminSupportPage() {
                 type="button"
                 variant="outline"
                 onClick={cancelEdit}
-                className="border-white/15 bg-transparent text-white hover:bg-white/10 hover:text-white"
+                className="border-slate-200 bg-white text-slate-700 hover:bg-slate-100"
               >
                 Cancel
               </Button>
             )}
           </div>
-          {message && <p className="mt-3 text-sm text-emerald-400">{message}</p>}
+          {message && <p className="mt-3 text-sm font-medium text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-2 rounded-xl">{message}</p>}
         </form>
 
-        <section className="rounded-2xl border border-white/10 bg-white/[.035] p-5">
-          <div className="flex items-center justify-between">
+        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div className="flex items-center gap-2">
-              <MessageSquareText className="h-5 w-5 text-indigo-400" />
-              <h2 className="font-semibold">Public FAQ</h2>
+              <MessageSquareText className="h-5 w-5 text-indigo-600" />
+              <h2 className="font-semibold text-slate-900">Public FAQ</h2>
             </div>
-            <span className="rounded-full bg-white/10 px-3 py-1 text-xs text-slate-300">
+            <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
               {faqs.length} items
             </span>
           </div>
@@ -199,22 +199,26 @@ export default function AdminSupportPage() {
               faqs.map((faq) => (
                 <article
                   key={faq.id ?? `${faq.question}-${faq.displayOrder}`}
-                  className={`rounded-xl border p-4 ${editingId === faq.id ? "border-indigo-400/40 bg-indigo-500/5" : "border-white/10 bg-[#0b1020]/60"}`}
+                  className={`rounded-xl border p-4 transition ${
+                    editingId === faq.id
+                      ? "border-indigo-300 bg-indigo-50/50 ring-2 ring-indigo-100"
+                      : "border-slate-200 bg-slate-50/60 hover:bg-slate-50"
+                  }`}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <p className="font-medium text-white">{faq.question}</p>
-                        <span className="rounded-full bg-indigo-500/10 px-2 py-0.5 text-[11px] font-semibold text-indigo-300">
+                        <p className="font-semibold text-slate-900">{faq.question}</p>
+                        <span className="rounded-full border border-indigo-200 bg-indigo-50 px-2 py-0.5 text-[11px] font-semibold text-indigo-700">
                           {faq.category?.trim() || "General"}
                         </span>
                       </div>
-                      <p className="mt-2 text-sm text-slate-400">{faq.answer}</p>
+                      <p className="mt-2 text-sm text-slate-600">{faq.answer}</p>
                     </div>
                     <button
                       type="button"
                       onClick={() => startEdit(faq)}
-                      className="rounded-lg p-2 text-slate-400 hover:bg-indigo-500/10 hover:text-indigo-300"
+                      className="rounded-lg p-2 text-slate-400 hover:bg-indigo-50 hover:text-indigo-600"
                       aria-label={`Edit FAQ ${faq.question}`}
                     >
                       <Pencil className="h-4 w-4" />
@@ -222,7 +226,7 @@ export default function AdminSupportPage() {
                     <button
                       type="button"
                       onClick={() => faq.id && void removeFaq(faq.id)}
-                      className="rounded-lg p-2 text-slate-400 hover:bg-rose-500/10 hover:text-rose-400"
+                      className="rounded-lg p-2 text-slate-400 hover:bg-rose-50 hover:text-rose-600"
                       aria-label={`Delete FAQ ${faq.question}`}
                     >
                       <Trash2 className="h-4 w-4" />
@@ -235,13 +239,13 @@ export default function AdminSupportPage() {
         </section>
       </div>
 
-      <section className="mt-8 rounded-2xl border border-white/10 bg-white/[.035] p-5">
-        <div className="flex items-center justify-between">
+      <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-xs">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
           <div className="flex items-center gap-2">
-            <MessageSquareText className="h-5 w-5 text-indigo-400" />
-            <h2 className="font-semibold">Contact requests</h2>
+            <MessageSquareText className="h-5 w-5 text-indigo-600" />
+            <h2 className="font-semibold text-slate-900">Contact requests</h2>
           </div>
-          <span className="rounded-full bg-white/10 px-3 py-1 text-xs text-slate-300">
+          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
             {contactRequests.length} total
           </span>
         </div>
@@ -253,20 +257,20 @@ export default function AdminSupportPage() {
             contactRequests.map((item) => (
               <article
                 key={item.id}
-                className="rounded-xl border border-white/10 bg-[#0b1020]/60 p-4"
+                className="rounded-xl border border-slate-200 bg-slate-50/60 p-4"
               >
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
-                    <p className="font-medium text-white">{item.name}</p>
-                    <p className="text-xs text-slate-400">{item.email}</p>
+                    <p className="font-semibold text-slate-900">{item.name}</p>
+                    <p className="text-xs text-slate-500">{item.email}</p>
                   </div>
-                  <span className="rounded-full bg-indigo-500/10 px-2.5 py-1 text-xs text-indigo-200">
+                  <span className="rounded-full border border-indigo-200 bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-700">
                     {item.status}
                   </span>
                 </div>
-                <p className="mt-3 text-sm font-medium text-slate-200">{item.subject}</p>
-                <p className="mt-2 text-sm text-slate-400 whitespace-pre-wrap">{item.message}</p>
-                <p className="mt-3 text-[11px] text-slate-500">
+                <p className="mt-2.5 text-sm font-semibold text-slate-800">{item.subject}</p>
+                <p className="mt-1.5 text-sm text-slate-600 whitespace-pre-wrap">{item.message}</p>
+                <p className="mt-3 text-[11px] font-medium text-slate-400">
                   {new Date(item.createdAt).toLocaleString()}
                 </p>
               </article>

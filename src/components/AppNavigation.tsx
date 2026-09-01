@@ -14,9 +14,13 @@ export type NavigationUser = {
   avatarUrl: string | null;
 };
 
-function useUnreadMessages() {
+function useUnreadMessages(pathname: string) {
   const [count, setCount] = useState(0);
   useEffect(() => {
+    if (pathname.startsWith("/messages") || pathname.startsWith("/professional/messages")) {
+      setCount(0);
+      return;
+    }
     const load = () => {
       void fetch("/api/v1/messages", { cache: "no-store" })
         .then((response) => (response.ok ? response.json() : null))
@@ -36,13 +40,22 @@ function useUnreadMessages() {
       window.removeEventListener("servio:message-read", load);
       window.removeEventListener("servio:notifications-read", load);
     };
-  }, []);
+  }, [pathname]);
   return count;
 }
 
-function useUnreadNotifications() {
+function useUnreadNotifications(pathname: string) {
   const [count, setCount] = useState(0);
   useEffect(() => {
+    if (pathname.startsWith("/notifications")) {
+      setCount(0);
+      void fetch("/api/portal/notifications", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ all: true }),
+      }).then(() => window.dispatchEvent(new CustomEvent("servio:notifications-read")));
+      return;
+    }
     const load = () => {
       void fetch("/api/portal/notifications", { cache: "no-store" })
         .then((response) => (response.ok ? response.json() : null))
@@ -53,16 +66,18 @@ function useUnreadNotifications() {
     };
     load();
     window.addEventListener("servio:notification", load);
+    window.addEventListener("servio:notifications-read", load);
     window.addEventListener("servio:message", load);
     window.addEventListener("servio:message-read", load);
     window.addEventListener("focus", load);
     return () => {
       window.removeEventListener("servio:notification", load);
+      window.removeEventListener("servio:notifications-read", load);
       window.removeEventListener("servio:message", load);
       window.removeEventListener("servio:message-read", load);
       window.removeEventListener("focus", load);
     };
-  }, []);
+  }, [pathname]);
   return count;
 }
 
@@ -75,8 +90,8 @@ export function AppSidebar({
   pathname: string;
   user: NavigationUser;
 }) {
-  const unreadMessages = useUnreadMessages();
-  const unreadNotifications = useUnreadNotifications();
+  const unreadMessages = useUnreadMessages(pathname);
+  const unreadNotifications = useUnreadNotifications(pathname);
   return (
     <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-border bg-surface lg:block">
       <div className="flex h-16 items-center px-5">
@@ -136,8 +151,8 @@ export function AppMobileNavigation({
   items: NavigationItem[];
   pathname: string;
 }) {
-  const unreadMessages = useUnreadMessages();
-  const unreadNotifications = useUnreadNotifications();
+  const unreadMessages = useUnreadMessages(pathname);
+  const unreadNotifications = useUnreadNotifications(pathname);
   return (
     <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface/95 backdrop-blur-md lg:hidden">
       <div className="grid grid-cols-6">

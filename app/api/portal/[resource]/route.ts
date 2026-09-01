@@ -37,9 +37,16 @@ export async function GET(
       });
       const projectIdFor = (href: string | null) => {
         if (!href) return null;
-        const pathMatch = href.match(/^\/project\/(\d+)\/tracking/);
+        const pathMatch = href.match(/^\/project\/(\d+)/);
         if (pathMatch) return Number(pathMatch[1]);
         const queryMatch = href.match(/[?&]project=(\d+)(?:&|$)/);
+        return queryMatch ? Number(queryMatch[1]) : null;
+      };
+      const jobIdFor = (href: string | null) => {
+        if (!href) return null;
+        const jobPathMatch = href.match(/^\/job\/(\d+)/);
+        if (jobPathMatch) return Number(jobPathMatch[1]);
+        const queryMatch = href.match(/[?&]job=(\d+)(?:&|$)/);
         return queryMatch ? Number(queryMatch[1]) : null;
       };
       const legacyDisputeIds = notifications.flatMap((notification) => {
@@ -75,25 +82,55 @@ export async function GET(
         const projectId = resolvedProjectIdFor(notification);
         return projectId ? [projectId] : [];
       });
-      const projects = await db.projectTracking.findMany({
-        where: { id: { in: projectIds } },
-        select: { id: true, jobId: true },
+      const directJobIds = notifications.flatMap((notification) => {
+        const jobId = jobIdFor(notification.href);
+        return jobId ? [jobId] : [];
       });
-      const jobs = await db.clientJob.findMany({
-        where: { id: { in: projects.map((project) => project.jobId) } },
+      const [projects, directJobs] = await Promise.all([
+        db.projectTracking.findMany({
+          where: { id: { in: projectIds } },
+          select: { id: true, jobId: true },
+        }),
+        db.clientJob.findMany({
+          where: { id: { in: directJobIds } },
+          select: { id: true, title: true },
+        }),
+      ]);
+      const projectJobIds = projects.map((project) => project.jobId);
+      const projectJobs = await db.clientJob.findMany({
+        where: { id: { in: projectJobIds } },
         select: { id: true, title: true },
       });
-      const jobMap = new Map(jobs.map((job) => [job.id, job.title]));
-      const projectMap = new Map(
-        projects.map((project) => [project.id, jobMap.get(project.jobId)]),
-      );
+      const jobMap = new Map<number, string | null>();
+      for (const job of directJobs) jobMap.set(job.id, job.title);
+      for (const job of projectJobs) jobMap.set(job.id, job.title);
+      const projectMap = new Map<number, string | null>();
+      for (const project of projects) projectMap.set(project.id, jobMap.get(project.jobId) ?? null);
       return NextResponse.json(
         notifications.map((notification) => {
           const projectId = resolvedProjectIdFor(notification);
+          const jobId = jobIdFor(notification.href);
+          const isProjectOrJob =
+            projectId !== null ||
+            jobId !== null ||
+            notification.type.startsWith("PROJECT_") ||
+            notification.type.startsWith("MILESTONE_") ||
+            notification.type.startsWith("DISPUTE_") ||
+            notification.type.startsWith("REVISION_") ||
+            notification.type.startsWith("WORK_") ||
+            notification.type.startsWith("PROPOSAL_") ||
+            notification.type.startsWith("NEW_JOB") ||
+            notification.type.startsWith("OFFER_");
           return {
             ...notification,
             projectId,
-            projectTitle: projectId ? projectMap.get(projectId) || `Project #${projectId}` : null,
+            jobId,
+            isProject: isProjectOrJob,
+            projectTitle: projectId
+              ? projectMap.get(projectId) || `Project #${projectId}`
+              : jobId
+                ? jobMap.get(jobId) || `Job #${jobId}`
+                : null,
           };
         }),
       );
@@ -721,6 +758,42 @@ export async function PATCH(
     await db.userNotification.updateMany({
       where: { id: parsed.data.id, userId: session.userId, readAt: null },
       data: { readAt: new Date() },
+    });
+  }
+  return NextResponse.json({ success: true });
+}
+
+const deleteNotificationSchema = z
+  .object({ id: z.number().int().positive() })
+  .or(z.object({ ids: z.array(z.number().int().positive()).min(1).max(100) }))
+  .or(z.object({ all: z.literal(true) }));
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ resource: string }> },
+) {
+  const session = await sessionFromRequest(request);
+  if (!session) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+  const { resource } = await params;
+  if (resource !== "notifications")
+    return NextResponse.json({ error: "Not found." }, { status: 404 });
+  const parsed = deleteNotificationSchema.safeParse(await request.json().catch(() => null));
+  if (!parsed.success)
+    return NextResponse.json({ error: "Invalid delete notification request." }, { status: 400 });
+  if ("all" in parsed.data) {
+    await db.userNotification.updateMany({
+      where: { userId: session.userId, clearedAt: null },
+      data: { clearedAt: new Date() },
+    });
+  } else if ("ids" in parsed.data) {
+    await db.userNotification.updateMany({
+      where: { id: { in: parsed.data.ids }, userId: session.userId },
+      data: { clearedAt: new Date() },
+    });
+  } else {
+    await db.userNotification.updateMany({
+      where: { id: parsed.data.id, userId: session.userId },
+      data: { clearedAt: new Date() },
     });
   }
   return NextResponse.json({ success: true });

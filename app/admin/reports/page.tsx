@@ -63,7 +63,7 @@ function UsersReport() {
           fileBaseName="users"
         />
       </div>
-      <div className="mt-4 overflow-hidden rounded-2xl border border-white/10 bg-white/[.02] text-slate-100 [&_th]:text-slate-400 [&_tr]:border-white/10 [&_tr:hover]:bg-white/[.03]">
+      <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white text-slate-800 shadow-xs [&_th]:text-slate-500 [&_th]:bg-slate-50 [&_tr]:border-slate-100 [&_tr:hover]:bg-slate-50/70">
         <SelectableReportTable
           loading={loading}
           rows={users}
@@ -78,7 +78,7 @@ function UsersReport() {
               key: "name",
               header: "Name",
               render: (user) => (
-                <span className="font-medium text-white">
+                <span className="font-semibold text-slate-900">
                   {user.firstName} {user.lastName}
                 </span>
               ),
@@ -121,7 +121,7 @@ function JobsReport() {
   return (
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-slate-400">
+        <p className="text-sm text-slate-500 font-medium">
           {jobs.length} {jobs.length === 1 ? "job" : "jobs"}
         </p>
         <ExportMenu
@@ -130,7 +130,7 @@ function JobsReport() {
           fileBaseName="jobs"
         />
       </div>
-      <div className="mt-4 overflow-hidden rounded-2xl border border-white/10 bg-white/[.02] text-slate-100 [&_th]:text-slate-400 [&_tr]:border-white/10 [&_tr:hover]:bg-white/[.03]">
+      <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white text-slate-800 shadow-xs [&_th]:text-slate-500 [&_th]:bg-slate-50 [&_tr]:border-slate-100 [&_tr:hover]:bg-slate-50/70">
         <SelectableReportTable
           loading={loading}
           rows={jobs}
@@ -145,7 +145,7 @@ function JobsReport() {
               key: "title",
               header: "Title",
               render: (job) => (
-                <span className="font-medium text-white">{job.title ?? "Untitled job"}</span>
+                <span className="font-semibold text-slate-900">{job.title ?? "Untitled job"}</span>
               ),
             },
             {
@@ -231,7 +231,7 @@ function FinanceReport() {
   return (
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-slate-400">
+        <p className="text-sm text-slate-500 font-medium">
           {rows.length} {rows.length === 1 ? "record" : "records"} — payments and payouts
         </p>
         <ExportMenu
@@ -240,7 +240,7 @@ function FinanceReport() {
           fileBaseName="finance"
         />
       </div>
-      <div className="mt-4 overflow-hidden rounded-2xl border border-white/10 bg-white/[.02] text-slate-100 [&_th]:text-slate-400 [&_tr]:border-white/10 [&_tr:hover]:bg-white/[.03]">
+      <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white text-slate-800 shadow-xs [&_th]:text-slate-500 [&_th]:bg-slate-50 [&_tr]:border-slate-100 [&_tr:hover]:bg-slate-50/70">
         <SelectableReportTable
           loading={loading}
           rows={rows}
@@ -279,15 +279,15 @@ export default function AdminReportsPage() {
 
   return (
     <div>
-      <p className="text-xs font-bold uppercase tracking-[.2em] text-indigo-400">Admin module</p>
-      <h1 className="mt-2 flex items-center gap-2 font-display text-3xl font-bold">
-        <FileBarChart className="h-6 w-6 text-indigo-400" /> Reports
+      <p className="text-xs font-bold uppercase tracking-[.2em] text-indigo-600">Admin module</p>
+      <h1 className="mt-2 flex items-center gap-2 font-display text-3xl font-bold text-slate-900">
+        <FileBarChart className="h-6 w-6 text-indigo-600" /> Reports
       </h1>
-      <p className="mt-2 text-slate-400">
+      <p className="mt-2 text-slate-500">
         Export platform data as a PDF — download everything, or select specific rows.
       </p>
 
-      <div className="mt-6 flex gap-1 rounded-xl bg-[#0b1020] p-1 lg:w-fit">
+      <div className="mt-6 flex gap-1 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-2xs lg:w-fit">
         {(
           [
             { key: "users", label: "Users & professionals" },
@@ -299,7 +299,11 @@ export default function AdminReportsPage() {
             key={item.key}
             type="button"
             onClick={() => setTab(item.key)}
-            className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${tab === item.key ? "bg-indigo-500 text-white" : "text-slate-400 hover:text-white"}`}
+            className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
+              tab === item.key
+                ? "bg-indigo-600 text-white shadow-xs"
+                : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+            }`}
           >
             {item.label}
           </button>

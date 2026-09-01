@@ -20,10 +20,29 @@ export function RealtimeNotifications() {
   const notificationsInitialized = useRef(false);
 
   const showNotification = useCallback((notification: RealtimeNotification) => {
+    let actionLabel = "View";
+    if (notification.href?.includes("/project/")) actionLabel = "View Project";
+    else if (notification.href?.includes("/job/")) actionLabel = "Review Job";
+    else if (notification.type.includes("PROPOSAL")) actionLabel = "Review Proposal";
+    else if (notification.type.includes("DISPUTE")) actionLabel = "Check Dispute";
+    else if (notification.type.includes("VERIFICATION")) actionLabel = "Inspect Status";
+
     toast(notification.title, {
       description: notification.description,
       action: notification.href
-        ? { label: "Open", onClick: () => window.location.assign(notification.href!) }
+        ? {
+            label: actionLabel,
+            onClick: () => {
+              if (notification.id != null) {
+                void fetch("/api/portal/notifications", {
+                  method: "PATCH",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ id: notification.id }),
+                });
+              }
+              window.location.assign(notification.href!);
+            },
+          }
         : undefined,
     });
     window.dispatchEvent(new CustomEvent("servio:notification"));
