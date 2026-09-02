@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef } from "react";
 import { io } from "socket.io-client";
 import { toast } from "sonner";
+import { CircleCheck } from "lucide-react";
 
 type AdminRealtimeNotification = {
   id?: number;
@@ -23,8 +24,10 @@ export function AdminRealtime() {
     else if (notification.href?.includes("/admin/finance")) actionLabel = "Check Escrow";
     else if (notification.href?.includes("/admin/users")) actionLabel = "View User";
 
-    toast(notification.title, {
+    toast(notification.title || "New admin notification", {
+      icon: <CircleCheck className="h-5 w-5 text-emerald-400" />,
       description: notification.description,
+      duration: 6000,
       action: notification.href
         ? {
             label: actionLabel,
@@ -40,11 +43,17 @@ export function AdminRealtime() {
             },
           }
         : undefined,
+      cancel: {
+        label: "Dismiss all",
+        onClick: () => {
+          toast.dismiss();
+        },
+      },
     });
   }, []);
 
   useEffect(() => {
-    const socket = io({
+    const socket = io(window.location.origin, {
       path: "/api/realtime",
       transports: ["websocket", "polling"],
       withCredentials: true,
@@ -53,8 +62,15 @@ export function AdminRealtime() {
       reconnectionDelayMax: 10000,
     });
 
+    socket.on("connect_error", (error) => {
+      console.error("Admin realtime connection failed", error.message);
+    });
+
     const onAdminNotification = (payload: AdminRealtimeNotification) => {
-      const key = payload.id != null ? `id:${payload.id}` : `${payload.type}|${payload.title}|${payload.href}`;
+      const key =
+        payload.id != null
+          ? `id:${payload.id}`
+          : `${payload.type}|${payload.title}|${payload.href}`;
       if (seenKeys.current.has(key)) return;
       seenKeys.current.add(key);
 
@@ -64,7 +80,9 @@ export function AdminRealtime() {
     };
 
     const onVerificationsUpdate = (payload: unknown) => {
-      window.dispatchEvent(new CustomEvent("servio:admin-verifications-update", { detail: payload }));
+      window.dispatchEvent(
+        new CustomEvent("servio:admin-verifications-update", { detail: payload }),
+      );
       window.dispatchEvent(new CustomEvent("servio:notification"));
       window.dispatchEvent(new CustomEvent("servio:admin-overview-update"));
     };
@@ -121,4 +139,3 @@ export function AdminRealtime() {
 
   return null;
 }
-

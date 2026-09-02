@@ -44,7 +44,11 @@ type Dispute = {
   createdAt: string;
   updatedAt: string;
 };
-type OperationsData = { jobs: Job[]; disputes: Dispute[] };
+type OperationsData = {
+  jobs: Job[];
+  disputes: Dispute[];
+  stats: { totalJobs: number; openJobs: number; scheduledJobs: number };
+};
 type DisputeDetails = {
   dispute: Dispute & { trackingId: number; message: string };
   client: { id: number; firstName: string; lastName: string; email: string } | null;
@@ -211,8 +215,16 @@ export default function OperationsPage() {
   const load = () => {
     void fetch("/api/v1/admin/data/jobs", { cache: "no-store" })
       .then((response) => response.json())
-      .then((result) => setData({ jobs: result.jobs ?? [], disputes: result.disputes ?? [] }))
-      .catch(() => setData({ jobs: [], disputes: [] }));
+      .then((result) =>
+        setData({
+          jobs: result.jobs ?? [],
+          disputes: result.disputes ?? [],
+          stats: result.stats ?? { totalJobs: 0, openJobs: 0, scheduledJobs: 0 },
+        }),
+      )
+      .catch(() =>
+        setData({ jobs: [], disputes: [], stats: { totalJobs: 0, openJobs: 0, scheduledJobs: 0 } }),
+      );
   };
 
   useEffect(() => {
@@ -387,13 +399,24 @@ export default function OperationsPage() {
         <div className="mt-6 h-80 animate-pulse rounded-3xl bg-slate-100" />
       ) : (
         <>
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
             <Metric
               icon={BriefcaseBusiness}
               label="Total jobs"
-              value={data.jobs.length}
-              detail={`${data.jobs.filter((job) => job.status === "OPEN").length} currently open`}
+              value={data.stats.totalJobs}
+              detail={`${data.stats.openJobs} currently open`}
               color="indigo"
+              onClick={() => {
+                setView("jobs");
+                setFilter("ALL");
+              }}
+            />
+            <Metric
+              icon={CalendarDays}
+              label="Scheduled jobs"
+              value={data.stats.scheduledJobs}
+              detail="Future-dated open jobs"
+              color="amber"
               onClick={() => {
                 setView("jobs");
                 setFilter("ALL");
@@ -728,7 +751,9 @@ function JobRow({ job, onOpen }: { job: Job; onOpen: (id: number) => void }) {
         </div>
         <p className="mt-1 text-sm text-slate-500">
           {job.category ?? "General"} <span className="mx-1.5 text-slate-300">•</span>{" "}
-          <span className="font-medium text-slate-700">{job.user.firstName} {job.user.lastName}</span>
+          <span className="font-medium text-slate-700">
+            {job.user.firstName} {job.user.lastName}
+          </span>
         </p>
         <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 font-medium">
           <span className="inline-flex items-center gap-1.5">
@@ -779,7 +804,9 @@ function DisputeRow({ dispute, onOpen }: { dispute: Dispute; onOpen: (id: number
         </p>
       </div>
       <div className="min-w-36 sm:text-right">
-        <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Case #{dispute.id}</p>
+        <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+          Case #{dispute.id}
+        </p>
         <p className="mt-1 text-sm font-medium text-slate-700">Updated {date(dispute.updatedAt)}</p>
       </div>
       <ChevronRight className="hidden h-5 w-5 text-slate-400 transition group-hover:translate-x-1 group-hover:text-indigo-600 sm:block" />
@@ -999,7 +1026,9 @@ function JobDetailsPanel({
                 <p>{job.user.address ?? "Address not provided"}</p>
                 <p className="pt-2 text-xs text-slate-500 border-t border-slate-200">
                   Account created {date(job.user.createdAt)} ·{" "}
-                  <span className="font-semibold text-slate-700">{job.user.isVerified ? "Verified" : "Not verified"}</span>
+                  <span className="font-semibold text-slate-700">
+                    {job.user.isVerified ? "Verified" : "Not verified"}
+                  </span>
                 </p>
               </div>
               {job.project ? (
@@ -1013,7 +1042,9 @@ function JobDetailsPanel({
                   </p>
                   <dl className="mt-4 grid grid-cols-3 gap-2 text-center">
                     <div className="rounded-lg bg-white border border-slate-200 p-2 shadow-2xs">
-                      <dt className="text-[10px] uppercase font-semibold text-slate-500">Milestones</dt>
+                      <dt className="text-[10px] uppercase font-semibold text-slate-500">
+                        Milestones
+                      </dt>
                       <dd className="mt-1 text-sm font-bold text-slate-900">
                         {job.project.milestones.length}
                       </dd>
@@ -1025,7 +1056,9 @@ function JobDetailsPanel({
                       </dd>
                     </div>
                     <div className="rounded-lg bg-white border border-slate-200 p-2 shadow-2xs">
-                      <dt className="text-[10px] uppercase font-semibold text-slate-500">Remaining</dt>
+                      <dt className="text-[10px] uppercase font-semibold text-slate-500">
+                        Remaining
+                      </dt>
                       <dd className="mt-1 text-sm font-bold text-slate-900">
                         ₹{job.project.financial.remainingAmount.toLocaleString()}
                       </dd>
@@ -1037,9 +1070,14 @@ function JobDetailsPanel({
                     </h4>
                     {job.project.milestones.length ? (
                       job.project.milestones.map((milestone) => (
-                        <div key={milestone.id} className="rounded-lg border border-slate-200 bg-white p-3 shadow-2xs">
+                        <div
+                          key={milestone.id}
+                          className="rounded-lg border border-slate-200 bg-white p-3 shadow-2xs"
+                        >
                           <div className="flex items-start justify-between gap-2">
-                            <p className="text-sm font-semibold text-slate-900">{milestone.title}</p>
+                            <p className="text-sm font-semibold text-slate-900">
+                              {milestone.title}
+                            </p>
                             <Badge value={milestone.status} />
                           </div>
                           <p className="mt-1 text-xs text-slate-500">
@@ -1198,7 +1236,11 @@ function DisputeDetailsPanel({
                     size="sm"
                     variant={recipient === "CLIENT" ? "default" : "outline"}
                     onClick={() => setRecipient("CLIENT")}
-                    className={recipient === "CLIENT" ? "bg-indigo-600 text-white" : "border-slate-200 bg-white text-slate-700"}
+                    className={
+                      recipient === "CLIENT"
+                        ? "bg-indigo-600 text-white"
+                        : "border-slate-200 bg-white text-slate-700"
+                    }
                   >
                     Message client
                   </Button>
@@ -1207,7 +1249,11 @@ function DisputeDetailsPanel({
                     size="sm"
                     variant={recipient === "PROFESSIONAL" ? "default" : "outline"}
                     onClick={() => setRecipient("PROFESSIONAL")}
-                    className={recipient === "PROFESSIONAL" ? "bg-indigo-600 text-white" : "border-slate-200 bg-white text-slate-700"}
+                    className={
+                      recipient === "PROFESSIONAL"
+                        ? "bg-indigo-600 text-white"
+                        : "border-slate-200 bg-white text-slate-700"
+                    }
                   >
                     Message professional
                   </Button>
@@ -1233,7 +1279,9 @@ function DisputeDetailsPanel({
                       : `Send to ${recipient === "CLIENT" ? "client" : "professional"}`}
                   </Button>
                 </div>
-                {sendMessage ? <p className="mt-2 text-xs font-semibold text-emerald-700">{sendMessage}</p> : null}
+                {sendMessage ? (
+                  <p className="mt-2 text-xs font-semibold text-emerald-700">{sendMessage}</p>
+                ) : null}
                 {details.messages.length ? (
                   <div className="mt-4 space-y-2 border-t border-slate-200 pt-3">
                     <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
@@ -1256,7 +1304,9 @@ function DisputeDetailsPanel({
               </div>
               <div className="rounded-2xl border border-indigo-200 bg-indigo-50/50 p-4">
                 <h3 className="text-sm font-semibold text-indigo-800">What you should do next</h3>
-                <p className="mt-1 text-sm text-slate-700 leading-relaxed">{adminAction(details)}</p>
+                <p className="mt-1 text-sm text-slate-700 leading-relaxed">
+                  {adminAction(details)}
+                </p>
                 <p className="mt-3 border-t border-indigo-200/80 pt-3 text-xs font-medium text-slate-600">
                   Project status: {projectStage(details.project)}
                 </p>
@@ -1330,7 +1380,9 @@ function DisputeDetailsPanel({
                     </dd>
                   </div>
                   <div className="rounded-lg bg-white border border-slate-200 p-2 shadow-2xs">
-                    <dt className="text-[10px] uppercase font-semibold text-slate-500">Remaining</dt>
+                    <dt className="text-[10px] uppercase font-semibold text-slate-500">
+                      Remaining
+                    </dt>
                     <dd className="mt-1 text-sm font-bold text-slate-900">
                       ₹{details.financial.remainingAmount.toLocaleString()}
                     </dd>

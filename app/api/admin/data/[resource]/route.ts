@@ -94,17 +94,21 @@ export async function GET(
           createdAt: true,
         },
         orderBy: { createdAt: "desc" },
-        take: 100,
       }),
     });
   if (resource === "jobs") {
-    const [jobs, disputes] = await Promise.all([
+    const now = new Date();
+    const [jobs, disputes, totalJobs, scheduledJobs, openJobs] = await Promise.all([
       db.clientJob.findMany({
         include: { user: { select: { firstName: true, lastName: true, email: true } } },
         orderBy: { createdAt: "desc" },
-        take: 100,
       }),
       db.projectDispute.findMany({ orderBy: { createdAt: "desc" }, take: 50 }),
+      db.clientJob.count(),
+      db.clientJob.count({ where: { status: "OPEN", jobDate: { gt: now } } }),
+      db.clientJob.count({
+        where: { status: "OPEN", OR: [{ jobDate: null }, { jobDate: { lte: now } }] },
+      }),
     ]);
     const projects = await db.projectTracking.findMany({
       where: { jobId: { in: jobs.map((job) => job.id) } },
@@ -117,7 +121,11 @@ export async function GET(
         project?.completedAt || project?.status.toUpperCase().includes("COMPLETED");
       return { ...job, status: isCompleted ? "COMPLETED" : project ? "RUNNING" : job.status };
     });
-    return NextResponse.json({ jobs: jobsWithProjectStatus, disputes });
+    return NextResponse.json({
+      jobs: jobsWithProjectStatus,
+      disputes,
+      stats: { totalJobs, openJobs, scheduledJobs },
+    });
   }
   if (resource === "finance") {
     const [transactions, withdrawals, payments, walletTransactions, adminUsers] = await Promise.all(

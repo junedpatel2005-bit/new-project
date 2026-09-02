@@ -33,15 +33,17 @@ async function main() {
   });
   if (!seedClient) throw new Error("Seed Client not found.");
 
-  const client2 = (await db.user.findFirst({
-    where: { email: "client.zub@yopmail.com" },
-    select: { id: true },
-  })) ?? seedClient;
+  const client2 =
+    (await db.user.findFirst({
+      where: { email: "client.zub@yopmail.com" },
+      select: { id: true },
+    })) ?? seedClient;
 
-  const client3 = (await db.user.findFirst({
-    where: { email: "qa.tester.signup@servio.example" },
-    select: { id: true },
-  })) ?? seedClient;
+  const client3 =
+    (await db.user.findFirst({
+      where: { email: "qa.tester.signup@servio.example" },
+      select: { id: true },
+    })) ?? seedClient;
 
   const clients = [seedClient, client2, client3];
 
@@ -54,16 +56,16 @@ async function main() {
     orderBy: { id: "asc" },
   });
 
-  const idsToMakeOpen = existingJobs
-    .filter((_, idx) => idx % 2 === 0)
-    .map((j) => j.id);
+  const idsToMakeOpen = existingJobs.filter((_, idx) => idx % 2 === 0).map((j) => j.id);
 
   if (idsToMakeOpen.length > 0) {
     await db.clientJob.updateMany({
       where: { id: { in: idsToMakeOpen } },
       data: { jobDate: null },
     });
-    console.log(`Updated ${idsToMakeOpen.length} existing jobs to have jobDate = null (Active Open Jobs).`);
+    console.log(
+      `Updated ${idsToMakeOpen.length} existing jobs to have jobDate = null (Active Open Jobs).`,
+    );
   }
 
   // 3. Create 100+ brand new OPEN jobs (jobDate = null) across various subcategories
@@ -90,8 +92,7 @@ async function main() {
           : faker.number.int({ min: 2000, max: 15000 });
 
     const budgetMax =
-      budgetBase +
-      faker.number.int({ min: 500, max: Math.max(800, Math.ceil(budgetBase * 0.4)) });
+      budgetBase + faker.number.int({ min: 500, max: Math.max(800, Math.ceil(budgetBase * 0.4)) });
     const isHourly = faker.datatype.boolean({ probability: 0.2 });
     const hourlyRate = isHourly ? faker.number.int({ min: 200, max: 1000 }) : null;
 
@@ -149,10 +150,17 @@ async function main() {
     (j) => j.status === "OPEN" && (!j.jobDate || new Date(j.jobDate).getTime() <= now),
   ).length;
   const seedClientOpenJobs = allJobs.filter(
-    (j) => j.userId === seedClient.id && j.status === "OPEN" && (!j.jobDate || new Date(j.jobDate).getTime() <= now),
+    (j) =>
+      j.userId === seedClient.id &&
+      j.status === "OPEN" &&
+      (!j.jobDate || new Date(j.jobDate).getTime() <= now),
   ).length;
   const seedClientScheduledJobs = allJobs.filter(
-    (j) => j.userId === seedClient.id && j.status === "OPEN" && j.jobDate && new Date(j.jobDate).getTime() > now,
+    (j) =>
+      j.userId === seedClient.id &&
+      j.status === "OPEN" &&
+      j.jobDate &&
+      new Date(j.jobDate).getTime() > now,
   ).length;
 
   console.log("\n✅ DATABASE SUMMARY AFTER UPDATE:");

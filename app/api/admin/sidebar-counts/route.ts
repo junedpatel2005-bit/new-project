@@ -89,12 +89,6 @@ export async function PATCH(request: NextRequest) {
         maxAge: 60 * 60 * 24 * 30,
       });
     }
-    if (body?.section === "notifications") {
-      await db.userNotification.updateMany({
-        where: { userId: session.userId, readAt: null },
-        data: { readAt: new Date() },
-      });
-    }
     if (body?.section === "messages") {
       await db.socketMessage.updateMany({
         where: { receiverId: session.userId, readAt: null },

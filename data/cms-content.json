@@ -24,9 +24,6 @@
       "icon": "award"
     }
   ],
-  "sectionOrder": [
-    "hero",
-    "features"
-  ],
+  "sectionOrder": ["hero", "features"],
   "updatedAt": "2026-08-29T07:57:48.809Z"
 }

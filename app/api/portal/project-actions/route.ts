@@ -22,8 +22,8 @@ const bodySchema = z.discriminatedUnion("action", [
     action: z.literal("update-progress"),
     projectId: z.number().int().positive(),
     progress: z.number().int().min(0).max(100),
-    stage: z.string().trim().min(2).max(160),
-    note: z.string().trim().min(2).max(2000),
+    stage: z.string().trim().max(160).nullish(),
+    note: z.string().trim().max(2000).nullish(),
   }),
   z.object({
     action: z.literal("upload-work"),
@@ -232,13 +232,15 @@ export async function POST(request: NextRequest) {
       await event("WORK_STARTED", "Work started", "The client started work on this project.");
     }
     if (input.action === "update-progress") {
+      const stageText = input.stage?.trim() || project.currentStage || "In Progress";
+      const noteText = input.note?.trim() || `Progress updated to ${input.progress}%`;
       await db.projectTracking.update({
         where: { id: project.id },
-        data: { status: "IN_PROGRESS", progress: input.progress, currentStage: input.stage },
+        data: { status: "IN_PROGRESS", progress: input.progress, currentStage: stageText },
       });
-      await event("PROGRESS_UPDATED", `Progress updated — ${input.progress}%`, input.note, {
+      await event("PROGRESS_UPDATED", `Progress updated — ${input.progress}%`, noteText, {
         progress: input.progress,
-        stage: input.stage,
+        stage: stageText,
       });
     }
     if (input.action === "create-milestone") {

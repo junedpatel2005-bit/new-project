@@ -1225,30 +1225,7 @@ export default function JobDetails() {
         {/* Actions - Footer Section */}
         <div className="mt-8 border-t border-border pt-6">
           {job.client ? (
-            <>
-              <p className="font-medium mb-4">Posted by {job.client.name}</p>
-              {job.projectId && (
-                <div className="flex flex-wrap gap-2">
-                  <Button className="w-full sm:w-auto" asChild>
-                    <Link href={`/project/${job.projectId}/tracking`}>Track Project</Link>
-                  </Button>
-                  {job.status === "CLOSED" && (
-                    <>
-                      <Button variant="outline" className="w-full sm:w-auto" asChild>
-                        <Link href={`/project/${job.projectId}/tracking#project-feedback`}>
-                          Write Review
-                        </Link>
-                      </Button>
-                      <Button variant="outline" className="w-full sm:w-auto" asChild>
-                        <Link href={`/project/${job.projectId}/tracking#project-dispute`}>
-                          Raise Dispute
-                        </Link>
-                      </Button>
-                    </>
-                  )}
-                </div>
-              )}
-            </>
+            <p className="font-medium text-slate-700">Posted by {job.client.name}</p>
           ) : (
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <p className="font-medium text-muted-foreground">This is your job posting.</p>
@@ -1431,24 +1408,47 @@ export default function JobDetails() {
       >
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Project is now yours</DialogTitle>
+            <DialogTitle>
+              {viewerRole === "PROFESSIONAL"
+                ? "Project is now yours"
+                : "Professional Hired Successfully"}
+            </DialogTitle>
             <DialogDescription>
-              The client&apos;s terms were accepted. You can now manage this project from Running
-              Projects.
+              {viewerRole === "PROFESSIONAL"
+                ? "The client's terms were accepted. You can now manage this project from Running Projects."
+                : "You have accepted the proposal. You can now track project milestones, fund escrow, and collaborate with your hired professional."}
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-wrap justify-end gap-2 pt-2">
-            <Button variant="outline" onClick={() => router.push("/professional/running-projects")}>
-              Go to Running Projects
-            </Button>
-            <Button
-              onClick={() => {
-                if (acceptedProjectId !== null)
-                  router.push(`/project/${acceptedProjectId}/tracking`);
-              }}
-            >
-              View Project
-            </Button>
+            {viewerRole === "PROFESSIONAL" ? (
+              <>
+                <Button variant="outline" onClick={() => router.push("/professional/running-projects")}>
+                  Go to Running Projects
+                </Button>
+                <Button
+                  onClick={() => {
+                    if (acceptedProjectId !== null)
+                      router.push(`/project/${acceptedProjectId}`);
+                  }}
+                >
+                  View Project Workroom
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="outline" onClick={() => router.push("/my-jobs")}>
+                  Go to My Projects
+                </Button>
+                <Button
+                  onClick={() => {
+                    if (acceptedProjectId !== null)
+                      router.push(`/project/${acceptedProjectId}`);
+                  }}
+                >
+                  View Project &amp; Escrow
+                </Button>
+              </>
+            )}
           </div>
         </DialogContent>
       </Dialog>

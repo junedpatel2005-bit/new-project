@@ -12,5 +12,6 @@ export type MarketingPageId = (typeof marketingPageIds)[number];
 export type MarketingItem = { id: string; title: string; description: string; icon: string };
 export type MarketingPageContent = {
   hero: { label: string; title: string; description: string };
+  features?: { label: string; title: string; description: string };
   items: MarketingItem[];
 };

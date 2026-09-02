@@ -24,24 +24,27 @@ export default function ProfessionalsPreviewMap({
   const points = useMemo(() => pinned.map((entry) => entry.point), [pinned]);
   const mapRef = useRef<google.maps.Map | null>(null);
 
-  const applyView = (map: google.maps.Map) => {
-    if (points.length === 0) return;
-    if (points.length === 1) {
-      const first = points[0];
-      if (first) {
-        map.setCenter(first);
-        map.setZoom(10);
+  const applyView = useCallback(
+    (map: google.maps.Map) => {
+      if (points.length === 0) return;
+      if (points.length === 1) {
+        const first = points[0];
+        if (first) {
+          map.setCenter(first);
+          map.setZoom(10);
+        }
+        return;
       }
-      return;
-    }
-    const bounds = new google.maps.LatLngBounds();
-    points.forEach((p) => bounds.extend(p));
-    map.fitBounds(bounds);
-  };
+      const bounds = new google.maps.LatLngBounds();
+      points.forEach((p) => bounds.extend(p));
+      map.fitBounds(bounds);
+    },
+    [points],
+  );
 
   useEffect(() => {
     if (mapRef.current) applyView(mapRef.current);
-  }, [points]);
+  }, [applyView]);
 
   if (!isConfigured) {
     return (

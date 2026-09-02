@@ -457,7 +457,9 @@ export default function AdminUsersPage() {
                     className="rounded-xl border border-slate-200 bg-slate-50/70 p-4"
                   >
                     <MetricIcon className="h-4 w-4 text-indigo-600" />
-                    <p className="mt-3 text-xl font-bold text-slate-900">{value as string | number}</p>
+                    <p className="mt-3 text-xl font-bold text-slate-900">
+                      {value as string | number}
+                    </p>
                     <p className="text-xs font-medium text-slate-500">{label as string}</p>
                   </div>
                 );
@@ -467,7 +469,10 @@ export default function AdminUsersPage() {
               <h3 className="font-semibold text-slate-900">Account details</h3>
               <div className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
                 <p className="text-slate-500 font-medium">
-                  Mobile <span className="ml-2 font-semibold text-slate-900">{mobileNumber ?? "Not added"}</span>
+                  Mobile{" "}
+                  <span className="ml-2 font-semibold text-slate-900">
+                    {mobileNumber ?? "Not added"}
+                  </span>
                 </p>
                 <p className="text-slate-500 font-medium">
                   Email status{" "}
@@ -492,11 +497,14 @@ export default function AdminUsersPage() {
                   </span>
                 </p>
                 <p className="text-slate-500 font-medium">
-                  Work mode <span className="ml-2 font-semibold text-slate-900">{detail.user.workMode}</span>
+                  Work mode{" "}
+                  <span className="ml-2 font-semibold text-slate-900">{detail.user.workMode}</span>
                 </p>
                 <p className="text-slate-500 font-medium">
                   Availability{" "}
-                  <span className="ml-2 font-semibold text-slate-900">{detail.user.availabilityStatus}</span>
+                  <span className="ml-2 font-semibold text-slate-900">
+                    {detail.user.availabilityStatus}
+                  </span>
                 </p>
                 <p className="text-slate-500 font-medium">
                   Experience{" "}
@@ -532,7 +540,9 @@ export default function AdminUsersPage() {
                 </p>
                 <p className="text-slate-500 font-medium">
                   Category{" "}
-                  <span className="ml-2 font-semibold text-slate-900">{detail.user.professionalCategory ?? "—"}</span>
+                  <span className="ml-2 font-semibold text-slate-900">
+                    {detail.user.professionalCategory ?? "—"}
+                  </span>
                 </p>
                 <p className="text-slate-500 font-medium">
                   Location{" "}
@@ -541,7 +551,10 @@ export default function AdminUsersPage() {
                   </span>
                 </p>
                 <p className="text-slate-500 font-medium">
-                  Company <span className="ml-2 font-semibold text-slate-900">{detail.user.companyName ?? "—"}</span>
+                  Company{" "}
+                  <span className="ml-2 font-semibold text-slate-900">
+                    {detail.user.companyName ?? "—"}
+                  </span>
                 </p>
                 <p className="text-slate-500 font-medium">
                   Rating{" "}

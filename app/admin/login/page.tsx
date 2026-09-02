@@ -78,7 +78,9 @@ export default function AdminLogin() {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="font-display font-extrabold text-lg text-white tracking-tight">Klick-Pro</span>
+                  <span className="font-display font-extrabold text-lg text-white tracking-tight">
+                    Klick-Pro
+                  </span>
                   <span className="rounded-md bg-white/20 backdrop-blur-xs px-2 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider">
                     Console v2.4
                   </span>
@@ -97,7 +99,8 @@ export default function AdminLogin() {
                 Complete oversight of your service marketplace.
               </h1>
               <p className="mt-3 text-sm leading-relaxed text-indigo-100/80">
-                Manage verifications, monitor active escrows, resolve client disputes, and oversee live marketplace operations.
+                Manage verifications, monitor active escrows, resolve client disputes, and oversee
+                live marketplace operations.
               </p>
             </div>
 
@@ -109,7 +112,9 @@ export default function AdminLogin() {
                 </div>
                 <div>
                   <p className="text-xs font-bold text-white">Trust & Compliance Engine</p>
-                  <p className="text-[11px] text-indigo-100/80">Automated Persona KYC check and manual document inspection.</p>
+                  <p className="text-[11px] text-indigo-100/80">
+                    Automated Persona KYC check and manual document inspection.
+                  </p>
                 </div>
               </div>
 
@@ -119,7 +124,9 @@ export default function AdminLogin() {
                 </div>
                 <div>
                   <p className="text-xs font-bold text-white">Socket.IO Live Synchronization</p>
-                  <p className="text-[11px] text-indigo-100/80">Instant multi-channel push events and automatic data revalidation.</p>
+                  <p className="text-[11px] text-indigo-100/80">
+                    Instant multi-channel push events and automatic data revalidation.
+                  </p>
                 </div>
               </div>
             </div>
@@ -263,7 +270,8 @@ export default function AdminLogin() {
 
           {/* Footer Notice */}
           <p className="mt-8 text-center text-xs font-medium text-slate-400">
-            For security, multiple failed login attempts will temporarily lock administrative access.
+            For security, multiple failed login attempts will temporarily lock administrative
+            access.
           </p>
         </section>
       </div>

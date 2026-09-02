@@ -322,7 +322,9 @@ export default function FinancePage() {
               <div className="min-w-56 flex-1">
                 <p className="font-semibold text-slate-900">{item.title}</p>
                 <p className="mt-0.5 text-xs text-slate-500">{item.person}</p>
-                {item.detail ? <p className="mt-0.5 text-xs text-slate-400">{item.detail}</p> : null}
+                {item.detail ? (
+                  <p className="mt-0.5 text-xs text-slate-400">{item.detail}</p>
+                ) : null}
               </div>
               <span className="text-sm text-slate-500 font-medium">
                 {new Date(item.createdAt).toLocaleString()}

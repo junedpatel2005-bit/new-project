@@ -12,8 +12,16 @@ import { countryCodes } from "@/lib/country-codes";
 import { isValidPhoneNumber, phoneValidationMessage } from "@/lib/phone-validation";
 
 const DEMO_ACCOUNTS = {
-  client: { email: "seed.client@servio.example", password: "ServioSeed#2026" },
-  professional: { email: "surat.pro@servio.example", password: "ServioSeed#2026" },
+  client: {
+    username: "seed_client",
+    email: "seed.client@servio.example",
+    password: "ServioSeed#2026",
+  },
+  professional: {
+    username: "surat_pro",
+    email: "surat.pro@servio.example",
+    password: "ServioSeed#2026",
+  },
 } as const;
 
 export default function Login() {
@@ -40,6 +48,12 @@ export default function Login() {
     setFieldErrors({ email: "", password: "" });
     setError(null);
     passwordRef.current?.focus();
+  }
+
+  async function quickLogin(role: "" | keyof typeof DEMO_ACCOUNTS) {
+    if (!role) return;
+    quickFill(role);
+    await submit();
   }
 
   useEffect(() => {
@@ -285,7 +299,7 @@ export default function Login() {
               defaultValue=""
               disabled={pending}
               onChange={(event) => {
-                quickFill(event.target.value as "" | keyof typeof DEMO_ACCOUNTS);
+                void quickLogin(event.target.value as "" | keyof typeof DEMO_ACCOUNTS);
                 event.target.value = "";
               }}
               className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm disabled:opacity-50"
@@ -294,6 +308,15 @@ export default function Login() {
               <option value="client">Client</option>
               <option value="professional">Professional</option>
             </select>
+            <div className="space-y-1 text-xs text-amber-800">
+              <p>Selecting an account signs in immediately.</p>
+              <p>
+                Client: <code>seed_client</code> / <code>ServioSeed#2026</code>
+              </p>
+              <p>
+                Professional: <code>surat_pro</code> / <code>ServioSeed#2026</code>
+              </p>
+            </div>
             <p className="text-xs text-amber-700">
               Fills the email and password below — just press Enter to log in.
             </p>

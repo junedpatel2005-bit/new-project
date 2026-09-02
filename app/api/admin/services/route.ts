@@ -86,11 +86,13 @@ export async function POST(request: NextRequest) {
     );
   if (parsed.data.parentId !== null) {
     const parent = await db.serviceCategory.findUnique({ where: { id: parsed.data.parentId } });
-    if (!parent || parent.parentId !== null || parent.segment !== parsed.data.segment)
+    if (!parent)
       return NextResponse.json(
-        { error: "Choose a valid top-level category as the parent." },
+        { error: "Choose a valid category as the parent." },
         { status: 400 },
       );
+    // Inherit segment from parent
+    parsed.data.segment = (parent.segment as "RESIDENTIAL" | "COMMERCIAL" | "INDUSTRIAL") ?? parsed.data.segment;
   }
   const service = await db.serviceCategory.create({
     data: { ...parsed.data, slug: baseSlug, sortOrder: await db.serviceCategory.count() },

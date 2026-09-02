@@ -1,7 +1,7 @@
 "use client";
 
 import { GoogleMap, InfoWindow, Marker } from "@react-google-maps/api";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { BadgeCheck, MapPin, Star } from "lucide-react";
 import type { ProfessionalDiscoveryResult } from "@/lib/types/professional-discovery";
@@ -28,22 +28,25 @@ export default function ProfessionalDiscoveryMap({
   const activeProfessional =
     professionals.find((professional) => professional.id === activeProfessionalId) ?? null;
 
-  const applyView = (map: google.maps.Map) => {
-    if (selectedPoint) {
-      map.panTo(selectedPoint);
-      map.setZoom(12);
-      return;
-    }
-    if (points.length > 0) {
-      const bounds = new google.maps.LatLngBounds();
-      points.forEach((p) => bounds.extend(p));
-      map.fitBounds(bounds);
-    }
-  };
+  const applyView = useCallback(
+    (map: google.maps.Map) => {
+      if (selectedPoint) {
+        map.panTo(selectedPoint);
+        map.setZoom(12);
+        return;
+      }
+      if (points.length > 0) {
+        const bounds = new google.maps.LatLngBounds();
+        points.forEach((p) => bounds.extend(p));
+        map.fitBounds(bounds);
+      }
+    },
+    [selectedPoint, points],
+  );
 
   useEffect(() => {
     if (mapRef.current) applyView(mapRef.current);
-  }, [selectedPoint?.lat, selectedPoint?.lng, points.length]);
+  }, [applyView]);
 
   if (!isConfigured) {
     return (

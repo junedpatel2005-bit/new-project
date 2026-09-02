@@ -64,7 +64,9 @@ export function PortalShell({
   const activeUser = user ?? initialUser;
   const isProfessional = activeUser
     ? activeUser.role === "PROFESSIONAL"
-    : Boolean(pathname?.startsWith("/professional") || pathname?.startsWith("/professional-profile"));
+    : Boolean(
+        pathname?.startsWith("/professional") || pathname?.startsWith("/professional-profile"),
+      );
 
   const items = isProfessional ? professionalItems : clientItems;
   const mobileItems = isProfessional ? professionalMobileItems : clientMobileItems;

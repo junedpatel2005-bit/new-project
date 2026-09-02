@@ -121,7 +121,8 @@ export async function PATCH(request: NextRequest) {
     }),
   ]);
   emitRealtimeNotification([parsed.data.userId], {
-    title: parsed.data.status === "APPROVED" ? "Verification Approved" : "Verification Status Updated",
+    title:
+      parsed.data.status === "APPROVED" ? "Verification Approved" : "Verification Status Updated",
     description:
       parsed.data.status === "APPROVED"
         ? "Congratulations, your professional account is now verified!"

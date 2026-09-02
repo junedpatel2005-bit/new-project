@@ -125,7 +125,8 @@ export default function Admin() {
               Platform Command Center
             </h1>
             <p className="mt-2 max-w-2xl text-sm font-medium text-slate-500">
-              Overview of active marketplace accounts, jobs workflow, compliance status, and escrow transactions.
+              Overview of active marketplace accounts, jobs workflow, compliance status, and escrow
+              transactions.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
@@ -156,14 +157,18 @@ export default function Admin() {
             className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-xs transition-all hover:-translate-y-0.5 hover:shadow-md hover:border-indigo-200"
           >
             <div className="flex items-center justify-between">
-              <div className={`grid h-12 w-12 place-items-center rounded-2xl border ${card.bgLight} transition group-hover:scale-105`}>
+              <div
+                className={`grid h-12 w-12 place-items-center rounded-2xl border ${card.bgLight} transition group-hover:scale-105`}
+              >
                 <card.icon className="h-6 w-6" />
               </div>
               <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold text-slate-600 uppercase tracking-wider">
                 {card.badge}
               </span>
             </div>
-            <p className="mt-5 text-3xl font-extrabold text-slate-900 tracking-tight">{card.value ?? "0"}</p>
+            <p className="mt-5 text-3xl font-extrabold text-slate-900 tracking-tight">
+              {card.value ?? "0"}
+            </p>
             <p className="mt-1 text-sm font-semibold text-slate-500">{card.label}</p>
           </Link>
         ))}
@@ -176,7 +181,9 @@ export default function Admin() {
             <div className="grid h-10 w-10 place-items-center rounded-xl bg-emerald-100 text-emerald-700 border border-emerald-200">
               <UserPlus className="h-5 w-5" />
             </div>
-            <span className="text-xs font-bold text-emerald-700 bg-emerald-100/60 px-2 py-0.5 rounded-md">Growth</span>
+            <span className="text-xs font-bold text-emerald-700 bg-emerald-100/60 px-2 py-0.5 rounded-md">
+              Growth
+            </span>
           </div>
           <p className="mt-4 text-2xl font-bold text-slate-900">{data?.newUsers.length ?? "0"}</p>
           <p className="text-xs font-semibold text-emerald-800">Recent User Registrations</p>
@@ -187,7 +194,9 @@ export default function Admin() {
             <div className="grid h-10 w-10 place-items-center rounded-xl bg-sky-100 text-sky-700 border border-sky-200">
               <BriefcaseBusiness className="h-5 w-5" />
             </div>
-            <span className="text-xs font-bold text-sky-700 bg-sky-100/60 px-2 py-0.5 rounded-md">Marketplace</span>
+            <span className="text-xs font-bold text-sky-700 bg-sky-100/60 px-2 py-0.5 rounded-md">
+              Marketplace
+            </span>
           </div>
           <p className="mt-4 text-2xl font-bold text-slate-900">{data?.newJobs.length ?? "0"}</p>
           <p className="text-xs font-semibold text-sky-800">Recent Job Requests</p>
@@ -198,9 +207,13 @@ export default function Admin() {
             <div className="grid h-10 w-10 place-items-center rounded-xl bg-amber-100 text-amber-700 border border-amber-200">
               <AlertTriangle className="h-5 w-5" />
             </div>
-            <span className="text-xs font-bold text-amber-700 bg-amber-100/60 px-2 py-0.5 rounded-md">Attention</span>
+            <span className="text-xs font-bold text-amber-700 bg-amber-100/60 px-2 py-0.5 rounded-md">
+              Attention
+            </span>
           </div>
-          <p className="mt-4 text-2xl font-bold text-slate-900">{data?.newDisputes.length ?? "0"}</p>
+          <p className="mt-4 text-2xl font-bold text-slate-900">
+            {data?.newDisputes.length ?? "0"}
+          </p>
           <p className="text-xs font-semibold text-amber-800">Pending Resolution Tickets</p>
         </div>
       </div>
@@ -234,7 +247,9 @@ export default function Admin() {
           {data?.newJobs.map((job) => (
             <div key={job.id} className="flex items-center justify-between gap-3 py-3.5">
               <div>
-                <p className="font-semibold text-sm text-slate-900">{job.title ?? `Job #${job.id}`}</p>
+                <p className="font-semibold text-sm text-slate-900">
+                  {job.title ?? `Job #${job.id}`}
+                </p>
                 <p className="text-xs text-slate-500">
                   {job.category ?? "General"} · {job.user.firstName} {job.user.lastName}
                 </p>
@@ -252,7 +267,8 @@ export default function Admin() {
               <div>
                 <p className="font-semibold text-sm text-slate-900">{dispute.issueType}</p>
                 <p className="text-xs text-slate-500">
-                  <span className="font-bold text-amber-600">{dispute.priority}</span> · {dispute.status}
+                  <span className="font-bold text-amber-600">{dispute.priority}</span> ·{" "}
+                  {dispute.status}
                 </p>
               </div>
               <span className="text-xs font-medium text-slate-400 bg-slate-50 px-2 py-1 rounded-md border border-slate-200">

@@ -63,6 +63,11 @@ export const marketingDefaults: Record<MarketingPageId, MarketingPageContent> = 
       description:
         "Browse available projects, bid on work, and build your reputation with satisfied clients worldwide.",
     },
+    features: {
+      label: "Why Professionals Choose Us",
+      title: "Everything you need to grow",
+      description: "Find quality projects, get paid safely, and build a reputation clients trust.",
+    },
     items: [
       item("grow", "Grow", "Find quality projects and build your professional business.", "trend"),
       item(

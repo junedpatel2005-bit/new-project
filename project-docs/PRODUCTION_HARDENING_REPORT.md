@@ -68,16 +68,16 @@ Webhook event claiming and development OTP consumption use conditional state upd
 
 ## Validation Results
 
-| Check | Result |
-|---|---|
-| `npx prisma format` | PASS |
-| `npx prisma validate` | PASS |
-| `npx prisma generate` | PASS |
-| `npm run typecheck` | PASS |
-| `npm test -- --run` | PASS — 12 tests in 3 files |
-| `npm run lint` | PASS WITH WARNINGS — 6 pre-existing React Hook warnings |
-| `npm run build` | PASS — Next.js 16.3.0 production build |
-| Disposable migration replay | NOT AVAILABLE |
+| Check                       | Result                                                  |
+| --------------------------- | ------------------------------------------------------- |
+| `npx prisma format`         | PASS                                                    |
+| `npx prisma validate`       | PASS                                                    |
+| `npx prisma generate`       | PASS                                                    |
+| `npm run typecheck`         | PASS                                                    |
+| `npm test -- --run`         | PASS — 12 tests in 3 files                              |
+| `npm run lint`              | PASS WITH WARNINGS — 6 pre-existing React Hook warnings |
+| `npm run build`             | PASS — Next.js 16.3.0 production build                  |
+| Disposable migration replay | NOT AVAILABLE                                           |
 
 ## Deployment Preconditions
 

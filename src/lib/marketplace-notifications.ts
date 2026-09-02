@@ -124,7 +124,11 @@ async function notifyRole(
       if (storedNotification.type.includes("ACCOUNT") || storedNotification.type.includes("USER")) {
         emitAdminUsersUpdate();
       }
-      if (storedNotification.type.includes("JOB") || storedNotification.type.includes("DISPUTE") || storedNotification.type.includes("PROJECT")) {
+      if (
+        storedNotification.type.includes("JOB") ||
+        storedNotification.type.includes("DISPUTE") ||
+        storedNotification.type.includes("PROJECT")
+      ) {
         emitAdminOperationsUpdate();
       }
       if (storedNotification.type.includes("VERIFICATION")) {

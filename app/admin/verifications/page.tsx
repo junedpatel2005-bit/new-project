@@ -211,7 +211,9 @@ export default function AdminVerificationsPage() {
                     <h2 className="font-bold text-slate-900 text-base">
                       {item.user.firstName} {item.user.lastName}
                     </h2>
-                    <p className="text-xs font-medium text-slate-400 truncate max-w-[160px]">{item.user.email}</p>
+                    <p className="text-xs font-medium text-slate-400 truncate max-w-[160px]">
+                      {item.user.email}
+                    </p>
                   </div>
                 </div>
                 <span
@@ -285,7 +287,9 @@ export default function AdminVerificationsPage() {
                       {item.user.firstName} {item.user.lastName}
                     </td>
                     <td className="p-4">{item.provider}</td>
-                    <td className="p-4 font-mono text-xs text-slate-600">{item.providerInquiryId}</td>
+                    <td className="p-4 font-mono text-xs text-slate-600">
+                      {item.providerInquiryId}
+                    </td>
                     <td className="p-4">{item.providerStatus}</td>
                     <td className="p-4">{item.adminStatus}</td>
                     <td className="p-4 text-slate-500">
@@ -525,7 +529,9 @@ export default function AdminVerificationsPage() {
                 <p className="text-xs font-bold uppercase tracking-[.2em] text-indigo-600">
                   Document review
                 </p>
-                <h2 className="mt-1 font-display text-xl font-bold text-slate-900">{document.label}</h2>
+                <h2 className="mt-1 font-display text-xl font-bold text-slate-900">
+                  {document.label}
+                </h2>
                 <p className="mt-0.5 text-sm text-slate-500">Submitted by {document.owner}</p>
               </div>
               <button
@@ -552,7 +558,9 @@ export default function AdminVerificationsPage() {
             ) : (
               <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-5">
                 <FileText className="h-8 w-8 text-indigo-600" />
-                <p className="mt-4 break-all text-sm font-semibold text-slate-900">{document.value}</p>
+                <p className="mt-4 break-all text-sm font-semibold text-slate-900">
+                  {document.value}
+                </p>
                 <p className="mt-2 text-sm leading-6 text-slate-500">
                   This older request only stored the file name, so the original image is not
                   available. Please upload the document again from the Professional Verification

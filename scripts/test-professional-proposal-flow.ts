@@ -12,9 +12,19 @@ const db = new PrismaClient({
 });
 const authSecret = process.env.AUTH_SECRET;
 if (!authSecret) throw new Error("AUTH_SECRET is required to run the project-flow test.");
+import { randomUUID } from "node:crypto";
+
 const secret = new TextEncoder().encode(authSecret);
-const cookie = async (userId: number, role: "CLIENT" | "PROFESSIONAL") =>
-  `servio_session=${await new SignJWT({ userId, role }).setProtectedHeader({ alg: "HS256" }).setExpirationTime("1h").sign(secret)}`;
+const cookie = async (userId: number, role: "CLIENT" | "PROFESSIONAL") => {
+  const sessionId = randomUUID();
+  const expiresAt = new Date(Date.now() + 3600 * 1000);
+  await db.session.create({ data: { id: sessionId, userId, expiresAt } });
+  const token = await new SignJWT({ userId, role, sessionId })
+    .setProtectedHeader({ alg: "HS256" })
+    .setExpirationTime("1h")
+    .sign(secret);
+  return `servio_session=${token}`;
+};
 
 let jobOne: number | undefined;
 let jobTwo: number | undefined;

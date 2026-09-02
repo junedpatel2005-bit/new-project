@@ -4,14 +4,14 @@ Your job is not only to make the code work.
 
 Your job is to produce code that is:
 
-* secure
-* readable
-* maintainable
-* testable
-* scalable
-* consistent
-* production-safe
-* easy for another developer to understand
+- secure
+- readable
+- maintainable
+- testable
+- scalable
+- consistent
+- production-safe
+- easy for another developer to understand
 
 Follow these coding standards for EVERY change.
 
@@ -128,11 +128,11 @@ validate the structure before treating it as User.
 
 Use explicit types for:
 
-* public function parameters
-* service boundaries
-* API payloads
-* database transformation functions
-* security-sensitive data
+- public function parameters
+- service boundaries
+- API payloads
+- database transformation functions
+- security-sensitive data
 
 Allow TypeScript inference for obvious local variables.
 
@@ -227,14 +227,14 @@ Validate all external input.
 
 External input includes:
 
-* request body
-* query parameters
-* URL parameters
-* headers
-* cookies
-* webhook payloads
-* file uploads
-* third-party API responses
+- request body
+- query parameters
+- URL parameters
+- headers
+- cookies
+- webhook payloads
+- file uploads
+- third-party API responses
 
 Use the project's validation library if available.
 
@@ -246,14 +246,14 @@ Validate again on the server.
 
 Validate:
 
-* required fields
-* type
-* length
-* allowed values
-* numeric range
-* date range
-* format
-* relationship rules
+- required fields
+- type
+- length
+- allowed values
+- numeric range
+- date range
+- format
+- relationship rules
 
 # 8. AUTHENTICATION STANDARD
 
@@ -269,11 +269,11 @@ Sensitive routes should verify the current database user where appropriate.
 
 Check:
 
-* user exists
-* account is active
-* account is verified where required
-* role is still valid
-* user owns the requested resource or has appropriate permission
+- user exists
+- account is active
+- account is verified where required
+- role is still valid
+- user owns the requested resource or has appropriate permission
 
 Do not trust stale authorization data from a long-lived token for high-risk operations.
 
@@ -454,10 +454,8 @@ Use database transactions when multiple writes represent one business operation.
 
 Example:
 
-project state change
-+
-timeline event
-+
+project state change +
+timeline event +
 financial record
 
 should not leave partial state.
@@ -566,12 +564,12 @@ Never send password hashes to clients.
 
 OTP codes must:
 
-* expire
-* be single-use
-* be rate limited
-* have attempt limits
-* not be logged
-* not be returned through APIs
+- expire
+- be single-use
+- be rate limited
+- have attempt limits
+- not be logged
+- not be returned through APIs
 
 Consumed OTPs must not be reusable.
 
@@ -579,11 +577,11 @@ Consumed OTPs must not be reusable.
 
 Validate:
 
-* MIME type
-* extension
-* size
-* ownership
-* storage location
+- MIME type
+- extension
+- size
+- ownership
+- storage location
 
 Do not trust the filename provided by the browser.
 
@@ -597,12 +595,12 @@ Logs should help debugging without leaking private data.
 
 Good logs contain:
 
-* event
-* request/correlation ID
-* operation
-* user ID where appropriate
-* resource ID
-* safe error metadata
+- event
+- request/correlation ID
+- operation
+- user ID where appropriate
+- resource ID
+- safe error metadata
 
 Do not log:
 
@@ -689,9 +687,9 @@ Do not blindly index every column.
 
 For each new index explain:
 
-* what query benefits
-* why existing indexes are insufficient
-* expected tradeoff
+- what query benefits
+- why existing indexes are insufficient
+- expected tradeoff
 
 # 29. BUSINESS LOGIC
 
@@ -844,10 +842,10 @@ Do not add a new package for something that can be implemented safely and simply
 
 Before adding a dependency:
 
-* check existing libraries
-* explain why it is needed
-* prefer actively maintained packages
-* avoid unnecessary dependency growth
+- check existing libraries
+- explain why it is needed
+- prefer actively maintained packages
+- avoid unnecessary dependency growth
 
 # 39. ARCHITECTURE
 
@@ -972,15 +970,15 @@ Before finishing, inspect the git diff.
 
 Verify:
 
-* no secrets added
-* no debug logs left
-* no unrelated files changed
-* no accidental formatting of the whole repository
-* no backwards compatibility regression
-* migration is safe
-* tests cover important behavior
-* imports are clean
-* types pass
+- no secrets added
+- no debug logs left
+- no unrelated files changed
+- no accidental formatting of the whole repository
+- no backwards compatibility regression
+- migration is safe
+- tests cover important behavior
+- imports are clean
+- types pass
 
 # 46. OUTPUT AFTER EVERY TASK
 

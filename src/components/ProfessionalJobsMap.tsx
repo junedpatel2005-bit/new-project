@@ -40,10 +40,14 @@ export default function ProfessionalJobsMap({
   onSelectJob: (id: number) => void;
 }) {
   const { isLoaded, isConfigured } = useGoogleMaps();
-  const mapCenter = useMemo(() => ({ lat: center[0], lng: center[1] }), [center[0], center[1]]);
-  const [activeJobId, setActiveJobId] = useState<number | null>(() => (jobs.length === 1 ? jobs[0]?.id ?? null : null));
+  const [centerLat, centerLng] = center;
+  const mapCenter = useMemo(() => ({ lat: centerLat, lng: centerLng }), [centerLat, centerLng]);
+  const [activeJobId, setActiveJobId] = useState<number | null>(() =>
+    jobs.length === 1 ? (jobs[0]?.id ?? null) : null,
+  );
   const mapRef = useRef<google.maps.Map | null>(null);
-  const activeJob = jobs.find((job) => job.id === activeJobId) ?? (jobs.length === 1 ? jobs[0] : null);
+  const activeJob =
+    jobs.find((job) => job.id === activeJobId) ?? (jobs.length === 1 ? jobs[0] : null);
 
   useEffect(() => {
     if (jobs.length === 1 && jobs[0]) {

@@ -10,10 +10,10 @@ The Prisma schema is syntactically valid and passes Prisma validation. However, 
 
 ## Verification
 
-| Check | Result |
-|---|---|
-| `npx prisma validate` | Passed |
-| `npx prisma format --check` | Failed: unformatted files detected |
+| Check                       | Result                                                                  |
+| --------------------------- | ----------------------------------------------------------------------- |
+| `npx prisma validate`       | Passed                                                                  |
+| `npx prisma format --check` | Failed: unformatted files detected                                      |
 | `npx prisma migrate status` | Could not complete because the database schema engine returned an error |
 
 ## Findings

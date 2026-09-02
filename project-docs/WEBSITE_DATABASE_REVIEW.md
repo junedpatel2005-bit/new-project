@@ -305,16 +305,16 @@ Views, functions, triggers, and database permissions cannot be assessed from rep
 
 ## Website ↔ Database Feature Trace
 
-| Feature | UI | API/backend | Auth/authz | Database | Current conclusion |
-|---|---|---|---|---|---|
-| Registration/email verification | Signup/verify routes | Auth action route | Session withheld until verification | User and verification token models | Code path covered by focused tests; full flow needs staging |
-| Phone OTP | Signup/reset UI | Auth action + OTP provider | Role and verification proof | `OtpCode` | Development consume is atomic in source; PostgreSQL concurrency test not run |
-| Jobs/proposals | Client/professional pages | Job/proposal routes | Role/ownership predicates present in reviewed paths | `ClientJob`, `ProjectRequest`, proposal models | Needs two-user matrix and workflow E2E |
-| Project tracking | Project/tracking pages | Project actions/files/routes | Client/professional scope checks present in key paths | Project tracking/milestone/timeline/upload models | Partial transaction/concurrency evidence |
-| Wallet/payments | Earnings/wallet UI | Wallet/Razorpay routes | Client/professional/admin checks | Payment, Wallet, WalletTransaction, Invoice | Financial tests and provider staging required |
-| File uploads | Verification/project UI | Multipart upload/download routes | Generated keys and ownership checks in reviewed paths | StoredFile and project upload metadata | Validation present; lifecycle reconciliation pending |
-| Messages/notifications | Message/notification pages | Message/notification/realtime helpers | User-scoped paths require matrix testing | Message/notification models | Durable delivery not proven |
-| Admin/CMS | Admin pages | Admin routes | Server admin checks | CMS/admin models | Admin negative tests absent |
+| Feature                         | UI                         | API/backend                           | Auth/authz                                            | Database                                          | Current conclusion                                                           |
+| ------------------------------- | -------------------------- | ------------------------------------- | ----------------------------------------------------- | ------------------------------------------------- | ---------------------------------------------------------------------------- |
+| Registration/email verification | Signup/verify routes       | Auth action route                     | Session withheld until verification                   | User and verification token models                | Code path covered by focused tests; full flow needs staging                  |
+| Phone OTP                       | Signup/reset UI            | Auth action + OTP provider            | Role and verification proof                           | `OtpCode`                                         | Development consume is atomic in source; PostgreSQL concurrency test not run |
+| Jobs/proposals                  | Client/professional pages  | Job/proposal routes                   | Role/ownership predicates present in reviewed paths   | `ClientJob`, `ProjectRequest`, proposal models    | Needs two-user matrix and workflow E2E                                       |
+| Project tracking                | Project/tracking pages     | Project actions/files/routes          | Client/professional scope checks present in key paths | Project tracking/milestone/timeline/upload models | Partial transaction/concurrency evidence                                     |
+| Wallet/payments                 | Earnings/wallet UI         | Wallet/Razorpay routes                | Client/professional/admin checks                      | Payment, Wallet, WalletTransaction, Invoice       | Financial tests and provider staging required                                |
+| File uploads                    | Verification/project UI    | Multipart upload/download routes      | Generated keys and ownership checks in reviewed paths | StoredFile and project upload metadata            | Validation present; lifecycle reconciliation pending                         |
+| Messages/notifications          | Message/notification pages | Message/notification/realtime helpers | User-scoped paths require matrix testing              | Message/notification models                       | Durable delivery not proven                                                  |
+| Admin/CMS                       | Admin pages                | Admin routes                          | Server admin checks                                   | CMS/admin models                                  | Admin negative tests absent                                                  |
 
 ## Security Assessment
 
@@ -386,18 +386,18 @@ Run responsive/accessibility/SEO/browser-flow checks, provider sandboxes, CSP re
 
 ## Local Validation Results
 
-| Command | Result | Evidence |
-|---|---|---|
-| `npx prisma format` | PASS | Ran locally |
-| `npx prisma validate` | PASS | Ran locally |
-| `npx prisma generate` | PASS | Ran locally |
-| `npm run typecheck` | PASS | Ran locally |
-| `npm test -- --run` | PASS | 12 tests in 3 files |
-| `npm run lint` | PASS WITH WARNINGS | 6 React Hook warnings |
-| `npm run build` | PASS | Next.js 16.3.0 |
-| PostgreSQL integration suite | NOT AVAILABLE | Docker/psql unavailable in workspace |
-| Live database audit | NOT AVAILABLE | No database access authorized |
-| Browser E2E/accessibility/SEO | NOT RUN | No browser test session used |
+| Command                       | Result             | Evidence                             |
+| ----------------------------- | ------------------ | ------------------------------------ |
+| `npx prisma format`           | PASS               | Ran locally                          |
+| `npx prisma validate`         | PASS               | Ran locally                          |
+| `npx prisma generate`         | PASS               | Ran locally                          |
+| `npm run typecheck`           | PASS               | Ran locally                          |
+| `npm test -- --run`           | PASS               | 12 tests in 3 files                  |
+| `npm run lint`                | PASS WITH WARNINGS | 6 React Hook warnings                |
+| `npm run build`               | PASS               | Next.js 16.3.0                       |
+| PostgreSQL integration suite  | NOT AVAILABLE      | Docker/psql unavailable in workspace |
+| Live database audit           | NOT AVAILABLE      | No database access authorized        |
+| Browser E2E/accessibility/SEO | NOT RUN            | No browser test session used         |
 
 ## Final Assessment
 

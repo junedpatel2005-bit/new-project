@@ -48,6 +48,7 @@ import {
   ShieldCheck,
   Smartphone,
   Sparkles,
+  Star,
   Strikethrough,
   Tablet,
   Type,
@@ -65,6 +66,7 @@ import type { HomeContent, HomeFeature } from "@/lib/home-cms-file";
 import MarketingVisualPage from "@/components/MarketingVisualPage";
 import {
   marketingPageIds,
+  type MarketingItem,
   type MarketingPageContent,
   type MarketingPageId,
 } from "@/lib/marketing-cms-shared";
@@ -117,7 +119,9 @@ export default function CmsEditor() {
   const [metaDescription, setMetaDescription] = useState(
     "Connect with vetted professionals for home, digital, and corporate projects with verified escrow payments.",
   );
-  const [metaKeywords, setMetaKeywords] = useState("local services, professionals, escrow, verified jobs");
+  const [metaKeywords, setMetaKeywords] = useState(
+    "local services, professionals, escrow, verified jobs",
+  );
 
   // Add Block Modal State
   const [addBlockOpen, setAddBlockOpen] = useState(false);
@@ -289,7 +293,9 @@ export default function CmsEditor() {
         <div className="flex flex-wrap items-center gap-2.5">
           {/* Page Picker */}
           <div className="flex items-center gap-2">
-            <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Page:</label>
+            <label className="text-xs font-bold uppercase tracking-wider text-slate-500">
+              Page:
+            </label>
             <select
               value={selectedPage}
               onChange={(event) => handlePageChange(event.target.value)}
@@ -339,7 +345,9 @@ export default function CmsEditor() {
       {/* Status Notifications */}
       {status === "ready" && (
         <div className="flex items-center justify-between rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs font-bold text-amber-900 shadow-2xs">
-          <span>You have unsaved changes. Don&apos;t forget to click &quot;Save &amp; Publish&quot;.</span>
+          <span>
+            You have unsaved changes. Don&apos;t forget to click &quot;Save &amp; Publish&quot;.
+          </span>
           <button
             type="button"
             onClick={() => void save()}
@@ -368,7 +376,9 @@ export default function CmsEditor() {
             title="Desktop View (100%)"
             onClick={() => setViewport("desktop")}
             className={`rounded-lg p-1.5 transition ${
-              viewport === "desktop" ? "bg-white text-indigo-700 shadow-xs" : "text-slate-500 hover:text-slate-900"
+              viewport === "desktop"
+                ? "bg-white text-indigo-700 shadow-xs"
+                : "text-slate-500 hover:text-slate-900"
             }`}
           >
             <Laptop className="h-4 w-4" />
@@ -378,7 +388,9 @@ export default function CmsEditor() {
             title="Tablet View (768px)"
             onClick={() => setViewport("tablet")}
             className={`rounded-lg p-1.5 transition ${
-              viewport === "tablet" ? "bg-white text-indigo-700 shadow-xs" : "text-slate-500 hover:text-slate-900"
+              viewport === "tablet"
+                ? "bg-white text-indigo-700 shadow-xs"
+                : "text-slate-500 hover:text-slate-900"
             }`}
           >
             <Tablet className="h-4 w-4" />
@@ -388,7 +400,9 @@ export default function CmsEditor() {
             title="Mobile View (375px)"
             onClick={() => setViewport("mobile")}
             className={`rounded-lg p-1.5 transition ${
-              viewport === "mobile" ? "bg-white text-indigo-700 shadow-xs" : "text-slate-500 hover:text-slate-900"
+              viewport === "mobile"
+                ? "bg-white text-indigo-700 shadow-xs"
+                : "text-slate-500 hover:text-slate-900"
             }`}
           >
             <Smartphone className="h-4 w-4" />
@@ -399,6 +413,13 @@ export default function CmsEditor() {
       {/* Main Canvas with Responsive Container Simulation */}
       <div className="flex justify-center transition-all duration-300">
         <div
+          onClickCapture={(e) => {
+            const target = e.target as HTMLElement;
+            const anchor = target.closest("a");
+            if (anchor && !target.isContentEditable) {
+              e.preventDefault();
+            }
+          }}
           className={`w-full overflow-hidden rounded-3xl bg-white shadow-xl border border-slate-200 transition-all duration-300 ${
             viewport === "tablet"
               ? "max-w-[768px] ring-8 ring-slate-200/80 my-4"
@@ -511,7 +532,9 @@ export default function CmsEditor() {
               </div>
               <div>
                 <p className="font-bold text-sm text-slate-900">Trust &amp; Feature Card</p>
-                <p className="mt-1 text-xs text-slate-500">Highlights security, milestones, or guarantees.</p>
+                <p className="mt-1 text-xs text-slate-500">
+                  Highlights security, milestones, or guarantees.
+                </p>
               </div>
             </button>
 
@@ -531,7 +554,9 @@ export default function CmsEditor() {
               </div>
               <div>
                 <p className="font-bold text-sm text-slate-900">Partnership &amp; Support</p>
-                <p className="mt-1 text-xs text-slate-500">Showcases collaboration and customer service.</p>
+                <p className="mt-1 text-xs text-slate-500">
+                  Showcases collaboration and customer service.
+                </p>
               </div>
             </button>
 
@@ -551,7 +576,9 @@ export default function CmsEditor() {
               </div>
               <div>
                 <p className="font-bold text-sm text-slate-900">Excellence &amp; Awards</p>
-                <p className="mt-1 text-xs text-slate-500">Demonstrates top performance and rating standards.</p>
+                <p className="mt-1 text-xs text-slate-500">
+                  Demonstrates top performance and rating standards.
+                </p>
               </div>
             </button>
 
@@ -571,7 +598,9 @@ export default function CmsEditor() {
               </div>
               <div>
                 <p className="font-bold text-sm text-slate-900">Custom Category Block</p>
-                <p className="mt-1 text-xs text-slate-500">Flexible block for custom text and benefits.</p>
+                <p className="mt-1 text-xs text-slate-500">
+                  Flexible block for custom text and benefits.
+                </p>
               </div>
             </button>
           </div>
@@ -610,7 +639,9 @@ export default function CmsEditor() {
             <div>
               <div className="flex items-center justify-between text-xs font-bold text-slate-700 mb-1">
                 <span>Meta Description</span>
-                <span className="text-slate-400 font-medium">{metaDescription.length}/160 chars</span>
+                <span className="text-slate-400 font-medium">
+                  {metaDescription.length}/160 chars
+                </span>
               </div>
               <textarea
                 rows={3}
@@ -672,7 +703,9 @@ function RichFormattingToolbar() {
   };
 
   const insertHyperlink = () => {
-    const url = window.prompt("Enter the destination web URL (e.g. https://klickpro.com/services):");
+    const url = window.prompt(
+      "Enter the destination web URL (e.g. https://klickpro.com/services):",
+    );
     if (url) {
       document.execCommand("createLink", false, url);
     }
@@ -893,6 +926,17 @@ function HomeCmsEditor({
   const [notice, setNotice] = useState("");
   const [loadError, setLoadError] = useState("");
   const [viewport, setViewport] = useState<"desktop" | "tablet" | "mobile">("desktop");
+  const [seoOpen, setSeoOpen] = useState(false);
+  const [addBlockOpen, setAddBlockOpen] = useState(false);
+  const [metaTitle, setMetaTitle] = useState(
+    "Klick-Pro | Hire Top Local & Remote Verified Professionals",
+  );
+  const [metaDescription, setMetaDescription] = useState(
+    "Connect with vetted professionals for home, IT, and creative services with milestone escrow security.",
+  );
+  const [metaKeywords, setMetaKeywords] = useState(
+    "hire professionals, verified pros, escrow freelance, local services",
+  );
 
   useEffect(() => {
     void fetch("/api/admin/cms?page=home", { cache: "no-store" })
@@ -910,6 +954,23 @@ function HomeCmsEditor({
     setContent(next);
     setSaved(false);
     setDirty(true);
+  };
+
+  const addHomeFeature = (customData?: Partial<HomeFeature>) => {
+    if (!content) return;
+    update({
+      ...content,
+      features: [
+        ...content.features,
+        {
+          id: `feature-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+          title: customData?.title ?? "New Feature Card",
+          description: customData?.description ?? "Add description for this feature.",
+          icon: customData?.icon ?? "shield",
+        },
+      ],
+    });
+    setAddBlockOpen(false);
   };
 
   const deleteFeature = (id: string) => {
@@ -995,19 +1056,41 @@ function HomeCmsEditor({
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Page:</label>
-          <select
-            value={selectedPage}
-            onChange={(event) => requestPageChange(event.target.value)}
-            className="h-10 rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-bold text-slate-800 shadow-2xs outline-none focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-100 transition"
+        <div className="flex flex-wrap items-center gap-2.5">
+          <div className="flex items-center gap-2">
+            <label className="text-xs font-bold uppercase tracking-wider text-slate-500">
+              Page:
+            </label>
+            <select
+              value={selectedPage}
+              onChange={(event) => requestPageChange(event.target.value)}
+              className="h-10 rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-bold text-slate-800 shadow-2xs outline-none focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-100 transition"
+            >
+              {cmsPages.map((page) => (
+                <option key={page.href} value={page.href} className="text-slate-900">
+                  {page.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setSeoOpen(true)}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 transition shadow-2xs"
           >
-            {cmsPages.map((page) => (
-              <option key={page.href} value={page.href} className="text-slate-900">
-                {page.label}
-              </option>
-            ))}
-          </select>
+            <Globe className="h-4 w-4 text-indigo-600" />
+            <span>SEO &amp; Meta</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setAddBlockOpen(true)}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-indigo-200 bg-indigo-50 px-3.5 py-2 text-xs font-bold text-indigo-700 hover:bg-indigo-100 transition shadow-2xs"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Add Block</span>
+          </button>
 
           <button
             type="button"
@@ -1049,7 +1132,9 @@ function HomeCmsEditor({
             title="Desktop View (100%)"
             onClick={() => setViewport("desktop")}
             className={`rounded-lg p-1.5 transition ${
-              viewport === "desktop" ? "bg-white text-indigo-700 shadow-xs" : "text-slate-500 hover:text-slate-900"
+              viewport === "desktop"
+                ? "bg-white text-indigo-700 shadow-xs"
+                : "text-slate-500 hover:text-slate-900"
             }`}
           >
             <Laptop className="h-4 w-4" />
@@ -1059,7 +1144,9 @@ function HomeCmsEditor({
             title="Tablet View (768px)"
             onClick={() => setViewport("tablet")}
             className={`rounded-lg p-1.5 transition ${
-              viewport === "tablet" ? "bg-white text-indigo-700 shadow-xs" : "text-slate-500 hover:text-slate-900"
+              viewport === "tablet"
+                ? "bg-white text-indigo-700 shadow-xs"
+                : "text-slate-500 hover:text-slate-900"
             }`}
           >
             <Tablet className="h-4 w-4" />
@@ -1069,7 +1156,9 @@ function HomeCmsEditor({
             title="Mobile View (375px)"
             onClick={() => setViewport("mobile")}
             className={`rounded-lg p-1.5 transition ${
-              viewport === "mobile" ? "bg-white text-indigo-700 shadow-xs" : "text-slate-500 hover:text-slate-900"
+              viewport === "mobile"
+                ? "bg-white text-indigo-700 shadow-xs"
+                : "text-slate-500 hover:text-slate-900"
             }`}
           >
             <Smartphone className="h-4 w-4" />
@@ -1094,6 +1183,13 @@ function HomeCmsEditor({
       {/* Canvas Viewport */}
       <div className="flex justify-center transition-all duration-300">
         <div
+          onClickCapture={(e) => {
+            const target = e.target as HTMLElement;
+            const anchor = target.closest("a");
+            if (anchor && !target.isContentEditable) {
+              e.preventDefault();
+            }
+          }}
           className={`w-full overflow-hidden rounded-3xl bg-white shadow-xl border border-slate-200 transition-all duration-300 ${
             viewport === "tablet"
               ? "max-w-[768px] ring-8 ring-slate-200/80 my-4"
@@ -1114,6 +1210,189 @@ function HomeCmsEditor({
           />
         </div>
       </div>
+
+      {/* Add Block Modal Dialog */}
+      <Dialog open={addBlockOpen} onOpenChange={setAddBlockOpen}>
+        <DialogContent className="max-w-2xl rounded-3xl bg-white p-6 sm:p-8 border-slate-200">
+          <DialogHeader>
+            <DialogTitle className="font-display font-extrabold text-xl text-slate-900">
+              Add Homepage Block
+            </DialogTitle>
+            <DialogDescription className="text-xs text-slate-500">
+              Select a pre-designed layout block to insert into the homepage.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <button
+              type="button"
+              onClick={() =>
+                addHomeFeature({
+                  title: "Verified Trust & Safety",
+                  description: "Background-checked professionals with verified credentials.",
+                  icon: "shield",
+                })
+              }
+              className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50/60 p-4 text-left hover:border-indigo-300 hover:bg-indigo-50/40 transition"
+            >
+              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-indigo-100 text-indigo-700">
+                <ShieldCheck className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="font-bold text-sm text-slate-900">Trust &amp; Security Card</p>
+                <p className="mt-1 text-xs text-slate-500">
+                  Highlights security, milestones, or guarantees.
+                </p>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() =>
+                addHomeFeature({
+                  title: "Fast Matching & Hiring",
+                  description: "Receive competitive bids within minutes of posting your job.",
+                  icon: "briefcase",
+                })
+              }
+              className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50/60 p-4 text-left hover:border-indigo-300 hover:bg-indigo-50/40 transition"
+            >
+              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-purple-100 text-purple-700">
+                <Sparkles className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="font-bold text-sm text-slate-900">Hiring &amp; Speed</p>
+                <p className="mt-1 text-xs text-slate-500">
+                  Showcases quick job matching and proposal tools.
+                </p>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() =>
+                addHomeFeature({
+                  title: "Escrow Protected Payments",
+                  description: "Funds are released only when you approve completed milestones.",
+                  icon: "award",
+                })
+              }
+              className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50/60 p-4 text-left hover:border-indigo-300 hover:bg-indigo-50/40 transition"
+            >
+              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-emerald-100 text-emerald-700">
+                <CheckCircle2 className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="font-bold text-sm text-slate-900">Payment Protection</p>
+                <p className="mt-1 text-xs text-slate-500">
+                  Demonstrates safe escrow transactions.
+                </p>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() =>
+                addHomeFeature({
+                  title: "24/7 Dedicated Assistance",
+                  description: "Our dedicated support team is available whenever you need help.",
+                  icon: "users",
+                })
+              }
+              className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50/60 p-4 text-left hover:border-indigo-300 hover:bg-indigo-50/40 transition"
+            >
+              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-blue-100 text-blue-700">
+                <Type className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="font-bold text-sm text-slate-900">Custom Category Block</p>
+                <p className="mt-1 text-xs text-slate-500">
+                  Flexible block for custom text and benefits.
+                </p>
+              </div>
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* SEO & Meta Drawer Dialog */}
+      <Dialog open={seoOpen} onOpenChange={setSeoOpen}>
+        <DialogContent className="max-w-xl rounded-3xl bg-white p-6 sm:p-8 border-slate-200">
+          <DialogHeader>
+            <DialogTitle className="font-display font-extrabold text-xl text-slate-900 flex items-center gap-2">
+              <Globe className="h-5 w-5 text-indigo-600" />
+              <span>SEO &amp; Social Meta Tags</span>
+            </DialogTitle>
+            <DialogDescription className="text-xs text-slate-500">
+              Customize how the homepage appears in Google search results and social media shares.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="mt-4 space-y-4">
+            <div>
+              <div className="flex items-center justify-between text-xs font-bold text-slate-700 mb-1">
+                <span>Page Title Tag</span>
+                <span className="text-slate-400 font-medium">{metaTitle.length}/60 chars</span>
+              </div>
+              <input
+                type="text"
+                value={metaTitle}
+                onChange={(e) => setMetaTitle(e.target.value)}
+                className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-medium text-slate-900 outline-none focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-100 transition"
+              />
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between text-xs font-bold text-slate-700 mb-1">
+                <span>Meta Description</span>
+                <span className="text-slate-400 font-medium">
+                  {metaDescription.length}/160 chars
+                </span>
+              </div>
+              <textarea
+                rows={3}
+                value={metaDescription}
+                onChange={(e) => setMetaDescription(e.target.value)}
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs font-medium text-slate-900 outline-none focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-100 transition"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Keywords</label>
+              <input
+                type="text"
+                value={metaKeywords}
+                onChange={(e) => setMetaKeywords(e.target.value)}
+                className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-medium text-slate-900 outline-none focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-100 transition"
+              />
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center gap-1.5">
+                <Search className="h-3.5 w-3.5" />
+                Google Search Result Preview
+              </p>
+              <p className="text-xs text-slate-500 truncate">https://klickpro.com/</p>
+              <h4 className="mt-1 font-semibold text-sm text-blue-700 hover:underline cursor-pointer">
+                {metaTitle}
+              </h4>
+              <p className="mt-1 text-xs text-slate-600 line-clamp-2 leading-relaxed">
+                {metaDescription}
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-6 flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => setSeoOpen(false)}
+              className="rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white hover:bg-indigo-500 transition shadow-2xs"
+            >
+              Apply SEO Settings
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -1132,18 +1411,32 @@ function MarketingCmsEditor({
   const [pendingPage, setPendingPage] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [viewport, setViewport] = useState<"desktop" | "tablet" | "mobile">("desktop");
+  const [seoOpen, setSeoOpen] = useState(false);
+  const [addBlockOpen, setAddBlockOpen] = useState(false);
+  const pageTitle = cmsPages.find((item) => item.href === `/${page}`)?.label ?? "Marketing Page";
+  const [metaTitle, setMetaTitle] = useState(`Klick-Pro | ${pageTitle}`);
+  const [metaDescription, setMetaDescription] = useState(
+    `Learn more about ${pageTitle} on Klick-Pro. Connect with verified service professionals with secure milestone escrow.`,
+  );
+  const [metaKeywords, setMetaKeywords] = useState(
+    `klick pro, ${pageTitle.toLowerCase()}, verified professionals, local services`,
+  );
 
   useEffect(() => {
     setContent(null);
     setError("");
     setDirty(false);
+    setMetaTitle(`Klick-Pro | ${pageTitle}`);
+    setMetaDescription(
+      `Learn more about ${pageTitle} on Klick-Pro. Connect with verified service professionals with secure milestone escrow.`,
+    );
     void fetch(`/api/admin/cms?page=${page}`, { cache: "no-store" })
       .then(async (response) => {
         if (!response.ok) throw new Error();
         setContent((await response.json()) as MarketingPageContent);
       })
       .catch(() => setError("Unable to load this page."));
-  }, [page]);
+  }, [page, pageTitle]);
 
   if (error && !content) return <p className="text-rose-600 font-medium">{error}</p>;
   if (!content) return <p className="text-slate-500 font-medium">Loading page…</p>;
@@ -1155,6 +1448,18 @@ function MarketingCmsEditor({
   };
 
   const id = () => `item-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+  const addMarketingItem = (customData?: Partial<MarketingItem>) => {
+    if (!content) return;
+    const newItem: MarketingItem = {
+      id: id(),
+      title: customData?.title ?? "New Feature Card",
+      description: customData?.description ?? "Add description for this item.",
+      icon: customData?.icon ?? "shield",
+    };
+    update({ ...content, items: [...content.items, newItem] });
+    setAddBlockOpen(false);
+  };
 
   const deleteItem = (itemId: string) => {
     if (content.items.length > 1) {
@@ -1197,8 +1502,6 @@ function MarketingCmsEditor({
     else onPageChange(next);
   };
 
-  const pageTitle = cmsPages.find((item) => item.href === `/${page}`)?.label ?? "Marketing Page";
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -1219,19 +1522,41 @@ function MarketingCmsEditor({
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Page:</label>
-          <select
-            value={`/${page}`}
-            onChange={(event) => switchPage(event.target.value)}
-            className="h-10 rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-bold text-slate-800 shadow-2xs outline-none focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-100 transition"
+        <div className="flex flex-wrap items-center gap-2.5">
+          <div className="flex items-center gap-2">
+            <label className="text-xs font-bold uppercase tracking-wider text-slate-500">
+              Page:
+            </label>
+            <select
+              value={`/${page}`}
+              onChange={(event) => switchPage(event.target.value)}
+              className="h-10 rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-bold text-slate-800 shadow-2xs outline-none focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-100 transition"
+            >
+              {cmsPages.map((item) => (
+                <option key={item.href} value={item.href} className="text-slate-900">
+                  {item.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setSeoOpen(true)}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 transition shadow-2xs"
           >
-            {cmsPages.map((item) => (
-              <option key={item.href} value={item.href} className="text-slate-900">
-                {item.label}
-              </option>
-            ))}
-          </select>
+            <Globe className="h-4 w-4 text-indigo-600" />
+            <span>SEO &amp; Meta</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setAddBlockOpen(true)}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-indigo-200 bg-indigo-50 px-3.5 py-2 text-xs font-bold text-indigo-700 hover:bg-indigo-100 transition shadow-2xs"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Add Block</span>
+          </button>
 
           <button
             type="button"
@@ -1273,7 +1598,9 @@ function MarketingCmsEditor({
             title="Desktop View (100%)"
             onClick={() => setViewport("desktop")}
             className={`rounded-lg p-1.5 transition ${
-              viewport === "desktop" ? "bg-white text-indigo-700 shadow-xs" : "text-slate-500 hover:text-slate-900"
+              viewport === "desktop"
+                ? "bg-white text-indigo-700 shadow-xs"
+                : "text-slate-500 hover:text-slate-900"
             }`}
           >
             <Laptop className="h-4 w-4" />
@@ -1283,7 +1610,9 @@ function MarketingCmsEditor({
             title="Tablet View (768px)"
             onClick={() => setViewport("tablet")}
             className={`rounded-lg p-1.5 transition ${
-              viewport === "tablet" ? "bg-white text-indigo-700 shadow-xs" : "text-slate-500 hover:text-slate-900"
+              viewport === "tablet"
+                ? "bg-white text-indigo-700 shadow-xs"
+                : "text-slate-500 hover:text-slate-900"
             }`}
           >
             <Tablet className="h-4 w-4" />
@@ -1293,7 +1622,9 @@ function MarketingCmsEditor({
             title="Mobile View (375px)"
             onClick={() => setViewport("mobile")}
             className={`rounded-lg p-1.5 transition ${
-              viewport === "mobile" ? "bg-white text-indigo-700 shadow-xs" : "text-slate-500 hover:text-slate-900"
+              viewport === "mobile"
+                ? "bg-white text-indigo-700 shadow-xs"
+                : "text-slate-500 hover:text-slate-900"
             }`}
           >
             <Smartphone className="h-4 w-4" />
@@ -1321,6 +1652,13 @@ function MarketingCmsEditor({
       {/* Viewport Canvas Container */}
       <div className="flex justify-center transition-all duration-300">
         <div
+          onClickCapture={(e) => {
+            const target = e.target as HTMLElement;
+            const anchor = target.closest("a");
+            if (anchor && !target.isContentEditable) {
+              e.preventDefault();
+            }
+          }}
           className={`w-full overflow-hidden rounded-3xl bg-white shadow-xl border border-slate-200 transition-all duration-300 ${
             viewport === "tablet"
               ? "max-w-[768px] ring-8 ring-slate-200/80 my-4"
@@ -1330,7 +1668,15 @@ function MarketingCmsEditor({
           }`}
         >
           {page === "professional-home" ? (
-            <ProfessionalHome cmsMode cmsContent={content} onCmsChange={update} />
+            <ProfessionalHome
+              cmsMode
+              cmsContent={content}
+              onCmsChange={update}
+              selectedId={selectedId}
+              onSelect={setSelectedId}
+              onDelete={deleteItem}
+              onDuplicate={duplicateItem}
+            />
           ) : (
             <MarketingVisualPage
               page={page}
@@ -1345,6 +1691,191 @@ function MarketingCmsEditor({
           )}
         </div>
       </div>
+
+      {/* Add Block Modal Dialog */}
+      <Dialog open={addBlockOpen} onOpenChange={setAddBlockOpen}>
+        <DialogContent className="max-w-2xl rounded-3xl bg-white p-6 sm:p-8 border-slate-200">
+          <DialogHeader>
+            <DialogTitle className="font-display font-extrabold text-xl text-slate-900">
+              Add Block to {pageTitle}
+            </DialogTitle>
+            <DialogDescription className="text-xs text-slate-500">
+              Select a pre-designed layout card to insert into this page.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <button
+              type="button"
+              onClick={() =>
+                addMarketingItem({
+                  title: "Trust & Verification",
+                  description:
+                    "All professionals undergo identity verification and background screening.",
+                  icon: "shield",
+                })
+              }
+              className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50/60 p-4 text-left hover:border-indigo-300 hover:bg-indigo-50/40 transition"
+            >
+              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-indigo-100 text-indigo-700">
+                <ShieldCheck className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="font-bold text-sm text-slate-900">Trust &amp; Verification</p>
+                <p className="mt-1 text-xs text-slate-500">
+                  Highlights security, background checks, or badges.
+                </p>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() =>
+                addMarketingItem({
+                  title: "Fast Project Matching",
+                  description: "Post once and connect with qualified professionals in minutes.",
+                  icon: "briefcase",
+                })
+              }
+              className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50/60 p-4 text-left hover:border-indigo-300 hover:bg-indigo-50/40 transition"
+            >
+              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-purple-100 text-purple-700">
+                <Sparkles className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="font-bold text-sm text-slate-900">Professional Services</p>
+                <p className="mt-1 text-xs text-slate-500">
+                  Showcases specialized talent and project scope.
+                </p>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() =>
+                addMarketingItem({
+                  title: "Secure Escrow Protection",
+                  description: "Milestone payments are safely held and released upon approval.",
+                  icon: "wallet",
+                })
+              }
+              className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50/60 p-4 text-left hover:border-indigo-300 hover:bg-indigo-50/40 transition"
+            >
+              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-emerald-100 text-emerald-700">
+                <CheckCircle2 className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="font-bold text-sm text-slate-900">Escrow &amp; Pricing</p>
+                <p className="mt-1 text-xs text-slate-500">
+                  Demonstrates payment safety and billing tiers.
+                </p>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() =>
+                addMarketingItem({
+                  title: "Top Rated Reputation",
+                  description:
+                    "Verified reviews and ratings from authentic clients across the platform.",
+                  icon: "star",
+                })
+              }
+              className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50/60 p-4 text-left hover:border-indigo-300 hover:bg-indigo-50/40 transition"
+            >
+              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-amber-100 text-amber-700">
+                <Star className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="font-bold text-sm text-slate-900">Ratings &amp; Reviews</p>
+                <p className="mt-1 text-xs text-slate-500">
+                  Builds social proof and client confidence.
+                </p>
+              </div>
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* SEO & Meta Drawer Dialog */}
+      <Dialog open={seoOpen} onOpenChange={setSeoOpen}>
+        <DialogContent className="max-w-xl rounded-3xl bg-white p-6 sm:p-8 border-slate-200">
+          <DialogHeader>
+            <DialogTitle className="font-display font-extrabold text-xl text-slate-900 flex items-center gap-2">
+              <Globe className="h-5 w-5 text-indigo-600" />
+              <span>SEO &amp; Social Meta Tags — {pageTitle}</span>
+            </DialogTitle>
+            <DialogDescription className="text-xs text-slate-500">
+              Customize how the {pageTitle} page appears in Google search results and social shares.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="mt-4 space-y-4">
+            <div>
+              <div className="flex items-center justify-between text-xs font-bold text-slate-700 mb-1">
+                <span>Page Title Tag</span>
+                <span className="text-slate-400 font-medium">{metaTitle.length}/60 chars</span>
+              </div>
+              <input
+                type="text"
+                value={metaTitle}
+                onChange={(e) => setMetaTitle(e.target.value)}
+                className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-medium text-slate-900 outline-none focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-100 transition"
+              />
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between text-xs font-bold text-slate-700 mb-1">
+                <span>Meta Description</span>
+                <span className="text-slate-400 font-medium">
+                  {metaDescription.length}/160 chars
+                </span>
+              </div>
+              <textarea
+                rows={3}
+                value={metaDescription}
+                onChange={(e) => setMetaDescription(e.target.value)}
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs font-medium text-slate-900 outline-none focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-100 transition"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Keywords</label>
+              <input
+                type="text"
+                value={metaKeywords}
+                onChange={(e) => setMetaKeywords(e.target.value)}
+                className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-medium text-slate-900 outline-none focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-100 transition"
+              />
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center gap-1.5">
+                <Search className="h-3.5 w-3.5" />
+                Google Search Result Preview
+              </p>
+              <p className="text-xs text-slate-500 truncate">https://klickpro.com/{page}</p>
+              <h4 className="mt-1 font-semibold text-sm text-blue-700 hover:underline cursor-pointer">
+                {metaTitle}
+              </h4>
+              <p className="mt-1 text-xs text-slate-600 line-clamp-2 leading-relaxed">
+                {metaDescription}
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-6 flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => setSeoOpen(false)}
+              className="rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white hover:bg-indigo-500 transition shadow-2xs"
+            >
+              Apply SEO Settings
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

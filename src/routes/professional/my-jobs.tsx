@@ -371,7 +371,9 @@ function ProfessionalJobsContent() {
 
   const segmentCategory = useMemo(
     () =>
-      segment ? categories.find((c) => c.parentId === null && c.segment === segment) ?? null : null,
+      segment
+        ? (categories.find((c) => c.parentId === null && c.segment === segment) ?? null)
+        : null,
     [categories, segment],
   );
 
@@ -390,7 +392,8 @@ function ProfessionalJobsContent() {
 
   const activeTopCategory = useMemo(() => {
     if (!selectedCategory) return null;
-    if (segmentCategory && selectedCategory.parentId === segmentCategory.id) return selectedCategory;
+    if (segmentCategory && selectedCategory.parentId === segmentCategory.id)
+      return selectedCategory;
     if (selectedCategory.parentId === null) return selectedCategory;
     return categories.find((c) => c.id === selectedCategory.parentId) ?? null;
   }, [categories, selectedCategory, segmentCategory]);
@@ -423,9 +426,7 @@ function ProfessionalJobsContent() {
   const segmentCategoryNames = useMemo(
     () =>
       new Set(
-        categories
-          .filter((item) => !segment || item.segment === segment)
-          .map((item) => item.name),
+        categories.filter((item) => !segment || item.segment === segment).map((item) => item.name),
       ),
     [categories, segment],
   );
@@ -497,7 +498,7 @@ function ProfessionalJobsContent() {
     query,
     segment,
     segmentCategoryNames,
-    category,
+    matchingCategoryNames,
     city,
     state,
     district,
@@ -555,11 +556,12 @@ function ProfessionalJobsContent() {
   }, [mapJobs, focusedJobId]);
 
   const focusedJob = useMemo(
-    () => (focusedJobId != null ? mapJobs.find((j) => j.id === focusedJobId) ?? null : null),
+    () => (focusedJobId != null ? (mapJobs.find((j) => j.id === focusedJobId) ?? null) : null),
     [mapJobs, focusedJobId],
   );
 
-  const selectedJob = displayedMapJobs.find((job) => job.id === selectedJobId) ?? displayedMapJobs[0] ?? null;
+  const selectedJob =
+    displayedMapJobs.find((job) => job.id === selectedJobId) ?? displayedMapJobs[0] ?? null;
   const mapCenter: [number, number] = selectedJob
     ? [selectedJob.locationLat, selectedJob.locationLng]
     : [20, 0];
@@ -1057,7 +1059,10 @@ function ProfessionalJobsContent() {
                         <span className="flex items-center gap-1.5 font-medium text-foreground truncate">
                           <MapPin className="h-3.5 w-3.5 text-primary shrink-0" />
                           <span>
-                            Showing location for: <strong className="font-semibold text-primary">{focusedJob.title}</strong>
+                            Showing location for:{" "}
+                            <strong className="font-semibold text-primary">
+                              {focusedJob.title}
+                            </strong>
                           </span>
                         </span>
                         <button

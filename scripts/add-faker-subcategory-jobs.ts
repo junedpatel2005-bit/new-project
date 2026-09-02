@@ -80,16 +80,16 @@ async function main() {
     });
   }
 
-  const clientAccounts = [
-    seedClient,
-    client2 ?? seedClient,
-    client3 ?? seedClient,
-  ];
+  const clientAccounts = [seedClient, client2 ?? seedClient, client3 ?? seedClient];
 
   console.log("Using Client Accounts:");
   console.log(`  1. Seed Client (Primary): ID #${seedClient.id} (${seedClient.email})`);
-  console.log(`  2. Secondary Client 1:    ID #${clientAccounts[1].id} (${clientAccounts[1].email})`);
-  console.log(`  3. Secondary Client 2:    ID #${clientAccounts[2].id} (${clientAccounts[2].email})`);
+  console.log(
+    `  2. Secondary Client 1:    ID #${clientAccounts[1].id} (${clientAccounts[1].email})`,
+  );
+  console.log(
+    `  3. Secondary Client 2:    ID #${clientAccounts[2].id} (${clientAccounts[2].email})`,
+  );
 
   // 2. Fetch all subcategories (Tier 3) and categories (Tier 2)
   const categories = await db.serviceCategory.findMany({
@@ -112,7 +112,7 @@ async function main() {
   for (let i = 0; i < categories.length; i++) {
     const cat = categories[i]!;
     const loc = INDIAN_LOCATIONS[i % INDIAN_LOCATIONS.length]!;
-    
+
     // Distribute: Every subcat gets a job.
     // 60% assigned to Seed Client, 20% to Client 2, 20% to Client 3
     let assignedClient = seedClient;
@@ -127,8 +127,7 @@ async function main() {
           : faker.number.int({ min: 1500, max: 12000 });
 
     const budgetMax =
-      budgetBase +
-      faker.number.int({ min: 500, max: Math.max(800, Math.ceil(budgetBase * 0.5)) });
+      budgetBase + faker.number.int({ min: 500, max: Math.max(800, Math.ceil(budgetBase * 0.5)) });
     const isHourly = faker.datatype.boolean({ probability: 0.25 });
     const hourlyRate = isHourly ? faker.number.int({ min: 150, max: 1200 }) : null;
 
@@ -195,4 +194,3 @@ main()
     process.exit(1);
   })
   .finally(() => db.$disconnect());
-

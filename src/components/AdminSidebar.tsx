@@ -25,8 +25,18 @@ const linkGroups = [
     items: [
       { href: "/admin", label: "Overview", icon: LayoutDashboard },
       { href: "/admin/users", label: "Users", icon: UsersRound, badge: "newUsers" },
-      { href: "/admin/verifications", label: "Verification", icon: ShieldCheck, badge: "verification" },
-      { href: "/admin/operations", label: "Jobs & disputes", icon: BriefcaseBusiness, badge: "jobs" },
+      {
+        href: "/admin/verifications",
+        label: "Verification",
+        icon: ShieldCheck,
+        badge: "verification",
+      },
+      {
+        href: "/admin/operations",
+        label: "Jobs & disputes",
+        icon: BriefcaseBusiness,
+        badge: "jobs",
+      },
     ],
   },
   {
@@ -96,9 +106,6 @@ export function AdminSidebar() {
     } else if (pathname === "/admin/operations") {
       section = "operations";
       badgeKey = "jobs";
-    } else if (pathname === "/admin/notifications") {
-      section = "notifications";
-      badgeKey = "notifications";
     } else if (pathname === "/admin/messages") {
       section = "messages";
       badgeKey = "messages";
@@ -177,9 +184,7 @@ export function AdminSidebar() {
                           {badgeCount > 99 ? "99+" : badgeCount}
                         </span>
                       )}
-                      {active && (
-                        <ChevronRight className="ml-auto h-4 w-4 text-indigo-500" />
-                      )}
+                      {active && <ChevronRight className="ml-auto h-4 w-4 text-indigo-500" />}
                     </Link>
                   );
                 })}

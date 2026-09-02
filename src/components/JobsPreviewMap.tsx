@@ -1,7 +1,7 @@
 "use client";
 
 import { GoogleMap, Marker } from "@react-google-maps/api";
-import { useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useGoogleMaps } from "@/components/GoogleMapsProvider";
 
 const worldFallbackCenter = { lat: 20, lng: 0 };
@@ -22,28 +22,31 @@ export default function JobsPreviewMap({
 
   const mapRef = useRef<google.maps.Map | null>(null);
 
-  const applyView = (map: google.maps.Map) => {
-    if (points.length === 0) {
-      map.setCenter(center);
-      map.setZoom(4);
-      return;
-    }
-    if (points.length === 1) {
-      const first = points[0];
-      if (first) {
-        map.setCenter({ lat: first[0], lng: first[1] });
-        map.setZoom(9);
+  const applyView = useCallback(
+    (map: google.maps.Map) => {
+      if (points.length === 0) {
+        map.setCenter(center);
+        map.setZoom(4);
+        return;
       }
-      return;
-    }
-    const bounds = new google.maps.LatLngBounds();
-    points.forEach(([lat, lng]) => bounds.extend({ lat, lng }));
-    map.fitBounds(bounds);
-  };
+      if (points.length === 1) {
+        const first = points[0];
+        if (first) {
+          map.setCenter({ lat: first[0], lng: first[1] });
+          map.setZoom(9);
+        }
+        return;
+      }
+      const bounds = new google.maps.LatLngBounds();
+      points.forEach(([lat, lng]) => bounds.extend({ lat, lng }));
+      map.fitBounds(bounds);
+    },
+    [points, center],
+  );
 
   useEffect(() => {
     if (mapRef.current) applyView(mapRef.current);
-  }, [points, center]);
+  }, [applyView]);
 
   if (!isConfigured) {
     return (

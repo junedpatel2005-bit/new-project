@@ -52,7 +52,8 @@ const HIERARCHY: ParentCat[] = [
         name: "Home Cleaning & Housekeeping",
         slug: "home-cleaning-housekeeping",
         iconName: "Sparkles",
-        description: "Professional cleaning, deep cleaning, and housekeeping services for residences.",
+        description:
+          "Professional cleaning, deep cleaning, and housekeeping services for residences.",
         subcategories: [
           { name: "Regular home cleaning", slug: "regular-home-cleaning" },
           { name: "Deep cleaning", slug: "deep-cleaning" },
@@ -69,7 +70,8 @@ const HIERARCHY: ParentCat[] = [
         name: "Electrical Services",
         slug: "residential-electrical-services",
         iconName: "Zap",
-        description: "Licensed electricians for wiring, switchboards, lighting, and home electrical repairs.",
+        description:
+          "Licensed electricians for wiring, switchboards, lighting, and home electrical repairs.",
         subcategories: [
           { name: "Electrician", slug: "electrician" },
           { name: "Wiring", slug: "residential-wiring" },
@@ -139,7 +141,8 @@ const HIERARCHY: ParentCat[] = [
         name: "Painting & Wall Services",
         slug: "painting-wall-services",
         iconName: "Paintbrush",
-        description: "Interior & exterior house painting, waterproofing, wallpapers, and false ceilings.",
+        description:
+          "Interior & exterior house painting, waterproofing, wallpapers, and false ceilings.",
         subcategories: [
           { name: "Interior painting", slug: "interior-painting" },
           { name: "Exterior painting", slug: "exterior-painting" },
@@ -173,7 +176,8 @@ const HIERARCHY: ParentCat[] = [
         name: "Appliance Repair",
         slug: "residential-appliance-repair",
         iconName: "Tv",
-        description: "Repairs for refrigerators, washing machines, microwaves, TVs, and kitchen appliances.",
+        description:
+          "Repairs for refrigerators, washing machines, microwaves, TVs, and kitchen appliances.",
         subcategories: [
           { name: "Refrigerator repair", slug: "refrigerator-repair" },
           { name: "Washing machine repair", slug: "washing-machine-repair" },
@@ -191,7 +195,8 @@ const HIERARCHY: ParentCat[] = [
         name: "Water Purifier & RO",
         slug: "water-purifier-ro",
         iconName: "Droplets",
-        description: "RO installation, servicing, membrane filter replacement, and water softeners.",
+        description:
+          "RO installation, servicing, membrane filter replacement, and water softeners.",
         subcategories: [
           { name: "RO installation", slug: "ro-installation" },
           { name: "RO servicing", slug: "ro-servicing" },
@@ -204,7 +209,8 @@ const HIERARCHY: ParentCat[] = [
         name: "Pest Control",
         slug: "residential-pest-control",
         iconName: "Bug",
-        description: "Safe pest extermination for termites, cockroaches, rodents, mosquitoes, and bed bugs.",
+        description:
+          "Safe pest extermination for termites, cockroaches, rodents, mosquitoes, and bed bugs.",
         subcategories: [
           { name: "Cockroach control", slug: "cockroach-control" },
           { name: "Mosquito control", slug: "mosquito-control" },
@@ -219,7 +225,8 @@ const HIERARCHY: ParentCat[] = [
         name: "Packers & Movers",
         slug: "residential-packers-movers",
         iconName: "Truck",
-        description: "House shifting, local & intercity relocation, packing, and furniture transport.",
+        description:
+          "House shifting, local & intercity relocation, packing, and furniture transport.",
         subcategories: [
           { name: "Home shifting", slug: "home-shifting" },
           { name: "Local moving", slug: "local-moving" },
@@ -265,7 +272,8 @@ const HIERARCHY: ParentCat[] = [
         name: "Cleaning & Maintenance",
         slug: "residential-cleaning-maintenance",
         iconName: "Brush",
-        description: "Solar panel cleaning, chimney & duct cleaning, pressure washing, and drain clearing.",
+        description:
+          "Solar panel cleaning, chimney & duct cleaning, pressure washing, and drain clearing.",
         subcategories: [
           { name: "Water tank (Cleaning)", slug: "water-tank-cleaning-maint" },
           { name: "Solar panel cleaning", slug: "solar-panel-cleaning" },
@@ -279,7 +287,8 @@ const HIERARCHY: ParentCat[] = [
         name: "General Handyman",
         slug: "general-handyman",
         iconName: "Wrench",
-        description: "Furniture assembly, TV mounting, curtain rods, drilling, shelf mounting, and repairs.",
+        description:
+          "Furniture assembly, TV mounting, curtain rods, drilling, shelf mounting, and repairs.",
         subcategories: [
           { name: "Furniture assembly", slug: "furniture-assembly" },
           { name: "TV mounting", slug: "tv-mounting" },
@@ -293,7 +302,8 @@ const HIERARCHY: ParentCat[] = [
         name: "Security & Guards",
         slug: "residential-security-guards",
         iconName: "Shield",
-        description: "Trained residential security guards, night watchmen, and gated community security.",
+        description:
+          "Trained residential security guards, night watchmen, and gated community security.",
         subcategories: [
           { name: "Security guard", slug: "residential-security-guard" },
           { name: "Night guard", slug: "night-guard" },
@@ -307,14 +317,16 @@ const HIERARCHY: ParentCat[] = [
     name: "Commercial Services",
     slug: "commercial",
     segment: "COMMERCIAL",
-    description: "Facility management, office renovations, IT networking, and business support services.",
+    description:
+      "Facility management, office renovations, IT networking, and business support services.",
     iconName: "Building2",
     categories: [
       {
         name: "Building & Facility Services",
         slug: "building-facility-services",
         iconName: "Building",
-        description: "Facility management, housekeeping staff, commercial HVAC, elevators, and fire safety.",
+        description:
+          "Facility management, housekeeping staff, commercial HVAC, elevators, and fire safety.",
         subcategories: [
           { name: "Commercial cleaning", slug: "commercial-cleaning" },
           { name: "Housekeeping staff", slug: "housekeeping-staff-commercial" },
@@ -331,7 +343,8 @@ const HIERARCHY: ParentCat[] = [
         name: "Construction & Renovation (Commercial)",
         slug: "commercial-construction-renovation",
         iconName: "HardHat",
-        description: "Commercial interior fitouts, civil contractors, glass partitions, and false ceilings.",
+        description:
+          "Commercial interior fitouts, civil contractors, glass partitions, and false ceilings.",
         subcategories: [
           { name: "Commercial renovation", slug: "commercial-renovation" },
           { name: "Civil contractor", slug: "civil-contractor" },
@@ -348,7 +361,8 @@ const HIERARCHY: ParentCat[] = [
         name: "Electrical & HVAC (Commercial)",
         slug: "commercial-electrical-hvac",
         iconName: "Zap",
-        description: "Commercial electrical panels, diesel generators, chillers, cooling towers, and VRF systems.",
+        description:
+          "Commercial electrical panels, diesel generators, chillers, cooling towers, and VRF systems.",
         subcategories: [
           { name: "Commercial electrician", slug: "commercial-electrician" },
           { name: "Electrical panel (Commercial)", slug: "commercial-electrical-panel" },
@@ -366,7 +380,8 @@ const HIERARCHY: ParentCat[] = [
         name: "IT & Technology",
         slug: "commercial-it-technology",
         iconName: "Laptop",
-        description: "Networking, server rooms, commercial Wi-Fi, biometric access, and structured cabling.",
+        description:
+          "Networking, server rooms, commercial Wi-Fi, biometric access, and structured cabling.",
         subcategories: [
           { name: "Computer repair", slug: "computer-repair" },
           { name: "IT support", slug: "it-support" },
@@ -384,7 +399,8 @@ const HIERARCHY: ParentCat[] = [
         name: "Business Support",
         slug: "commercial-business-support",
         iconName: "Briefcase",
-        description: "Office shifting, corporate security, receptionists, office boys, and staffing.",
+        description:
+          "Office shifting, corporate security, receptionists, office boys, and staffing.",
         subcategories: [
           { name: "Office shifting", slug: "office-shifting" },
           { name: "Packers & movers (Commercial)", slug: "commercial-packers-movers" },
@@ -401,7 +417,8 @@ const HIERARCHY: ParentCat[] = [
         name: "Restaurant & Hospitality",
         slug: "restaurant-hospitality",
         iconName: "Utensils",
-        description: "Kitchen equipment, commercial refrigeration, exhaust hoods, pest control, and laundry.",
+        description:
+          "Kitchen equipment, commercial refrigeration, exhaust hoods, pest control, and laundry.",
         subcategories: [
           { name: "Kitchen equipment", slug: "commercial-kitchen-equipment" },
           { name: "Commercial refrigeration", slug: "commercial-refrigeration" },
@@ -419,14 +436,16 @@ const HIERARCHY: ParentCat[] = [
     name: "Industrial Services",
     slug: "industrial",
     segment: "INDUSTRIAL",
-    description: "Plant maintenance, automation, robotics, fabrication, mechanical, and safety compliance.",
+    description:
+      "Plant maintenance, automation, robotics, fabrication, mechanical, and safety compliance.",
     iconName: "Factory",
     categories: [
       {
         name: "Electrical & Automation",
         slug: "industrial-electrical-automation",
         iconName: "Cpu",
-        description: "PLC programming, SCADA, HMI, VFD, MCC/PCC panels, and industrial control systems.",
+        description:
+          "PLC programming, SCADA, HMI, VFD, MCC/PCC panels, and industrial control systems.",
         subcategories: [
           { name: "Industrial electrician", slug: "industrial-electrician" },
           { name: "Electrical panel (Industrial)", slug: "industrial-electrical-panel" },
@@ -445,12 +464,16 @@ const HIERARCHY: ParentCat[] = [
         name: "Mechanical",
         slug: "industrial-mechanical",
         iconName: "Cog",
-        description: "Machine installation, preventive breakdown maintenance, millwrights, pumps, and compressors.",
+        description:
+          "Machine installation, preventive breakdown maintenance, millwrights, pumps, and compressors.",
         subcategories: [
           { name: "Mechanical maintenance", slug: "mechanical-maintenance" },
           { name: "Machine installation", slug: "machine-installation" },
           { name: "Machine repair", slug: "machine-repair" },
-          { name: "Preventive maintenance (Mechanical)", slug: "preventive-maintenance-mechanical" },
+          {
+            name: "Preventive maintenance (Mechanical)",
+            slug: "preventive-maintenance-mechanical",
+          },
           { name: "Breakdown maintenance", slug: "breakdown-maintenance" },
           { name: "Millwright", slug: "millwright-services" },
           { name: "Machinery alignment", slug: "machinery-alignment" },
@@ -463,7 +486,8 @@ const HIERARCHY: ParentCat[] = [
         name: "Welding & Fabrication",
         slug: "industrial-welding-fabrication",
         iconName: "Flame",
-        description: "MIG, TIG, ARC welding, stainless-steel fabrication, pipe fabrication, CNC, and laser cutting.",
+        description:
+          "MIG, TIG, ARC welding, stainless-steel fabrication, pipe fabrication, CNC, and laser cutting.",
         subcategories: [
           { name: "MIG welding", slug: "mig-welding" },
           { name: "TIG welding", slug: "tig-welding" },
@@ -480,7 +504,8 @@ const HIERARCHY: ParentCat[] = [
         name: "Civil & Infrastructure (Industrial)",
         slug: "industrial-civil-infrastructure",
         iconName: "Layers",
-        description: "Industrial RCC, factory renovations, epoxy & industrial flooring, and structural steel.",
+        description:
+          "Industrial RCC, factory renovations, epoxy & industrial flooring, and structural steel.",
         subcategories: [
           { name: "Industrial civil work", slug: "industrial-civil-work" },
           { name: "RCC", slug: "industrial-rcc" },
@@ -496,7 +521,8 @@ const HIERARCHY: ParentCat[] = [
         name: "Process & Instrumentation",
         slug: "process-instrumentation",
         iconName: "Activity",
-        description: "Process piping, calibration, flow meters, sensors, valves, pneumatics, and hydraulics.",
+        description:
+          "Process piping, calibration, flow meters, sensors, valves, pneumatics, and hydraulics.",
         subcategories: [
           { name: "Process piping", slug: "process-piping" },
           { name: "Instrumentation (Process)", slug: "process-instrumentation-service" },
@@ -514,7 +540,8 @@ const HIERARCHY: ParentCat[] = [
         name: "Robotics & Automation",
         slug: "robotics-automation",
         iconName: "Bot",
-        description: "Robot programming, robotic arm installation, vision systems, and conveyor automation.",
+        description:
+          "Robot programming, robotic arm installation, vision systems, and conveyor automation.",
         subcategories: [
           { name: "Robot programming", slug: "robot-programming" },
           { name: "Robot installation", slug: "robot-installation" },
@@ -529,7 +556,8 @@ const HIERARCHY: ParentCat[] = [
         name: "Plant & Facility Maintenance",
         slug: "plant-facility-maintenance",
         iconName: "Wrench",
-        description: "Factory maintenance, shutdown maintenance, boilers, chillers, ETP/STP, and water treatment.",
+        description:
+          "Factory maintenance, shutdown maintenance, boilers, chillers, ETP/STP, and water treatment.",
         subcategories: [
           { name: "Factory maintenance", slug: "factory-maintenance" },
           { name: "Preventive maintenance (Plant)", slug: "plant-preventive-maintenance" },
@@ -548,7 +576,8 @@ const HIERARCHY: ParentCat[] = [
         name: "Skilled Labour",
         slug: "industrial-skilled-labour",
         iconName: "Users",
-        description: "Certified fitters, welders, CNC machine operators, and maintenance technicians.",
+        description:
+          "Certified fitters, welders, CNC machine operators, and maintenance technicians.",
         subcategories: [
           { name: "Electrician (Industrial)", slug: "industrial-skilled-electrician" },
           { name: "Fitter", slug: "industrial-fitter" },
@@ -566,7 +595,8 @@ const HIERARCHY: ParentCat[] = [
         name: "Safety & Compliance",
         slug: "industrial-safety-compliance",
         iconName: "ShieldAlert",
-        description: "Industrial safety audits, fire safety compliance, PPE, and equipment safety inspections.",
+        description:
+          "Industrial safety audits, fire safety compliance, PPE, and equipment safety inspections.",
         subcategories: [
           { name: "Industrial safety", slug: "industrial-safety-audit" },
           { name: "Fire safety (Industrial)", slug: "industrial-fire-safety" },
@@ -581,7 +611,8 @@ const HIERARCHY: ParentCat[] = [
         name: "Engineering & Professional",
         slug: "industrial-engineering-professional",
         iconName: "FileCheck",
-        description: "Electrical, mechanical, and civil engineering, CAD 3D design, and technical consulting.",
+        description:
+          "Electrical, mechanical, and civil engineering, CAD 3D design, and technical consulting.",
         subcategories: [
           { name: "Electrical engineering", slug: "electrical-engineering" },
           { name: "Mechanical engineering", slug: "mechanical-engineering" },
@@ -658,7 +689,9 @@ async function seedHierarchy() {
       parentId: null,
     });
     parentCount++;
-    console.log(`[Tier 1 Parent] #${parentRecord.id} ${parentRecord.name} (${parentRecord.segment})`);
+    console.log(
+      `[Tier 1 Parent] #${parentRecord.id} ${parentRecord.name} (${parentRecord.segment})`,
+    );
 
     for (let cIdx = 0; cIdx < parentDef.categories.length; cIdx++) {
       const catDef = parentDef.categories[cIdx]!;

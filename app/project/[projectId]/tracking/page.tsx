@@ -13,6 +13,7 @@ import {
   History,
   LayoutGrid,
   MapPin,
+  SlidersHorizontal,
   Sparkles,
   Upload,
   Wallet,
@@ -20,6 +21,7 @@ import {
 import { AppShell } from "@/components/AppShell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -231,7 +233,8 @@ export default function SharedProjectTrackingPage() {
   }, [refresh]);
 
   useEffect(() => {
-    const socket = io({
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    const socket = io(origin, {
       path: "/api/realtime",
       withCredentials: true,
       transports: ["websocket", "polling"],
@@ -239,22 +242,44 @@ export default function SharedProjectTrackingPage() {
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
     });
+
     const onProjectUpdated = (payload?: { projectId?: number | string }) => {
       if (!payload?.projectId || String(payload.projectId) === String(projectId)) {
         void refresh().catch(() => undefined);
       }
     };
+
     socket.on("project:updated", onProjectUpdated);
     socket.on("notification:new", () => void refresh().catch(() => undefined));
+    socket.on("proposal:new", () => void refresh().catch(() => undefined));
 
     const onCustomNotification = () => void refresh().catch(() => undefined);
     window.addEventListener("servio:notification", onCustomNotification);
     window.addEventListener("servio:project-update", onCustomNotification);
 
+    // Live Heartbeat Polling fallback (ensures tracking stays synced in real-time)
+    const pollInterval = window.setInterval(() => {
+      if (typeof document !== "undefined" && document.visibilityState === "visible") {
+        void refresh().catch(() => undefined);
+      }
+    }, 4000);
+
+    const onFocus = () => void refresh().catch(() => undefined);
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "visible") void refresh().catch(() => undefined);
+    };
+
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
     return () => {
       socket.off("project:updated", onProjectUpdated);
       socket.off("notification:new");
+      socket.off("proposal:new");
       socket.disconnect();
+      window.clearInterval(pollInterval);
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
       window.removeEventListener("servio:notification", onCustomNotification);
       window.removeEventListener("servio:project-update", onCustomNotification);
     };
@@ -421,8 +446,9 @@ export default function SharedProjectTrackingPage() {
     (total, milestone) => total + milestone.amount,
     0,
   );
-  const remainingMilestoneAmount =
-    data.agreedAmount == null ? null : Math.max(0, data.agreedAmount - totalMilestoneValue);
+  const totalAgreed = data.agreedAmount ?? totalMilestoneValue ?? 0;
+  const unassignedMilestoneAmount = Math.max(0, totalAgreed - totalMilestoneValue);
+  const remainingMilestoneAmount = unassignedMilestoneAmount;
   const milestoneMinDate = dateInputValue(data.job?.jobDate);
   const milestoneMaxDate = dateInputValue(data.job?.deadline);
   const paidToProfessional = data.milestones.reduce(
@@ -438,17 +464,17 @@ export default function SharedProjectTrackingPage() {
       total + (milestone.payment && milestone.payment.status !== "FAILED" ? milestone.amount : 0),
     0,
   );
-  const remainingClientPayment = Math.max(0, totalMilestoneValue - clientPaidMilestoneTotal);
-  const remainingProfessionalPayout = Math.max(
-    0,
-    data.milestones.reduce(
-      (total, milestone) =>
-        total +
-        (milestone.payment?.professionalPayoutAmount ??
-          Math.max(0, Math.ceil(milestone.amount * 0.9))),
-      0,
-    ) - paidToProfessional,
-  );
+  const approvedMilestonesTotal = data.milestones
+    .filter((m) => m.status === "APPROVED" || m.payment?.status === "COMPLETED")
+    .reduce((sum, m) => sum + m.amount, 0);
+  const autoProgressPercentage =
+    data.project.status === "COMPLETED"
+      ? 100
+      : totalAgreed > 0
+        ? Math.min(100, Math.round((approvedMilestonesTotal / totalAgreed) * 100))
+        : 0;
+  const remainingProjectBalance = Math.max(0, totalAgreed - clientPaidMilestoneTotal);
+  const remainingClientPayment = remainingProjectBalance;
   const unpaidMilestones = data.milestones.filter(
     (milestone) => !milestone.payment || milestone.payment.status === "FAILED",
   );
@@ -521,9 +547,9 @@ export default function SharedProjectTrackingPage() {
               <Badge className="h-fit border-white/25 bg-white/15 px-3 py-1.5 text-white hover:bg-white/15">
                 {label(data.project.status)}
               </Badge>
-              <div className="rounded-2xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-sm">
-                <p className="text-xs text-white/65">Overall progress</p>
-                <p className="mt-1 text-xl font-bold">{data.project.progress}%</p>
+              <div className="rounded-2xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-sm shadow-xs">
+                <p className="text-xs font-medium text-white/70">Overall progress</p>
+                <p className="mt-1 text-xl font-bold text-white">{autoProgressPercentage}%</p>
               </div>
             </div>
           </div>
@@ -547,7 +573,7 @@ export default function SharedProjectTrackingPage() {
               <span className="hidden sm:inline">Work Upload</span>
             </TabsTrigger>
             <TabsTrigger value="timeline" className="gap-1.5">
-              <History className="h-3.5 w-3.5" />
+              <Clock3 className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">Timeline</span>
             </TabsTrigger>
           </TabsList>
@@ -597,16 +623,24 @@ export default function SharedProjectTrackingPage() {
                   </p>
                 </div>
               ) : (
-                <div className="rounded-2xl bg-muted p-4">
-                  <div className="flex justify-between text-sm font-medium">
-                    <span>Overall progress</span>
-                    <span className="text-primary">{data.project.progress}%</span>
+                <div className="rounded-2xl bg-muted p-4 shadow-2xs">
+                  <div className="flex items-center justify-between text-sm font-medium">
+                    <span className="font-semibold text-foreground">Overall progress</span>
+                    <span className="font-bold text-primary">{autoProgressPercentage}%</span>
                   </div>
                   <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-background">
                     <div
                       className="h-full rounded-full bg-[linear-gradient(90deg,var(--color-primary),var(--color-cta))] transition-all duration-700"
-                      style={{ width: `${Math.min(Math.max(data.project.progress, 0), 100)}%` }}
+                      style={{ width: `${Math.min(Math.max(autoProgressPercentage, 0), 100)}%` }}
                     />
+                  </div>
+                  <div className="mt-2.5 flex items-center justify-between text-xs text-muted-foreground">
+                    <span>
+                      {data.milestones.filter((m) => m.status === "APPROVED" || m.payment?.status === "COMPLETED").length} of {data.milestones.length} milestones approved &amp; paid
+                    </span>
+                    <span className="font-medium text-foreground">
+                      ₹{approvedMilestonesTotal.toLocaleString("en-IN")} of ₹{totalAgreed.toLocaleString("en-IN")} (Auto-calculated)
+                    </span>
                   </div>
                 </div>
               )}
@@ -640,15 +674,21 @@ export default function SharedProjectTrackingPage() {
                   value={`₹${totalMilestoneValue.toLocaleString("en-IN")}`}
                 />
                 <Info
+                  icon={AlertCircle}
+                  label="Unassigned milestone budget"
+                  value={`₹${unassignedMilestoneAmount.toLocaleString("en-IN")}`}
+                  tone={unassignedMilestoneAmount > 0 ? "text-indigo-700 font-semibold" : undefined}
+                />
+                <Info
                   icon={CheckCircle2}
                   label="Paid to professional"
                   value={`₹${paidToProfessional.toLocaleString("en-IN")}`}
                 />
                 <Info
                   icon={AlertCircle}
-                  label="Remaining to pay"
-                  value={`₹${remainingProfessionalPayout.toLocaleString("en-IN")}`}
-                  tone={remainingProfessionalPayout > 0 ? "text-amber-700" : "text-emerald-700"}
+                  label="Remaining project balance"
+                  value={`₹${remainingProjectBalance.toLocaleString("en-IN")}`}
+                  tone={remainingProjectBalance > 0 ? "text-amber-700" : "text-emerald-700"}
                 />
               </div>
               {(data.job?.locationAddress ||
@@ -733,18 +773,7 @@ export default function SharedProjectTrackingPage() {
                     {busy === "start-work" ? "Starting…" : "Start Work"}
                   </Button>
                 )}
-                {!isClient && data.project.status === "IN_PROGRESS" && (
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setProgress(String(data.project.progress));
-                      setStage(data.project.currentStage ?? "");
-                      setShowProgress(true);
-                    }}
-                  >
-                    Update Progress
-                  </Button>
-                )}
+
                 {!isClient && data.project.status !== "COMPLETED" && (
                   <Button variant="outline" onClick={() => setShowRequestModal(true)}>
                     Request client
@@ -768,44 +797,7 @@ export default function SharedProjectTrackingPage() {
               </section>
             )}
 
-            {showProgress && (
-              <Form
-                title="Update Progress"
-                onCancel={() => setShowProgress(false)}
-                onSubmit={() => {
-                  const value = Number(progress);
-                  if (
-                    !Number.isInteger(value) ||
-                    value < 0 ||
-                    value > 100 ||
-                    !stage.trim() ||
-                    !note.trim()
-                  )
-                    return setMessage("Enter valid progress, stage, and update.");
-                  void action("update-progress", { progress: value, stage, note });
-                }}
-                busy={busy === "update-progress"}
-              >
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={progress}
-                  onChange={(e) => setProgress(e.target.value)}
-                  placeholder="Progress (%)"
-                />
-                <input
-                  value={stage}
-                  onChange={(e) => setStage(e.target.value)}
-                  placeholder="Current stage"
-                />
-                <textarea
-                  value={note}
-                  onChange={(e) => setNote(e.target.value)}
-                  placeholder="Work update"
-                />
-              </Form>
-            )}
+
 
             {!isClient && canFinal && data.project.status === "IN_PROGRESS" && (
               <section className="rounded-2xl border bg-card p-5 shadow-soft">
@@ -1893,6 +1885,88 @@ export default function SharedProjectTrackingPage() {
               }}
             >
               {busy === "create-milestone" ? "Creating…" : "Create milestone"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={showProgress} onOpenChange={setShowProgress}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Update Project Progress</DialogTitle>
+            <DialogDescription>
+              Adjust completion percentage and add optional status updates for the client.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <div>
+              <div className="flex items-center justify-between text-sm font-bold">
+                <span className="text-slate-700">Completion</span>
+                <span className="text-xl font-extrabold text-indigo-600">{progress || "0"}%</span>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                step="5"
+                value={progress || "0"}
+                onChange={(e) => setProgress(e.target.value)}
+                className="mt-3 w-full accent-indigo-600 cursor-pointer h-2 bg-slate-200 rounded-lg appearance-none"
+              />
+              <div className="mt-2.5 flex items-center justify-between gap-1.5">
+                {[0, 25, 50, 75, 100].map((preset) => (
+                  <button
+                    key={preset}
+                    type="button"
+                    onClick={() => setProgress(String(preset))}
+                    className={`flex-1 rounded-lg py-1 text-xs font-bold border transition cursor-pointer ${
+                      Number(progress) === preset
+                        ? "border-indigo-600 bg-indigo-50 text-indigo-700 shadow-2xs"
+                        : "border-slate-200 hover:bg-slate-50 text-slate-600"
+                    }`}
+                  >
+                    {preset}%
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-slate-700">Current Phase / Stage (Optional)</label>
+              <Input
+                value={stage}
+                onChange={(e) => setStage(e.target.value)}
+                placeholder="e.g. Cutting phase, Assembly, Final Inspection…"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-slate-700">Progress Update Note (Optional)</label>
+              <textarea
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder="Brief update note on what was completed…"
+                className="w-full min-h-[72px] rounded-xl border border-input bg-background px-3 py-2 text-xs focus:outline-hidden"
+              />
+            </div>
+          </div>
+          <DialogFooter className="mt-4 flex flex-wrap gap-2">
+            <Button variant="outline" onClick={() => setShowProgress(false)}>
+              Cancel
+            </Button>
+            <Button
+              disabled={busy === "update-progress"}
+              onClick={async () => {
+                const value = Number(progress);
+                if (isNaN(value) || value < 0 || value > 100) return;
+                await action("update-progress", {
+                  progress: value,
+                  stage: stage.trim() || undefined,
+                  note: note.trim() || undefined,
+                });
+                setShowProgress(false);
+              }}
+            >
+              {busy === "update-progress" ? "Saving…" : "Save Progress"}
             </Button>
           </DialogFooter>
         </DialogContent>

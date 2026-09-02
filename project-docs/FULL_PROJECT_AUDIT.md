@@ -26,46 +26,46 @@ API Design: 6/10
 Transactions: 4/10  
 Performance: 6/10  
 Testing: 4/10  
-Production Readiness: 3/10  
+Production Readiness: 3/10
 
 Overall: 5/10
 
 ## Repository Discovery
 
-| Concern | Finding |
-|---|---|
-| Framework/runtime | Next.js 16.3.0, App Router, Node.js route handlers, custom `server.mjs`; TypeScript strict mode |
-| Package manager | npm; `package-lock.json`; Node 22 in CI |
-| Database/ORM | PostgreSQL; Prisma 7.9.1 with `@prisma/adapter-pg`; roughly 60 models |
-| Authentication | Custom HS256 JWT in an HttpOnly cookie; email/password, email verification, phone OTP, Google and admin flows |
-| APIs | Next route handlers under `app/api`; Socket.IO realtime integration |
-| Storage | Local development provider; S3-compatible provider for production; private file routes |
-| Integrations | Razorpay, Persona, SMTP/Nodemailer, Twilio Verify, Google Maps, Sentry configuration |
-| Jobs/events | In-process background executor, database notification/audit records, realtime emits; no durable outbox identified |
-| Deployment | Vercel documentation/config plus `.vercel`/Cloudflare-related repository files; deployment target must be reconciled |
-| Tests/tooling | Vitest, ESLint, TypeScript, Next production build; one GitHub Actions quality workflow |
-| Migration strategy | `prisma migrate deploy`; `prisma/migrations/0_init` is empty and later migrations assume an existing schema |
+| Concern            | Finding                                                                                                              |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| Framework/runtime  | Next.js 16.3.0, App Router, Node.js route handlers, custom `server.mjs`; TypeScript strict mode                      |
+| Package manager    | npm; `package-lock.json`; Node 22 in CI                                                                              |
+| Database/ORM       | PostgreSQL; Prisma 7.9.1 with `@prisma/adapter-pg`; roughly 60 models                                                |
+| Authentication     | Custom HS256 JWT in an HttpOnly cookie; email/password, email verification, phone OTP, Google and admin flows        |
+| APIs               | Next route handlers under `app/api`; Socket.IO realtime integration                                                  |
+| Storage            | Local development provider; S3-compatible provider for production; private file routes                               |
+| Integrations       | Razorpay, Persona, SMTP/Nodemailer, Twilio Verify, Google Maps, Sentry configuration                                 |
+| Jobs/events        | In-process background executor, database notification/audit records, realtime emits; no durable outbox identified    |
+| Deployment         | Vercel documentation/config plus `.vercel`/Cloudflare-related repository files; deployment target must be reconciled |
+| Tests/tooling      | Vitest, ESLint, TypeScript, Next production build; one GitHub Actions quality workflow                               |
+| Migration strategy | `prisma migrate deploy`; `prisma/migrations/0_init` is empty and later migrations assume an existing schema          |
 
 ## Issue Table
 
-| ID | Severity | Area | File/Table | Issue | Confidence | Status |
-|---|---|---|---|---|---|---|
-| MIG-001 | CRITICAL | Migrations | `prisma/migrations/0_init/migration.sql` | Empty baseline cannot reproduce the schema from a fresh database | HIGH | CONFIRMED |
-| FIN-001 | HIGH | Financial integrity | `app/api/webhooks/razorpay/route.ts` | Payment and wallet updates are separate writes after event recording | HIGH | CONFIRMED |
-| DB-001 | HIGH | Database integrity | `prisma/schema.prisma`, pending integrity migration | Core relation/constraint guards exist only in an unapplied migration | HIGH | CONFIRMED |
-| AUTH-001 | HIGH | Authentication | `src/lib/auth.ts` | Seven-day stateless sessions have no server-side revocation/version check | HIGH | CONFIRMED |
-| MIG-002 | HIGH | Migrations/money | `202608200005_integer_money_fields/migration.sql` | Historical amount conversion uses `ROUND()` and needs reconciliation evidence | HIGH | CONFIRMED |
-| TEST-001 | HIGH | Testing | `tests`, `src/**/*.test.ts` | No live-schema, IDOR, financial transaction, webhook replay, or concurrency suite | HIGH | CONFIRMED |
-| SUPA-001 | HIGH | Supabase/RLS | `supabase/`, deployed database | Repository has no RLS/policy artifacts to verify deployed access controls | HIGH | NEEDS LIVE VERIFICATION |
-| API-001 | MEDIUM | Webhooks | Razorpay/Persona webhook handlers | Razorpay has no timestamp check; Persona stores event before business update | HIGH | CONFIRMED |
-| SEC-001 | MEDIUM | Security headers | `next.config.ts` | CSP permits `unsafe-inline` and development permits `unsafe-eval` | HIGH | CONFIRMED |
-| API-002 | MEDIUM | APIs | route handlers | Broad surface has inconsistent error DTOs and limited schema validation | MEDIUM | LIKELY |
-| FILE-001 | MEDIUM | Uploads | `src/lib/project-file-storage.ts`, upload routes | Storage/database cleanup and file lifecycle are not durable or fully transactional | HIGH | CONFIRMED |
-| TRAN-001 | HIGH | Transactions/events | project action routes and notification helpers | Multi-step business transitions can leave state, timeline, audit, and notification records split | HIGH | LIKELY |
-| CON-001 | HIGH | Concurrency | OTP and project/payment transitions | Several read-then-write paths need conditional-update or lock verification | MEDIUM | LIKELY |
-| PERF-001 | MEDIUM | Performance | project/timeline and marketplace routes | Potential repeated child queries and unbounded list patterns need query-plan review | MEDIUM | NEEDS LIVE VERIFICATION |
-| OPS-001 | MEDIUM | CI/deployment | `.github/workflows/quality.yml`, `DEPLOY.md` | CI omits Prisma/migration/security checks and deployment docs omit restore/rollback/health procedures | HIGH | CONFIRMED |
-| CODE-001 | LOW | Maintainability | route handlers and map components | Business orchestration remains concentrated in handlers; six lint warnings remain | HIGH | CONFIRMED |
+| ID       | Severity | Area                | File/Table                                          | Issue                                                                                                 | Confidence | Status                  |
+| -------- | -------- | ------------------- | --------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ---------- | ----------------------- |
+| MIG-001  | CRITICAL | Migrations          | `prisma/migrations/0_init/migration.sql`            | Empty baseline cannot reproduce the schema from a fresh database                                      | HIGH       | CONFIRMED               |
+| FIN-001  | HIGH     | Financial integrity | `app/api/webhooks/razorpay/route.ts`                | Payment and wallet updates are separate writes after event recording                                  | HIGH       | CONFIRMED               |
+| DB-001   | HIGH     | Database integrity  | `prisma/schema.prisma`, pending integrity migration | Core relation/constraint guards exist only in an unapplied migration                                  | HIGH       | CONFIRMED               |
+| AUTH-001 | HIGH     | Authentication      | `src/lib/auth.ts`                                   | Seven-day stateless sessions have no server-side revocation/version check                             | HIGH       | CONFIRMED               |
+| MIG-002  | HIGH     | Migrations/money    | `202608200005_integer_money_fields/migration.sql`   | Historical amount conversion uses `ROUND()` and needs reconciliation evidence                         | HIGH       | CONFIRMED               |
+| TEST-001 | HIGH     | Testing             | `tests`, `src/**/*.test.ts`                         | No live-schema, IDOR, financial transaction, webhook replay, or concurrency suite                     | HIGH       | CONFIRMED               |
+| SUPA-001 | HIGH     | Supabase/RLS        | `supabase/`, deployed database                      | Repository has no RLS/policy artifacts to verify deployed access controls                             | HIGH       | NEEDS LIVE VERIFICATION |
+| API-001  | MEDIUM   | Webhooks            | Razorpay/Persona webhook handlers                   | Razorpay has no timestamp check; Persona stores event before business update                          | HIGH       | CONFIRMED               |
+| SEC-001  | MEDIUM   | Security headers    | `next.config.ts`                                    | CSP permits `unsafe-inline` and development permits `unsafe-eval`                                     | HIGH       | CONFIRMED               |
+| API-002  | MEDIUM   | APIs                | route handlers                                      | Broad surface has inconsistent error DTOs and limited schema validation                               | MEDIUM     | LIKELY                  |
+| FILE-001 | MEDIUM   | Uploads             | `src/lib/project-file-storage.ts`, upload routes    | Storage/database cleanup and file lifecycle are not durable or fully transactional                    | HIGH       | CONFIRMED               |
+| TRAN-001 | HIGH     | Transactions/events | project action routes and notification helpers      | Multi-step business transitions can leave state, timeline, audit, and notification records split      | HIGH       | LIKELY                  |
+| CON-001  | HIGH     | Concurrency         | OTP and project/payment transitions                 | Several read-then-write paths need conditional-update or lock verification                            | MEDIUM     | LIKELY                  |
+| PERF-001 | MEDIUM   | Performance         | project/timeline and marketplace routes             | Potential repeated child queries and unbounded list patterns need query-plan review                   | MEDIUM     | NEEDS LIVE VERIFICATION |
+| OPS-001  | MEDIUM   | CI/deployment       | `.github/workflows/quality.yml`, `DEPLOY.md`        | CI omits Prisma/migration/security checks and deployment docs omit restore/rollback/health procedures | HIGH       | CONFIRMED               |
+| CODE-001 | LOW      | Maintainability     | route handlers and map components                   | Business orchestration remains concentrated in handlers; six lint warnings remain                     | HIGH       | CONFIRMED               |
 
 ## Issue Details
 
@@ -615,20 +615,20 @@ Money is represented in integer minor units in the current design, but historica
 
 The current Prisma schema includes relations for many previously relation-like fields, and the pending migration adds database foreign keys with restrictive deletion behavior. Until deployed and queried, orphan risk remains. The relationship matrix below records the important reviewed paths.
 
-| Model | Column | Intended Target | Prisma Relation | DB FK | ON DELETE | Status |
-|---|---|---|---|---|---|---|
-| Payment | `clientId` | User | Yes | Pending migration | RESTRICT | Needs deployment verification |
-| Payment | `professionalId` | User | Yes | Pending migration | RESTRICT | Needs deployment verification |
-| Payment | `jobId` | ClientJob | Yes | Pending migration | RESTRICT | Needs deployment verification |
-| Payment | `projectTrackingId` | ProjectTracking | Yes | Pending migration | RESTRICT | Needs deployment verification |
-| ProjectRequest | `jobId` | ClientJob | Yes | Pending migration | RESTRICT | Needs deployment verification |
-| ProjectRequest | `clientId`/`professionalId` | User | Yes | Pending migration | RESTRICT | Needs deployment verification |
-| ProjectTracking | `requestId`/`jobId` | ProjectRequest/ClientJob | Yes | Pending migration | RESTRICT | Needs deployment verification |
-| ProjectMilestone | `trackingId` | ProjectTracking | Yes | Pending migration | RESTRICT | Needs deployment verification |
-| ProjectTimelineEvent | `trackingId` | ProjectTracking | Yes | Pending migration | RESTRICT | Needs deployment verification |
-| ProjectWorkUpload | `trackingId`/`milestoneId` | ProjectTracking/ProjectMilestone | Yes | Pending migration | RESTRICT | Needs deployment verification |
-| ClientProfile | `userId` | User | Yes | Pending unique/FK guard | RESTRICT | Needs deployment verification |
-| Service | `categoryId` | ServiceCategory | Yes | Pending migration | RESTRICT | Needs deployment verification |
+| Model                | Column                      | Intended Target                  | Prisma Relation | DB FK                   | ON DELETE | Status                        |
+| -------------------- | --------------------------- | -------------------------------- | --------------- | ----------------------- | --------- | ----------------------------- |
+| Payment              | `clientId`                  | User                             | Yes             | Pending migration       | RESTRICT  | Needs deployment verification |
+| Payment              | `professionalId`            | User                             | Yes             | Pending migration       | RESTRICT  | Needs deployment verification |
+| Payment              | `jobId`                     | ClientJob                        | Yes             | Pending migration       | RESTRICT  | Needs deployment verification |
+| Payment              | `projectTrackingId`         | ProjectTracking                  | Yes             | Pending migration       | RESTRICT  | Needs deployment verification |
+| ProjectRequest       | `jobId`                     | ClientJob                        | Yes             | Pending migration       | RESTRICT  | Needs deployment verification |
+| ProjectRequest       | `clientId`/`professionalId` | User                             | Yes             | Pending migration       | RESTRICT  | Needs deployment verification |
+| ProjectTracking      | `requestId`/`jobId`         | ProjectRequest/ClientJob         | Yes             | Pending migration       | RESTRICT  | Needs deployment verification |
+| ProjectMilestone     | `trackingId`                | ProjectTracking                  | Yes             | Pending migration       | RESTRICT  | Needs deployment verification |
+| ProjectTimelineEvent | `trackingId`                | ProjectTracking                  | Yes             | Pending migration       | RESTRICT  | Needs deployment verification |
+| ProjectWorkUpload    | `trackingId`/`milestoneId`  | ProjectTracking/ProjectMilestone | Yes             | Pending migration       | RESTRICT  | Needs deployment verification |
+| ClientProfile        | `userId`                    | User                             | Yes             | Pending unique/FK guard | RESTRICT  | Needs deployment verification |
+| Service              | `categoryId`                | ServiceCategory                  | Yes             | Pending migration       | RESTRICT  | Needs deployment verification |
 
 ## Constraint Findings
 
@@ -648,14 +648,14 @@ No production-like data or EXPLAIN plans were available, so N+1 and index findin
 
 ## Index Recommendations
 
-| Query pattern | Candidate columns/order | Benefit | Trade-off | EXPLAIN required |
-|---|---|---|---|---|
-| Unconsumed OTP by phone/role, newest first | `OtpCode(phone, role, createdAt DESC)` with partial predicate if supported | Faster verification and bounded lookup | Write/storage cost; partial predicate must match | Yes |
-| Project ownership/status lists | `ProjectTracking(professionalId, status, updatedAt DESC)` and client equivalent | Faster portal lists | Extra write work | Yes |
-| Payment by provider order/status | `Payment(razorpayOrderId, status)` | Faster webhook reconciliation | Provider key may already be unique | Yes |
-| Timeline by project chronology | `ProjectTimelineEvent(trackingId, createdAt ASC)` | Faster tracking pages | Additional index storage | Yes |
-| Notifications by recipient/unread/time | `(userId, readAt, createdAt DESC)` | Faster notification badge/list queries | More index maintenance | Yes |
-| Stored files by owner/purpose | `(ownerId, purpose, createdAt DESC)` | Faster private file administration | Moderate storage/write cost | Yes |
+| Query pattern                              | Candidate columns/order                                                         | Benefit                                | Trade-off                                        | EXPLAIN required |
+| ------------------------------------------ | ------------------------------------------------------------------------------- | -------------------------------------- | ------------------------------------------------ | ---------------- |
+| Unconsumed OTP by phone/role, newest first | `OtpCode(phone, role, createdAt DESC)` with partial predicate if supported      | Faster verification and bounded lookup | Write/storage cost; partial predicate must match | Yes              |
+| Project ownership/status lists             | `ProjectTracking(professionalId, status, updatedAt DESC)` and client equivalent | Faster portal lists                    | Extra write work                                 | Yes              |
+| Payment by provider order/status           | `Payment(razorpayOrderId, status)`                                              | Faster webhook reconciliation          | Provider key may already be unique               | Yes              |
+| Timeline by project chronology             | `ProjectTimelineEvent(trackingId, createdAt ASC)`                               | Faster tracking pages                  | Additional index storage                         | Yes              |
+| Notifications by recipient/unread/time     | `(userId, readAt, createdAt DESC)`                                              | Faster notification badge/list queries | More index maintenance                           | Yes              |
+| Stored files by owner/purpose              | `(ownerId, purpose, createdAt DESC)`                                            | Faster private file administration     | Moderate storage/write cost                      | Yes              |
 
 ## File Upload Findings
 
@@ -679,16 +679,16 @@ Missing high-value suites: two-user IDOR matrix, admin boundary, real Prisma mig
 
 ## CI / Build Findings
 
-| Command | Result |
-|---|---|
-| `npx prisma format` | PASS |
-| `npx prisma validate` | PASS |
-| `npx prisma generate` | PASS |
-| `npm run typecheck` | PASS |
-| `npm test -- --run` | PASS — 12 tests in 3 files |
-| `npm run lint` | PASS WITH WARNINGS — 6 React Hook warnings, 0 errors |
-| `npm run build` | PASS — Next.js 16.3.0 production build |
-| Fresh `npx prisma migrate deploy` | NOT AVAILABLE — no disposable database was provided |
+| Command                           | Result                                               |
+| --------------------------------- | ---------------------------------------------------- |
+| `npx prisma format`               | PASS                                                 |
+| `npx prisma validate`             | PASS                                                 |
+| `npx prisma generate`             | PASS                                                 |
+| `npm run typecheck`               | PASS                                                 |
+| `npm test -- --run`               | PASS — 12 tests in 3 files                           |
+| `npm run lint`                    | PASS WITH WARNINGS — 6 React Hook warnings, 0 errors |
+| `npm run build`                   | PASS — Next.js 16.3.0 production build               |
+| Fresh `npx prisma migrate deploy` | NOT AVAILABLE — no disposable database was provided  |
 
 CI currently runs lint/typecheck/test/build only. It does not run the Prisma or fresh-database checks above.
 

@@ -12,6 +12,7 @@ import {
 } from "@/lib/auth";
 import {
   createPhoneVerificationProof,
+  hasValidPhoneVerificationProof,
   phoneProofCookie,
   phoneProofCookieOptions,
 } from "@/lib/dev-phone-otp";
@@ -366,6 +367,19 @@ export async function POST(
       );
     }
     const data = parsed.data;
+    if (data.phone) {
+      const proofToken = request.cookies.get(phoneProofCookie)?.value;
+      const hasProof = await hasValidPhoneVerificationProof(proofToken, data.phone, data.role);
+      if (!hasProof) {
+        return NextResponse.json(
+          {
+            error: "Phone verification is required before completing registration.",
+            fields: { phone: "Please verify your phone number via OTP first." },
+          },
+          { status: 403 },
+        );
+      }
+    }
     const existingEmailUser = await db.user.findUnique({ where: { email: data.email } });
     const existingPhoneUser = data.phone
       ? await db.user.findFirst({ where: { phone: data.phone } })
@@ -388,6 +402,7 @@ export async function POST(
         lastName: data.lastName,
         email: data.email,
         phone: data.phone,
+        phoneVerifiedAt: data.phone ? new Date() : null,
         passwordHash: await bcrypt.hash(data.password, 12),
         role: data.role,
       },

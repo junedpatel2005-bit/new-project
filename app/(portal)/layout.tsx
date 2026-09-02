@@ -7,12 +7,24 @@ import { sessionCookie, verifySession } from "@/lib/auth";
 export default async function PortalLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const token = (await cookies()).get(sessionCookie)?.value;
   if (!token) redirect("/login");
-  let portalUser: { firstName: string; lastName: string; role: string; avatarUrl: string | null } | null = null;
+  let portalUser: {
+    firstName: string;
+    lastName: string;
+    role: string;
+    avatarUrl: string | null;
+  } | null = null;
   try {
     const session = await verifySession(token);
     const user = await db.user.findUnique({
       where: { id: session.userId },
-      select: { firstName: true, lastName: true, role: true, avatarUrl: true, isActive: true, emailVerifiedAt: true },
+      select: {
+        firstName: true,
+        lastName: true,
+        role: true,
+        avatarUrl: true,
+        isActive: true,
+        emailVerifiedAt: true,
+      },
     });
     if (!user?.isActive) redirect("/login");
     if (session.role !== "ADMIN" && !user.emailVerifiedAt) redirect("/verify");
@@ -31,4 +43,3 @@ export default async function PortalLayout({ children }: Readonly<{ children: Re
     </PortalTitleProvider>
   );
 }
-

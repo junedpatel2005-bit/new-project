@@ -13,16 +13,16 @@
         "icon": "clipboard"
       },
       {
-        "id": "compare",
-        "title": "Compare proposals",
-        "description": "Receive quotes from vetted pros. Chat, compare ratings, and shortlist the best.",
-        "icon": "message"
-      },
-      {
         "id": "hire",
         "title": "Hire safely",
         "description": "Funds are held in escrow and released only when each milestone is approved.",
         "icon": "shield"
+      },
+      {
+        "id": "compare",
+        "title": "Compare proposals",
+        "description": "Receive quotes from vetted pros. Chat, compare ratings, and shortlist the best.",
+        "icon": "message"
       },
       {
         "id": "pay",
@@ -64,6 +64,11 @@
       "label": "Grow your professional business",
       "title": "Find projects that match your skills",
       "description": "Browse available projects, bid on work, and build your reputation with satisfied clients worldwide."
+    },
+    "features": {
+      "label": "Why Professionals Choose Us",
+      "title": "Everything you need to grow",
+      "description": "Find quality projects, get paid safely, and build a reputation clients trust."
     },
     "items": [
       {

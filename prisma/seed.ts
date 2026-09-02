@@ -307,7 +307,8 @@ const HIERARCHY = [
     name: "Commercial Services",
     slug: "commercial",
     segment: "COMMERCIAL",
-    description: "Facility management, office renovations, IT networking, and business support services.",
+    description:
+      "Facility management, office renovations, IT networking, and business support services.",
     iconName: "Building2",
     categories: [
       {
@@ -413,7 +414,8 @@ const HIERARCHY = [
     name: "Industrial Services",
     slug: "industrial",
     segment: "INDUSTRIAL",
-    description: "Plant maintenance, automation, robotics, fabrication, mechanical, and safety compliance.",
+    description:
+      "Plant maintenance, automation, robotics, fabrication, mechanical, and safety compliance.",
     iconName: "Factory",
     categories: [
       {
@@ -442,7 +444,10 @@ const HIERARCHY = [
           { name: "Mechanical maintenance", slug: "mechanical-maintenance" },
           { name: "Machine installation", slug: "machine-installation" },
           { name: "Machine repair", slug: "machine-repair" },
-          { name: "Preventive maintenance (Mechanical)", slug: "preventive-maintenance-mechanical" },
+          {
+            name: "Preventive maintenance (Mechanical)",
+            slug: "preventive-maintenance-mechanical",
+          },
           { name: "Breakdown maintenance", slug: "breakdown-maintenance" },
           { name: "Millwright", slug: "millwright-services" },
           { name: "Machinery alignment", slug: "machinery-alignment" },

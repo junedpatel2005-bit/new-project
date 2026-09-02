@@ -20,7 +20,6 @@ export async function GET() {
       description: true,
       category: true,
       locationLabel: true,
-      locationAddress: true,
       locationState: true,
       locationDistrict: true,
       budgetMin: true,
@@ -28,14 +27,14 @@ export async function GET() {
       hourlyRate: true,
       timingType: true,
       createdAt: true,
-      user: { select: { firstName: true, lastName: true, isVerified: true } },
+      user: { select: { firstName: true, isVerified: true } },
     },
   });
 
   return NextResponse.json(
     jobs.map((job) => ({
       ...job,
-      clientName: `${job.user.firstName} ${job.user.lastName}`.trim() || "Client",
+      clientName: job.user.firstName ? `${job.user.firstName}` : "Client",
       clientVerified: job.user.isVerified,
       user: undefined,
       createdAt: job.createdAt.toISOString(),

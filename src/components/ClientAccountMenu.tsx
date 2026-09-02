@@ -81,6 +81,8 @@ export function ClientAccountMenu() {
 
   const initials = `${user.firstName[0] ?? ""}${user.lastName[0] ?? ""}`.toUpperCase();
   const isClient = user.role === "CLIENT";
+  const isProfessional = user.role === "PROFESSIONAL";
+  const isAdmin = user.role === "ADMIN";
 
   return (
     <DropdownMenu>
@@ -124,19 +126,31 @@ export function ClientAccountMenu() {
               <Link href="/client-profile?from=dashboard">Saved Locations</Link>
             </DropdownMenuItem>
           </>
-        ) : (
+        ) : isProfessional ? (
           <>
             <DropdownMenuItem asChild>
               <Link href="/professional-profile?from=dashboard">Professional Profile</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link href="/dashboard">Dashboard</Link>
+              <Link href="/professional/dashboard">Dashboard</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link href="/my-jobs">Projects</Link>
+              <Link href="/professional/my-jobs">Projects</Link>
             </DropdownMenuItem>
           </>
-        )}
+        ) : isAdmin ? (
+          <>
+            <DropdownMenuItem asChild>
+              <Link href="/admin">Admin dashboard</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/admin/users">Users</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/admin/operations">Jobs &amp; disputes</Link>
+            </DropdownMenuItem>
+          </>
+        ) : null}
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={logout} className="text-destructive">
           <LogOut className="h-4 w-4" />

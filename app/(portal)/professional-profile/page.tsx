@@ -206,7 +206,7 @@ export default async function ProfessionalProfilePage() {
                 <Link href="/professional/setup">Edit profile</Link>
               </Button>
               <Button variant="outline" asChild>
-                <Link href="/dashboard">Dashboard</Link>
+                <Link href="/professional/dashboard">Dashboard</Link>
               </Button>
             </div>
           </div>

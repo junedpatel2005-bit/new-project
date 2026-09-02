@@ -86,37 +86,72 @@ export async function POST(request: Request) {
           where: { razorpayOrderId: entity.order_id },
           select: { id: true, status: true, razorpayPaymentId: true, amount: true, currency: true },
         });
-        if (!payment) throw new Error("Razorpay order is not linked to a local payment.");
-        if (entity.id && payment.razorpayPaymentId && entity.id !== payment.razorpayPaymentId)
-          throw new Error("Razorpay payment does not match the local payment.");
-        if (entity.amount !== undefined && entity.amount !== payment.amount * 100)
-          throw new Error("Razorpay amount does not match the local payment.");
-        if (entity.currency && entity.currency !== payment.currency)
-          throw new Error("Razorpay currency does not match the local payment.");
+        const walletTx = !payment
+          ? await tx.walletTransaction.findUnique({
+              where: { providerReference: entity.order_id },
+              select: { id: true, walletId: true, amount: true, status: true },
+            })
+          : null;
 
-        if (payload.event === "payment.captured") {
-          await tx.payment.updateMany({
-            where: { id: payment.id, status: { in: ["PENDING", "FAILED"] } },
-            data: { status: "COMPLETED", capturedAt: new Date(), razorpayPaymentId: entity.id },
-          });
+        if (!payment && !walletTx) {
+          throw new Error("Razorpay order is not linked to a local payment or wallet transaction.");
         }
-        if (payload.event === "payment.failed") {
-          await tx.payment.updateMany({
-            where: { id: payment.id, status: "PENDING" },
-            data: {
-              status: "FAILED",
-              failureReason: entity.error_description ?? "Payment failed.",
-            },
-          });
-          await tx.walletTransaction.updateMany({
-            where: { providerReference: entity.order_id, status: "PENDING" },
-            data: {
-              status: "FAILED",
-              metadataJson: JSON.stringify({
-                reason: entity.error_description ?? "Payment failed.",
-              }),
-            },
-          });
+
+        if (payment) {
+          if (entity.id && payment.razorpayPaymentId && entity.id !== payment.razorpayPaymentId)
+            throw new Error("Razorpay payment does not match the local payment.");
+          if (entity.amount !== undefined && entity.amount !== payment.amount * 100)
+            throw new Error("Razorpay amount does not match the local payment.");
+          if (entity.currency && entity.currency !== payment.currency)
+            throw new Error("Razorpay currency does not match the local payment.");
+
+          if (payload.event === "payment.captured") {
+            await tx.payment.updateMany({
+              where: { id: payment.id, status: { in: ["PENDING", "FAILED"] } },
+              data: { status: "COMPLETED", capturedAt: new Date(), razorpayPaymentId: entity.id },
+            });
+          }
+          if (payload.event === "payment.failed") {
+            await tx.payment.updateMany({
+              where: { id: payment.id, status: "PENDING" },
+              data: {
+                status: "FAILED",
+                failureReason: entity.error_description ?? "Payment failed.",
+              },
+            });
+          }
+        }
+
+        if (walletTx) {
+          if (entity.amount !== undefined && entity.amount !== walletTx.amount * 100)
+            throw new Error("Razorpay amount does not match the local wallet transaction.");
+
+          if (payload.event === "payment.captured") {
+            if (walletTx.status === "PENDING") {
+              await tx.wallet.update({
+                where: { id: walletTx.walletId },
+                data: { balance: { increment: walletTx.amount } },
+              });
+              await tx.walletTransaction.update({
+                where: { id: walletTx.id },
+                data: {
+                  status: "COMPLETED",
+                  description: `Wallet funded via Razorpay (${entity.id ?? entity.order_id})`,
+                },
+              });
+            }
+          }
+          if (payload.event === "payment.failed") {
+            await tx.walletTransaction.updateMany({
+              where: { id: walletTx.id, status: "PENDING" },
+              data: {
+                status: "FAILED",
+                metadataJson: JSON.stringify({
+                  reason: entity.error_description ?? "Payment failed.",
+                }),
+              },
+            });
+          }
         }
       }
 

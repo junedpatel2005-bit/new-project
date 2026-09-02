@@ -60,14 +60,14 @@ export function AppHeader({ role }: { role?: string }) {
       label: "Messages",
       hint: "Conversations",
       icon: MessageSquare,
-      href: "/messages",
+      href: role === "PROFESSIONAL" ? "/professional/messages" : "/messages",
       words: ["message", "messages", "chat"],
     },
     {
       label: "Reports",
       hint: "Reports and activity",
       icon: FileBarChart,
-      href: "/reports",
+      href: role === "PROFESSIONAL" ? "/professional/reports" : "/reports",
       words: ["report", "reports", "analytics"],
     },
     {
@@ -75,9 +75,11 @@ export function AppHeader({ role }: { role?: string }) {
       hint: "Account profile",
       icon: User,
       href:
-        role === "PROFESSIONAL"
-          ? "/professional-profile?from=dashboard"
-          : "/client-profile?from=dashboard",
+        role === "ADMIN"
+          ? "/admin"
+          : role === "PROFESSIONAL"
+            ? "/professional-profile?from=dashboard"
+            : "/client-profile?from=dashboard",
       words: ["profile", "account", "personal"],
     },
   ];
@@ -203,7 +205,7 @@ export function AppHeader({ role }: { role?: string }) {
           )}
         </div>
       </div>
-      {role !== "PROFESSIONAL" && (
+      {role === "CLIENT" && (
         <Link href="/post-job" className="hidden sm:inline-flex">
           <Button size="sm" className="bg-cta text-cta-foreground hover:bg-cta/90">
             Post a Job

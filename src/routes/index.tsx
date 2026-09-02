@@ -140,29 +140,54 @@ export default function Landing({
               </span>
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Button asChild size="lg">
-                <Link href="/discover">
-                  <Search className="mr-2 h-4 w-4" />
-                  <span
-                    contentEditable={cmsMode}
-                    suppressContentEditableWarning={cmsMode}
-                    onInput={(e) => edit({ primaryCta: e.currentTarget.textContent ?? "" })}
-                  >
-                    {content.hero.primaryCta}
-                  </span>
-                </Link>
+              <Button
+                asChild={!cmsMode}
+                size="lg"
+                type="button"
+                onClick={cmsMode ? (e) => e.preventDefault() : undefined}
+              >
+                {cmsMode ? (
+                  <div className="flex items-center">
+                    <Search className="mr-2 h-4 w-4" />
+                    <span
+                      contentEditable={cmsMode}
+                      suppressContentEditableWarning={cmsMode}
+                      onInput={(e) => edit({ primaryCta: e.currentTarget.textContent ?? "" })}
+                    >
+                      {content.hero.primaryCta}
+                    </span>
+                  </div>
+                ) : (
+                  <Link href="/discover">
+                    <Search className="mr-2 h-4 w-4" />
+                    <span>{content.hero.primaryCta}</span>
+                  </Link>
+                )}
               </Button>
-              <Button asChild size="lg" variant="outline">
-                <Link href="/post-job">
-                  <Briefcase className="mr-2 h-4 w-4" />
-                  <span
-                    contentEditable={cmsMode}
-                    suppressContentEditableWarning={cmsMode}
-                    onInput={(e) => edit({ secondaryCta: e.currentTarget.textContent ?? "" })}
-                  >
-                    {content.hero.secondaryCta}
-                  </span>
-                </Link>
+              <Button
+                asChild={!cmsMode}
+                size="lg"
+                variant="outline"
+                type="button"
+                onClick={cmsMode ? (e) => e.preventDefault() : undefined}
+              >
+                {cmsMode ? (
+                  <div className="flex items-center">
+                    <Briefcase className="mr-2 h-4 w-4" />
+                    <span
+                      contentEditable={cmsMode}
+                      suppressContentEditableWarning={cmsMode}
+                      onInput={(e) => edit({ secondaryCta: e.currentTarget.textContent ?? "" })}
+                    >
+                      {content.hero.secondaryCta}
+                    </span>
+                  </div>
+                ) : (
+                  <Link href="/post-job">
+                    <Briefcase className="mr-2 h-4 w-4" />
+                    <span>{content.hero.secondaryCta}</span>
+                  </Link>
+                )}
               </Button>
             </div>
           </div>

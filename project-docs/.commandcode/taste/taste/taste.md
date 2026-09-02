@@ -1,4 +1,5 @@
 # Taste
+
 - Treats the written "Coding Standards & Engineering Rules" document (strict TypeScript incl. `noUncheckedIndexedAccess`, no `any`/`@ts-ignore`, no inline CSS, no business logic in UI components, no direct DB access from UI, server-side authorization, DRY/reusable components, OpenAPI contract-first APIs, Zod validation, tests, no new libraries when the existing stack suffices) as mandatory project standards and expects the codebase to comply, not just be documented. Confidence: 0.95
 - Wants mock/static/hardcoded data removed from UI pages and replaced with real database-backed data, converting screens flow-by-flow rather than deleting the mock module early. Confidence: 0.95
 - Expects professional, production-grade ("senior coder") implementations, not demo/toy work — calls out childish-quality output explicitly. Confidence: 0.8
@@ -27,6 +28,7 @@
 - When the user reports that they cannot edit content on the CMS page (e.g., "in cms page how it work in that page i cant change"), treats it as a functional blocker — expects the CMS editing flow to actually work end-to-end in the browser for that page and wants a plain explanation of how editing works there, not just a description of the underlying architecture. Reported again ("in this page i cant change"), with the root cause being page text keys missing from the editor's defaults so edits were silently dropped. Confidence: 0.7
 
 le marketing pages; CMS marketing pages are for public viewing/content editing, not as authenticated landing pages. Confidence: 0.7
+
 - When reviewing or delivering API code (e.g., "check client job api"), explicitly expects clean, well-organized, "perfect" output rather than messy/ugly code — flags messy formatting or disorganized structure when asking for API inspection. Confidence: 0.6
 - Treats the database schema (Prisma `schema.prisma`) as in scope for coding-standards review: when asking to "check" the project against standards, expects the Prisma schema itself to be reviewed and brought into conformance, not just application code. Confidence: 0.7
 - Writes in informal, non-native English with frequent typos and dropped words (e.g., "becus", "somthing", "withaout", "show" instead of "so"/"something"/"without"/"so"); expects the assistant to understand the intent without strict grammar and to mirror the same casual register rather than over-formalizing. Confidence: 0.85
@@ -34,4 +36,3 @@ le marketing pages; CMS marketing pages are for public viewing/content editing, 
 - Wants screens to reflect server-side changes live without a manual page reload — expects realtime subscriptions (Socket.IO or equivalent) to be wired into the affected screens (project tracking, dashboards, my-jobs) so the counterparty's open tab and counters update in place; treats "I have to reload to see it" as a bug. Willing to swap the realtime transport (e.g., Socket.IO → raw `ws`) if the original doesn't fit the deployment platform, as long as the live-update behavior is preserved end-to-end. Confidence: 0.85
 
 rmatting or disorganized structure when asking for API inspection. Confidence: 0.6
-

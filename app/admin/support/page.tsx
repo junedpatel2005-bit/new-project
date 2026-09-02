@@ -110,7 +110,9 @@ export default function AdminSupportPage() {
   return (
     <div>
       <p className="text-xs font-bold uppercase tracking-[.2em] text-indigo-600">Support</p>
-      <h1 className="mt-2 font-display text-3xl font-bold text-slate-900">FAQ & contact requests</h1>
+      <h1 className="mt-2 font-display text-3xl font-bold text-slate-900">
+        FAQ & contact requests
+      </h1>
       <p className="mt-1.5 text-slate-500">
         Manage public FAQs and review incoming messages sent through the contact form.
       </p>
@@ -164,7 +166,10 @@ export default function AdminSupportPage() {
           </label>
 
           <div className="mt-5 flex gap-2">
-            <Button disabled={saving} className="flex-1 bg-indigo-600 text-white hover:bg-indigo-500 shadow-xs">
+            <Button
+              disabled={saving}
+              className="flex-1 bg-indigo-600 text-white hover:bg-indigo-500 shadow-xs"
+            >
               {saving ? "Saving..." : editingId ? "Save changes" : "Add FAQ item"}
             </Button>
             {editingId && (
@@ -178,7 +183,11 @@ export default function AdminSupportPage() {
               </Button>
             )}
           </div>
-          {message && <p className="mt-3 text-sm font-medium text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-2 rounded-xl">{message}</p>}
+          {message && (
+            <p className="mt-3 text-sm font-medium text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-2 rounded-xl">
+              {message}
+            </p>
+          )}
         </form>
 
         <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs">

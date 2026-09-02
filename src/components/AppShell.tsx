@@ -46,12 +46,18 @@ export function AppShell({
   const activeUser = user ?? initialUser;
   const isProfessional = activeUser
     ? activeUser.role === "PROFESSIONAL"
-    : Boolean(pathname?.startsWith("/professional") || pathname?.startsWith("/professional-profile"));
+    : Boolean(
+        pathname?.startsWith("/professional") || pathname?.startsWith("/professional-profile"),
+      );
 
   const items = isProfessional ? professionalItems : clientItems;
   const mobileItems = isProfessional ? professionalMobileItems : clientMobileItems;
 
-  const navigationUser = activeUser ?? (isProfessional ? { firstName: "", lastName: "", role: "PROFESSIONAL", avatarUrl: null } : null);
+  const navigationUser =
+    activeUser ??
+    (isProfessional
+      ? { firstName: "", lastName: "", role: "PROFESSIONAL", avatarUrl: null }
+      : null);
 
   return (
     <div className="min-h-screen bg-background pb-16 lg:pb-0">

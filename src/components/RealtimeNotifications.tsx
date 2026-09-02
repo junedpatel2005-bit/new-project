@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import { toast } from "sonner";
+import { CircleCheck } from "lucide-react";
 
 type RealtimeNotification = {
   id?: number;
@@ -28,6 +29,7 @@ export function RealtimeNotifications() {
     else if (notification.type.includes("VERIFICATION")) actionLabel = "Inspect Status";
 
     toast(notification.title, {
+      icon: <CircleCheck className="h-5 w-5 text-emerald-400" />,
       description: notification.description,
       action: notification.href
         ? {
@@ -44,6 +46,12 @@ export function RealtimeNotifications() {
             },
           }
         : undefined,
+      cancel: {
+        label: "Dismiss all",
+        onClick: () => {
+          toast.dismiss();
+        },
+      },
     });
     window.dispatchEvent(new CustomEvent("servio:notification"));
   }, []);

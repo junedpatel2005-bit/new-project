@@ -21,7 +21,9 @@ async function runAudit() {
   console.log("");
 
   // 2. Migration Status
-  const migrations = await db.$queryRaw<Array<{ migration_name: string; finished_at: Date; rolled_back_at: Date | null }>>(Prisma.sql`
+  const migrations = await db.$queryRaw<
+    Array<{ migration_name: string; finished_at: Date; rolled_back_at: Date | null }>
+  >(Prisma.sql`
     SELECT migration_name, finished_at, rolled_back_at
     FROM "_prisma_migrations"
     ORDER BY started_at;
@@ -37,7 +39,7 @@ async function runAudit() {
 
   // 3. Row Counts
   console.log("--- Row Counts by Entity ---");
-  const countQueries: Array<{ name: string; query: Promise<any> }> = [
+  const countQueries: Array<{ name: string; query: Promise<number> }> = [
     { name: "User", query: db.user.count() },
     { name: "Session", query: db.session.count() },
     { name: "ClientProfile", query: db.clientProfile.count() },
@@ -59,8 +61,9 @@ async function runAudit() {
     try {
       const count = await query;
       console.log(`  ${name.padEnd(20)}: ${count} rows`);
-    } catch (e: any) {
-      console.log(`  ${name.padEnd(20)}: ERROR (${e.message})`);
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : String(e);
+      console.log(`  ${name.padEnd(20)}: ERROR (${message})`);
     }
   }
   console.log("");
@@ -90,7 +93,9 @@ async function runAudit() {
 
   // 5. Uniqueness & Duplicate Checks
   console.log("--- Duplicate & Uniqueness Checks ---");
-  const duplicateEmails = await db.$queryRaw<Array<{ normalized_email: string; count: number }>>(Prisma.sql`
+  const duplicateEmails = await db.$queryRaw<
+    Array<{ normalized_email: string; count: number }>
+  >(Prisma.sql`
     SELECT lower(email) AS normalized_email, count(*) AS count
     FROM "User" WHERE email IS NOT NULL GROUP BY lower(email) HAVING count(*) > 1;
   `);
@@ -101,7 +106,9 @@ async function runAudit() {
   `);
   console.log(`  Duplicate Client Profiles per User: ${duplicateProfiles.length}`);
 
-  const duplicatePrimaryLocations = await db.$queryRaw<Array<{ clientProfileId: number; count: number }>>(Prisma.sql`
+  const duplicatePrimaryLocations = await db.$queryRaw<
+    Array<{ clientProfileId: number; count: number }>
+  >(Prisma.sql`
     SELECT "clientProfileId", count(*) AS count FROM "ClientSavedLocation" WHERE "isPrimary" = true GROUP BY "clientProfileId" HAVING count(*) > 1;
   `);
   console.log(`  Duplicate Primary Locations per Profile: ${duplicatePrimaryLocations.length}`);
@@ -121,7 +128,15 @@ async function runAudit() {
   `);
   console.log(`  Negative Wallet Balances: ${negativeWallets.length}`);
 
-  const feeMismatches = await db.$queryRaw<Array<{ id: number; amount: number; base_amount: number; client_fee_amount: number; status: string }>>(Prisma.sql`
+  const feeMismatches = await db.$queryRaw<
+    Array<{
+      id: number;
+      amount: number;
+      base_amount: number;
+      client_fee_amount: number;
+      status: string;
+    }>
+  >(Prisma.sql`
     SELECT id, amount, base_amount, client_fee_amount, status FROM "Payment"
     WHERE amount <> base_amount + client_fee_amount
        OR professional_payout_amount + admin_net_amount <> base_amount;
@@ -147,7 +162,9 @@ async function runAudit() {
 
   // 8. RLS (Row Level Security) Status
   console.log("--- Row Level Security (RLS) Status ---");
-  const rlsStatus = await db.$queryRaw<Array<{ tablename: string; rls_enabled: boolean }>>(Prisma.sql`
+  const rlsStatus = await db.$queryRaw<
+    Array<{ tablename: string; rls_enabled: boolean }>
+  >(Prisma.sql`
     SELECT c.relname AS tablename, c.relrowsecurity AS rls_enabled
     FROM pg_class c
     JOIN pg_namespace n ON n.oid = c.relnamespace
@@ -165,4 +182,3 @@ async function runAudit() {
 }
 
 runAudit().catch(console.error);
-

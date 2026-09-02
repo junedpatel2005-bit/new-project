@@ -1,7 +1,7 @@
 "use client";
 
-import { NotificationInbox } from "@/components/NotificationInbox";
+import { AdminNotificationCenter } from "@/components/AdminNotificationCenter";
 
 export default function AdminNotificationsPage() {
-  return <NotificationInbox admin />;
+  return <AdminNotificationCenter />;
 }

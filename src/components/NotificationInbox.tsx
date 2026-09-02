@@ -3,25 +3,26 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
+  Activity,
   AlertTriangle,
   ArrowRight,
   Bell,
-  Briefcase,
+  BriefcaseBusiness,
   Check,
   CheckCheck,
   CircleDollarSign,
-  FileCheck,
+  CircleDot,
+  Clock3,
+  ExternalLink,
   FileText,
-  Filter,
-  FolderGit2,
-  Info,
-  Loader2,
-  MessageSquare,
+  MapPin,
+  RefreshCw,
   Search,
   ShieldCheck,
-  Sparkles,
   Trash2,
-  UserCheck,
+  UserPlus,
+  UserRound,
+  UsersRound,
   X,
 } from "lucide-react";
 import {
@@ -40,14 +41,95 @@ export type Notification = {
   href: string | null;
   createdAt: string;
   readAt: string | null;
-  projectId: number | null;
-  jobId: number | null;
+  projectId?: number | null;
+  jobId?: number | null;
   isProject?: boolean;
-  projectTitle: string | null;
+  projectTitle?: string | null;
+  category?: string | null;
+  clientName?: string | null;
+  professionalName?: string | null;
 };
 
-type TimelineProject = {
-  project: { id: number; progress: number; status: string };
+type ProjectGroup = {
+  key: string;
+  projectId: number | null;
+  jobId: number | null;
+  title: string;
+  category: string | null;
+  clientName: string | null;
+  professionalName: string | null;
+  notifications: Notification[];
+};
+
+type TimelineData = {
+  project: {
+    id: number;
+    jobId?: number | null;
+    status: string;
+    progress: number;
+    startedAt?: string | null;
+    completedAt?: string | null;
+  };
+  job?: {
+    id?: number;
+    title?: string | null;
+    category?: string | null;
+    description?: string | null;
+    budgetMin?: number | null;
+    budgetMax?: number | null;
+    hourlyRate?: number | null;
+    timingType?: string | null;
+    urgency?: string | null;
+    workMode?: string | null;
+    locationAddress?: string | null;
+    deadline?: string | null;
+    attachments?: Array<{ id: number; fileName: string; previewUrl?: string | null }>;
+  } | null;
+  client?: {
+    id?: number;
+    firstName: string;
+    lastName: string;
+    email?: string | null;
+    phone?: string | null;
+    avatarUrl?: string | null;
+    averageRating?: number | null;
+    isVerified?: boolean;
+    address?: string | null;
+  } | null;
+  professional?: {
+    id?: number;
+    firstName: string;
+    lastName: string;
+    email?: string | null;
+    phone?: string | null;
+    avatarUrl?: string | null;
+    averageRating?: number | null;
+    isVerified?: boolean;
+    address?: string | null;
+  } | null;
+  proposals?: Array<{
+    id: number;
+    bidAmount: number | null;
+    duration: string | null;
+    coverLetter: string | null;
+    status: string;
+    createdAt: string;
+    professional: {
+      id: number;
+      firstName: string;
+      lastName: string;
+      avatarUrl?: string | null;
+      averageRating?: number | null;
+      isVerified?: boolean;
+    };
+  }>;
+  milestones?: Array<{
+    id: number;
+    title: string;
+    amount: number;
+    status: string;
+    payment?: { status: string; professionalPayoutAmount?: number | null } | null;
+  }>;
   timeline: Array<{
     id: number;
     title: string;
@@ -55,336 +137,331 @@ type TimelineProject = {
     createdAt: string;
     actorRole: string;
   }>;
+  agreedAmount?: number | null;
 };
 
-function getNotificationCategoryIcon(type: string) {
-  if (type.includes("MILESTONE") || type.includes("PAYMENT") || type.includes("PAYOUT")) {
-    return { icon: CircleDollarSign, bg: "bg-emerald-50 text-emerald-700 border-emerald-200" };
-  }
-  if (type.includes("DISPUTE")) {
-    return { icon: AlertTriangle, bg: "bg-amber-50 text-amber-700 border-amber-200" };
-  }
-  if (type.includes("VERIFICATION") || type.includes("SECURITY")) {
-    return { icon: ShieldCheck, bg: "bg-indigo-50 text-indigo-700 border-indigo-200" };
-  }
-  if (type.includes("PROPOSAL") || type.includes("BID") || type.includes("OFFER")) {
-    return { icon: FileText, bg: "bg-purple-50 text-purple-700 border-purple-200" };
-  }
-  if (type.includes("WORK") || type.includes("REVISION") || type.includes("STAGE")) {
-    return { icon: FileCheck, bg: "bg-blue-50 text-blue-700 border-blue-200" };
-  }
-  if (type.includes("ACCOUNT") || type.includes("USER") || type.includes("WELCOME")) {
-    return { icon: UserCheck, bg: "bg-teal-50 text-teal-700 border-teal-200" };
-  }
-  if (type.includes("MESSAGE")) {
-    return { icon: MessageSquare, bg: "bg-sky-50 text-sky-700 border-sky-200" };
-  }
-  if (type.includes("JOB") || type.includes("PROJECT")) {
-    return { icon: Briefcase, bg: "bg-indigo-50 text-indigo-700 border-indigo-200" };
-  }
-  return { icon: Bell, bg: "bg-slate-100 text-slate-700 border-slate-200" };
+function getCategoryIcon(type: string) {
+  if (type.includes("DISPUTE"))
+    return { Icon: AlertTriangle, color: "text-amber-700 bg-amber-50 border-amber-200" };
+  if (type.includes("SECURITY") || type.includes("VERIFICATION") || type.includes("KYC"))
+    return { Icon: ShieldCheck, color: "text-rose-700 bg-rose-50 border-rose-200" };
+  if (type.includes("PAYMENT") || type.includes("PAYOUT") || type.includes("ESCROW"))
+    return { Icon: CircleDollarSign, color: "text-emerald-700 bg-emerald-50 border-emerald-200" };
+  if (type.includes("MILESTONE"))
+    return { Icon: Activity, color: "text-cyan-700 bg-cyan-50 border-cyan-200" };
+  if (type.includes("PROPOSAL") || type.includes("OFFER") || type.includes("BID"))
+    return { Icon: FileText, color: "text-purple-700 bg-purple-50 border-purple-200" };
+  if (type.includes("ACCOUNT") || type.includes("USER") || type.includes("REGISTER") || type.includes("WELCOME"))
+    return { Icon: UserPlus, color: "text-indigo-700 bg-indigo-50 border-indigo-200" };
+  if (type.includes("PROJECT") || type.includes("JOB") || type.includes("CONTRACT") || type.includes("MATCHING"))
+    return { Icon: BriefcaseBusiness, color: "text-blue-700 bg-blue-50 border-blue-200" };
+  return { Icon: Bell, color: "text-slate-600 bg-slate-50 border-slate-200" };
 }
 
-export function NotificationInbox({ admin: isAdmin = false }: { admin?: boolean } = {}) {
+function relativeTime(value: string) {
+  const seconds = Math.max(0, Math.floor((Date.now() - new Date(value).getTime()) / 1000));
+  if (seconds < 60) return "Just now";
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+  return `${Math.floor(seconds / 86400)}d ago`;
+}
+
+export function NotificationInbox({ admin: _isAdmin = false }: { admin?: boolean } = {}) {
   const router = useRouter();
-  const [items, setItems] = useState<Notification[] | null>(null);
+  const [items, setItems] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+
+  // 2 TABS ONLY: "projects" or "other"
   const [activeTab, setActiveTab] = useState<"projects" | "other">("projects");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [query, setQuery] = useState("");
   const [unreadOnly, setUnreadOnly] = useState(false);
-  const [expandedProjects, setExpandedProjects] = useState<Set<number>>(new Set());
 
-  // Timeline Dialog State
-  const [timelineProjectId, setTimelineProjectId] = useState<number | null>(null);
-  const [timelineProject, setTimelineProject] = useState<TimelineProject | null>(null);
+  // Pop-up Timeline Modal state
+  const [timelineTarget, setTimelineTarget] = useState<{ projectId?: number | null; jobId?: number | null } | null>(null);
+  const [timeline, setTimeline] = useState<TimelineData | null>(null);
   const [timelineLoading, setTimelineLoading] = useState(false);
-  const [timelineError, setTimelineError] = useState(false);
+  const [modalTab, setModalTab] = useState<"timeline" | "details" | "proposals">("timeline");
 
-  // Clear Confirmation Modal
-  const [confirmClearAll, setConfirmClearAll] = useState(false);
-
-  const loadNotifications = useCallback(async () => {
+  const load = useCallback(async () => {
+    setLoading(true);
     try {
       const response = await fetch("/api/portal/notifications", { cache: "no-store" });
-      if (!response.ok) throw new Error("Failed to load notifications");
+      if (!response.ok) throw new Error("Unable to load notifications");
       const data = (await response.json()) as Notification[];
-      setItems(data);
-      setError(false);
+      setItems(Array.isArray(data) ? data : []);
     } catch {
-      setError(true);
+      // Ignored
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    void loadNotifications();
-    window.addEventListener("servio:notification", loadNotifications);
-    window.addEventListener("focus", loadNotifications);
+    void load();
+    window.addEventListener("servio:notification", load);
+    window.addEventListener("servio:notifications-read", load);
     return () => {
-      window.removeEventListener("servio:notification", loadNotifications);
-      window.removeEventListener("focus", loadNotifications);
+      window.removeEventListener("servio:notification", load);
+      window.removeEventListener("servio:notifications-read", load);
     };
-  }, [loadNotifications]);
+  }, [load]);
 
-  // Filtered notifications
-  const filteredItems = useMemo(() => {
-    if (!items) return [];
-    return items.filter((item) => {
-      if (unreadOnly && item.readAt) return false;
-      if (searchQuery.trim()) {
-        const query = searchQuery.toLowerCase();
-        const text = `${item.title} ${item.description ?? ""} ${item.projectTitle ?? ""}`.toLowerCase();
-        if (!text.includes(query)) return false;
+  // Split into Project items & Other items
+  const { projectItems, otherItems } = useMemo(() => {
+    const proj: Notification[] = [];
+    const oth: Notification[] = [];
+    for (const item of items) {
+      if (item.projectId || item.jobId || item.isProject) {
+        proj.push(item);
+      } else {
+        oth.push(item);
       }
-      return true;
-    });
-  }, [items, unreadOnly, searchQuery]);
+    }
+    return { projectItems: proj, otherItems: oth };
+  }, [items]);
 
-  // Categorize between Project notifications and Other notifications
-  const projectNotifications = useMemo(() => {
-    return filteredItems.filter((item) => item.isProject || item.projectId !== null || item.jobId !== null);
-  }, [filteredItems]);
-
-  const otherNotifications = useMemo(() => {
-    return filteredItems.filter((item) => !item.isProject && item.projectId === null && item.jobId === null);
-  }, [filteredItems]);
-
-  // Group Project Notifications by Project / Job
+  // Group project items by project/job
   const projectGroups = useMemo(() => {
-    const groups = new Map<string, { key: string; projectId: number | null; jobId: number | null; title: string; notifications: Notification[] }>();
+    const map = new Map<string, ProjectGroup>();
+    const normalized = query.trim().toLowerCase();
 
-    projectNotifications.forEach((item) => {
-      const groupKey = item.projectId ? `project-${item.projectId}` : item.jobId ? `job-${item.jobId}` : `item-${item.id}`;
-      if (!groups.has(groupKey)) {
-        groups.set(groupKey, {
-          key: groupKey,
-          projectId: item.projectId,
-          jobId: item.jobId,
-          title: item.projectTitle || (item.projectId ? `Project #${item.projectId}` : item.jobId ? `Job #${item.jobId}` : item.title),
-          notifications: [],
+    projectItems.forEach((item) => {
+      if (unreadOnly && item.readAt) return;
+      if (normalized) {
+        const text = `${item.title} ${item.description ?? ""} ${item.projectTitle ?? ""} ${item.clientName ?? ""} ${item.professionalName ?? ""}`.toLowerCase();
+        if (!text.includes(normalized)) return;
+      }
+
+      const key = item.projectId ? `p_${item.projectId}` : `j_${item.jobId ?? item.id}`;
+      const existing = map.get(key);
+      if (existing) {
+        existing.notifications.push(item);
+        if (!existing.clientName && item.clientName) existing.clientName = item.clientName;
+        if (!existing.professionalName && item.professionalName) existing.professionalName = item.professionalName;
+        if (!existing.category && item.category) existing.category = item.category;
+      } else {
+        map.set(key, {
+          key,
+          projectId: item.projectId ?? null,
+          jobId: item.jobId ?? null,
+          title: item.projectTitle || (item.projectId ? `Project #${item.projectId}` : `Job #${item.jobId ?? item.id}`),
+          category: item.category ?? null,
+          clientName: item.clientName ?? null,
+          professionalName: item.professionalName ?? null,
+          notifications: [item],
         });
       }
-      groups.get(groupKey)!.notifications.push(item);
     });
 
-    return [...groups.values()].map((g) => ({
-      ...g,
-      notifications: g.notifications.sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      ),
-    }));
-  }, [projectNotifications]);
+    return [...map.values()].sort(
+      (a, b) =>
+        new Date(b.notifications[0]?.createdAt ?? 0).getTime() -
+        new Date(a.notifications[0]?.createdAt ?? 0).getTime(),
+    );
+  }, [projectItems, query, unreadOnly]);
 
-  const totalUnread = useMemo(() => items?.filter((item) => !item.readAt).length ?? 0, [items]);
-  const projectUnread = useMemo(
-    () => items?.filter((item) => (item.isProject || item.projectId !== null) && !item.readAt).length ?? 0,
-    [items],
-  );
-  const otherUnread = useMemo(
-    () => items?.filter((item) => !item.isProject && item.projectId === null && !item.readAt).length ?? 0,
-    [items],
-  );
+  // Filtered other items
+  const filteredOtherItems = useMemo(() => {
+    const normalized = query.trim().toLowerCase();
+    return otherItems.filter((item) => {
+      if (unreadOnly && item.readAt) return false;
+      if (!normalized) return true;
+      return `${item.title} ${item.description ?? ""}`.toLowerCase().includes(normalized);
+    });
+  }, [otherItems, query, unreadOnly]);
 
-  // Mark single or multiple notifications as read
-  async function markRead(ids: number[]) {
+  const totalUnreadCount = useMemo(() => items.filter((i) => !i.readAt).length, [items]);
+  const projectUnreadCount = useMemo(() => projectItems.filter((i) => !i.readAt).length, [projectItems]);
+  const otherUnreadCount = useMemo(() => otherItems.filter((i) => !i.readAt).length, [otherItems]);
+
+  // Actions
+  async function markRead(ids: number[], unread = false) {
     if (!ids.length) return;
     const now = new Date().toISOString();
-    setItems((current) =>
-      current ? current.map((item) => (ids.includes(item.id) ? { ...item, readAt: item.readAt ?? now } : item)) : null,
+    setItems((curr) =>
+      curr.map((i) => (ids.includes(i.id) ? { ...i, readAt: unread ? null : (i.readAt ?? now) } : i)),
     );
-    await fetch("/api/portal/notifications", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ids }),
-    });
-    window.dispatchEvent(new CustomEvent("servio:notifications-read"));
+    try {
+      await fetch("/api/portal/notifications", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids, unread }),
+      });
+      window.dispatchEvent(new CustomEvent("servio:notifications-read"));
+    } catch {
+      // Ignored
+    }
   }
 
-  // Mark all notifications as read
   async function markAllRead() {
     const now = new Date().toISOString();
-    setItems((current) => current ? current.map((item) => ({ ...item, readAt: item.readAt ?? now })) : null);
-    await fetch("/api/portal/notifications", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ all: true }),
-    });
-    window.dispatchEvent(new CustomEvent("servio:notifications-read"));
-  }
-
-  // Delete single notification
-  async function deleteNotification(id: number, event?: React.MouseEvent) {
-    if (event) event.stopPropagation();
-    setItems((current) => current ? current.filter((item) => item.id !== id) : null);
-    await fetch("/api/portal/notifications", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
-    });
-    window.dispatchEvent(new CustomEvent("servio:notifications-read"));
-  }
-
-  // Clear all notifications
-  async function clearAllNotifications() {
-    setItems([]);
-    setConfirmClearAll(false);
-    await fetch("/api/portal/notifications", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ all: true }),
-    });
-    window.dispatchEvent(new CustomEvent("servio:notifications-read"));
-  }
-
-  // Handle clicking on a notification item
-  async function handleNotificationClick(item: Notification) {
-    if (!item.readAt) {
-      await markRead([item.id]);
-    }
-    if (item.href) {
-      router.push(item.href);
-    }
-  }
-
-  // Open Project Timeline modal
-  async function openTimelineModal(projectId: number, event?: React.MouseEvent) {
-    if (event) event.stopPropagation();
-    setTimelineProjectId(projectId);
-    setTimelineLoading(true);
-    setTimelineError(false);
+    setItems((curr) => curr.map((i) => ({ ...i, readAt: i.readAt ?? now })));
     try {
-      const response = await fetch(`/api/portal/project?id=${projectId}`, { cache: "no-store" });
-      if (!response.ok) throw new Error("Timeline fetch failed");
-      const data = (await response.json()) as TimelineProject;
-      setTimelineProject(data);
+      await fetch("/api/portal/notifications", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ all: true, unread: false }),
+      });
+      window.dispatchEvent(new CustomEvent("servio:notifications-read"));
     } catch {
-      setTimelineError(true);
+      // Ignored
+    }
+  }
+
+  async function deleteNotification(id: number, e?: React.MouseEvent) {
+    e?.stopPropagation();
+    setItems((curr) => curr.filter((i) => i.id !== id));
+    try {
+      await fetch("/api/portal/notifications", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      window.dispatchEvent(new CustomEvent("servio:notifications-read"));
+    } catch {
+      // Ignored
+    }
+  }
+
+  // Open rich timeline pop-up
+  async function openTimelineModal(opts: { projectId?: number | null; jobId?: number | null }, e?: React.MouseEvent) {
+    e?.stopPropagation();
+    setTimelineTarget(opts);
+    setTimeline(null);
+    setTimelineLoading(true);
+    setModalTab("timeline");
+
+    const queryParam = opts.projectId ? `id=${opts.projectId}` : `jobId=${opts.jobId}`;
+    try {
+      const res = await fetch(`/api/portal/project?${queryParam}`, { cache: "no-store" });
+      if (!res.ok) throw new Error("Failed to fetch project");
+      const data = (await res.json()) as TimelineData;
+      setTimeline(data);
+
+      // Auto mark related items read
+      const related = items
+        .filter((i) => (opts.projectId && i.projectId === opts.projectId) || (opts.jobId && i.jobId === opts.jobId))
+        .map((i) => i.id);
+      if (related.length > 0) {
+        void markRead(related, false);
+      }
+    } catch {
+      setTimeline(null);
     } finally {
       setTimelineLoading(false);
     }
   }
 
   return (
-    <div className="space-y-6">
-      {/* Top Banner Header */}
-      <div className="flex flex-col justify-between gap-4 rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-8 shadow-xs sm:flex-row sm:items-center">
+    <div className="mx-auto max-w-5xl space-y-6 pb-12">
+      {/* Header */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-bold text-indigo-700 border border-indigo-200">
-              <Sparkles className="h-3.5 w-3.5" />
-              Real-Time Notifications
-            </span>
-            <span className="text-xs font-medium text-slate-400">· Live updates</span>
-          </div>
-          <h1 className="mt-2.5 font-display text-3xl font-extrabold text-slate-900 tracking-tight">
-            Notification Center
-          </h1>
-          <p className="mt-1 text-sm font-medium text-slate-500">
-            Track real-time project milestones, job proposals, escrow payments, and security alerts.
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Notifications</h1>
+          <p className="mt-1 text-sm text-slate-500">
+            Real-time updates on your jobs, proposals, milestones, and account.
           </p>
         </div>
 
-        {/* Global Action Buttons */}
-        <div className="flex flex-wrap items-center gap-2.5">
-          {totalUnread > 0 && (
+        <div className="flex items-center gap-2">
+          {totalUnreadCount > 0 && (
             <button
               type="button"
               onClick={() => void markAllRead()}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-indigo-200 bg-indigo-50 px-3.5 py-2 text-xs font-bold text-indigo-700 hover:bg-indigo-100 transition shadow-2xs"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition shadow-2xs cursor-pointer"
             >
-              <CheckCheck className="h-4 w-4" />
-              Mark all read ({totalUnread})
+              <CheckCheck className="h-4 w-4 text-indigo-600" />
+              Mark all as read
             </button>
           )}
 
-          {(items?.length ?? 0) > 0 && (
-            <button
-              type="button"
-              onClick={() => setConfirmClearAll(true)}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-600 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition shadow-2xs"
-            >
-              <Trash2 className="h-4 w-4" />
-              Clear all
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={() => void load()}
+            disabled={loading}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white p-2 text-slate-700 hover:bg-slate-50 transition shadow-2xs disabled:opacity-50 cursor-pointer"
+            title="Refresh notifications"
+          >
+            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin text-indigo-600" : ""}`} />
+          </button>
         </div>
       </div>
 
-      {/* Main Container Card */}
-      <div className="rounded-3xl border border-slate-200 bg-white shadow-xs overflow-hidden">
-        {/* Navigation Tabs & Search Toolbar */}
-        <div className="border-b border-slate-200 bg-slate-50/60 p-4 sm:p-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          {/* 2 Primary Tabs */}
-          <div className="inline-flex rounded-2xl border border-slate-200 bg-slate-100 p-1.5 gap-1.5 self-start shadow-inner">
-            {/* Tab 1: Project Notifications */}
+      {/* 2 Tabs & Search Toolbar */}
+      <div className="rounded-2xl border border-slate-200 bg-white p-2 shadow-2xs">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          {/* THE 2 TABS */}
+          <div className="flex items-center gap-1.5 rounded-xl bg-slate-100/80 p-1">
             <button
               type="button"
               onClick={() => setActiveTab("projects")}
-              className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition ${
+              className={`flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-bold transition cursor-pointer ${
                 activeTab === "projects"
-                  ? "bg-white text-indigo-700 shadow-sm border border-slate-200/80 font-extrabold"
-                  : "text-slate-600 hover:text-slate-900 hover:bg-white/50"
+                  ? "bg-white text-indigo-600 shadow-2xs"
+                  : "text-slate-600 hover:text-slate-900"
               }`}
             >
-              <FolderGit2 className="h-4 w-4 text-indigo-600" />
-              <span>Project Notifications</span>
-              <span
-                className={`rounded-full px-2 py-0.5 text-[10px] font-extrabold ${
-                  activeTab === "projects"
-                    ? projectUnread > 0
-                      ? "bg-indigo-600 text-white"
-                      : "bg-slate-100 text-slate-700"
-                    : "bg-slate-200 text-slate-600"
-                }`}
-              >
-                {projectNotifications.length}
-              </span>
+              <BriefcaseBusiness className="h-4 w-4" />
+              <span>Project &amp; Job Activity</span>
+              {projectItems.length > 0 && (
+                <span
+                  className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                    activeTab === "projects"
+                      ? "bg-indigo-50 text-indigo-700 border border-indigo-200"
+                      : "bg-slate-200/80 text-slate-700"
+                  }`}
+                >
+                  {projectItems.length}
+                </span>
+              )}
+              {projectUnreadCount > 0 && (
+                <span className="h-2 w-2 rounded-full bg-indigo-600" />
+              )}
             </button>
 
-            {/* Tab 2: Other Notifications */}
             <button
               type="button"
               onClick={() => setActiveTab("other")}
-              className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition ${
+              className={`flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-bold transition cursor-pointer ${
                 activeTab === "other"
-                  ? "bg-white text-indigo-700 shadow-sm border border-slate-200/80 font-extrabold"
-                  : "text-slate-600 hover:text-slate-900 hover:bg-white/50"
+                  ? "bg-white text-indigo-600 shadow-2xs"
+                  : "text-slate-600 hover:text-slate-900"
               }`}
             >
-              <Bell className="h-4 w-4 text-indigo-600" />
+              <Bell className="h-4 w-4" />
               <span>Other Notifications</span>
-              <span
-                className={`rounded-full px-2 py-0.5 text-[10px] font-extrabold ${
-                  activeTab === "other"
-                    ? otherUnread > 0
-                      ? "bg-indigo-600 text-white"
-                      : "bg-slate-100 text-slate-700"
-                    : "bg-slate-200 text-slate-600"
-                }`}
-              >
-                {otherNotifications.length}
-              </span>
+              {otherItems.length > 0 && (
+                <span
+                  className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                    activeTab === "other"
+                      ? "bg-indigo-50 text-indigo-700 border border-indigo-200"
+                      : "bg-slate-200/80 text-slate-700"
+                  }`}
+                >
+                  {otherItems.length}
+                </span>
+              )}
+              {otherUnreadCount > 0 && (
+                <span className="h-2 w-2 rounded-full bg-indigo-600" />
+              )}
             </button>
           </div>
 
-          {/* Search and Filters */}
-          <div className="flex flex-wrap items-center gap-3">
-            {/* Search Input */}
-            <div className="relative min-w-[220px] flex-1 sm:flex-initial">
-              <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+          {/* Search & Unread filter */}
+          <div className="flex items-center gap-2 px-1">
+            <div className="relative flex-1 sm:w-64">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search updates…"
-                className="h-9 w-full rounded-xl border border-slate-200 bg-white pl-9 pr-3 text-xs font-medium text-slate-900 placeholder:text-slate-400 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Filter notifications…"
+                className="h-9 w-full rounded-xl border border-slate-200 bg-slate-50/50 pl-8 pr-3 text-xs text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:bg-white focus:outline-hidden"
               />
-              {searchQuery && (
+              {query && (
                 <button
                   type="button"
-                  onClick={() => setSearchQuery("")}
+                  onClick={() => setQuery("")}
                   className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                 >
                   <X className="h-3.5 w-3.5" />
@@ -392,426 +469,564 @@ export function NotificationInbox({ admin: isAdmin = false }: { admin?: boolean 
               )}
             </div>
 
-            {/* Unread Only Toggle */}
             <button
               type="button"
-              onClick={() => setUnreadOnly(!unreadOnly)}
-              className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-bold transition shadow-2xs ${
+              onClick={() => setUnreadOnly((prev) => !prev)}
+              className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-semibold transition cursor-pointer ${
                 unreadOnly
-                  ? "bg-indigo-600 text-white border-indigo-600"
-                  : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+                  ? "border-indigo-300 bg-indigo-50 text-indigo-700"
+                  : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
               }`}
             >
-              <Filter className="h-3.5 w-3.5" />
-              <span>Unread Only</span>
+              <CircleDot className="h-3.5 w-3.5 text-indigo-600" />
+              Unread only
             </button>
           </div>
         </div>
+      </div>
 
-        {/* Tab Content Body */}
-        <div className="p-4 sm:p-6">
-          {/* Loading Skeleton */}
-          {loading && (
-            <div className="space-y-4 py-8">
-              <div className="h-20 animate-pulse rounded-2xl bg-slate-100" />
-              <div className="h-20 animate-pulse rounded-2xl bg-slate-100" />
-              <div className="h-20 animate-pulse rounded-2xl bg-slate-100" />
+      {/* Loading state */}
+      {loading && items.length === 0 && (
+        <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center shadow-2xs">
+          <RefreshCw className="mx-auto h-6 w-6 animate-spin text-indigo-600 mb-2" />
+          <p className="text-sm font-medium text-slate-600">Loading notifications…</p>
+        </div>
+      )}
+
+      {/* TAB 1: PROJECT & JOB ACTIVITY (Project-Wise Grouped) */}
+      {!loading && activeTab === "projects" && (
+        <div className="space-y-4">
+          {projectGroups.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-12 text-center shadow-2xs">
+              <BriefcaseBusiness className="mx-auto h-8 w-8 text-slate-300 mb-2" />
+              <h3 className="text-base font-bold text-slate-800">No project activity found</h3>
+              <p className="mt-1 text-xs text-slate-500">
+                {unreadOnly || query
+                  ? "Try clearing search filters or the unread toggle."
+                  : "Proposals received, milestones funded, and project status alerts will appear here."}
+              </p>
             </div>
-          )}
+          ) : (
+            projectGroups.map((group) => {
+              const unreadCount = group.notifications.filter((n) => !n.readAt).length;
+              return (
+                <div
+                  key={group.key}
+                  className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xs transition hover:border-slate-300"
+                >
+                  {/* Project Card Header */}
+                  <div className="border-b border-slate-100 bg-slate-50/70 p-4 sm:p-5">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="grid h-7 w-7 place-items-center rounded-lg bg-indigo-100 text-indigo-700 border border-indigo-200">
+                            <BriefcaseBusiness className="h-4 w-4" />
+                          </span>
+                          <h2 className="truncate text-base font-bold text-slate-900">
+                            {group.title}
+                          </h2>
+                          {group.category && (
+                            <span className="rounded-md bg-slate-100 border border-slate-200 px-2 py-0.5 text-[10px] font-bold text-slate-700">
+                              {group.category}
+                            </span>
+                          )}
+                          {unreadCount > 0 && (
+                            <span className="rounded-md bg-indigo-50 border border-indigo-200 px-2 py-0.5 text-[10px] font-bold text-indigo-700">
+                              {unreadCount} unread
+                            </span>
+                          )}
+                        </div>
 
-          {/* Error State */}
-          {!loading && error && (
-            <div className="rounded-2xl border border-rose-200 bg-rose-50 p-6 text-center shadow-2xs">
-              <AlertTriangle className="mx-auto h-8 w-8 text-rose-600" />
-              <h3 className="mt-2 text-sm font-bold text-rose-900">Unable to load notifications</h3>
-              <p className="mt-1 text-xs text-rose-700">Please check your internet connection and reload.</p>
-              <button
-                type="button"
-                onClick={() => void loadNotifications()}
-                className="mt-4 rounded-xl bg-rose-600 px-4 py-2 text-xs font-bold text-white hover:bg-rose-500 transition"
-              >
-                Try Again
-              </button>
-            </div>
-          )}
+                        {/* Client & Pro metadata */}
+                        <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1 text-xs text-slate-500">
+                          {group.clientName && (
+                            <span className="inline-flex items-center gap-1.5">
+                              <UserRound className="h-3.5 w-3.5 text-indigo-600" /> Client:{" "}
+                              <strong className="text-slate-800 font-medium">{group.clientName}</strong>
+                            </span>
+                          )}
+                          {group.professionalName && (
+                            <span className="inline-flex items-center gap-1.5">
+                              <UsersRound className="h-3.5 w-3.5 text-violet-600" /> Pro:{" "}
+                              <strong className="text-slate-800 font-medium">{group.professionalName}</strong>
+                            </span>
+                          )}
+                          <span className="text-[11px] text-slate-400">
+                            {group.notifications.length} updates · Last {relativeTime(group.notifications[0]?.createdAt ?? "")}
+                          </span>
+                        </div>
+                      </div>
 
-          {/* TAB 1: Project Notifications View */}
-          {!loading && !error && activeTab === "projects" && (
-            <div className="space-y-5">
-              {projectGroups.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 p-12 text-center">
-                  <FolderGit2 className="mx-auto h-10 w-10 text-slate-400" />
-                  <h3 className="mt-3 text-sm font-bold text-slate-800">No project notifications</h3>
-                  <p className="mt-1 text-xs text-slate-500">
-                    Milestone updates, work submissions, and job proposals will appear organized here.
-                  </p>
-                </div>
-              ) : (
-                projectGroups.map((group) => {
-                  const unreadCount = group.notifications.filter((n) => !n.readAt).length;
-                  const isExpanded = expandedProjects.has(group.projectId ?? 0);
-                  const visibleNotifications = isExpanded
-                    ? group.notifications
-                    : group.notifications.slice(0, 3);
+                      {/* View Timeline Pop-up Trigger Button */}
+                      <button
+                        type="button"
+                        onClick={(e) => void openTimelineModal({ projectId: group.projectId, jobId: group.jobId }, e)}
+                        className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl bg-indigo-600 px-3.5 py-2 text-xs font-bold text-white hover:bg-indigo-500 transition shadow-2xs cursor-pointer"
+                      >
+                        <Clock3 className="h-3.5 w-3.5" />
+                        View Timeline &amp; Info
+                        <ArrowRight className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </div>
 
-                  return (
-                    <section
-                      key={group.key}
-                      className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs transition hover:border-slate-300"
-                    >
-                      {/* Project Card Group Header */}
-                      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 bg-slate-50/70 px-5 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="grid h-10 w-10 place-items-center rounded-xl bg-indigo-50 text-indigo-700 border border-indigo-100 font-bold shadow-2xs">
-                            <FolderGit2 className="h-5 w-5" />
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <h3 className="font-display font-extrabold text-sm sm:text-base text-slate-900">
-                                {group.title}
-                              </h3>
-                              {unreadCount > 0 && (
-                                <span className="rounded-full bg-indigo-100 px-2 py-0.5 text-[10px] font-extrabold text-indigo-700 border border-indigo-200">
-                                  {unreadCount} new
+                  {/* List of notifications inside this project */}
+                  <div className="divide-y divide-slate-100">
+                    {group.notifications.map((item) => {
+                      const { Icon, color } = getCategoryIcon(item.type);
+                      return (
+                        <div
+                          key={item.id}
+                          onClick={() => {
+                            if (!item.readAt) void markRead([item.id], false);
+                            if (item.href) router.push(item.href);
+                          }}
+                          className={`group flex items-start justify-between gap-4 p-4 text-left transition hover:bg-slate-50/80 cursor-pointer ${
+                            !item.readAt ? "bg-indigo-50/20" : ""
+                          }`}
+                        >
+                          <div className="flex items-start gap-3.5 min-w-0 flex-1">
+                            <span
+                              className={`grid h-8 w-8 shrink-0 place-items-center rounded-xl border ${color} shadow-2xs mt-0.5`}
+                            >
+                              <Icon className="h-4 w-4" />
+                            </span>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <span className="text-sm font-bold text-slate-900">{item.title}</span>
+                                {!item.readAt && <span className="h-2 w-2 rounded-full bg-indigo-600" />}
+                                <span className="text-[11px] text-slate-400 font-normal">
+                                  {relativeTime(item.createdAt)}
                                 </span>
+                              </div>
+                              {item.description && (
+                                <p className="mt-1 text-xs text-slate-600 leading-relaxed">
+                                  {item.description}
+                                </p>
                               )}
+                              <div className="mt-2 flex items-center gap-3 text-[11px] text-slate-400">
+                                <span>{new Date(item.createdAt).toLocaleString()}</span>
+                                {item.href && (
+                                  <span className="inline-flex items-center gap-1 font-semibold text-indigo-600 group-hover:underline">
+                                    View <ArrowRight className="h-3 w-3" />
+                                  </span>
+                                )}
+                              </div>
                             </div>
-                            <p className="text-xs text-slate-500 font-medium">
-                              {group.projectId ? `Project #${group.projectId}` : `Job #${group.jobId}`} · {group.notifications.length} updates recorded
-                            </p>
+                          </div>
+
+                          {/* Action Buttons on Hover */}
+                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                            {!item.readAt ? (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  void markRead([item.id], false);
+                                }}
+                                title="Mark as read"
+                                className="rounded-lg p-1.5 text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition"
+                              >
+                                <Check className="h-3.5 w-3.5" />
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  void markRead([item.id], true);
+                                }}
+                                title="Mark as unread"
+                                className="rounded-lg p-1.5 text-slate-400 hover:bg-indigo-50 hover:text-indigo-600 transition"
+                              >
+                                <CircleDot className="h-3.5 w-3.5" />
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              onClick={(e) => void deleteNotification(item.id, e)}
+                              title="Delete notification"
+                              className="rounded-lg p-1.5 text-slate-400 hover:bg-rose-100 hover:text-rose-600 transition"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
                           </div>
                         </div>
-
-                        {/* Project Actions */}
-                        <div className="flex items-center gap-2">
-                          {group.projectId && (
-                            <button
-                              type="button"
-                              onClick={(e) => void openTimelineModal(group.projectId!, e)}
-                              className="inline-flex items-center gap-1.5 rounded-xl border border-indigo-200 bg-indigo-50/80 px-3 py-1.5 text-xs font-bold text-indigo-700 hover:bg-indigo-100 transition shadow-2xs"
-                            >
-                              <FileText className="h-3.5 w-3.5" />
-                              <span>Timeline</span>
-                            </button>
-                          )}
-                          {group.projectId && (
-                            <button
-                              type="button"
-                              onClick={() => router.push(`/project/${group.projectId}/tracking`)}
-                              className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-indigo-500 transition shadow-2xs"
-                            >
-                              <span>Open Project</span>
-                              <ArrowRight className="h-3.5 w-3.5" />
-                            </button>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Notification Item List in this Project */}
-                      <div className="divide-y divide-slate-100">
-                        {visibleNotifications.map((item) => {
-                          const { icon: Icon, bg } = getNotificationCategoryIcon(item.type);
-                          return (
-                            <div
-                              key={item.id}
-                              onClick={() => void handleNotificationClick(item)}
-                              className={`group flex items-start gap-4 p-4 sm:p-5 transition cursor-pointer hover:bg-slate-50/80 ${
-                                !item.readAt ? "bg-indigo-50/30" : "bg-white"
-                              }`}
-                            >
-                              {/* Category Icon */}
-                              <div className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl border ${bg}`}>
-                                <Icon className="h-4 w-4" />
-                              </div>
-
-                              {/* Content */}
-                              <div className="min-w-0 flex-1">
-                                <div className="flex items-center justify-between gap-2">
-                                  <p
-                                    className={`text-sm tracking-tight ${
-                                      !item.readAt ? "font-bold text-slate-900" : "font-semibold text-slate-700"
-                                    }`}
-                                  >
-                                    {item.title}
-                                  </p>
-                                  {!item.readAt && (
-                                    <span className="h-2 w-2 rounded-full bg-indigo-600 ring-2 ring-indigo-100 shrink-0" />
-                                  )}
-                                </div>
-                                {item.description && (
-                                  <p className="mt-1 text-xs text-slate-500 line-clamp-2 leading-relaxed">
-                                    {item.description}
-                                  </p>
-                                )}
-                                <div className="mt-2 flex items-center gap-3 text-[11px] text-slate-400 font-medium">
-                                  <span>{new Date(item.createdAt).toLocaleString()}</span>
-                                  {item.href && (
-                                    <span className="text-indigo-600 font-bold group-hover:underline flex items-center gap-1">
-                                      View details <ArrowRight className="h-3 w-3 inline" />
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
-
-                              {/* Quick Actions (Delete / Mark Read) */}
-                              <div className="flex items-center gap-1 opacity-80 group-hover:opacity-100">
-                                {!item.readAt && (
-                                  <button
-                                    type="button"
-                                    title="Mark as read"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      void markRead([item.id]);
-                                    }}
-                                    className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-indigo-600 transition"
-                                  >
-                                    <Check className="h-4 w-4" />
-                                  </button>
-                                )}
-                                <button
-                                  type="button"
-                                  title="Delete notification"
-                                  onClick={(e) => void deleteNotification(item.id, e)}
-                                  className="rounded-lg p-1.5 text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </button>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-
-                      {/* Expand / Collapse Button */}
-                      {group.notifications.length > 3 && (
-                        <div className="border-t border-slate-100 bg-slate-50/40 p-2.5 text-center">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setExpandedProjects((current) => {
-                                const next = new Set(current);
-                                if (isExpanded) next.delete(group.projectId ?? 0);
-                                else next.add(group.projectId ?? 0);
-                                return next;
-                              })
-                            }
-                            className="text-xs font-bold text-indigo-600 hover:text-indigo-700"
-                          >
-                            {isExpanded
-                              ? "Show fewer updates"
-                              : `View ${group.notifications.length - 3} older updates for this project`}
-                          </button>
-                        </div>
-                      )}
-                    </section>
-                  );
-                })
-              )}
-            </div>
-          )}
-
-          {/* TAB 2: Other Notifications View */}
-          {!loading && !error && activeTab === "other" && (
-            <div className="space-y-3">
-              {otherNotifications.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 p-12 text-center">
-                  <Bell className="mx-auto h-10 w-10 text-slate-400" />
-                  <h3 className="mt-3 text-sm font-bold text-slate-800">No other notifications</h3>
-                  <p className="mt-1 text-xs text-slate-500">
-                    Account, verification, system messages, and announcements will appear here.
-                  </p>
+                      );
+                    })}
+                  </div>
                 </div>
-              ) : (
-                otherNotifications.map((item) => {
-                  const { icon: Icon, bg } = getNotificationCategoryIcon(item.type);
-                  return (
-                    <div
-                      key={item.id}
-                      onClick={() => void handleNotificationClick(item)}
-                      className={`group flex items-start gap-4 rounded-2xl border border-slate-200 p-4 sm:p-5 transition cursor-pointer hover:border-indigo-200 hover:shadow-xs ${
-                        !item.readAt ? "bg-indigo-50/20 border-indigo-200/80" : "bg-white"
-                      }`}
-                    >
-                      {/* Icon */}
-                      <div className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl border ${bg}`}>
-                        <Icon className="h-5 w-5" />
-                      </div>
+              );
+            })
+          )}
+        </div>
+      )}
 
-                      {/* Details */}
+      {/* TAB 2: OTHER NOTIFICATIONS (Welcome, KYC, Matching Jobs) */}
+      {!loading && activeTab === "other" && (
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xs">
+          {filteredOtherItems.length === 0 ? (
+            <div className="p-12 text-center">
+              <Bell className="mx-auto h-8 w-8 text-slate-300 mb-2" />
+              <h3 className="text-base font-bold text-slate-800">No general notifications</h3>
+              <p className="mt-1 text-xs text-slate-500">
+                Welcome alerts, verification updates, and matching opportunities will appear here.
+              </p>
+            </div>
+          ) : (
+            <div className="divide-y divide-slate-100">
+              {filteredOtherItems.map((item) => {
+                const { Icon, color } = getCategoryIcon(item.type);
+                return (
+                  <div
+                    key={item.id}
+                    onClick={() => {
+                      if (!item.readAt) void markRead([item.id], false);
+                      if (item.href) router.push(item.href);
+                    }}
+                    className={`group flex items-start justify-between gap-4 p-4 text-left transition hover:bg-slate-50/80 cursor-pointer ${
+                      !item.readAt ? "bg-indigo-50/20" : ""
+                    }`}
+                  >
+                    <div className="flex items-start gap-3.5 min-w-0 flex-1">
+                      <span
+                        className={`grid h-8 w-8 shrink-0 place-items-center rounded-xl border ${color} shadow-2xs mt-0.5`}
+                      >
+                        <Icon className="h-4 w-4" />
+                      </span>
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between gap-2">
-                          <p
-                            className={`text-sm tracking-tight ${
-                              !item.readAt ? "font-bold text-slate-900" : "font-semibold text-slate-700"
-                            }`}
-                          >
-                            {item.title}
-                          </p>
-                          {!item.readAt && (
-                            <span className="h-2 w-2 rounded-full bg-indigo-600 ring-2 ring-indigo-100 shrink-0" />
-                          )}
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-sm font-bold text-slate-900">{item.title}</span>
+                          {!item.readAt && <span className="h-2 w-2 rounded-full bg-indigo-600" />}
+                          <span className="text-[11px] text-slate-400 font-normal">
+                            {relativeTime(item.createdAt)}
+                          </span>
                         </div>
                         {item.description && (
-                          <p className="mt-1 text-xs text-slate-500 line-clamp-2 leading-relaxed">
+                          <p className="mt-1 text-xs text-slate-600 leading-relaxed">
                             {item.description}
                           </p>
                         )}
-                        <div className="mt-2.5 flex items-center gap-3 text-[11px] text-slate-400 font-medium">
+                        <div className="mt-2 flex items-center gap-3 text-[11px] text-slate-400">
                           <span>{new Date(item.createdAt).toLocaleString()}</span>
                           {item.href && (
-                            <span className="text-indigo-600 font-bold group-hover:underline flex items-center gap-1">
-                              Action link <ArrowRight className="h-3 w-3 inline" />
+                            <span className="inline-flex items-center gap-1 font-semibold text-indigo-600 group-hover:underline">
+                              View details <ArrowRight className="h-3 w-3" />
                             </span>
                           )}
                         </div>
                       </div>
+                    </div>
 
-                      {/* Actions */}
-                      <div className="flex items-center gap-1 opacity-80 group-hover:opacity-100">
-                        {!item.readAt && (
-                          <button
-                            type="button"
-                            title="Mark as read"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              void markRead([item.id]);
-                            }}
-                            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-indigo-600 transition"
-                          >
-                            <Check className="h-4 w-4" />
-                          </button>
-                        )}
+                    {/* Actions */}
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                      {!item.readAt ? (
                         <button
                           type="button"
-                          title="Delete notification"
-                          onClick={(e) => void deleteNotification(item.id, e)}
-                          className="rounded-lg p-1.5 text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            void markRead([item.id], false);
+                          }}
+                          title="Mark as read"
+                          className="rounded-lg p-1.5 text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition"
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Check className="h-3.5 w-3.5" />
                         </button>
-                      </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            void markRead([item.id], true);
+                          }}
+                          title="Mark as unread"
+                          className="rounded-lg p-1.5 text-slate-400 hover:bg-indigo-50 hover:text-indigo-600 transition"
+                        >
+                          <CircleDot className="h-3.5 w-3.5" />
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={(e) => void deleteNotification(item.id, e)}
+                        title="Delete notification"
+                        className="rounded-lg p-1.5 text-slate-400 hover:bg-rose-100 hover:text-rose-600 transition"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
                     </div>
-                  );
-                })
-              )}
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
-      </div>
+      )}
 
-      {/* Project Timeline Modal Dialog */}
+      {/* ========================================================= */}
+      {/* POP-UP TIMELINE & PROJECT DETAILS MODAL                   */}
+      {/* ========================================================= */}
       <Dialog
-        open={timelineProjectId !== null}
+        open={timelineTarget !== null}
         onOpenChange={(open) => {
           if (!open) {
-            setTimelineProjectId(null);
-            setTimelineProject(null);
-            setTimelineError(false);
+            setTimelineTarget(null);
+            setTimeline(null);
           }
         }}
       >
-        <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-2xl bg-white rounded-3xl p-6 border-slate-200">
-          <DialogHeader>
-            <DialogTitle className="font-display font-extrabold text-xl text-slate-900">
-              Project Timeline Activity
-            </DialogTitle>
-            <DialogDescription className="text-xs text-slate-500">
-              {timelineProject
-                ? `Project #${timelineProjectId} · ${timelineProject.project.progress}% completed`
-                : "Inspecting milestone progression..."}
-            </DialogDescription>
-          </DialogHeader>
-
-          {timelineLoading && (
-            <div className="py-12 text-center">
-              <Loader2 className="mx-auto h-8 w-8 animate-spin text-indigo-600" />
-              <p className="mt-2 text-xs font-semibold text-slate-500">Loading activity timeline…</p>
-            </div>
-          )}
-
-          {!timelineLoading && timelineError && (
-            <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-xs font-semibold text-rose-700">
-              Unable to load project timeline data.
-            </div>
-          )}
-
-          {!timelineLoading && timelineProject && (
-            <div className="mt-4 space-y-6">
-              {/* Progress Tracker */}
-              <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
-                <div className="flex items-center justify-between text-xs font-bold text-slate-700 mb-2">
-                  <span>Overall Progress</span>
-                  <span className="text-indigo-600">{timelineProject.project.progress}%</span>
+        <DialogContent className="fixed inset-y-0 right-0 left-auto flex h-full w-full max-w-2xl translate-x-0 translate-y-0 flex-col gap-0 overflow-y-auto rounded-none border-l border-slate-200 bg-white p-0 sm:max-w-2xl">
+          {/* Modal Header */}
+          <div className="border-b border-slate-200 p-6 sticky top-0 bg-white/95 backdrop-blur z-10">
+            <DialogHeader>
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <DialogTitle className="text-xl font-bold text-slate-950">
+                    {timeline?.job?.title ?? (timelineTarget?.projectId ? `Project #${timelineTarget.projectId}` : `Job #${timelineTarget?.jobId}`)}
+                  </DialogTitle>
+                  <DialogDescription className="text-xs text-slate-500 mt-1">
+                    {timeline?.job?.category ?? "Marketplace Activity"} · Timeline &amp; Project Info
+                  </DialogDescription>
                 </div>
-                <div className="h-2 w-full rounded-full bg-slate-200 overflow-hidden">
+              </div>
+            </DialogHeader>
+
+            {/* Modal Internal Tabs */}
+            <div className="mt-4 flex items-center gap-2 border-b border-slate-100 pb-2">
+              <button
+                type="button"
+                onClick={() => setModalTab("timeline")}
+                className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
+                  modalTab === "timeline" ? "bg-indigo-50 text-indigo-700" : "text-slate-500 hover:text-slate-800"
+                }`}
+              >
+                <Clock3 className="h-3.5 w-3.5" /> Activity Timeline
+              </button>
+              <button
+                type="button"
+                onClick={() => setModalTab("details")}
+                className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
+                  modalTab === "details" ? "bg-indigo-50 text-indigo-700" : "text-slate-500 hover:text-slate-800"
+                }`}
+              >
+                <FileText className="h-3.5 w-3.5" /> Scope &amp; Details
+              </button>
+              <button
+                type="button"
+                onClick={() => setModalTab("proposals")}
+                className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
+                  modalTab === "proposals" ? "bg-indigo-50 text-indigo-700" : "text-slate-500 hover:text-slate-800"
+                }`}
+              >
+                <UsersRound className="h-3.5 w-3.5" /> Proposals &amp; Parties ({timeline?.proposals?.length ?? 0})
+              </button>
+            </div>
+          </div>
+
+          {/* Modal Body */}
+          {timelineLoading && (
+            <div className="p-16 text-center text-sm text-slate-500">
+              <RefreshCw className="mx-auto h-7 w-7 animate-spin text-indigo-600 mb-3" />
+              Loading project details &amp; timeline…
+            </div>
+          )}
+
+          {!timelineLoading && !timeline && (
+            <div className="m-6 rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
+              Unable to load project timeline information.
+            </div>
+          )}
+
+          {!timelineLoading && timeline && (
+            <div className="space-y-6 p-6">
+              {/* Progress & Status Summary */}
+              <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
+                <div className="flex items-center justify-between text-xs font-bold text-slate-700">
+                  <span className="flex items-center gap-1.5">
+                    <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                    Status: <strong className="text-slate-900 uppercase">{timeline.project.status.replaceAll("_", " ")}</strong>
+                  </span>
+                  <span>{timeline.project.progress}% completed</span>
+                </div>
+                <div className="mt-3 h-2 rounded-full bg-slate-200 overflow-hidden">
                   <div
-                    className="h-full rounded-full bg-indigo-600 transition-all"
-                    style={{ width: `${timelineProject.project.progress}%` }}
+                    className="h-full rounded-full bg-indigo-600 transition-all duration-500"
+                    style={{ width: `${timeline.project.progress}%` }}
                   />
                 </div>
               </div>
 
-              {/* Chronological Events */}
-              <div className="relative border-l-2 border-slate-200 pl-5 space-y-6 ml-3">
-                {timelineProject.timeline.length === 0 ? (
-                  <p className="text-xs text-slate-400 py-4">No logged activity yet for this project.</p>
-                ) : (
-                  timelineProject.timeline.map((event) => (
-                    <div key={event.id} className="relative">
-                      {/* Step Dot */}
-                      <span className="absolute -left-[27px] top-1 h-3.5 w-3.5 rounded-full bg-indigo-600 ring-4 ring-white border-2 border-indigo-200" />
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h4 className="text-sm font-bold text-slate-900">{event.title}</h4>
-                          <span className="rounded-md bg-slate-100 px-1.5 py-0.5 text-[10px] font-bold text-slate-600 uppercase">
-                            {event.actorRole}
-                          </span>
+              {/* TAB 1: VISUAL TIMELINE */}
+              {modalTab === "timeline" && (
+                <div className="space-y-4">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                    Chronological Events
+                  </h3>
+                  <div className="relative space-y-6 border-l-2 border-indigo-200 pl-5 ml-2">
+                    {timeline.timeline.length === 0 ? (
+                      <p className="text-sm text-slate-500">No activity events recorded yet.</p>
+                    ) : (
+                      timeline.timeline.map((event) => (
+                        <div key={event.id} className="relative">
+                          <span className="absolute -left-[27px] top-1 h-3.5 w-3.5 rounded-full border-2 border-indigo-200 bg-indigo-600 ring-4 ring-white" />
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h4 className="text-sm font-bold text-slate-900">{event.title}</h4>
+                            <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-bold uppercase text-slate-600">
+                              {event.actorRole}
+                            </span>
+                          </div>
+                          {event.description && (
+                            <p className="mt-1 text-xs leading-relaxed text-slate-600">
+                              {event.description}
+                            </p>
+                          )}
+                          <p className="mt-1 text-[11px] text-slate-400">
+                            {new Date(event.createdAt).toLocaleString()}
+                          </p>
                         </div>
-                        {event.description && (
-                          <p className="mt-1 text-xs text-slate-600 leading-relaxed">{event.description}</p>
-                        )}
-                        <p className="mt-1 text-[10px] text-slate-400 font-medium">
-                          {new Date(event.createdAt).toLocaleString()}
-                        </p>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 2: SCOPE & DETAILS */}
+              {modalTab === "details" && (
+                <div className="space-y-4">
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-4">
+                      <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        Budget / Pricing
+                      </div>
+                      <div className="mt-1 text-sm font-bold text-slate-900">
+                        {timeline.job?.timingType === "HOURLY"
+                          ? `₹${timeline.job?.hourlyRate ?? 0} / hr`
+                          : `₹${timeline.job?.budgetMin ?? 0} – ₹${timeline.job?.budgetMax ?? 0}`}
                       </div>
                     </div>
-                  ))
-                )}
+                    <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-4">
+                      <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        Work Mode &amp; Urgency
+                      </div>
+                      <div className="mt-1 text-sm font-bold text-slate-900">
+                        {timeline.job?.workMode ?? "On-site"} · {timeline.job?.urgency ?? "Standard"}
+                      </div>
+                    </div>
+                  </div>
+
+                  {timeline.job?.locationAddress && (
+                    <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-4 text-xs text-slate-700">
+                      <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                        Location
+                      </div>
+                      <div className="flex items-center gap-1.5 font-medium">
+                        <MapPin className="h-3.5 w-3.5 text-indigo-600 shrink-0" />
+                        {timeline.job.locationAddress}
+                      </div>
+                    </div>
+                  )}
+
+                  {timeline.job?.description && (
+                    <div className="rounded-xl border border-slate-200 bg-white p-4">
+                      <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">
+                        Scope of Work &amp; Description
+                      </div>
+                      <p className="text-xs text-slate-700 leading-relaxed whitespace-pre-wrap">
+                        {timeline.job.description}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* TAB 3: PROPOSALS & PARTIES */}
+              {modalTab === "proposals" && (
+                <div className="space-y-4">
+                  {/* Parties Cards */}
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-4">
+                      <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        Client Details
+                      </div>
+                      <div className="mt-1.5 text-sm font-bold text-slate-900">
+                        {timeline.client ? `${timeline.client.firstName} ${timeline.client.lastName}` : "Unknown"}
+                      </div>
+                      {timeline.client?.email && (
+                        <div className="text-xs text-slate-500">{timeline.client.email}</div>
+                      )}
+                    </div>
+
+                    <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-4">
+                      <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        Assigned Professional
+                      </div>
+                      <div className="mt-1.5 text-sm font-bold text-slate-900">
+                        {timeline.professional ? `${timeline.professional.firstName} ${timeline.professional.lastName}` : "Not assigned yet"}
+                      </div>
+                      {timeline.professional?.email && (
+                        <div className="text-xs text-slate-500">{timeline.professional.email}</div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Proposals List */}
+                  <div>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+                      Received Proposals ({timeline.proposals?.length ?? 0})
+                    </h4>
+                    {!timeline.proposals || timeline.proposals.length === 0 ? (
+                      <p className="text-xs text-slate-500 italic">No proposals submitted yet.</p>
+                    ) : (
+                      <div className="space-y-2.5">
+                        {timeline.proposals.map((prop) => (
+                          <div
+                            key={prop.id}
+                            className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-2xs"
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="font-bold text-xs text-slate-900">
+                                {prop.professional.firstName} {prop.professional.lastName}
+                              </span>
+                              <span className="rounded-md bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
+                                Bid: ₹{prop.bidAmount ?? "N/A"}
+                              </span>
+                            </div>
+                            {prop.coverLetter && (
+                              <p className="mt-1.5 text-xs text-slate-600 line-clamp-2">
+                                &ldquo;{prop.coverLetter}&rdquo;
+                              </p>
+                            )}
+                            <div className="mt-2 text-[10px] text-slate-400">
+                              Duration: {prop.duration ?? "Estimated"} · Submitted {relativeTime(prop.createdAt)}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Direct Navigation Button at bottom of modal */}
+              <div className="pt-4 border-t border-slate-200">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const url = timelineTarget?.projectId
+                      ? `/project/${timelineTarget.projectId}`
+                      : `/job/${timelineTarget?.jobId}`;
+                    router.push(url);
+                  }}
+                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-indigo-600 py-3 text-xs font-bold text-white hover:bg-indigo-500 transition shadow-2xs cursor-pointer"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  View Full Project Details
+                </button>
               </div>
             </div>
           )}
-        </DialogContent>
-      </Dialog>
-
-      {/* Clear All Confirmation Dialog */}
-      <Dialog open={confirmClearAll} onOpenChange={setConfirmClearAll}>
-        <DialogContent className="max-w-md rounded-3xl bg-white p-6 border-slate-200">
-          <DialogHeader>
-            <DialogTitle className="font-display font-extrabold text-lg text-slate-900">
-              Clear all notifications?
-            </DialogTitle>
-            <DialogDescription className="text-xs text-slate-500">
-              This will remove all notifications from your inbox. This action cannot be undone.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="mt-6 flex justify-end gap-3">
-            <button
-              type="button"
-              onClick={() => setConfirmClearAll(false)}
-              className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 transition"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={() => void clearAllNotifications()}
-              className="rounded-xl bg-rose-600 px-4 py-2 text-xs font-bold text-white hover:bg-rose-500 transition shadow-2xs"
-            >
-              Confirm Clear
-            </button>
-          </div>
         </DialogContent>
       </Dialog>
     </div>
   );
 }
+
