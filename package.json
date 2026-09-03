@@ -15,6 +15,7 @@
     "test:integration": "cross-env NODE_ENV=test tsx scripts/test-db.ts integration",
     "test:migrations": "cross-env NODE_ENV=test tsx scripts/test-db.ts migrate-replay",
     "test:project-flow": "tsx scripts/test-professional-proposal-flow.ts",
+    "test:all-flows": "tsx scripts/test-all-flows.ts",
     "db:seed": "tsx prisma/seed.ts",
     "db:add-subcategory-jobs": "tsx scripts/add-faker-subcategory-jobs.ts",
     "db:add-juned-jobs": "tsx scripts/add-faker-jobs-for-juned.ts",

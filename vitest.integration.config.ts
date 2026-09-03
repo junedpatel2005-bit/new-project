@@ -8,5 +8,6 @@ export default defineConfig({
   test: {
     include: ["tests/integration/**/*.test.ts"],
     exclude: ["**/node_modules/**", "**/dist/**", "**/.{git,cache,output,temp}/**"],
+    setupFiles: ["tests/integration/setup.ts"],
   },
 });

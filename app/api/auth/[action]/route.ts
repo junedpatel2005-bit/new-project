@@ -407,14 +407,24 @@ export async function POST(
         role: data.role,
       },
     });
-    // Registration notifications must be persisted even when the recipients are
-    // currently signed out. They will be shown from the inbox after login.
-    await Promise.all([
-      notifyAdminsOfNewAccount(user),
-      ...(user.role === "PROFESSIONAL" ? [notifyClientsOfNewProfessional(user)] : []),
-    ]);
+    // Registration notifications and verification emails are dispatched in the background
+    // so registration completes instantly and does not block or crash if SMTP is slow.
+    enqueueBackgroundJob(
+      "notifications.new_account",
+      async () => {
+        await Promise.all([
+          notifyAdminsOfNewAccount(user),
+          ...(user.role === "PROFESSIONAL" ? [notifyClientsOfNewProfessional(user)] : []),
+        ]);
+      },
+      { userId: user.id },
+    );
     const raw = await createEmailVerificationToken(user.id);
-    await sendEmailVerificationLink(user.email, raw, publicAppOrigin(request));
+    enqueueBackgroundJob(
+      "email.verification",
+      () => sendEmailVerificationLink(user.email, raw, publicAppOrigin(request)),
+      { userId: user.id },
+    );
     const response = NextResponse.json(
       {
         success: true,

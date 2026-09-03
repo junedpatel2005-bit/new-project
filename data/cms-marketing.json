@@ -204,5 +204,32 @@
         "icon": "briefcase"
       }
     ]
+  },
+  "faq": {
+    "hero": {
+      "label": "Help center",
+      "title": "Frequently asked questions",
+      "description": "Can't find what you're looking for? Our team is one click away."
+    },
+    "items": [
+      {
+        "id": "what",
+        "title": "What is Klick-Pro?",
+        "description": "Klick-Pro is a marketplace that connects clients with verified professionals for local and remote work.",
+        "icon": "shield"
+      },
+      {
+        "id": "free",
+        "title": "Is it free to use?",
+        "description": "Posting jobs and creating a profile are free. Clients pay only the agreed price.",
+        "icon": "shield"
+      },
+      {
+        "id": "vet",
+        "title": "How are professionals vetted?",
+        "description": "Every pro completes ID verification. For in-home services, we also run background checks.",
+        "icon": "shield"
+      }
+    ]
   }
 }

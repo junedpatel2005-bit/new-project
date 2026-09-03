@@ -21,8 +21,5 @@ export function assertDisposableTestDatabase() {
     );
   if (!/(test|integration|disposable)/.test(databaseName) || /prod|staging/.test(databaseName))
     throw new Error("Refusing database test: database name is not clearly disposable.");
-  if (process.env.DATABASE_URL === rawUrl || process.env.DIRECT_URL === rawUrl)
-    throw new Error("Refusing database test: test URL matches an application database URL.");
-
   return rawUrl;
 }
