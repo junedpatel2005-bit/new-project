@@ -2,7 +2,13 @@ import { createServer } from "node:http";
 import { parse } from "node:url";
 import { jwtVerify } from "jose";
 import next from "next";
+import pg from "pg";
 import { Server } from "socket.io";
+
+const { Pool } = pg;
+const dbPool = process.env.DATABASE_URL
+  ? new Pool({ connectionString: process.env.DATABASE_URL, max: 2, idleTimeoutMillis: 30000 })
+  : null;
 
 const dev = process.env.NODE_ENV !== "production";
 const hostname = process.env.HOSTNAME ?? "0.0.0.0";
@@ -36,6 +42,23 @@ io.use(async (socket, nextSocket) => {
     const { payload } = await jwtVerify(token, secret);
     const userId = Number(payload.userId);
     if (!Number.isSafeInteger(userId) || userId < 1) throw new Error("Invalid session");
+
+    if (dbPool && typeof payload.sessionId === "string") {
+      const { rows } = await dbPool.query(
+        'SELECT s.revoked_at, s.expires_at, u."isActive" FROM sessions s JOIN "User" u ON s.user_id = u.id WHERE s.id = $1',
+        [payload.sessionId],
+      );
+      const sessionRow = rows[0];
+      if (
+        !sessionRow ||
+        sessionRow.revoked_at ||
+        new Date(sessionRow.expires_at) <= new Date() ||
+        !sessionRow.isActive
+      ) {
+        throw new Error("Revoked or inactive session");
+      }
+    }
+
     socket.data.userId = userId;
     socket.data.role = payload.role;
     nextSocket();

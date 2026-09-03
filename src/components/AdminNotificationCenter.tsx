@@ -151,7 +151,12 @@ function getCategoryIcon(type: string) {
     return { Icon: Activity, color: "text-cyan-700 bg-cyan-50 border-cyan-200" };
   if (type.includes("PROPOSAL") || type.includes("OFFER") || type.includes("BID"))
     return { Icon: FileText, color: "text-purple-700 bg-purple-50 border-purple-200" };
-  if (type.includes("ACCOUNT") || type.includes("USER") || type.includes("REGISTER") || type.includes("WELCOME"))
+  if (
+    type.includes("ACCOUNT") ||
+    type.includes("USER") ||
+    type.includes("REGISTER") ||
+    type.includes("WELCOME")
+  )
     return { Icon: UserPlus, color: "text-indigo-700 bg-indigo-50 border-indigo-200" };
   if (type.includes("PROJECT") || type.includes("JOB") || type.includes("CONTRACT"))
     return { Icon: BriefcaseBusiness, color: "text-blue-700 bg-blue-50 border-blue-200" };
@@ -171,14 +176,17 @@ export function AdminNotificationCenter() {
   const [items, setItems] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  
+
   // 2 TABS ONLY: "projects" or "other"
   const [activeTab, setActiveTab] = useState<"projects" | "other">("projects");
   const [query, setQuery] = useState("");
   const [unreadOnly, setUnreadOnly] = useState(false);
 
   // Pop-up Timeline Modal state
-  const [timelineTarget, setTimelineTarget] = useState<{ projectId?: number | null; jobId?: number | null } | null>(null);
+  const [timelineTarget, setTimelineTarget] = useState<{
+    projectId?: number | null;
+    jobId?: number | null;
+  } | null>(null);
   const [timeline, setTimeline] = useState<TimelineData | null>(null);
   const [timelineLoading, setTimelineLoading] = useState(false);
   const [modalTab, setModalTab] = useState<"timeline" | "details" | "proposals">("timeline");
@@ -230,7 +238,8 @@ export function AdminNotificationCenter() {
     projectItems.forEach((item) => {
       if (unreadOnly && item.readAt) return;
       if (normalized) {
-        const text = `${item.title} ${item.description ?? ""} ${item.projectTitle ?? ""} ${item.clientName ?? ""} ${item.professionalName ?? ""}`.toLowerCase();
+        const text =
+          `${item.title} ${item.description ?? ""} ${item.projectTitle ?? ""} ${item.clientName ?? ""} ${item.professionalName ?? ""}`.toLowerCase();
         if (!text.includes(normalized)) return;
       }
 
@@ -239,14 +248,17 @@ export function AdminNotificationCenter() {
       if (existing) {
         existing.notifications.push(item);
         if (!existing.clientName && item.clientName) existing.clientName = item.clientName;
-        if (!existing.professionalName && item.professionalName) existing.professionalName = item.professionalName;
+        if (!existing.professionalName && item.professionalName)
+          existing.professionalName = item.professionalName;
         if (!existing.category && item.category) existing.category = item.category;
       } else {
         map.set(key, {
           key,
           projectId: item.projectId,
           jobId: item.jobId,
-          title: item.projectTitle || (item.projectId ? `Project #${item.projectId}` : `Job #${item.jobId ?? item.id}`),
+          title:
+            item.projectTitle ||
+            (item.projectId ? `Project #${item.projectId}` : `Job #${item.jobId ?? item.id}`),
           category: item.category ?? null,
           clientName: item.clientName ?? null,
           professionalName: item.professionalName ?? null,
@@ -273,7 +285,10 @@ export function AdminNotificationCenter() {
   }, [otherItems, query, unreadOnly]);
 
   const totalUnreadCount = useMemo(() => items.filter((i) => !i.readAt).length, [items]);
-  const projectUnreadCount = useMemo(() => projectItems.filter((i) => !i.readAt).length, [projectItems]);
+  const projectUnreadCount = useMemo(
+    () => projectItems.filter((i) => !i.readAt).length,
+    [projectItems],
+  );
   const otherUnreadCount = useMemo(() => otherItems.filter((i) => !i.readAt).length, [otherItems]);
 
   // Actions
@@ -281,7 +296,9 @@ export function AdminNotificationCenter() {
     if (!ids.length) return;
     const now = new Date().toISOString();
     setItems((curr) =>
-      curr.map((i) => (ids.includes(i.id) ? { ...i, readAt: unread ? null : (i.readAt ?? now) } : i)),
+      curr.map((i) =>
+        ids.includes(i.id) ? { ...i, readAt: unread ? null : (i.readAt ?? now) } : i,
+      ),
     );
     try {
       await fetch("/api/portal/notifications", {
@@ -326,7 +343,10 @@ export function AdminNotificationCenter() {
   }
 
   // Open rich timeline pop-up
-  async function openTimelineModal(opts: { projectId?: number | null; jobId?: number | null }, e?: React.MouseEvent) {
+  async function openTimelineModal(
+    opts: { projectId?: number | null; jobId?: number | null },
+    e?: React.MouseEvent,
+  ) {
     e?.stopPropagation();
     setTimelineTarget(opts);
     setTimeline(null);
@@ -342,7 +362,11 @@ export function AdminNotificationCenter() {
 
       // Auto mark related items read
       const related = items
-        .filter((i) => (opts.projectId && i.projectId === opts.projectId) || (opts.jobId && i.jobId === opts.jobId))
+        .filter(
+          (i) =>
+            (opts.projectId && i.projectId === opts.projectId) ||
+            (opts.jobId && i.jobId === opts.jobId),
+        )
         .map((i) => i.id);
       if (related.length > 0) {
         void markRead(related, false);
@@ -359,7 +383,9 @@ export function AdminNotificationCenter() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Notifications &amp; Activity</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+            Notifications &amp; Activity
+          </h1>
           <p className="mt-1 text-sm text-slate-500">
             Real-time project updates, proposals, payments, and system notifications.
           </p>
@@ -416,9 +442,7 @@ export function AdminNotificationCenter() {
                   {projectItems.length}
                 </span>
               )}
-              {projectUnreadCount > 0 && (
-                <span className="h-2 w-2 rounded-full bg-indigo-600" />
-              )}
+              {projectUnreadCount > 0 && <span className="h-2 w-2 rounded-full bg-indigo-600" />}
             </button>
 
             <button
@@ -443,9 +467,7 @@ export function AdminNotificationCenter() {
                   {otherItems.length}
                 </span>
               )}
-              {otherUnreadCount > 0 && (
-                <span className="h-2 w-2 rounded-full bg-indigo-600" />
-              )}
+              {otherUnreadCount > 0 && <span className="h-2 w-2 rounded-full bg-indigo-600" />}
             </button>
           </div>
 
@@ -544,17 +566,22 @@ export function AdminNotificationCenter() {
                           {group.clientName && (
                             <span className="inline-flex items-center gap-1.5">
                               <UserRound className="h-3.5 w-3.5 text-indigo-600" /> Client:{" "}
-                              <strong className="text-slate-800 font-medium">{group.clientName}</strong>
+                              <strong className="text-slate-800 font-medium">
+                                {group.clientName}
+                              </strong>
                             </span>
                           )}
                           {group.professionalName && (
                             <span className="inline-flex items-center gap-1.5">
                               <UsersRound className="h-3.5 w-3.5 text-violet-600" /> Pro:{" "}
-                              <strong className="text-slate-800 font-medium">{group.professionalName}</strong>
+                              <strong className="text-slate-800 font-medium">
+                                {group.professionalName}
+                              </strong>
                             </span>
                           )}
                           <span className="text-[11px] text-slate-400">
-                            {group.notifications.length} updates · Last {relativeTime(group.notifications[0]?.createdAt ?? "")}
+                            {group.notifications.length} updates · Last{" "}
+                            {relativeTime(group.notifications[0]?.createdAt ?? "")}
                           </span>
                         </div>
                       </div>
@@ -562,7 +589,12 @@ export function AdminNotificationCenter() {
                       {/* View Timeline Pop-up Trigger Button */}
                       <button
                         type="button"
-                        onClick={(e) => void openTimelineModal({ projectId: group.projectId, jobId: group.jobId }, e)}
+                        onClick={(e) =>
+                          void openTimelineModal(
+                            { projectId: group.projectId, jobId: group.jobId },
+                            e,
+                          )
+                        }
                         className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl bg-indigo-600 px-3.5 py-2 text-xs font-bold text-white hover:bg-indigo-500 transition shadow-2xs cursor-pointer"
                       >
                         <Clock3 className="h-3.5 w-3.5" />
@@ -595,8 +627,12 @@ export function AdminNotificationCenter() {
                             </span>
                             <div className="min-w-0 flex-1">
                               <div className="flex flex-wrap items-center gap-2">
-                                <span className="text-sm font-bold text-slate-900">{item.title}</span>
-                                {!item.readAt && <span className="h-2 w-2 rounded-full bg-indigo-600" />}
+                                <span className="text-sm font-bold text-slate-900">
+                                  {item.title}
+                                </span>
+                                {!item.readAt && (
+                                  <span className="h-2 w-2 rounded-full bg-indigo-600" />
+                                )}
                                 <span className="text-[11px] text-slate-400 font-normal">
                                   {relativeTime(item.createdAt)}
                                 </span>
@@ -672,7 +708,8 @@ export function AdminNotificationCenter() {
               <Bell className="mx-auto h-8 w-8 text-slate-300 mb-2" />
               <h3 className="text-base font-bold text-slate-800">No general notifications</h3>
               <p className="mt-1 text-xs text-slate-500">
-                Platform registrations, KYC verification alerts, and system notices will appear here.
+                Platform registrations, KYC verification alerts, and system notices will appear
+                here.
               </p>
             </div>
           ) : (
@@ -783,10 +820,14 @@ export function AdminNotificationCenter() {
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <DialogTitle className="text-xl font-bold text-slate-950">
-                    {timeline?.job?.title ?? (timelineTarget?.projectId ? `Project #${timelineTarget.projectId}` : `Job #${timelineTarget?.jobId}`)}
+                    {timeline?.job?.title ??
+                      (timelineTarget?.projectId
+                        ? `Project #${timelineTarget.projectId}`
+                        : `Job #${timelineTarget?.jobId}`)}
                   </DialogTitle>
                   <DialogDescription className="text-xs text-slate-500 mt-1">
-                    {timeline?.job?.category ?? "Marketplace Activity"} · Complete Timeline, Scope &amp; Proposals Audit
+                    {timeline?.job?.category ?? "Marketplace Activity"} · Complete Timeline, Scope
+                    &amp; Proposals Audit
                   </DialogDescription>
                 </div>
               </div>
@@ -798,7 +839,9 @@ export function AdminNotificationCenter() {
                 type="button"
                 onClick={() => setModalTab("timeline")}
                 className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
-                  modalTab === "timeline" ? "bg-indigo-50 text-indigo-700" : "text-slate-500 hover:text-slate-800"
+                  modalTab === "timeline"
+                    ? "bg-indigo-50 text-indigo-700"
+                    : "text-slate-500 hover:text-slate-800"
                 }`}
               >
                 <Clock3 className="h-3.5 w-3.5" /> Activity Timeline
@@ -807,7 +850,9 @@ export function AdminNotificationCenter() {
                 type="button"
                 onClick={() => setModalTab("details")}
                 className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
-                  modalTab === "details" ? "bg-indigo-50 text-indigo-700" : "text-slate-500 hover:text-slate-800"
+                  modalTab === "details"
+                    ? "bg-indigo-50 text-indigo-700"
+                    : "text-slate-500 hover:text-slate-800"
                 }`}
               >
                 <FileText className="h-3.5 w-3.5" /> Scope &amp; Details
@@ -816,10 +861,13 @@ export function AdminNotificationCenter() {
                 type="button"
                 onClick={() => setModalTab("proposals")}
                 className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
-                  modalTab === "proposals" ? "bg-indigo-50 text-indigo-700" : "text-slate-500 hover:text-slate-800"
+                  modalTab === "proposals"
+                    ? "bg-indigo-50 text-indigo-700"
+                    : "text-slate-500 hover:text-slate-800"
                 }`}
               >
-                <UsersRound className="h-3.5 w-3.5" /> Proposals &amp; Parties ({timeline?.proposals?.length ?? 0})
+                <UsersRound className="h-3.5 w-3.5" /> Proposals &amp; Parties (
+                {timeline?.proposals?.length ?? 0})
               </button>
             </div>
           </div>
@@ -845,7 +893,10 @@ export function AdminNotificationCenter() {
                 <div className="flex items-center justify-between text-xs font-bold text-slate-700">
                   <span className="flex items-center gap-1.5">
                     <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                    Status: <strong className="text-slate-900 uppercase">{timeline.project.status.replaceAll("_", " ")}</strong>
+                    Status:{" "}
+                    <strong className="text-slate-900 uppercase">
+                      {timeline.project.status.replaceAll("_", " ")}
+                    </strong>
                   </span>
                   <span>{timeline.project.progress}% completed</span>
                 </div>
@@ -910,7 +961,8 @@ export function AdminNotificationCenter() {
                         Work Mode &amp; Urgency
                       </div>
                       <div className="mt-1 text-sm font-bold text-slate-900">
-                        {timeline.job?.workMode ?? "On-site"} · {timeline.job?.urgency ?? "Standard"}
+                        {timeline.job?.workMode ?? "On-site"} ·{" "}
+                        {timeline.job?.urgency ?? "Standard"}
                       </div>
                     </div>
                   </div>
@@ -950,7 +1002,9 @@ export function AdminNotificationCenter() {
                         Client Details
                       </div>
                       <div className="mt-1.5 text-sm font-bold text-slate-900">
-                        {timeline.client ? `${timeline.client.firstName} ${timeline.client.lastName}` : "Unknown"}
+                        {timeline.client
+                          ? `${timeline.client.firstName} ${timeline.client.lastName}`
+                          : "Unknown"}
                       </div>
                       {timeline.client?.email && (
                         <div className="text-xs text-slate-500">{timeline.client.email}</div>
@@ -962,7 +1016,9 @@ export function AdminNotificationCenter() {
                         Assigned Professional
                       </div>
                       <div className="mt-1.5 text-sm font-bold text-slate-900">
-                        {timeline.professional ? `${timeline.professional.firstName} ${timeline.professional.lastName}` : "Not assigned yet"}
+                        {timeline.professional
+                          ? `${timeline.professional.firstName} ${timeline.professional.lastName}`
+                          : "Not assigned yet"}
                       </div>
                       {timeline.professional?.email && (
                         <div className="text-xs text-slate-500">{timeline.professional.email}</div>
@@ -998,7 +1054,8 @@ export function AdminNotificationCenter() {
                               </p>
                             )}
                             <div className="mt-2 text-[10px] text-slate-400">
-                              Duration: {prop.duration ?? "Estimated"} · Submitted {relativeTime(prop.createdAt)}
+                              Duration: {prop.duration ?? "Estimated"} · Submitted{" "}
+                              {relativeTime(prop.createdAt)}
                             </div>
                           </div>
                         ))}
@@ -1031,4 +1088,3 @@ export function AdminNotificationCenter() {
     </div>
   );
 }
-

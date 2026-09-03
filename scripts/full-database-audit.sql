@@ -153,7 +153,7 @@ SELECT 'Payment charge reconciliation' AS check_name, id, amount, base_amount,
        client_fee_amount, professional_payout_amount, admin_net_amount
 FROM "Payment"
 WHERE amount <> base_amount + client_fee_amount
-   OR professional_payout_amount + admin_net_amount <> base_amount;
+   OR professional_payout_amount + admin_net_amount <> amount;
 
 -- 10 Range/business-rule checks
 SELECT 'ProjectTracking invalid progress' AS check_name, id, progress

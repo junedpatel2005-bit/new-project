@@ -30,7 +30,9 @@ async function main() {
         where: { id: { in: ids } },
         data: { readAt: null },
       });
-      console.log(`Reset ${ids.length} notifications to UNREAD for admin ${admin.email} (ID: ${admin.id}).`);
+      console.log(
+        `Reset ${ids.length} notifications to UNREAD for admin ${admin.email} (ID: ${admin.id}).`,
+      );
     }
   }
 

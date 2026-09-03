@@ -636,10 +636,16 @@ export default function SharedProjectTrackingPage() {
                   </div>
                   <div className="mt-2.5 flex items-center justify-between text-xs text-muted-foreground">
                     <span>
-                      {data.milestones.filter((m) => m.status === "APPROVED" || m.payment?.status === "COMPLETED").length} of {data.milestones.length} milestones approved &amp; paid
+                      {
+                        data.milestones.filter(
+                          (m) => m.status === "APPROVED" || m.payment?.status === "COMPLETED",
+                        ).length
+                      }{" "}
+                      of {data.milestones.length} milestones approved &amp; paid
                     </span>
                     <span className="font-medium text-foreground">
-                      ₹{approvedMilestonesTotal.toLocaleString("en-IN")} of ₹{totalAgreed.toLocaleString("en-IN")} (Auto-calculated)
+                      ₹{approvedMilestonesTotal.toLocaleString("en-IN")} of ₹
+                      {totalAgreed.toLocaleString("en-IN")} (Auto-calculated)
                     </span>
                   </div>
                 </div>
@@ -796,8 +802,6 @@ export default function SharedProjectTrackingPage() {
                 </div>
               </section>
             )}
-
-
 
             {!isClient && canFinal && data.project.status === "IN_PROGRESS" && (
               <section className="rounded-2xl border bg-card p-5 shadow-soft">
@@ -1931,7 +1935,9 @@ export default function SharedProjectTrackingPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-bold text-slate-700">Current Phase / Stage (Optional)</label>
+              <label className="text-xs font-bold text-slate-700">
+                Current Phase / Stage (Optional)
+              </label>
               <Input
                 value={stage}
                 onChange={(e) => setStage(e.target.value)}
@@ -1940,7 +1946,9 @@ export default function SharedProjectTrackingPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-bold text-slate-700">Progress Update Note (Optional)</label>
+              <label className="text-xs font-bold text-slate-700">
+                Progress Update Note (Optional)
+              </label>
               <textarea
                 value={note}
                 onChange={(e) => setNote(e.target.value)}

@@ -164,7 +164,9 @@ async function main() {
       const jobDate = faker.date.soon({ days: 14, refDate: createdAt });
       const deadline = faker.date.soon({ days: 30, refDate: jobDate });
 
-      const streetAddress = client.address || `${faker.location.buildingNumber()}, ${faker.location.street()}, ${cityInfo.city}, ${cityInfo.state}`;
+      const streetAddress =
+        client.address ||
+        `${faker.location.buildingNumber()}, ${faker.location.street()}, ${cityInfo.city}, ${cityInfo.state}`;
 
       jobsToCreate.push({
         userId: client.id,
@@ -234,7 +236,9 @@ async function main() {
   console.log(`======================================================`);
   console.log(`Sample of posted jobs:`);
   createdJobs.slice(0, 10).forEach((j, idx) => {
-    console.log(` ${idx + 1}. [Job #${j.id}] ${j.title} | Category: ${j.category} | Mode: ${j.workMode}`);
+    console.log(
+      ` ${idx + 1}. [Job #${j.id}] ${j.title} | Category: ${j.category} | Mode: ${j.workMode}`,
+    );
   });
 }
 

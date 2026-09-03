@@ -115,7 +115,9 @@ async function main() {
       ? `https://www.${companyName?.toLowerCase().replace(/[^a-z0-9]/g, "") ?? "biz"}.in`
       : null;
     const industry = hasCompany ? INDUSTRIES[i % INDUSTRIES.length]! : null;
-    const teamSize = hasCompany ? faker.helpers.arrayElement(["1-10", "11-50", "51-200"]) : "Just me";
+    const teamSize = hasCompany
+      ? faker.helpers.arrayElement(["1-10", "11-50", "51-200"])
+      : "Just me";
     const companyDescription = hasCompany ? faker.company.catchPhrase() : null;
     const streetAddress = `${faker.location.buildingNumber()}, ${faker.location.street()}, ${cityObj.city}, ${cityObj.state}`;
     const createdAt = faker.date.recent({ days: 90 });

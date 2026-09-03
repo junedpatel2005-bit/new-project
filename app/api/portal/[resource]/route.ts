@@ -842,7 +842,12 @@ export async function GET(
 
 const markReadSchema = z
   .object({ id: z.number().int().positive(), unread: z.boolean().optional() })
-  .or(z.object({ ids: z.array(z.number().int().positive()).min(1).max(100), unread: z.boolean().optional() }))
+  .or(
+    z.object({
+      ids: z.array(z.number().int().positive()).min(1).max(100),
+      unread: z.boolean().optional(),
+    }),
+  )
   .or(z.object({ all: z.literal(true), unread: z.boolean().optional() }));
 
 export async function PATCH(
@@ -863,7 +868,10 @@ export async function PATCH(
 
   if ("all" in parsed.data && parsed.data.all) {
     await db.userNotification.updateMany({
-      where: { userId: session.userId, ...(isUnread ? { readAt: { not: null } } : { readAt: null }) },
+      where: {
+        userId: session.userId,
+        ...(isUnread ? { readAt: { not: null } } : { readAt: null }),
+      },
       data: { readAt: targetReadAt },
     });
   } else if ("ids" in parsed.data && parsed.data.ids) {

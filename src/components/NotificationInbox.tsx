@@ -151,9 +151,19 @@ function getCategoryIcon(type: string) {
     return { Icon: Activity, color: "text-cyan-700 bg-cyan-50 border-cyan-200" };
   if (type.includes("PROPOSAL") || type.includes("OFFER") || type.includes("BID"))
     return { Icon: FileText, color: "text-purple-700 bg-purple-50 border-purple-200" };
-  if (type.includes("ACCOUNT") || type.includes("USER") || type.includes("REGISTER") || type.includes("WELCOME"))
+  if (
+    type.includes("ACCOUNT") ||
+    type.includes("USER") ||
+    type.includes("REGISTER") ||
+    type.includes("WELCOME")
+  )
     return { Icon: UserPlus, color: "text-indigo-700 bg-indigo-50 border-indigo-200" };
-  if (type.includes("PROJECT") || type.includes("JOB") || type.includes("CONTRACT") || type.includes("MATCHING"))
+  if (
+    type.includes("PROJECT") ||
+    type.includes("JOB") ||
+    type.includes("CONTRACT") ||
+    type.includes("MATCHING")
+  )
     return { Icon: BriefcaseBusiness, color: "text-blue-700 bg-blue-50 border-blue-200" };
   return { Icon: Bell, color: "text-slate-600 bg-slate-50 border-slate-200" };
 }
@@ -177,7 +187,10 @@ export function NotificationInbox({ admin: _isAdmin = false }: { admin?: boolean
   const [unreadOnly, setUnreadOnly] = useState(false);
 
   // Pop-up Timeline Modal state
-  const [timelineTarget, setTimelineTarget] = useState<{ projectId?: number | null; jobId?: number | null } | null>(null);
+  const [timelineTarget, setTimelineTarget] = useState<{
+    projectId?: number | null;
+    jobId?: number | null;
+  } | null>(null);
   const [timeline, setTimeline] = useState<TimelineData | null>(null);
   const [timelineLoading, setTimelineLoading] = useState(false);
   const [modalTab, setModalTab] = useState<"timeline" | "details" | "proposals">("timeline");
@@ -228,7 +241,8 @@ export function NotificationInbox({ admin: _isAdmin = false }: { admin?: boolean
     projectItems.forEach((item) => {
       if (unreadOnly && item.readAt) return;
       if (normalized) {
-        const text = `${item.title} ${item.description ?? ""} ${item.projectTitle ?? ""} ${item.clientName ?? ""} ${item.professionalName ?? ""}`.toLowerCase();
+        const text =
+          `${item.title} ${item.description ?? ""} ${item.projectTitle ?? ""} ${item.clientName ?? ""} ${item.professionalName ?? ""}`.toLowerCase();
         if (!text.includes(normalized)) return;
       }
 
@@ -237,14 +251,17 @@ export function NotificationInbox({ admin: _isAdmin = false }: { admin?: boolean
       if (existing) {
         existing.notifications.push(item);
         if (!existing.clientName && item.clientName) existing.clientName = item.clientName;
-        if (!existing.professionalName && item.professionalName) existing.professionalName = item.professionalName;
+        if (!existing.professionalName && item.professionalName)
+          existing.professionalName = item.professionalName;
         if (!existing.category && item.category) existing.category = item.category;
       } else {
         map.set(key, {
           key,
           projectId: item.projectId ?? null,
           jobId: item.jobId ?? null,
-          title: item.projectTitle || (item.projectId ? `Project #${item.projectId}` : `Job #${item.jobId ?? item.id}`),
+          title:
+            item.projectTitle ||
+            (item.projectId ? `Project #${item.projectId}` : `Job #${item.jobId ?? item.id}`),
           category: item.category ?? null,
           clientName: item.clientName ?? null,
           professionalName: item.professionalName ?? null,
@@ -271,7 +288,10 @@ export function NotificationInbox({ admin: _isAdmin = false }: { admin?: boolean
   }, [otherItems, query, unreadOnly]);
 
   const totalUnreadCount = useMemo(() => items.filter((i) => !i.readAt).length, [items]);
-  const projectUnreadCount = useMemo(() => projectItems.filter((i) => !i.readAt).length, [projectItems]);
+  const projectUnreadCount = useMemo(
+    () => projectItems.filter((i) => !i.readAt).length,
+    [projectItems],
+  );
   const otherUnreadCount = useMemo(() => otherItems.filter((i) => !i.readAt).length, [otherItems]);
 
   // Actions
@@ -279,7 +299,9 @@ export function NotificationInbox({ admin: _isAdmin = false }: { admin?: boolean
     if (!ids.length) return;
     const now = new Date().toISOString();
     setItems((curr) =>
-      curr.map((i) => (ids.includes(i.id) ? { ...i, readAt: unread ? null : (i.readAt ?? now) } : i)),
+      curr.map((i) =>
+        ids.includes(i.id) ? { ...i, readAt: unread ? null : (i.readAt ?? now) } : i,
+      ),
     );
     try {
       await fetch("/api/portal/notifications", {
@@ -324,7 +346,10 @@ export function NotificationInbox({ admin: _isAdmin = false }: { admin?: boolean
   }
 
   // Open rich timeline pop-up
-  async function openTimelineModal(opts: { projectId?: number | null; jobId?: number | null }, e?: React.MouseEvent) {
+  async function openTimelineModal(
+    opts: { projectId?: number | null; jobId?: number | null },
+    e?: React.MouseEvent,
+  ) {
     e?.stopPropagation();
     setTimelineTarget(opts);
     setTimeline(null);
@@ -340,7 +365,11 @@ export function NotificationInbox({ admin: _isAdmin = false }: { admin?: boolean
 
       // Auto mark related items read
       const related = items
-        .filter((i) => (opts.projectId && i.projectId === opts.projectId) || (opts.jobId && i.jobId === opts.jobId))
+        .filter(
+          (i) =>
+            (opts.projectId && i.projectId === opts.projectId) ||
+            (opts.jobId && i.jobId === opts.jobId),
+        )
         .map((i) => i.id);
       if (related.length > 0) {
         void markRead(related, false);
@@ -414,9 +443,7 @@ export function NotificationInbox({ admin: _isAdmin = false }: { admin?: boolean
                   {projectItems.length}
                 </span>
               )}
-              {projectUnreadCount > 0 && (
-                <span className="h-2 w-2 rounded-full bg-indigo-600" />
-              )}
+              {projectUnreadCount > 0 && <span className="h-2 w-2 rounded-full bg-indigo-600" />}
             </button>
 
             <button
@@ -441,9 +468,7 @@ export function NotificationInbox({ admin: _isAdmin = false }: { admin?: boolean
                   {otherItems.length}
                 </span>
               )}
-              {otherUnreadCount > 0 && (
-                <span className="h-2 w-2 rounded-full bg-indigo-600" />
-              )}
+              {otherUnreadCount > 0 && <span className="h-2 w-2 rounded-full bg-indigo-600" />}
             </button>
           </div>
 
@@ -542,17 +567,22 @@ export function NotificationInbox({ admin: _isAdmin = false }: { admin?: boolean
                           {group.clientName && (
                             <span className="inline-flex items-center gap-1.5">
                               <UserRound className="h-3.5 w-3.5 text-indigo-600" /> Client:{" "}
-                              <strong className="text-slate-800 font-medium">{group.clientName}</strong>
+                              <strong className="text-slate-800 font-medium">
+                                {group.clientName}
+                              </strong>
                             </span>
                           )}
                           {group.professionalName && (
                             <span className="inline-flex items-center gap-1.5">
                               <UsersRound className="h-3.5 w-3.5 text-violet-600" /> Pro:{" "}
-                              <strong className="text-slate-800 font-medium">{group.professionalName}</strong>
+                              <strong className="text-slate-800 font-medium">
+                                {group.professionalName}
+                              </strong>
                             </span>
                           )}
                           <span className="text-[11px] text-slate-400">
-                            {group.notifications.length} updates · Last {relativeTime(group.notifications[0]?.createdAt ?? "")}
+                            {group.notifications.length} updates · Last{" "}
+                            {relativeTime(group.notifications[0]?.createdAt ?? "")}
                           </span>
                         </div>
                       </div>
@@ -560,7 +590,12 @@ export function NotificationInbox({ admin: _isAdmin = false }: { admin?: boolean
                       {/* View Timeline Pop-up Trigger Button */}
                       <button
                         type="button"
-                        onClick={(e) => void openTimelineModal({ projectId: group.projectId, jobId: group.jobId }, e)}
+                        onClick={(e) =>
+                          void openTimelineModal(
+                            { projectId: group.projectId, jobId: group.jobId },
+                            e,
+                          )
+                        }
                         className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl bg-indigo-600 px-3.5 py-2 text-xs font-bold text-white hover:bg-indigo-500 transition shadow-2xs cursor-pointer"
                       >
                         <Clock3 className="h-3.5 w-3.5" />
@@ -593,8 +628,12 @@ export function NotificationInbox({ admin: _isAdmin = false }: { admin?: boolean
                             </span>
                             <div className="min-w-0 flex-1">
                               <div className="flex flex-wrap items-center gap-2">
-                                <span className="text-sm font-bold text-slate-900">{item.title}</span>
-                                {!item.readAt && <span className="h-2 w-2 rounded-full bg-indigo-600" />}
+                                <span className="text-sm font-bold text-slate-900">
+                                  {item.title}
+                                </span>
+                                {!item.readAt && (
+                                  <span className="h-2 w-2 rounded-full bg-indigo-600" />
+                                )}
                                 <span className="text-[11px] text-slate-400 font-normal">
                                   {relativeTime(item.createdAt)}
                                 </span>
@@ -781,10 +820,14 @@ export function NotificationInbox({ admin: _isAdmin = false }: { admin?: boolean
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <DialogTitle className="text-xl font-bold text-slate-950">
-                    {timeline?.job?.title ?? (timelineTarget?.projectId ? `Project #${timelineTarget.projectId}` : `Job #${timelineTarget?.jobId}`)}
+                    {timeline?.job?.title ??
+                      (timelineTarget?.projectId
+                        ? `Project #${timelineTarget.projectId}`
+                        : `Job #${timelineTarget?.jobId}`)}
                   </DialogTitle>
                   <DialogDescription className="text-xs text-slate-500 mt-1">
-                    {timeline?.job?.category ?? "Marketplace Activity"} · Timeline &amp; Project Info
+                    {timeline?.job?.category ?? "Marketplace Activity"} · Timeline &amp; Project
+                    Info
                   </DialogDescription>
                 </div>
               </div>
@@ -796,7 +839,9 @@ export function NotificationInbox({ admin: _isAdmin = false }: { admin?: boolean
                 type="button"
                 onClick={() => setModalTab("timeline")}
                 className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
-                  modalTab === "timeline" ? "bg-indigo-50 text-indigo-700" : "text-slate-500 hover:text-slate-800"
+                  modalTab === "timeline"
+                    ? "bg-indigo-50 text-indigo-700"
+                    : "text-slate-500 hover:text-slate-800"
                 }`}
               >
                 <Clock3 className="h-3.5 w-3.5" /> Activity Timeline
@@ -805,7 +850,9 @@ export function NotificationInbox({ admin: _isAdmin = false }: { admin?: boolean
                 type="button"
                 onClick={() => setModalTab("details")}
                 className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
-                  modalTab === "details" ? "bg-indigo-50 text-indigo-700" : "text-slate-500 hover:text-slate-800"
+                  modalTab === "details"
+                    ? "bg-indigo-50 text-indigo-700"
+                    : "text-slate-500 hover:text-slate-800"
                 }`}
               >
                 <FileText className="h-3.5 w-3.5" /> Scope &amp; Details
@@ -814,10 +861,13 @@ export function NotificationInbox({ admin: _isAdmin = false }: { admin?: boolean
                 type="button"
                 onClick={() => setModalTab("proposals")}
                 className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
-                  modalTab === "proposals" ? "bg-indigo-50 text-indigo-700" : "text-slate-500 hover:text-slate-800"
+                  modalTab === "proposals"
+                    ? "bg-indigo-50 text-indigo-700"
+                    : "text-slate-500 hover:text-slate-800"
                 }`}
               >
-                <UsersRound className="h-3.5 w-3.5" /> Proposals &amp; Parties ({timeline?.proposals?.length ?? 0})
+                <UsersRound className="h-3.5 w-3.5" /> Proposals &amp; Parties (
+                {timeline?.proposals?.length ?? 0})
               </button>
             </div>
           </div>
@@ -843,7 +893,10 @@ export function NotificationInbox({ admin: _isAdmin = false }: { admin?: boolean
                 <div className="flex items-center justify-between text-xs font-bold text-slate-700">
                   <span className="flex items-center gap-1.5">
                     <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                    Status: <strong className="text-slate-900 uppercase">{timeline.project.status.replaceAll("_", " ")}</strong>
+                    Status:{" "}
+                    <strong className="text-slate-900 uppercase">
+                      {timeline.project.status.replaceAll("_", " ")}
+                    </strong>
                   </span>
                   <span>{timeline.project.progress}% completed</span>
                 </div>
@@ -908,7 +961,8 @@ export function NotificationInbox({ admin: _isAdmin = false }: { admin?: boolean
                         Work Mode &amp; Urgency
                       </div>
                       <div className="mt-1 text-sm font-bold text-slate-900">
-                        {timeline.job?.workMode ?? "On-site"} · {timeline.job?.urgency ?? "Standard"}
+                        {timeline.job?.workMode ?? "On-site"} ·{" "}
+                        {timeline.job?.urgency ?? "Standard"}
                       </div>
                     </div>
                   </div>
@@ -948,7 +1002,9 @@ export function NotificationInbox({ admin: _isAdmin = false }: { admin?: boolean
                         Client Details
                       </div>
                       <div className="mt-1.5 text-sm font-bold text-slate-900">
-                        {timeline.client ? `${timeline.client.firstName} ${timeline.client.lastName}` : "Unknown"}
+                        {timeline.client
+                          ? `${timeline.client.firstName} ${timeline.client.lastName}`
+                          : "Unknown"}
                       </div>
                       {timeline.client?.email && (
                         <div className="text-xs text-slate-500">{timeline.client.email}</div>
@@ -960,7 +1016,9 @@ export function NotificationInbox({ admin: _isAdmin = false }: { admin?: boolean
                         Assigned Professional
                       </div>
                       <div className="mt-1.5 text-sm font-bold text-slate-900">
-                        {timeline.professional ? `${timeline.professional.firstName} ${timeline.professional.lastName}` : "Not assigned yet"}
+                        {timeline.professional
+                          ? `${timeline.professional.firstName} ${timeline.professional.lastName}`
+                          : "Not assigned yet"}
                       </div>
                       {timeline.professional?.email && (
                         <div className="text-xs text-slate-500">{timeline.professional.email}</div>
@@ -996,7 +1054,8 @@ export function NotificationInbox({ admin: _isAdmin = false }: { admin?: boolean
                               </p>
                             )}
                             <div className="mt-2 text-[10px] text-slate-400">
-                              Duration: {prop.duration ?? "Estimated"} · Submitted {relativeTime(prop.createdAt)}
+                              Duration: {prop.duration ?? "Estimated"} · Submitted{" "}
+                              {relativeTime(prop.createdAt)}
                             </div>
                           </div>
                         ))}
@@ -1029,4 +1088,3 @@ export function NotificationInbox({ admin: _isAdmin = false }: { admin?: boolean
     </div>
   );
 }
-

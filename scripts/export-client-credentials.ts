@@ -46,7 +46,8 @@ async function main() {
   }> = [];
 
   clients.forEach((client, index) => {
-    const password = client.email === "seed.client@servio.example" ? "ServioSeed#2026" : "ClientPass#2026";
+    const password =
+      client.email === "seed.client@servio.example" ? "ServioSeed#2026" : "ClientPass#2026";
     const name = `${client.firstName} ${client.lastName}`.trim();
     const company = client.companyName ?? "Personal Account";
     const address = client.address ?? "India";

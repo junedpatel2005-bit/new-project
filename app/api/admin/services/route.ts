@@ -92,7 +92,8 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       );
     // Inherit segment from parent
-    parsed.data.segment = (parent.segment as "RESIDENTIAL" | "COMMERCIAL" | "INDUSTRIAL") ?? parsed.data.segment;
+    parsed.data.segment =
+      (parent.segment as "RESIDENTIAL" | "COMMERCIAL" | "INDUSTRIAL") ?? parsed.data.segment;
   }
   const service = await db.serviceCategory.create({
     data: { ...parsed.data, slug: baseSlug, sortOrder: await db.serviceCategory.count() },

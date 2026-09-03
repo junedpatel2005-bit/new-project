@@ -1422,13 +1422,15 @@ export default function JobDetails() {
           <div className="flex flex-wrap justify-end gap-2 pt-2">
             {viewerRole === "PROFESSIONAL" ? (
               <>
-                <Button variant="outline" onClick={() => router.push("/professional/running-projects")}>
+                <Button
+                  variant="outline"
+                  onClick={() => router.push("/professional/running-projects")}
+                >
                   Go to Running Projects
                 </Button>
                 <Button
                   onClick={() => {
-                    if (acceptedProjectId !== null)
-                      router.push(`/project/${acceptedProjectId}`);
+                    if (acceptedProjectId !== null) router.push(`/project/${acceptedProjectId}`);
                   }}
                 >
                   View Project Workroom
@@ -1441,8 +1443,7 @@ export default function JobDetails() {
                 </Button>
                 <Button
                   onClick={() => {
-                    if (acceptedProjectId !== null)
-                      router.push(`/project/${acceptedProjectId}`);
+                    if (acceptedProjectId !== null) router.push(`/project/${acceptedProjectId}`);
                   }}
                 >
                   View Project &amp; Escrow
