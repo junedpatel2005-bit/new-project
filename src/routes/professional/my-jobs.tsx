@@ -658,7 +658,7 @@ function ProfessionalJobsContent() {
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
                     <Button asChild variant="outline" size="sm">
-                      <Link href={`/job/${item.jobId}`}>View Job</Link>
+                      <Link href={`/professional/job/${item.jobId}`}>View Job</Link>
                     </Button>
                     {item.status === "PENDING" && item.lastActorRole === "CLIENT" && (
                       <>
@@ -1111,7 +1111,7 @@ function ProfessionalJobsContent() {
                       return (
                         <article
                           key={job.id}
-                          onClick={() => router.push(`/job/${job.id}`)}
+                          onClick={() => router.push(`/professional/job/${job.id}`)}
                           className={`cursor-pointer rounded-2xl border bg-background p-4 transition hover:border-primary/40 ${
                             selectedJobId === job.id
                               ? "border-primary shadow-soft"
@@ -1189,7 +1189,7 @@ function ProfessionalJobsContent() {
                             <div className="flex items-center gap-2">
                               <Button asChild size="sm">
                                 <Link
-                                  href={`/job/${job.id}`}
+                                  href={`/professional/job/${job.id}`}
                                   onClick={(event) => event.stopPropagation()}
                                 >
                                   View details

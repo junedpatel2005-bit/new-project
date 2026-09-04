@@ -16,6 +16,7 @@ import {
   Star,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { usePortalTitle } from "@/components/PortalShell";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -124,10 +125,14 @@ type JobHireRequest = JobProposal;
 function JobShell({
   children,
   viewerRole,
+  embedded = false,
 }: {
   children: React.ReactNode;
   viewerRole: "CLIENT" | "PROFESSIONAL" | null;
+  embedded?: boolean;
 }) {
+  const { isInsidePortal } = usePortalTitle();
+  if (embedded || isInsidePortal) return <>{children}</>;
   if (viewerRole) return <AppShell>{children}</AppShell>;
   return (
     <div className="min-h-screen bg-background">
@@ -208,7 +213,13 @@ function formatFileSize(bytes: number | null) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-export default function JobDetails() {
+export default function JobDetails({
+  embedded = false,
+  initialViewerRole = null,
+}: {
+  embedded?: boolean;
+  initialViewerRole?: "CLIENT" | "PROFESSIONAL" | null;
+} = {}) {
   const { jobId } = useParams<{ jobId: string }>();
   const router = useRouter();
   const [job, setJob] = useState<ViewJob | null>(null);
@@ -226,7 +237,7 @@ export default function JobDetails() {
   const [hireBusy, setHireBusy] = useState(false);
   const [hireMessage, setHireMessage] = useState<string | null>(null);
   const [hireMessageStatus, setHireMessageStatus] = useState<"idle" | "error" | "success">("idle");
-  const [viewerRole, setViewerRole] = useState<"CLIENT" | "PROFESSIONAL" | null>(null);
+  const [viewerRole, setViewerRole] = useState<"CLIENT" | "PROFESSIONAL" | null>(initialViewerRole);
   const [ownProposal, setOwnProposal] = useState<{
     id: number;
     status: string;
@@ -587,13 +598,13 @@ export default function JobDetails() {
   }
   if (status === "loading")
     return (
-      <JobShell viewerRole={viewerRole}>
+      <JobShell viewerRole={viewerRole} embedded={embedded}>
         <div className="h-96 animate-pulse rounded-2xl bg-muted" />
       </JobShell>
     );
   if (status === "missing")
     return (
-      <JobShell viewerRole={viewerRole}>
+      <JobShell viewerRole={viewerRole} embedded={embedded}>
         <p className="rounded-xl border border-border bg-card p-6 text-muted-foreground">
           This job is no longer available.
         </p>
@@ -601,7 +612,7 @@ export default function JobDetails() {
     );
   if (status === "error" || !job)
     return (
-      <JobShell viewerRole={viewerRole}>
+      <JobShell viewerRole={viewerRole} embedded={embedded}>
         <p className="rounded-xl border border-destructive/30 bg-destructive/5 p-6 text-destructive">
           The job could not be loaded. Please try again.
         </p>
@@ -610,7 +621,7 @@ export default function JobDetails() {
 
   if (job.projectId && job.status === "CLOSED")
     return (
-      <JobShell viewerRole={viewerRole}>
+      <JobShell viewerRole={viewerRole} embedded={embedded}>
         <div className="rounded-2xl border border-border bg-card p-8 text-center shadow-soft">
           <h1 className="text-2xl font-semibold">Opening your completed project…</h1>
           <p className="mt-2 text-muted-foreground">
@@ -626,7 +637,7 @@ export default function JobDetails() {
   const isDeadlinePassed = job.deadline ? new Date(job.deadline) < new Date() : false;
 
   return (
-    <JobShell viewerRole={viewerRole}>
+    <JobShell viewerRole={viewerRole} embedded={embedded}>
       <article className="mx-auto max-w-4xl rounded-2xl border border-border bg-card p-6 shadow-soft sm:p-8">
         <div className="flex flex-wrap gap-2 text-xs">
           {job.mainCategory && job.mainCategory !== job.category && (

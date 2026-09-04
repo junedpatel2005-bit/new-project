@@ -23,12 +23,13 @@ type PortalUser = NavigationUser;
 const PortalTitleContext = createContext<{
   title?: string;
   setTitle: (title?: string) => void;
-}>({ setTitle: () => {} });
+  isInsidePortal?: boolean;
+}>({ setTitle: () => {}, isInsidePortal: false });
 
 export function PortalTitleProvider({ children }: { children: React.ReactNode }) {
   const [title, setTitle] = useState<string | undefined>(undefined);
   return (
-    <PortalTitleContext.Provider value={{ title, setTitle }}>
+    <PortalTitleContext.Provider value={{ title, setTitle, isInsidePortal: true }}>
       {children}
     </PortalTitleContext.Provider>
   );

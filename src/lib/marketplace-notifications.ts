@@ -24,19 +24,14 @@ async function sendEmails(
   recipients: Array<{ email: string; emailNotificationsEnabled: boolean }>,
   notification: BroadcastNotification,
 ) {
-  const configuredTestEmail = process.env.ADMIN_EMAIL?.includes("@")
-    ? process.env.ADMIN_EMAIL.trim().toLowerCase()
-    : null;
   const results = await Promise.allSettled(
     recipients
-      .filter((recipient) => recipient.emailNotificationsEnabled)
+      .filter((recipient) => recipient.emailNotificationsEnabled && recipient.email.trim())
       .map((recipient) =>
         sendNotificationEmail({
-          to:
-            configuredTestEmail &&
-            (recipient.email.endsWith(".local") || recipient.email.endsWith(".example"))
-              ? configuredTestEmail
-              : recipient.email,
+          // SMTP_USER/SMTP_FROM identify the sender only. The notification must
+          // always be delivered to the specific user's registered address.
+          to: recipient.email.trim(),
           ...notification,
           details: notification.emailDetails,
         }),
@@ -135,20 +130,7 @@ async function notifyRole(
         emitAdminVerificationsUpdate();
       }
     }
-    const configuredAdminEmail =
-      role === "ADMIN" && process.env.ADMIN_EMAIL?.includes("@")
-        ? process.env.ADMIN_EMAIL.trim().toLowerCase()
-        : null;
-    await sendEmails(
-      recipients.map((recipient) => ({
-        ...recipient,
-        email:
-          recipient.email.endsWith(".local") && configuredAdminEmail
-            ? configuredAdminEmail
-            : recipient.email,
-      })),
-      notification,
-    );
+    await sendEmails(recipients, notification);
   } catch (error) {
     // A failed notification must never block account creation or job publishing.
     logServerError("marketplace.notification.broadcast.failed", error, {

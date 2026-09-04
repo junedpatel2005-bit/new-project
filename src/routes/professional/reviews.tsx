@@ -7,9 +7,13 @@ import { Star, Loader2 } from "lucide-react";
 
 type Review = {
   id: number;
+  trackingId: number;
   rating: number;
   comment: string | null;
+  professionalResponse: string | null;
   clientName: string | null;
+  projectId: number | null;
+  projectTitle: string | null;
   createdAt: string;
 };
 
@@ -73,10 +77,30 @@ export default function ProfessionalReviews() {
                   {review.rating.toFixed(1)}
                 </div>
               </div>
+              <div className="mt-4 rounded-2xl bg-muted/60 px-4 py-3">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Project
+                </p>
+                <a
+                  href={`/project/${review.trackingId}/tracking`}
+                  className="mt-1 block text-sm font-semibold text-primary hover:underline"
+                >
+                  {review.projectTitle?.trim() ||
+                    (review.projectId ? `Project #${review.projectId}` : "Completed project")}
+                </a>
+              </div>
               {review.comment ? (
                 <p className="mt-4 text-sm text-muted-foreground">{review.comment}</p>
               ) : (
                 <p className="mt-4 text-sm text-muted-foreground">No comment provided.</p>
+              )}
+              {review.professionalResponse && (
+                <div className="mt-4 border-l-2 border-primary/30 pl-4">
+                  <p className="text-xs font-semibold text-muted-foreground">Your response</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {review.professionalResponse}
+                  </p>
+                </div>
               )}
             </li>
           ))}

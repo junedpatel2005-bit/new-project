@@ -156,7 +156,15 @@ export function AppHeader({ role }: { role?: string }) {
               const firstJob = jobs[0];
               const firstPage = pageResults[0];
               if (event.key === "Enter" && (firstJob || firstPage)) {
-                router.push(firstJob ? `/job/${firstJob.id}` : firstPage!.href);
+                if (firstJob) {
+                  const jobUrl =
+                    role === "PROFESSIONAL"
+                      ? `/professional/job/${firstJob.id}`
+                      : `/job/${firstJob.id}`;
+                  router.push(jobUrl);
+                } else {
+                  router.push(firstPage!.href);
+                }
                 setSearchOpen(false);
               }
             }}
@@ -186,7 +194,11 @@ export function AppHeader({ role }: { role?: string }) {
                   key={job.id}
                   type="button"
                   onClick={() => {
-                    router.push(`/job/${job.id}`);
+                    const jobUrl =
+                      role === "PROFESSIONAL"
+                        ? `/professional/job/${job.id}`
+                        : `/job/${job.id}`;
+                    router.push(jobUrl);
                     setSearchOpen(false);
                   }}
                   className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left hover:bg-muted"

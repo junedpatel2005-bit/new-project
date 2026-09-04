@@ -296,19 +296,30 @@ export async function GET(
         where: { professionalId: session.userId },
         orderBy: { createdAt: "desc" },
       });
-      const clients = await db.user.findMany({
-        where: { id: { in: [...new Set(reviews.map((review) => review.clientId))] } },
-        select: { id: true, firstName: true, lastName: true },
-      });
+      const [clients, projects] = await Promise.all([
+        db.user.findMany({
+          where: { id: { in: [...new Set(reviews.map((review) => review.clientId))] } },
+          select: { id: true, firstName: true, lastName: true },
+        }),
+        db.projectTracking.findMany({
+          where: { id: { in: reviews.map((review) => review.trackingId) } },
+          select: { id: true, job: { select: { id: true, title: true } } },
+        }),
+      ]);
       const clientMap = new Map(
         clients.map((client) => [client.id, `${client.firstName} ${client.lastName}`.trim()]),
       );
+      const projectMap = new Map(projects.map((project) => [project.id, project]));
       return NextResponse.json(
         reviews.map((review) => ({
           id: review.id,
+          trackingId: review.trackingId,
           rating: review.rating,
           comment: review.comment,
+          professionalResponse: review.professionalResponse,
           clientName: clientMap.get(review.clientId) ?? null,
+          projectId: projectMap.get(review.trackingId)?.job.id ?? null,
+          projectTitle: projectMap.get(review.trackingId)?.job.title ?? null,
           createdAt: review.createdAt.toISOString(),
         })),
       );
