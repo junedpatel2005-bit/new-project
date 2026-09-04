@@ -42,32 +42,34 @@ const tokenHash = (value: string) => createHash("sha256").update(value).digest("
 const clientKey = (request: NextRequest) =>
   request.headers.get("x-forwarded-for")?.split(",")[0] ?? "local";
 const safe = (message: string, status = 400) => NextResponse.json({ error: message }, { status });
-function publicAppOrigin(request: NextRequest) {
-  const configured = process.env.APP_URL?.trim();
+export function publicAppOrigin(request: NextRequest) {
+  // Build links from the host the user actually registered on. This keeps local
+  // emails on localhost and makes preview/production emails use their Vercel URL.
+  // APP_URL is only a fallback for runtimes that do not expose the public host.
   const forwardedHost = request.headers.get("x-forwarded-host")?.split(",")[0]?.trim();
   const requestHost = forwardedHost || request.headers.get("host")?.trim();
   const requestProtocol =
     request.headers.get("x-forwarded-proto")?.split(",")[0]?.trim() ||
     request.nextUrl.protocol.replace(":", "");
 
-  try {
-    if (configured) {
-      const configuredUrl = new URL(configured);
-      const configuredIsBindAddress = configuredUrl.hostname === "0.0.0.0";
-      const requestHasPublicHost = requestHost && requestHost !== "0.0.0.0:3000";
-      const configuredIsLocal = ["localhost", "127.0.0.1"].includes(configuredUrl.hostname);
-      if (!configuredIsBindAddress && (!configuredIsLocal || !requestHasPublicHost)) {
-        return configuredUrl.origin;
-      }
+  if (requestHost && requestHost !== "0.0.0.0:3000") {
+    try {
+      return new URL(`${requestProtocol}://${requestHost}`).origin;
+    } catch {
+      // Fall through to the configured origin when the proxy host is malformed.
     }
-  } catch {
-    // Fall through to the request host when APP_URL is malformed.
   }
 
-  if (requestHost && requestHost !== "0.0.0.0:3000") {
-    return `${requestProtocol}://${requestHost}`;
+  const configured = process.env.APP_URL?.trim();
+  if (configured) {
+    try {
+      return new URL(configured).origin;
+    } catch {
+      // Fall through to Next.js' request origin.
+    }
   }
-  return configured || request.nextUrl.origin.replace("0.0.0.0", "localhost");
+
+  return request.nextUrl.origin.replace("0.0.0.0", "localhost");
 }
 async function createEmailVerificationToken(userId: number) {
   const raw = randomBytes(32).toString("hex");
