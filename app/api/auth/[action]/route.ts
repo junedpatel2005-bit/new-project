@@ -20,7 +20,6 @@ import { requestPhoneOtp, verifyPhoneOtp } from "@/lib/phone-otp-provider";
 import { clearRateLimit, rateLimit } from "@/lib/rate-limit";
 import { sendAuthEmail } from "@/lib/email";
 import { enqueueBackgroundJob } from "@/lib/background-jobs";
-import { enqueueBackgroundJob } from "@/lib/background-jobs";
 import { logServerError } from "@/lib/server-logger";
 import {
   notifyAdminsOfNewAccount,
