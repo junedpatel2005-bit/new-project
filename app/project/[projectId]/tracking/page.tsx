@@ -20,7 +20,6 @@ import {
   Wallet,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -69,13 +68,6 @@ type Upload = {
   createdAt: string;
   milestoneId: number | null;
 };
-
-function milestoneProgress(status: string, paymentStatus?: string) {
-  if (status === "APPROVED" || paymentStatus === "COMPLETED") return 100;
-  if (status === "SUBMITTED") return 75;
-  if (status === "IN_PROGRESS") return 50;
-  return 0;
-}
 
 type Data = {
   project: {
@@ -477,18 +469,6 @@ export default function SharedProjectTrackingPage() {
   const completedMilestones = data.milestones.filter(
     (m) => m.status === "APPROVED" || m.payment?.status === "COMPLETED",
   );
-  const autoProgressPercentage =
-    data.project.status === "COMPLETED"
-      ? 100
-      : data.milestones.length > 0
-        ? Math.round(
-            data.milestones.reduce(
-              (total, milestone) =>
-                total + milestoneProgress(milestone.status, milestone.payment?.status),
-              0,
-            ) / data.milestones.length,
-          )
-        : 0;
   const remainingProjectBalance = Math.max(0, totalAgreed - clientPaidMilestoneTotal);
   const remainingClientPayment = remainingProjectBalance;
   const unpaidMilestones = data.milestones.filter(
@@ -559,7 +539,7 @@ export default function SharedProjectTrackingPage() {
                 {isClient ? `Professional: ${professional}` : `Client: ${client}`}
               </p>
             </div>
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center">
               {(isClient ? data.project.professionalId : data.project.clientId) && (
                 <Link
                   href={
@@ -567,21 +547,13 @@ export default function SharedProjectTrackingPage() {
                       ? `/messages?recipientId=${data.project.professionalId}&projectId=${data.project.id}`
                       : `/professional/messages?recipientId=${data.project.clientId}&projectId=${data.project.id}`
                   }
-                  className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white/10 px-4 py-2.5 text-xs font-semibold text-white hover:bg-white/20 transition backdrop-blur-sm shadow-xs"
+                  aria-label={`Open chat with ${isClient ? professional : client}`}
+                  title={`Open chat with ${isClient ? professional : client}`}
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition hover:bg-white/20 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-white/80"
                 >
-                  <MessageSquare className="h-4 w-4 text-white" />
-                  <span>
-                    Message {isClient ? professional || "Professional" : client || "Client"}
-                  </span>
+                  <MessageSquare className="h-5 w-5" />
                 </Link>
               )}
-              <Badge className="h-fit border-white/25 bg-white/15 px-3 py-1.5 text-white hover:bg-white/15">
-                {label(data.project.status)}
-              </Badge>
-              <div className="rounded-2xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-sm shadow-xs">
-                <p className="text-xs font-medium text-white/70">Overall progress</p>
-                <p className="mt-1 text-xl font-bold text-white">{autoProgressPercentage}%</p>
-              </div>
             </div>
           </div>
         </section>
@@ -611,6 +583,68 @@ export default function SharedProjectTrackingPage() {
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
+            <section
+              className={`rounded-2xl border p-5 shadow-soft ${
+                needsAction(data.project.status)
+                  ? "border-amber-300/50 bg-amber-50/60"
+                  : "border-primary/20 bg-primary/5"
+              }`}
+            >
+              <div className="flex items-start gap-3">
+                <div
+                  className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl ${
+                    needsAction(data.project.status)
+                      ? "bg-amber-500/15 text-amber-600"
+                      : "bg-primary/10 text-primary"
+                  }`}
+                >
+                  {needsAction(data.project.status) ? (
+                    <AlertCircle className="h-5 w-5" />
+                  ) : (
+                    <CheckCircle2 className="h-5 w-5" />
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <p
+                    className={`text-xs font-semibold uppercase tracking-wide ${
+                      needsAction(data.project.status) ? "text-amber-700" : "text-primary"
+                    }`}
+                  >
+                    {needsAction(data.project.status) ? "Action required" : "Current status"}
+                  </p>
+                  <h2 className="mt-1 text-xl font-semibold">
+                    {statusHeading(data.project.status, current?.title)}
+                  </h2>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {statusText(
+                      data.project.status,
+                      isClient,
+                      client,
+                      professional,
+                      current?.title,
+                      data.revisions[0]?.note,
+                    )}
+                  </p>
+                </div>
+              </div>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {data.viewerRole === "CLIENT" && data.project.status === "READY_TO_START" && (
+                  <Button
+                    disabled={busy === "start-work"}
+                    onClick={() => void action("start-work")}
+                  >
+                    {busy === "start-work" ? "Starting…" : "Start Work"}
+                  </Button>
+                )}
+
+                {!isClient && data.project.status !== "COMPLETED" && (
+                  <Button variant="outline" onClick={() => setShowRequestModal(true)}>
+                    Request client
+                  </Button>
+                )}
+              </div>
+            </section>
+
             <section className="rounded-2xl border bg-card p-5 shadow-soft">
               {isClient &&
               data.project.status !== "COMPLETED" &&
@@ -709,57 +743,6 @@ export default function SharedProjectTrackingPage() {
                     <div>
                       <h2 className="text-base font-semibold">Project location</h2>
 
-                      <section className="rounded-2xl border bg-card p-5 shadow-soft">
-                        <div className="rounded-2xl bg-muted p-4 shadow-2xs">
-                          <div className="flex items-center justify-between text-sm font-medium">
-                            <span className="font-semibold text-foreground">Overall progress</span>
-                            <span className="font-bold text-primary">
-                              {autoProgressPercentage}%
-                            </span>
-                          </div>
-                          <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-background">
-                            <div
-                              className="h-full rounded-full bg-[linear-gradient(90deg,var(--color-primary),var(--color-cta))] transition-all duration-700"
-                              style={{
-                                width: `${Math.min(Math.max(autoProgressPercentage, 0), 100)}%`,
-                              }}
-                            />
-                          </div>
-                          <div className="mt-2.5 flex items-center justify-between text-xs text-muted-foreground">
-                            <span>
-                              {completedMilestones.length} of {data.milestones.length} milestones
-                              completed
-                            </span>
-                            <span className="font-medium text-foreground">
-                              Milestone-wise (Auto-calculated)
-                            </span>
-                          </div>
-                          <div className="mt-3 space-y-1.5 border-t border-border/60 pt-3">
-                            {data.milestones.map((milestone, index) => {
-                              const isCompleted = completedMilestones.some(
-                                ({ id }) => id === milestone.id,
-                              );
-                              return (
-                                <div key={milestone.id} className="flex items-center gap-2 text-xs">
-                                  <span
-                                    className={`h-2 w-2 shrink-0 rounded-full ${
-                                      isCompleted ? "bg-emerald-500" : "bg-muted-foreground/30"
-                                    }`}
-                                  />
-                                  <span className="min-w-0 flex-1 truncate">
-                                    {index + 1}. {milestone.title}
-                                  </span>
-                                  <span className="text-muted-foreground">
-                                    {isCompleted
-                                      ? "Completed"
-                                      : milestone.status.replaceAll("_", " ")}
-                                  </span>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      </section>
                       <p className="text-sm text-muted-foreground">
                         {isClient
                           ? "Where you asked the professional to work"
@@ -780,68 +763,6 @@ export default function SharedProjectTrackingPage() {
                   )}
                 </div>
               )}
-            </section>
-
-            <section
-              className={`rounded-2xl border p-5 shadow-soft ${
-                needsAction(data.project.status)
-                  ? "border-amber-300/50 bg-amber-50/60"
-                  : "border-primary/20 bg-primary/5"
-              }`}
-            >
-              <div className="flex items-start gap-3">
-                <div
-                  className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl ${
-                    needsAction(data.project.status)
-                      ? "bg-amber-500/15 text-amber-600"
-                      : "bg-primary/10 text-primary"
-                  }`}
-                >
-                  {needsAction(data.project.status) ? (
-                    <AlertCircle className="h-5 w-5" />
-                  ) : (
-                    <CheckCircle2 className="h-5 w-5" />
-                  )}
-                </div>
-                <div className="min-w-0">
-                  <p
-                    className={`text-xs font-semibold uppercase tracking-wide ${
-                      needsAction(data.project.status) ? "text-amber-700" : "text-primary"
-                    }`}
-                  >
-                    {needsAction(data.project.status) ? "Action required" : "Current status"}
-                  </p>
-                  <h2 className="mt-1 text-xl font-semibold">
-                    {statusHeading(data.project.status, current?.title)}
-                  </h2>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    {statusText(
-                      data.project.status,
-                      isClient,
-                      client,
-                      professional,
-                      current?.title,
-                      data.revisions[0]?.note,
-                    )}
-                  </p>
-                </div>
-              </div>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {data.viewerRole === "CLIENT" && data.project.status === "READY_TO_START" && (
-                  <Button
-                    disabled={busy === "start-work"}
-                    onClick={() => void action("start-work")}
-                  >
-                    {busy === "start-work" ? "Starting…" : "Start Work"}
-                  </Button>
-                )}
-
-                {!isClient && data.project.status !== "COMPLETED" && (
-                  <Button variant="outline" onClick={() => setShowRequestModal(true)}>
-                    Request client
-                  </Button>
-                )}
-              </div>
             </section>
 
             {isClient && data.project.status !== "COMPLETED" && (
@@ -1708,9 +1629,6 @@ export default function SharedProjectTrackingPage() {
                 const clientCharge = offlinePayment
                   ? approvalMilestone.amount
                   : approvalMilestone.amount + clientFee;
-                const professionalPayout = offlinePayment
-                  ? approvalMilestone.amount
-                  : Math.max(0, approvalMilestone.amount - clientFee);
                 return (
                   <>
                     {approvalSuccess ? (
@@ -1795,12 +1713,6 @@ export default function SharedProjectTrackingPage() {
                             </span>
                             <span className="font-bold text-primary">
                               ₹{clientCharge.toLocaleString("en-IN")}
-                            </span>
-                          </div>
-                          <div className="flex justify-between gap-4">
-                            <span className="text-muted-foreground">Professional receives</span>
-                            <span className="font-semibold text-success">
-                              ₹{professionalPayout.toLocaleString("en-IN")}
                             </span>
                           </div>
                         </div>
