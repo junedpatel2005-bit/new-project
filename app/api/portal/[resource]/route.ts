@@ -99,7 +99,12 @@ export async function GET(
       });
       const [projects, directJobs] = await Promise.all([
         db.projectTracking.findMany({
-          where: { id: { in: projectIds } },
+          where: {
+            OR: [
+              ...(projectIds.length > 0 ? [{ id: { in: projectIds } }] : []),
+              ...(directJobIds.length > 0 ? [{ jobId: { in: directJobIds } }] : []),
+            ],
+          },
           include: {
             job: { select: { id: true, title: true, category: true, description: true } },
             client: { select: { firstName: true, lastName: true } },
@@ -118,6 +123,18 @@ export async function GET(
           },
         }),
       ]);
+      const jobToProjectTrackingMap = new Map<number, (typeof projects)[number]>();
+      const projectToJobIdMap = new Map<number, number>();
+      for (const p of projects) {
+        if (p.jobId) {
+          jobToProjectTrackingMap.set(p.jobId, p);
+          projectToJobIdMap.set(p.id, p.jobId);
+        }
+        if (p.job?.id) {
+          jobToProjectTrackingMap.set(p.job.id, p);
+          projectToJobIdMap.set(p.id, p.job.id);
+        }
+      }
       const jobMap = new Map<number, string | null>();
       const jobClientMap = new Map<number, string>();
       for (const job of allRecentJobs) {
@@ -150,24 +167,42 @@ export async function GET(
 
       return NextResponse.json(
         notifications.map((notification) => {
-          const projectId = resolvedProjectIdFor(notification);
-          const jobId = jobIdFor(notification.href);
-          const isProjectOrJob =
+          let projectId = resolvedProjectIdFor(notification);
+          let jobId = jobIdFor(notification.href);
+
+          if (!projectId && jobId && jobToProjectTrackingMap.has(jobId)) {
+            projectId = jobToProjectTrackingMap.get(jobId)!.id;
+          }
+          if (!jobId && projectId && projectToJobIdMap.has(projectId)) {
+            jobId = projectToJobIdMap.get(projectId)!;
+          }
+
+          const matchedProject =
+            (projectId ? projects.find((item) => item.id === projectId) : null) ??
+            (jobId ? jobToProjectTrackingMap.get(jobId) : null) ??
+            null;
+
+          const hasProjectOrProposalEngagement =
             projectId !== null ||
-            jobId !== null ||
             notification.type.startsWith("PROJECT_") ||
             notification.type.startsWith("MILESTONE_") ||
             notification.type.startsWith("DISPUTE_") ||
             notification.type.startsWith("REVISION_") ||
             notification.type.startsWith("WORK_") ||
             notification.type.startsWith("PROPOSAL_") ||
-            notification.type.startsWith("NEW_JOB") ||
+            notification.type.startsWith("NEW_PROPOSAL") ||
+            notification.type.startsWith("REQUEST_") ||
+            notification.type.startsWith("COUNTER_") ||
             notification.type.startsWith("OFFER_");
+
+          const isProjectOrJob = hasProjectOrProposalEngagement || (jobId !== null && projectId !== null);
 
           const desc = `${notification.title} ${notification.description ?? ""}`;
 
           let resolvedTitle: string | null = null;
-          if (projectId && projectMap.get(projectId)) {
+          if (matchedProject?.job?.title?.trim()) {
+            resolvedTitle = matchedProject.job.title.trim();
+          } else if (projectId && projectMap.get(projectId)) {
             resolvedTitle = projectMap.get(projectId)!;
           } else if (jobId && jobMap.get(jobId)) {
             resolvedTitle = jobMap.get(jobId)!;
@@ -182,9 +217,10 @@ export async function GET(
             ) {
               resolvedTitle = proposalMatch[1].trim();
             } else {
-              const newJobMatch = desc.match(/^(.+?)\s+is now open/i);
+              const descOnly = notification.description ?? "";
+              const newJobMatch = descOnly.match(/^(.+?)\s+is now open/i);
               if (newJobMatch && newJobMatch[1]) {
-                resolvedTitle = newJobMatch[1].trim();
+                resolvedTitle = newJobMatch[1].replace(/^New job posted\s+/i, "").trim();
               } else {
                 const disputeMatch = desc.match(/dispute on\s+(.+?)\.?$/i);
                 if (disputeMatch && disputeMatch[1]) {
@@ -210,9 +246,28 @@ export async function GET(
             }
           }
 
+          if (resolvedTitle?.toLowerCase().startsWith("new job posted ")) {
+            resolvedTitle = resolvedTitle.slice(15).trim();
+          }
+
           if (!resolvedTitle && isProjectOrJob) {
             if (projectId) resolvedTitle = `Project #${projectId}`;
             else if (jobId) resolvedTitle = `Job #${jobId}`;
+          }
+
+          let clientName: string | null = null;
+          if (matchedProject) {
+            clientName =
+              `${matchedProject.client.firstName} ${matchedProject.client.lastName}`.trim() || null;
+          } else if (jobId && jobClientMap.has(jobId)) {
+            clientName = jobClientMap.get(jobId) ?? null;
+          }
+
+          let professionalName: string | null = null;
+          if (matchedProject) {
+            professionalName =
+              `${matchedProject.professional.firstName} ${matchedProject.professional.lastName}`.trim() ||
+              null;
           }
 
           return {
@@ -221,27 +276,8 @@ export async function GET(
             jobId,
             isProject: isProjectOrJob,
             projectTitle: resolvedTitle,
-            clientName:
-              projectId !== null
-                ? (() => {
-                    const project = projects.find((item) => item.id === projectId);
-                    return project
-                      ? `${project.client.firstName} ${project.client.lastName}`.trim() || null
-                      : null;
-                  })()
-                : jobId !== null
-                  ? (jobClientMap.get(jobId) ?? null)
-                  : null,
-            professionalName:
-              projectId !== null
-                ? (() => {
-                    const project = projects.find((item) => item.id === projectId);
-                    return project
-                      ? `${project.professional.firstName} ${project.professional.lastName}`.trim() ||
-                          null
-                      : null;
-                  })()
-                : null,
+            clientName,
+            professionalName,
           };
         }),
       );

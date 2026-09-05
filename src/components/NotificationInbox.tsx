@@ -176,6 +176,33 @@ function relativeTime(value: string) {
   return `${Math.floor(seconds / 86400)}d ago`;
 }
 
+function isEngagementType(type?: string | null): boolean {
+  if (!type) return false;
+  const t = type.toUpperCase();
+  return (
+    t.startsWith("PROJECT_") ||
+    t.startsWith("MILESTONE_") ||
+    t.startsWith("DISPUTE_") ||
+    t.startsWith("REVISION_") ||
+    t.startsWith("WORK_") ||
+    t.startsWith("PROPOSAL_") ||
+    t.startsWith("NEW_PROPOSAL") ||
+    t.startsWith("REQUEST_") ||
+    t.startsWith("COUNTER_") ||
+    t.startsWith("OFFER_") ||
+    t.startsWith("CONTRACT_") ||
+    t.startsWith("BID_") ||
+    t.includes("PAYOUT") ||
+    t.includes("ESCROW")
+  );
+}
+
+function cleanProjectTitle(title?: string | null): string | null {
+  if (!title) return null;
+  const cleaned = title.replace(/^New job posted\s+/i, "").trim();
+  return cleaned || null;
+}
+
 export function NotificationInbox({ admin: _isAdmin = false }: { admin?: boolean } = {}) {
   const router = useRouter();
   const [items, setItems] = useState<Notification[]>([]);
@@ -220,24 +247,74 @@ export function NotificationInbox({ admin: _isAdmin = false }: { admin?: boolean
   }, [load]);
 
   // Split into Project items & Other items
+  // Only projects/jobs with active engagement (proposals, offers, project tracking) belong in Project & Job Activity.
+  // Standalone marketplace broadcast alerts without active engagement belong in Other Notifications.
   const { projectItems, otherItems } = useMemo(() => {
+    const engagedJobIds = new Set<number>();
+    const engagedProjectIds = new Set<number>();
+    const engagedTitles = new Set<string>();
+
+    for (const item of items) {
+      const hasEngagement = Boolean(
+        item.projectId ||
+        item.isProject ||
+        isEngagementType(item.type)
+      );
+      if (hasEngagement) {
+        if (item.jobId) engagedJobIds.add(item.jobId);
+        if (item.projectId) engagedProjectIds.add(item.projectId);
+        const t = cleanProjectTitle(item.projectTitle)?.toLowerCase();
+        if (t) engagedTitles.add(t);
+      }
+    }
+
     const proj: Notification[] = [];
     const oth: Notification[] = [];
+
     for (const item of items) {
-      if (item.projectId || item.jobId || item.isProject) {
+      const t = cleanProjectTitle(item.projectTitle)?.toLowerCase();
+      const belongsToActiveEngagement = Boolean(
+        item.projectId ||
+        item.isProject ||
+        isEngagementType(item.type) ||
+        (item.jobId && engagedJobIds.has(item.jobId)) ||
+        (t && engagedTitles.has(t) && (item.jobId || item.projectId))
+      );
+
+      if (belongsToActiveEngagement) {
         proj.push(item);
       } else {
         oth.push(item);
       }
     }
+
     return { projectItems: proj, otherItems: oth };
   }, [items]);
 
-  // Group project items by project/job
+  // Group project items by project/job (unifying all updates for the same project/job into one card)
   const projectGroups = useMemo(() => {
     const map = new Map<string, ProjectGroup>();
     const normalized = query.trim().toLowerCase();
 
+    // Pass 1: Build bidirectional cross-reference maps between projectIds, jobIds, and titles
+    const projToJob = new Map<number, number>();
+    const jobToProj = new Map<number, number>();
+    const titleToJob = new Map<string, number>();
+    const titleToProj = new Map<string, number>();
+
+    projectItems.forEach((item) => {
+      if (item.projectId && item.jobId) {
+        projToJob.set(item.projectId, item.jobId);
+        jobToProj.set(item.jobId, item.projectId);
+      }
+      const t = cleanProjectTitle(item.projectTitle)?.trim().toLowerCase();
+      if (t) {
+        if (item.jobId && !titleToJob.has(t)) titleToJob.set(t, item.jobId);
+        if (item.projectId && !titleToProj.has(t)) titleToProj.set(t, item.projectId);
+      }
+    });
+
+    // Pass 2: Group with unified canonical key
     projectItems.forEach((item) => {
       if (unreadOnly && item.readAt) return;
       if (normalized) {
@@ -246,22 +323,57 @@ export function NotificationInbox({ admin: _isAdmin = false }: { admin?: boolean
         if (!text.includes(normalized)) return;
       }
 
-      const key = item.projectId ? `p_${item.projectId}` : `j_${item.jobId ?? item.id}`;
+      const t = cleanProjectTitle(item.projectTitle)?.trim().toLowerCase();
+      const canonicalJobId =
+        item.jobId ??
+        (item.projectId ? projToJob.get(item.projectId) : null) ??
+        (t ? titleToJob.get(t) : null) ??
+        null;
+      const canonicalProjectId =
+        item.projectId ??
+        (item.jobId ? jobToProj.get(item.jobId) : null) ??
+        (t ? titleToProj.get(t) : null) ??
+        null;
+
+      let key: string;
+      if (canonicalJobId) {
+        key = `j_${canonicalJobId}`;
+      } else if (canonicalProjectId) {
+        key = `p_${canonicalProjectId}`;
+      } else if (t) {
+        key = `t_${t}`;
+      } else {
+        key = `n_${item.id}`;
+      }
+
+      const cleanedTitle = cleanProjectTitle(item.projectTitle);
       const existing = map.get(key);
       if (existing) {
         existing.notifications.push(item);
+        if (!existing.projectId && canonicalProjectId) existing.projectId = canonicalProjectId;
+        if (!existing.jobId && canonicalJobId) existing.jobId = canonicalJobId;
         if (!existing.clientName && item.clientName) existing.clientName = item.clientName;
         if (!existing.professionalName && item.professionalName)
           existing.professionalName = item.professionalName;
         if (!existing.category && item.category) existing.category = item.category;
+        if (
+          (!existing.title ||
+            existing.title.startsWith("Job #") ||
+            existing.title.startsWith("Project #")) &&
+          cleanedTitle
+        ) {
+          existing.title = cleanedTitle;
+        }
       } else {
         map.set(key, {
           key,
-          projectId: item.projectId ?? null,
-          jobId: item.jobId ?? null,
+          projectId: canonicalProjectId,
+          jobId: canonicalJobId,
           title:
-            item.projectTitle ||
-            (item.projectId ? `Project #${item.projectId}` : `Job #${item.jobId ?? item.id}`),
+            cleanedTitle ||
+            (canonicalProjectId
+              ? `Project #${canonicalProjectId}`
+              : `Job #${canonicalJobId ?? item.id}`),
           category: item.category ?? null,
           clientName: item.clientName ?? null,
           professionalName: item.professionalName ?? null,
@@ -270,11 +382,18 @@ export function NotificationInbox({ admin: _isAdmin = false }: { admin?: boolean
       }
     });
 
-    return [...map.values()].sort(
-      (a, b) =>
-        new Date(b.notifications[0]?.createdAt ?? 0).getTime() -
-        new Date(a.notifications[0]?.createdAt ?? 0).getTime(),
-    );
+    return [...map.values()]
+      .map((group) => ({
+        ...group,
+        notifications: [...group.notifications].sort(
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        ),
+      }))
+      .sort(
+        (a, b) =>
+          new Date(b.notifications[0]?.createdAt ?? 0).getTime() -
+          new Date(a.notifications[0]?.createdAt ?? 0).getTime(),
+      );
   }, [projectItems, query, unreadOnly]);
 
   // Filtered other items
@@ -587,20 +706,35 @@ export function NotificationInbox({ admin: _isAdmin = false }: { admin?: boolean
                         </div>
                       </div>
 
-                      {/* View Timeline Pop-up Trigger Button */}
+                      {/* View Timeline / Project / Job Pop-up Trigger Button */}
                       <button
                         type="button"
-                        onClick={(e) =>
-                          void openTimelineModal(
-                            { projectId: group.projectId, jobId: group.jobId },
-                            e,
-                          )
-                        }
+                        onClick={(e) => {
+                          if (group.projectId) {
+                            void openTimelineModal(
+                              { projectId: group.projectId, jobId: group.jobId },
+                              e,
+                            );
+                          } else if (group.jobId) {
+                            e.stopPropagation();
+                            router.push(`/job/${group.jobId}`);
+                          }
+                        }}
                         className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl bg-indigo-600 px-3.5 py-2 text-xs font-bold text-white hover:bg-indigo-500 transition shadow-2xs cursor-pointer"
                       >
-                        <Clock3 className="h-3.5 w-3.5" />
-                        View Timeline &amp; Info
-                        <ArrowRight className="h-3.5 w-3.5" />
+                        {group.projectId ? (
+                          <>
+                            <Clock3 className="h-3.5 w-3.5" />
+                            View Timeline &amp; Info
+                            <ArrowRight className="h-3.5 w-3.5" />
+                          </>
+                        ) : (
+                          <>
+                            <FileText className="h-3.5 w-3.5" />
+                            View Proposal &amp; Job
+                            <ArrowRight className="h-3.5 w-3.5" />
+                          </>
+                        )}
                       </button>
                     </div>
                   </div>

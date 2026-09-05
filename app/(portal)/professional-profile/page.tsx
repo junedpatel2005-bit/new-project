@@ -19,6 +19,8 @@ import {
   FileText,
   CheckCircle,
   AlertCircle,
+  Pencil,
+  LayoutDashboard,
 } from "lucide-react";
 import { sessionCookie, verifySession } from "@/lib/auth";
 import { getDetailedProfessional } from "@/lib/queries/marketplace";
@@ -48,31 +50,31 @@ function getVerificationBadge(status: string | null) {
     case "VERIFIED":
     case "APPROVED":
       return (
-        <Badge variant="default" className="gap-1">
-          <CheckCircle className="h-3 w-3" />
+        <span className="inline-flex items-center gap-1.5 rounded-xl border border-primary/20 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary shadow-xs">
+          <CheckCircle className="h-3.5 w-3.5 text-primary" />
           Verified
-        </Badge>
+        </span>
       );
     case "PENDING":
       return (
-        <Badge variant="secondary" className="gap-1">
-          <Clock className="h-3 w-3 animate-spin" />
+        <span className="inline-flex items-center gap-1.5 rounded-xl border border-amber-500/25 bg-amber-500/10 px-3 py-1.5 text-xs font-semibold text-amber-800 dark:text-amber-300 shadow-xs">
+          <Clock className="h-3.5 w-3.5 animate-spin" />
           Pending review
-        </Badge>
+        </span>
       );
     case "REJECTED":
       return (
-        <Badge variant="destructive" className="gap-1">
-          <AlertCircle className="h-3 w-3" />
+        <span className="inline-flex items-center gap-1.5 rounded-xl border border-destructive/25 bg-destructive/10 px-3 py-1.5 text-xs font-semibold text-destructive shadow-xs">
+          <AlertCircle className="h-3.5 w-3.5" />
           Rejected
-        </Badge>
+        </span>
       );
     default:
       return (
-        <Badge variant="outline" className="gap-1">
-          <ShieldCheck className="h-3 w-3" />
+        <span className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-muted/40 px-3 py-1.5 text-xs font-medium text-muted-foreground shadow-xs">
+          <ShieldCheck className="h-3.5 w-3.5" />
           Not verified
-        </Badge>
+        </span>
       );
   }
 }
@@ -81,30 +83,33 @@ function getAvailabilityBadge(status: string) {
   switch (status) {
     case "available":
       return (
-        <Badge variant="default" className="gap-1">
-          <CheckCircle className="h-3 w-3" />
-          Available
-        </Badge>
+        <span className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-800 dark:text-emerald-300 shadow-xs">
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+          </span>
+          Available for hire
+        </span>
       );
     case "busy":
       return (
-        <Badge variant="secondary" className="gap-1">
-          <Clock className="h-3 w-3" />
+        <span className="inline-flex items-center gap-1.5 rounded-xl border border-amber-500/25 bg-amber-500/10 px-3 py-1.5 text-xs font-semibold text-amber-800 dark:text-amber-300 shadow-xs">
+          <span className="h-2 w-2 rounded-full bg-amber-500" />
           Busy
-        </Badge>
+        </span>
       );
     case "unavailable":
       return (
-        <Badge variant="destructive" className="gap-1">
-          <AlertCircle className="h-3 w-3" />
+        <span className="inline-flex items-center gap-1.5 rounded-xl border border-destructive/25 bg-destructive/10 px-3 py-1.5 text-xs font-semibold text-destructive shadow-xs">
+          <span className="h-2 w-2 rounded-full bg-destructive" />
           Unavailable
-        </Badge>
+        </span>
       );
     default:
       return (
-        <Badge variant="outline" className="gap-1">
+        <span className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-muted/40 px-3 py-1.5 text-xs font-medium text-foreground shadow-xs capitalize">
           {status.replace("_", " ")}
-        </Badge>
+        </span>
       );
   }
 }
@@ -113,30 +118,30 @@ function getWorkModeBadge(mode: string) {
   switch (mode) {
     case "on_site":
       return (
-        <Badge variant="outline" className="gap-1">
-          <Building2 className="h-3 w-3" />
+        <span className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-muted/40 px-3 py-1.5 text-xs font-medium text-foreground shadow-xs">
+          <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
           On-site
-        </Badge>
+        </span>
       );
     case "remote":
       return (
-        <Badge variant="outline" className="gap-1">
-          <Globe className="h-3 w-3" />
+        <span className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-muted/40 px-3 py-1.5 text-xs font-medium text-foreground shadow-xs">
+          <Globe className="h-3.5 w-3.5 text-muted-foreground" />
           Remote
-        </Badge>
+        </span>
       );
     case "both":
       return (
-        <Badge variant="outline" className="gap-1">
-          <Users className="h-3 w-3" />
+        <span className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-muted/40 px-3 py-1.5 text-xs font-medium text-foreground shadow-xs">
+          <Users className="h-3.5 w-3.5 text-muted-foreground" />
           Hybrid
-        </Badge>
+        </span>
       );
     default:
       return (
-        <Badge variant="outline" className="gap-1">
+        <span className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-muted/40 px-3 py-1.5 text-xs font-medium text-foreground shadow-xs capitalize">
           {mode}
-        </Badge>
+        </span>
       );
   }
 }
@@ -171,77 +176,142 @@ export default async function ProfessionalProfilePage() {
 
   return (
     <div className="mx-auto max-w-6xl space-y-6 p-4 sm:p-6 lg:p-8">
-      <article className="overflow-hidden rounded-3xl border border-border bg-card shadow-soft">
-        <div className="relative h-36 overflow-hidden bg-gradient-to-r from-primary via-primary/80 to-accent">
-          <div className="absolute -right-10 -top-20 h-56 w-56 rounded-full bg-white/10 blur-2xl" />
-          <div className="absolute bottom-[-5rem] left-1/3 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
+      <article className="overflow-hidden rounded-3xl border border-border/80 bg-card shadow-card transition-all">
+        {/* Cover Canvas Banner */}
+        <div className="relative h-44 sm:h-52 md:h-56 w-full overflow-hidden bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(59,130,246,0.22),transparent_50%),radial-gradient(circle_at_85%_20%,rgba(99,102,241,0.2),transparent_45%)]" />
+          <div className="absolute -top-24 -right-12 h-64 w-64 rounded-full bg-primary/20 blur-3xl" />
+          <div className="absolute -bottom-16 left-1/3 h-52 w-52 rounded-full bg-cyan-400/15 blur-2xl" />
+
+          <div
+            className="absolute inset-0 opacity-10"
+            style={{
+              backgroundImage: `radial-gradient(circle at 1px 1px, white 1px, transparent 0)`,
+              backgroundSize: "28px 28px",
+            }}
+          />
+
+          {/* Top Glass Badge */}
+          <div className="absolute top-4 right-4 sm:top-5 sm:right-6 flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 py-1 text-xs font-medium text-white shadow-sm backdrop-blur-md">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+            </span>
+            <span>Professional Portal</span>
+          </div>
         </div>
-        <div className="px-6 pb-8 sm:px-8">
-          <div className="-mt-12 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-            <div className="flex items-end gap-4">
-              {professional.avatar ? (
-                <img
-                  src={professional.avatar}
-                  alt={professional.name}
-                  className="h-24 w-24 rounded-2xl border-4 border-card object-cover"
-                />
-              ) : (
-                <div className="grid h-24 w-24 place-items-center rounded-2xl border-4 border-card bg-muted text-3xl font-semibold">
-                  {professional.name.slice(0, 1)}
+
+        {/* Profile Content Section */}
+        <div className="px-6 pb-7 sm:px-8 sm:pb-8">
+          {/* Top Profile Row: Avatar & Actions */}
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 -mt-16 sm:-mt-20">
+            {/* Avatar with ring, shadow, and live indicator */}
+            <div className="relative inline-block shrink-0">
+              <div className="relative h-28 w-28 sm:h-32 sm:w-32 rounded-3xl p-1 bg-card ring-4 ring-card shadow-2xl overflow-hidden">
+                {professional.avatar ? (
+                  <img
+                    src={professional.avatar}
+                    alt={professional.name}
+                    className="h-full w-full rounded-[22px] object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center rounded-[22px] bg-gradient-to-br from-primary/15 via-primary/5 to-accent/30 text-3xl sm:text-4xl font-bold font-display text-primary shadow-inner">
+                    {professional.name.slice(0, 1).toUpperCase()}
+                  </div>
+                )}
+              </div>
+              {/* Presence status dot */}
+              <span className="absolute bottom-1 right-1 flex h-6 w-6 items-center justify-center rounded-full bg-card ring-2 ring-card shadow-md">
+                <span className="relative flex h-3 w-3">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex h-3 w-3 rounded-full bg-emerald-500" />
+                </span>
+              </span>
+            </div>
+
+            {/* Quick Action Buttons */}
+            <div className="flex flex-wrap items-center gap-2.5 sm:mb-2">
+              <Button asChild className="gap-2 shadow-sm font-medium">
+                <Link href="/professional/setup">
+                  <Pencil className="h-4 w-4" />
+                  Edit profile
+                </Link>
+              </Button>
+              <Button variant="outline" asChild className="gap-2 font-medium">
+                <Link href="/professional/dashboard">
+                  <LayoutDashboard className="h-4 w-4" />
+                  Dashboard
+                </Link>
+              </Button>
+            </div>
+          </div>
+
+          {/* Profile Identity Details (Guaranteed clean position below banner) */}
+          <div className="mt-5 space-y-4">
+            <div>
+              <div className="flex flex-wrap items-center gap-2.5">
+                <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+                  {professional.name}
+                </h1>
+                {professional.verified && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary border border-primary/20">
+                    <BadgeCheck className="h-3.5 w-3.5 text-primary" />
+                    Verified Pro
+                  </span>
+                )}
+                {(professional.companyName || professional.industry) && (
+                  <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground border border-border">
+                    {professional.companyName ?? professional.industry}
+                  </span>
+                )}
+              </div>
+              <p className="mt-1 text-base font-medium text-muted-foreground">
+                {professional.title}
+              </p>
+            </div>
+
+            {/* Structured Metadata & Trust Badges Strip */}
+            <div className="flex flex-wrap items-center gap-2.5 pt-1">
+              {/* Rating */}
+              <div className="inline-flex items-center gap-1.5 rounded-xl border border-amber-500/20 bg-amber-500/10 px-3 py-1.5 text-xs font-semibold text-amber-800 dark:text-amber-300">
+                <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                <span>{professional.rating.toFixed(1)}</span>
+                <span className="font-normal opacity-80">({professional.reviews} reviews)</span>
+              </div>
+
+              {/* Location */}
+              {professional.location && (
+                <div className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-muted/50 px-3 py-1.5 text-xs font-medium text-foreground">
+                  <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span>{professional.location}</span>
                 </div>
               )}
-              <div>
-                <h1 className="flex items-center gap-2 text-2xl font-semibold">
-                  {professional.name}
-                  {professional.verified && <BadgeCheck className="h-5 w-5 text-primary" />}
-                </h1>
-                <p className="text-muted-foreground">{professional.title}</p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {professional.companyName ?? professional.industry ?? "Independent professional"}
-                </p>
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <Button asChild>
-                <Link href="/professional/setup">Edit profile</Link>
-              </Button>
-              <Button variant="outline" asChild>
-                <Link href="/professional/dashboard">Dashboard</Link>
-              </Button>
-            </div>
-          </div>
 
-          <div className="mt-6 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-            <span className="inline-flex items-center gap-1">
-              <Star className="h-4 w-4 fill-warning text-warning" />
-              {professional.rating.toFixed(1)} ({professional.reviews} reviews)
-            </span>
-            {professional.location && (
-              <span className="inline-flex items-center gap-1">
-                <MapPin className="h-4 w-4" />
-                {professional.location}
+              {/* Availability */}
+              {getAvailabilityBadge(professional.availability)}
+
+              {/* Work Mode */}
+              {getWorkModeBadge(professional.workMode)}
+
+              {/* Verification Status */}
+              <span className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-muted/50 px-3 py-1.5 text-xs font-medium text-muted-foreground">
+                <ShieldCheck className="h-3.5 w-3.5 text-muted-foreground" />
+                <span>{professional.verificationStatus ?? "Verification pending"}</span>
               </span>
-            )}
-            <span>{getAvailabilityBadge(professional.availability)}</span>
-            <span>{getWorkModeBadge(professional.workMode)}</span>
-          </div>
 
-          <div className="mt-4 flex flex-wrap gap-3">
-            <span className="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-1 text-sm text-muted-foreground">
-              <ShieldCheck className="h-4 w-4" />
-              {professional.verificationStatus ?? "Verification pending"}
-            </span>
-            {professional.email ? (
-              <Badge variant="default" className="gap-1">
-                <CheckCircle className="h-3 w-3" />
-                Email on file
-              </Badge>
-            ) : (
-              <Badge variant="outline" className="gap-1">
-                <AlertCircle className="h-3 w-3" />
-                Email not verified
-              </Badge>
-            )}
+              {/* Email Verified */}
+              {professional.email ? (
+                <span className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-800 dark:text-emerald-300">
+                  <CheckCircle className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                  <span>Email verified</span>
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-muted/40 px-3 py-1.5 text-xs font-medium text-muted-foreground">
+                  <AlertCircle className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span>Email unverified</span>
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </article>

@@ -228,31 +228,70 @@ export function ClientProfilePage() {
           <p className="mt-1 text-amber-800">Complete your profile to continue.</p>
         </div>
       ) : null}
-      <header className="relative overflow-hidden rounded-3xl border border-border/80 bg-card shadow-soft">
-        <div className="h-32 bg-gradient-to-r from-primary via-primary/80 to-accent" />
-        <div className="relative px-5 pb-6 sm:px-8">
-          <div className="-mt-10 flex flex-wrap items-end justify-between gap-4">
-            <div className="flex items-end gap-4">
-              <Avatar className="h-20 w-20 border-4 border-card shadow-lg">
-                <AvatarImage
-                  src={form.profilePhotoUrl || undefined}
-                  alt={`${form.firstName} ${form.lastName}`}
-                />
-                <AvatarFallback className="bg-primary text-xl font-bold text-primary-foreground">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
-              <div className="pb-1">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-                  Client account
-                </p>
-                <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">My Profile</h1>
+      <header className="relative overflow-hidden rounded-3xl border border-border/80 bg-card shadow-card transition-all">
+        {/* Cover Canvas Banner */}
+        <div className="relative h-40 sm:h-48 md:h-52 w-full overflow-hidden bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(59,130,246,0.22),transparent_50%),radial-gradient(circle_at_85%_20%,rgba(99,102,241,0.2),transparent_45%)]" />
+          <div className="absolute -top-24 -right-12 h-64 w-64 rounded-full bg-primary/20 blur-3xl" />
+          <div className="absolute -bottom-16 left-1/3 h-52 w-52 rounded-full bg-cyan-400/15 blur-2xl" />
+
+          <div
+            className="absolute inset-0 opacity-10"
+            style={{
+              backgroundImage: `radial-gradient(circle at 1px 1px, white 1px, transparent 0)`,
+              backgroundSize: "28px 28px",
+            }}
+          />
+
+          {/* Top Glass Badge */}
+          <div className="absolute top-4 right-4 sm:top-5 sm:right-6 flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 py-1 text-xs font-medium text-white shadow-sm backdrop-blur-md">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+            </span>
+            <span>Client Workspace</span>
+          </div>
+        </div>
+
+        <div className="px-6 pb-7 sm:px-8 sm:pb-8">
+          {/* Top Row: Avatar overlapping the banner */}
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 -mt-16 sm:-mt-20">
+            <div className="relative inline-block shrink-0">
+              <div className="relative h-28 w-28 sm:h-32 sm:w-32 rounded-3xl p-1 bg-card ring-4 ring-card shadow-2xl overflow-hidden">
+                <Avatar className="h-full w-full rounded-[22px]">
+                  <AvatarImage
+                    src={form.profilePhotoUrl || undefined}
+                    alt={`${form.firstName} ${form.lastName}`}
+                    className="rounded-[22px] object-cover"
+                  />
+                  <AvatarFallback className="bg-gradient-to-br from-primary/15 via-primary/5 to-accent/30 text-2xl sm:text-3xl font-bold font-display text-primary">
+                    {initials}
+                  </AvatarFallback>
+                </Avatar>
               </div>
+              <span className="absolute bottom-1 right-1 flex h-6 w-6 items-center justify-center rounded-full bg-card ring-2 ring-card shadow-md">
+                <span className="relative flex h-3 w-3">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex h-3 w-3 rounded-full bg-emerald-500" />
+                </span>
+              </span>
             </div>
           </div>
-          <p className="mt-5 max-w-2xl text-sm text-muted-foreground sm:text-base">
-            Keep your details and service locations up to date so professionals can help you faster.
-          </p>
+
+          {/* Client Identity Info (100% cleanly below banner) */}
+          <div className="mt-5 space-y-2">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+                {form.firstName || form.lastName ? `${form.firstName} ${form.lastName}`.trim() : "My Profile"}
+              </h1>
+              <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary border border-primary/20">
+                Client account
+              </span>
+            </div>
+            <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">
+              Keep your details and service locations up to date so professionals can help you faster.
+            </p>
+          </div>
         </div>
       </header>
       {message && (

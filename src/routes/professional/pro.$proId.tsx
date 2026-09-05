@@ -3,7 +3,7 @@
 import { useParams, useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import { Suspense, useEffect, useState } from "react";
-import { BadgeCheck, MapPin, Star } from "lucide-react";
+import { BadgeCheck, MapPin, Star, Sparkles } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import {
@@ -201,37 +201,68 @@ function ProProfileContent() {
     );
   return (
     <AppShell>
-      <article className="mx-auto max-w-4xl overflow-hidden rounded-3xl border border-border bg-card shadow-soft">
-        <div className="h-28 gradient-primary" />
-        <div className="px-6 pb-8 sm:px-8">
-          <div className="-mt-12 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-            <div className="flex items-end gap-4">
-              {professional.avatar ? (
-                <img
-                  src={professional.avatar}
-                  alt={professional.name}
-                  className="h-24 w-24 rounded-2xl border-4 border-card object-cover"
-                />
-              ) : (
-                <div className="grid h-24 w-24 place-items-center rounded-2xl border-4 border-card bg-muted text-3xl font-semibold">
-                  {professional.name.slice(0, 1)}
-                </div>
-              )}
-              <div>
-                <h1 className="flex items-center gap-2 text-2xl font-semibold">
-                  {professional.name}
-                  {professional.verified && <BadgeCheck className="h-5 w-5 text-primary" />}
-                </h1>
-                <p className="text-muted-foreground">{professional.title}</p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {professional.companyName || professional.industry || "Independent professional"}
-                </p>
+      <article className="mx-auto max-w-4xl overflow-hidden rounded-3xl border border-border/80 bg-card shadow-card transition-all">
+        {/* Cover Canvas Banner */}
+        <div className="relative h-44 sm:h-52 md:h-56 w-full overflow-hidden bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(59,130,246,0.22),transparent_50%),radial-gradient(circle_at_85%_20%,rgba(99,102,241,0.2),transparent_45%)]" />
+          <div className="absolute -top-24 -right-12 h-64 w-64 rounded-full bg-primary/20 blur-3xl" />
+          <div className="absolute -bottom-16 left-1/3 h-52 w-52 rounded-full bg-cyan-400/15 blur-2xl" />
+
+          <div
+            className="absolute inset-0 opacity-10"
+            style={{
+              backgroundImage: `radial-gradient(circle at 1px 1px, white 1px, transparent 0)`,
+              backgroundSize: "28px 28px",
+            }}
+          />
+
+          {/* Top Glass Badge */}
+          <div className="absolute top-4 right-4 sm:top-5 sm:right-6 flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 py-1 text-xs font-medium text-white shadow-sm backdrop-blur-md">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+            </span>
+            <span>Verified Pro Partner</span>
+          </div>
+        </div>
+
+        {/* Profile Content Section */}
+        <div className="px-6 pb-7 sm:px-8 sm:pb-8">
+          {/* Top Profile Row: Avatar & Actions */}
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 -mt-16 sm:-mt-20">
+            {/* Avatar with ring, shadow, and live indicator */}
+            <div className="relative inline-block shrink-0">
+              <div className="relative h-28 w-28 sm:h-32 sm:w-32 rounded-3xl p-1 bg-card ring-4 ring-card shadow-2xl overflow-hidden">
+                {professional.avatar ? (
+                  <img
+                    src={professional.avatar}
+                    alt={professional.name}
+                    className="h-full w-full rounded-[22px] object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center rounded-[22px] bg-gradient-to-br from-primary/15 via-primary/5 to-accent/30 text-3xl sm:text-4xl font-bold font-display text-primary shadow-inner">
+                    {professional.name.slice(0, 1).toUpperCase()}
+                  </div>
+                )}
               </div>
+              {/* Presence status dot */}
+              <span className="absolute bottom-1 right-1 flex h-6 w-6 items-center justify-center rounded-full bg-card ring-2 ring-card shadow-md">
+                <span className="relative flex h-3 w-3">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex h-3 w-3 rounded-full bg-emerald-500" />
+                </span>
+              </span>
             </div>
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="w-full sm:w-auto">Hire</Button>
-              </DialogTrigger>
+
+            {/* Quick Action Buttons */}
+            <div className="flex flex-wrap items-center gap-2.5 sm:mb-2">
+              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button size="lg" className="w-full sm:w-auto gap-2 font-semibold shadow-md">
+                    <Sparkles className="h-4 w-4" />
+                    Hire {professional.name.split(" ")[0]}
+                  </Button>
+                </DialogTrigger>
               <DialogContent className="max-w-2xl">
                 <DialogHeader>
                   <DialogTitle>Hire {professional.name}</DialogTitle>
@@ -436,17 +467,71 @@ function ProProfileContent() {
               </DialogContent>
             </Dialog>
           </div>
-          <div className="mt-6 flex flex-wrap gap-4 text-sm text-muted-foreground">
-            <span className="inline-flex items-center gap-1">
-              <Star className="h-4 w-4 fill-warning text-warning" />
-              Client rating: {professional.rating.toFixed(1)} ({professional.reviews} reviews)
-            </span>
-            <span className="inline-flex items-center gap-1">
-              <MapPin className="h-4 w-4" />
-              {professional.location ?? "Remote"}
-            </span>
-            <span>Availability: {professional.availability.replace("_", " ")}</span>
+        </div>
+
+        {/* Profile Identity Details (Guaranteed clean position below banner) */}
+        <div className="mt-5 space-y-4">
+          <div>
+            <div className="flex flex-wrap items-center gap-2.5">
+              <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+                {professional.name}
+              </h1>
+              {professional.verified && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary border border-primary/20">
+                  <BadgeCheck className="h-3.5 w-3.5 text-primary" />
+                  Verified Pro
+                </span>
+              )}
+              {(professional.companyName || professional.industry) && (
+                <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground border border-border">
+                  {professional.companyName || professional.industry}
+                </span>
+              )}
+            </div>
+            <p className="mt-1 text-base font-medium text-muted-foreground">
+              {professional.title}
+            </p>
           </div>
+
+          {/* Structured Metadata & Trust Badges Strip */}
+          <div className="flex flex-wrap items-center gap-2.5 pt-1">
+            {/* Rating */}
+            <div className="inline-flex items-center gap-1.5 rounded-xl border border-amber-500/20 bg-amber-500/10 px-3 py-1.5 text-xs font-semibold text-amber-800 dark:text-amber-300">
+              <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+              <span>{professional.rating.toFixed(1)}</span>
+              <span className="font-normal opacity-80">({professional.reviews} reviews)</span>
+            </div>
+
+            {/* Location */}
+            <div className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-muted/50 px-3 py-1.5 text-xs font-medium text-foreground">
+              <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
+              <span>{professional.location ?? "Remote"}</span>
+            </div>
+
+            {/* Availability */}
+            <span className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-800 dark:text-emerald-300">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+              </span>
+              {professional.availability.replace("_", " ")}
+            </span>
+
+            {/* Rate */}
+            {professional.hourlyRate ? (
+              <span className="inline-flex items-center gap-1.5 rounded-xl border border-primary/20 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary">
+                ₹{professional.hourlyRate.toLocaleString()}/hr
+              </span>
+            ) : null}
+
+            {/* Work Mode */}
+            {professional.workMode ? (
+              <span className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-muted/40 px-3 py-1.5 text-xs font-medium text-foreground capitalize">
+                {professional.workMode.replace("_", " ")}
+              </span>
+            ) : null}
+          </div>
+        </div>
           <section className="mt-8 grid gap-6 sm:grid-cols-2">
             <div>
               <h2 className="text-lg font-semibold">About</h2>

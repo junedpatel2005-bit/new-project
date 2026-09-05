@@ -147,52 +147,104 @@ export default function ProfessionalDashboard() {
 
   return (
     <div className="space-y-6">
-      <section className="overflow-hidden rounded-3xl border border-border bg-card shadow-soft">
-        <div className="h-24 gradient-primary" />
-        <div className="flex flex-col gap-5 px-6 pb-6 sm:flex-row sm:items-end sm:justify-between">
-          <div className="-mt-10 flex items-end gap-4">
-            {professional.avatarUrl ? (
-              <img
-                src={professional.avatarUrl}
-                alt={name}
-                className="h-20 w-20 rounded-2xl border-4 border-card object-cover"
-              />
-            ) : (
-              <div className="grid h-20 w-20 place-items-center rounded-2xl border-4 border-card bg-muted text-2xl font-semibold">
-                {name.slice(0, 1)}
+      <section className="overflow-hidden rounded-3xl border border-border/80 bg-card shadow-card transition-all">
+        {/* Cover Canvas Banner */}
+        <div className="relative h-36 sm:h-44 w-full overflow-hidden bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(59,130,246,0.22),transparent_50%),radial-gradient(circle_at_85%_20%,rgba(99,102,241,0.2),transparent_45%)]" />
+          <div className="absolute -top-20 -right-10 h-48 w-48 rounded-full bg-primary/20 blur-3xl" />
+          <div className="absolute -bottom-10 left-1/3 h-40 w-40 rounded-full bg-cyan-400/15 blur-2xl" />
+
+          <div
+            className="absolute inset-0 opacity-10"
+            style={{
+              backgroundImage: `radial-gradient(circle at 1px 1px, white 1px, transparent 0)`,
+              backgroundSize: "28px 28px",
+            }}
+          />
+
+          {/* Top Glass Badge */}
+          <div className="absolute top-4 right-4 sm:top-5 sm:right-6 flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 py-1 text-xs font-medium text-white shadow-sm backdrop-blur-md">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+            </span>
+            <span>Professional Workspace</span>
+          </div>
+        </div>
+
+        <div className="px-6 pb-6 sm:px-8 sm:pb-7">
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 -mt-14 sm:-mt-16">
+            <div className="relative inline-block shrink-0">
+              <div className="relative h-24 w-24 sm:h-28 sm:w-28 rounded-3xl p-1 bg-card ring-4 ring-card shadow-2xl overflow-hidden">
+                {professional.avatarUrl ? (
+                  <img
+                    src={professional.avatarUrl}
+                    alt={name}
+                    className="h-full w-full rounded-[20px] object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center rounded-[20px] bg-gradient-to-br from-primary/15 via-primary/5 to-accent/30 text-2xl sm:text-3xl font-bold font-display text-primary shadow-inner">
+                    {name.slice(0, 1).toUpperCase()}
+                  </div>
+                )}
               </div>
-            )}
+              <span className="absolute bottom-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-card ring-2 ring-card shadow-md">
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500" />
+                </span>
+              </span>
+            </div>
+
+            <Button variant="outline" asChild className="gap-2 font-medium shadow-xs sm:mb-2">
+              <Link href="/professional-profile?from=dashboard">
+                <Pencil className="h-4 w-4" />
+                Edit profile
+              </Link>
+            </Button>
+          </div>
+
+          <div className="mt-4 space-y-3">
             <div>
-              <h1 className="flex items-center gap-2 text-2xl font-bold">
-                {name}
-                {professional.isVerified && <BadgeCheck className="h-5 w-5 text-primary" />}
-              </h1>
-              <p className="mt-1 text-muted-foreground">
+              <div className="flex flex-wrap items-center gap-2.5">
+                <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+                  {name}
+                </h1>
+                {professional.isVerified && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary border border-primary/20">
+                    <BadgeCheck className="h-3.5 w-3.5 text-primary" />
+                    Verified Pro
+                  </span>
+                )}
+              </div>
+              <p className="mt-1 text-sm sm:text-base font-medium text-muted-foreground">
                 {professional.professionalCategory ?? "Professional"}
               </p>
             </div>
+
+            <div className="flex flex-wrap items-center gap-2.5 pt-1">
+              <span className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-muted/50 px-3 py-1.5 text-xs font-medium text-foreground">
+                <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
+                {professional.professionalCity ?? "Location not added"}
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-xl border border-primary/20 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary">
+                <BadgeCheck className="h-3.5 w-3.5 text-primary" />
+                {professional.isVerified ? "Verified professional" : "Verification pending"}
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-800 dark:text-emerald-300 capitalize">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+                </span>
+                {availability}
+              </span>
+              {professional.experienceYears != null && (
+                <span className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-muted/40 px-3 py-1.5 text-xs font-medium text-muted-foreground">
+                  {professional.experienceYears} years experience
+                </span>
+              )}
+            </div>
           </div>
-          <Button variant="outline" asChild>
-            <Link href="/professional-profile?from=dashboard">
-              <Pencil className="mr-2 h-4 w-4" />
-              Edit profile
-            </Link>
-          </Button>
-        </div>
-        <div className="flex flex-wrap gap-3 border-t border-border px-6 py-4 text-sm text-muted-foreground">
-          <span className="inline-flex items-center gap-1.5">
-            <MapPin className="h-4 w-4" />
-            {professional.professionalCity ?? "Location not added"}
-          </span>
-          <Badge variant={professional.isVerified ? "secondary" : "outline"}>
-            {professional.isVerified ? "Verified professional" : "Verification pending"}
-          </Badge>
-          <Badge variant="outline" className="capitalize">
-            {availability}
-          </Badge>
-          {professional.experienceYears != null && (
-            <span>{professional.experienceYears} years experience</span>
-          )}
         </div>
       </section>
 

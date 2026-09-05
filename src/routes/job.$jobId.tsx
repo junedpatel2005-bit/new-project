@@ -276,6 +276,16 @@ export default function JobDetails({
         user?: { role?: "CLIENT" | "PROFESSIONAL" } | null;
       } | null;
       setViewerRole(auth?.user?.role ?? null);
+      const projectResponse = await fetch(
+        `/api/v1/portal/project?jobId=${encodeURIComponent(jobId)}`,
+      );
+      if (projectResponse.ok) {
+        const projectData = (await projectResponse.json()) as { project?: { id?: number } };
+        if (projectData.project?.id) {
+          router.replace(`/project/${projectData.project.id}/tracking`);
+          return;
+        }
+      }
       const ownerResponse = await fetch(`/api/v1/client/jobs/${encodeURIComponent(jobId)}`);
       if (ownerResponse.ok) {
         const {
@@ -343,19 +353,12 @@ export default function JobDetails({
           }
         }
       }
-      const projectResponse = await fetch(
-        `/api/v1/portal/project?jobId=${encodeURIComponent(jobId)}`,
-      );
-      if (projectResponse.ok) {
-        const projectData = (await projectResponse.json()) as { project: { id: number } };
-        marketplaceJob.projectId = projectData.project.id;
-      }
       setJob(marketplaceJob);
       setStatus("ready");
     } catch {
       setStatus("error");
     }
-  }, [jobId]);
+  }, [jobId, router]);
 
   useEffect(() => {
     void refresh();
