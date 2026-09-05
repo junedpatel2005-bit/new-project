@@ -378,12 +378,6 @@ export async function notifyMilestoneFunded(input: {
 }) {
   const href = `/project/${input.projectId}/tracking`;
   const amount = `₹${input.amount.toLocaleString("en-IN")}`;
-  await notifyUsers([input.clientId], {
-    type: "MILESTONE_FUNDED",
-    title: "Milestone payment received",
-    description: `${amount} has been received for ${input.milestoneTitle}. The professional payout is waiting for admin approval.`,
-    href,
-  });
   await notifyUsers([input.professionalId], {
     type: "MILESTONE_FUNDED",
     title: "Milestone funded",

@@ -33,7 +33,7 @@ export async function respondToProjectRequest(
 
   if (action === "reject") {
     await db.projectRequest.update({ where: { id: requestId }, data: { status: "REJECTED" } });
-    await notifyUsers([hireRequest.clientId, hireRequest.professionalId], {
+    await notifyUsers([otherPartyId], {
       type: "REQUEST_DECLINED",
       title: "Request Declined",
       description: `Your request for ${job?.title ?? "the job"} was declined.`,
@@ -72,7 +72,7 @@ export async function respondToProjectRequest(
         coverLetter: counterInput.message,
       },
     });
-    await notifyUsers([hireRequest.clientId, hireRequest.professionalId], {
+    await notifyUsers([otherPartyId], {
       type: "REQUEST_COUNTERED",
       title: "New Counter-Offer",
       description: `New terms proposed for ${job?.title ?? "the job"}: ₹${counterInput.bidAmount.toLocaleString()}.`,
@@ -120,8 +120,8 @@ export async function respondToProjectRequest(
     },
   });
   const clientAccepted = actor.role === "CLIENT";
-  await notifyUsers([hireRequest.clientId, hireRequest.professionalId], {
-    type: clientAccepted ? "PROJECT_AWARDED" : "REQUEST_ACCEPTED",
+  await notifyUsers([otherPartyId], {
+    type: "REQUEST_ACCEPTED",
     title: clientAccepted ? "Congratulations! You got the project" : "Request Accepted",
     description: clientAccepted
       ? `Congratulations! The client accepted your proposal for ${job.title ?? "the project"}. You got the project.`

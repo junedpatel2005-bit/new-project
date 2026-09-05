@@ -28,6 +28,12 @@ type RunningProject = {
   budget: number | null;
   timingType: string;
   progress: number;
+  milestones: {
+    id: number;
+    title: string;
+    status: string;
+    isCompleted: boolean;
+  }[];
   currentStage: string | null;
 };
 
@@ -369,6 +375,27 @@ export default function RunningProjectsPage() {
                         style={{ width: `${Math.min(Math.max(project.progress, 0), 100)}%` }}
                       />
                     </div>
+                    {project.milestones.length > 0 && (
+                      <div className="mt-3 space-y-1.5">
+                        {project.milestones.map((milestone, index) => (
+                          <div key={milestone.id} className="flex items-center gap-2 text-xs">
+                            <span
+                              className={`h-2 w-2 shrink-0 rounded-full ${
+                                milestone.isCompleted ? "bg-emerald-500" : "bg-muted-foreground/30"
+                              }`}
+                            />
+                            <span className="min-w-0 flex-1 truncate">
+                              {index + 1}. {milestone.title}
+                            </span>
+                            <span className="text-muted-foreground">
+                              {milestone.isCompleted
+                                ? "Completed"
+                                : displayStatus(milestone.status)}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               </article>

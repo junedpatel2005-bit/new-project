@@ -3,6 +3,13 @@ import nodemailer from "nodemailer";
 
 let emailConfigurationWarningShown = false;
 
+function klickProSender() {
+  const configuredSender = process.env.SMTP_FROM?.trim();
+  if (!configuredSender) return configuredSender;
+  const address = configuredSender.match(/<([^<>]+)>/)?.[1] ?? configuredSender;
+  return `Klick-Pro <${address}>`;
+}
+
 function escapeHtml(value: string) {
   return value.replace(
     /[&<>"']/g,
@@ -10,6 +17,40 @@ function escapeHtml(value: string) {
       ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character] ??
       character,
   );
+}
+
+function renderNotificationEmailHtml(input: {
+  title: string;
+  description: string;
+  href?: string;
+  detailsHtml: string;
+}) {
+  const safeTitle = escapeHtml(input.title);
+  const safeDescription = escapeHtml(input.description);
+  const actionHtml = input.href
+    ? `<p style="margin:28px 0 0;text-align:center"><a href="${escapeHtml(input.href)}" style="display:inline-block;background:#2454d6;color:#ffffff;font-size:16px;font-weight:600;padding:15px 24px;border-radius:8px;text-decoration:none">View in Klick-Pro</a></p><p style="margin:24px 0 0;color:#829ab1;font-size:13px;line-height:1.6;text-align:center">If the button does not work, copy and paste this link into your browser:<br><span style="word-break:break-all;color:#486581">${escapeHtml(input.href)}</span></p>`
+    : "";
+
+  return `<!doctype html>
+<html lang="en">
+  <body style="margin:0;background:#f8fafc;font-family:Arial,Helvetica,sans-serif;color:#0b1f4d">
+    <div style="display:none;max-height:0;overflow:hidden;opacity:0">${safeTitle}</div>
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f8fafc">
+      <tr><td align="center" style="padding:40px 16px">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:620px;background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden">
+          <tr><td style="padding:28px 32px;border-bottom:1px solid #eef2f7"><div style="font-size:24px;font-weight:700;color:#1748b5">Klick-Pro</div></td></tr>
+          <tr><td style="padding:48px 32px;text-align:left">
+            <h1 style="margin:0;color:#0b1f4d;font-size:30px;line-height:1.2">${safeTitle}</h1>
+            <p style="margin:20px 0 0;color:#334e68;font-size:16px;line-height:1.6;white-space:pre-line">${safeDescription}</p>
+            ${input.detailsHtml}
+            ${actionHtml}
+          </td></tr>
+          <tr><td style="padding:20px 32px;border-top:1px solid #eef2f7;text-align:center;color:#829ab1;font-size:12px;line-height:1.5">You are receiving this email from Klick-Pro.<br>&copy; 2026 Klick-Pro, Inc.</td></tr>
+        </table>
+      </td></tr>
+    </table>
+  </body>
+</html>`;
 }
 
 export async function sendAuthEmail(
@@ -30,7 +71,7 @@ export async function sendAuthEmail(
   const safeActionUrl = escapeHtml(actionUrl);
   const textActionUrl = actionUrl;
   await transporter.sendMail({
-    from: process.env.SMTP_FROM,
+    from: klickProSender(),
     to,
     subject,
     text: `${heading}\n\nUse the secure link below. It expires in 24 hours.\n\n${action}: ${textActionUrl}\n\nIf you did not create this account, you can ignore this email.`,
@@ -91,8 +132,6 @@ export async function sendNotificationEmail(input: {
     secure: Number(process.env.SMTP_PORT ?? 587) === 465,
     auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
   });
-  const safeTitle = escapeHtml(input.title);
-  const safeDescription = escapeHtml(input.description);
   const details = input.details?.filter((detail) => detail.value.trim()) ?? [];
   const detailsHtml = details.length
     ? `<div style="margin:24px 0 0;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden">${details
@@ -106,12 +145,17 @@ export async function sendNotificationEmail(input: {
     ? `\n\n${details.map((detail) => `${detail.label}: ${detail.value}`).join("\n")}`
     : "";
   const textDescription = `\n\n${input.description}`;
-  const htmlDescription = `<p>${safeDescription}</p>`;
+  const actionText = input.href ? `\n\nView in Klick-Pro: ${input.href}` : "";
   await transporter.sendMail({
-    from: process.env.SMTP_FROM,
+    from: klickProSender(),
     to: input.to,
     subject: input.title,
-    text: `${input.title}${textDescription}${textDetails}`,
-    html: `<main style="font-family:Arial,sans-serif;background:#F7F9FC;padding:32px"><section style="max-width:560px;margin:auto;background:#fff;padding:32px;border-radius:16px"><h1 style="color:#0B1F4D">${safeTitle}</h1>${htmlDescription}${detailsHtml}</section></main>`,
+    text: `${input.title}${textDescription}${textDetails}${actionText}`,
+    html: renderNotificationEmailHtml({
+      title: input.title,
+      description: input.description,
+      href: input.href,
+      detailsHtml,
+    }),
   });
 }

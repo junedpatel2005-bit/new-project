@@ -37,7 +37,13 @@ export async function GET(request: NextRequest) {
           take: 4,
         }),
         db.userNotification.findMany({
-          where: { userId, clearedAt: null },
+          where: {
+            userId,
+            clearedAt: null,
+            type: {
+              notIn: ["PROPOSAL_SENT", "PROPOSAL_UPDATE_SENT", "HIRE_REQUEST_SENT"],
+            },
+          },
           orderBy: { createdAt: "desc" },
         }),
         db.projectTransaction.aggregate({

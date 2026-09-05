@@ -22,6 +22,13 @@ async function sessionFromRequest(request: NextRequest) {
   }
 }
 
+function milestoneProgress(status: string, paymentStatus?: string) {
+  if (status === "APPROVED" || paymentStatus === "COMPLETED") return 100;
+  if (status === "SUBMITTED") return 75;
+  if (status === "IN_PROGRESS") return 50;
+  return 0;
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ resource: string }> },
@@ -32,7 +39,13 @@ export async function GET(
   try {
     if (resource === "notifications") {
       const notifications = await db.userNotification.findMany({
-        where: { userId: session.userId, clearedAt: null },
+        where: {
+          userId: session.userId,
+          clearedAt: null,
+          type: {
+            notIn: ["PROPOSAL_SENT", "PROPOSAL_UPDATE_SENT", "HIRE_REQUEST_SENT"],
+          },
+        },
         orderBy: { createdAt: "desc" },
       });
       const projectIdFor = (href: string | null) => {
@@ -195,7 +208,8 @@ export async function GET(
             notification.type.startsWith("COUNTER_") ||
             notification.type.startsWith("OFFER_");
 
-          const isProjectOrJob = hasProjectOrProposalEngagement || (jobId !== null && projectId !== null);
+          const isProjectOrJob =
+            hasProjectOrProposalEngagement || (jobId !== null && projectId !== null);
 
           const desc = `${notification.title} ${notification.description ?? ""}`;
 
@@ -493,6 +507,12 @@ export async function GET(
             where: { professionalId: session.userId, status: { not: "COMPLETED" } },
             orderBy: { acceptedAt: "desc" },
             take: 20,
+            include: {
+              milestones: {
+                orderBy: { createdAt: "asc" },
+                include: { payment: { select: { status: true } } },
+              },
+            },
           }),
           db.projectTracking.findMany({
             where: { professionalId: session.userId, status: "COMPLETED" },
@@ -731,7 +751,25 @@ export async function GET(
                 jobMap.get(project.jobId)?.budgetMin ??
                 null),
           timingType: jobMap.get(project.jobId)?.timingType ?? "FIXED",
-          progress: project.progress,
+          progress:
+            project.status === "COMPLETED"
+              ? 100
+              : project.milestones.length > 0
+                ? Math.round(
+                    project.milestones.reduce(
+                      (total, milestone) =>
+                        total + milestoneProgress(milestone.status, milestone.payment?.status),
+                      0,
+                    ) / project.milestones.length,
+                  )
+                : 0,
+          milestones: project.milestones.map((milestone) => ({
+            id: milestone.id,
+            title: milestone.title,
+            status: milestone.status,
+            isCompleted:
+              milestone.status === "APPROVED" || milestone.payment?.status === "COMPLETED",
+          })),
           currentStage: project.currentStage,
         })),
         completedProjects: await Promise.all(

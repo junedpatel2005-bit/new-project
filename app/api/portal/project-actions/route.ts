@@ -176,7 +176,11 @@ export async function POST(request: NextRequest) {
               ]
             : []),
         ];
-        await notifyUsers([project.clientId, project.professionalId], {
+        const partnerRecipients =
+          session.role === "ADMIN"
+            ? [project.clientId, project.professionalId]
+            : [project.clientId, project.professionalId].filter((id) => id !== session.userId);
+        await notifyUsers(partnerRecipients, {
           type: `PROJECT_ACTIVITY_${type}`,
           title,
           description: description ?? title,
@@ -261,7 +265,7 @@ export async function POST(request: NextRequest) {
       }
       const jobDates = await db.clientJob.findUnique({
         where: { id: project.jobId },
-        select: { jobDate: true, deadline: true },
+        select: { title: true, jobDate: true, deadline: true },
       });
       if (
         input.deadline &&
@@ -295,7 +299,8 @@ export async function POST(request: NextRequest) {
           status: activeCount === 0 ? "IN_PROGRESS" : "UPCOMING",
         },
       });
-      await event("MILESTONE_CREATED", "Milestone created", input.title, {
+      const jobTitle = jobDates?.title?.trim() || `Project #${project.id}`;
+      await event("MILESTONE_CREATED", `Milestone created · ${jobTitle}`, input.title, {
         milestoneId: milestone.id,
       });
     }
@@ -572,7 +577,7 @@ export async function POST(request: NextRequest) {
     }
     if (input.action === "request-client") {
       await event("PROFESSIONAL_REQUEST", input.title ?? "Request sent to client", input.note);
-      await notifyUsers([project.clientId, project.professionalId], {
+      await notifyUsers([project.clientId], {
         type: "PROJECT_REQUEST",
         title: input.title ?? "Request from your professional",
         description: input.note,
@@ -603,7 +608,7 @@ export async function POST(request: NextRequest) {
         "Completion confirmation requested",
         "The client reviewed the final work and asked the professional to confirm project completion.",
       );
-      await notifyUsers([project.clientId, project.professionalId], {
+      await notifyUsers([project.professionalId], {
         type: "PROJECT_COMPLETION_REQUESTED",
         title: "Completion request received",
         description: "The client reviewed the final work and is asking you to confirm completion.",
@@ -639,7 +644,7 @@ export async function POST(request: NextRequest) {
         "The professional confirmed project completion after the client requested confirmation.",
         { progress: 100 },
       );
-      await notifyUsers([project.clientId, project.professionalId], {
+      await notifyUsers([project.clientId], {
         type: "PROJECT_COMPLETED",
         title: "Project completed",
         description: "The professional confirmed that your project is complete.",

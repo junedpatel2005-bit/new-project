@@ -113,18 +113,6 @@ export async function POST(request: NextRequest) {
           { label: "Proposal message", value: parsed.data.coverLetter },
         ],
       });
-      await notifyUsers([session.userId], {
-        type: "PROPOSAL_UPDATE_SENT",
-        title: "Proposal updated successfully",
-        description: `Your proposal for ${job.title ?? "the job"} was updated and sent to the client.`,
-        href: `/job/${job.id}`,
-        emailDetails: [
-          { label: "Project", value: job.title ?? `Project #${job.id}` },
-          { label: "Proposed amount", value: `₹${parsed.data.bidAmount.toLocaleString("en-IN")}` },
-          { label: "Delivery time", value: parsed.data.duration },
-          { label: "Proposal message", value: parsed.data.coverLetter },
-        ],
-      });
       emitRealtimeProposalNew([job.userId], { jobId: job.id });
       return NextResponse.json({ proposal: updated });
     }
@@ -157,18 +145,6 @@ export async function POST(request: NextRequest) {
             ? `${professional.firstName} ${professional.lastName}`.trim()
             : "A professional",
         },
-        { label: "Project", value: job.title ?? `Project #${job.id}` },
-        { label: "Proposed amount", value: `₹${parsed.data.bidAmount.toLocaleString("en-IN")}` },
-        { label: "Delivery time", value: parsed.data.duration },
-        { label: "Proposal message", value: parsed.data.coverLetter },
-      ],
-    });
-    await notifyUsers([session.userId], {
-      type: "PROPOSAL_SENT",
-      title: "Proposal sent successfully",
-      description: `Your proposal for ${job.title ?? "the job"} was sent to the client.`,
-      href: `/job/${job.id}`,
-      emailDetails: [
         { label: "Project", value: job.title ?? `Project #${job.id}` },
         { label: "Proposed amount", value: `₹${parsed.data.bidAmount.toLocaleString("en-IN")}` },
         { label: "Delivery time", value: parsed.data.duration },

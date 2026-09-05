@@ -70,6 +70,13 @@ type Upload = {
   milestoneId: number | null;
 };
 
+function milestoneProgress(status: string, paymentStatus?: string) {
+  if (status === "APPROVED" || paymentStatus === "COMPLETED") return 100;
+  if (status === "SUBMITTED") return 75;
+  if (status === "IN_PROGRESS") return 50;
+  return 0;
+}
+
 type Data = {
   project: {
     id: number;
@@ -467,14 +474,20 @@ export default function SharedProjectTrackingPage() {
       total + (milestone.payment && milestone.payment.status !== "FAILED" ? milestone.amount : 0),
     0,
   );
-  const approvedMilestonesTotal = data.milestones
-    .filter((m) => m.status === "APPROVED" || m.payment?.status === "COMPLETED")
-    .reduce((sum, m) => sum + m.amount, 0);
+  const completedMilestones = data.milestones.filter(
+    (m) => m.status === "APPROVED" || m.payment?.status === "COMPLETED",
+  );
   const autoProgressPercentage =
     data.project.status === "COMPLETED"
       ? 100
-      : totalAgreed > 0
-        ? Math.min(100, Math.round((approvedMilestonesTotal / totalAgreed) * 100))
+      : data.milestones.length > 0
+        ? Math.round(
+            data.milestones.reduce(
+              (total, milestone) =>
+                total + milestoneProgress(milestone.status, milestone.payment?.status),
+              0,
+            ) / data.milestones.length,
+          )
         : 0;
   const remainingProjectBalance = Math.max(0, totalAgreed - clientPaidMilestoneTotal);
   const remainingClientPayment = remainingProjectBalance;
@@ -558,7 +571,7 @@ export default function SharedProjectTrackingPage() {
                 >
                   <MessageSquare className="h-4 w-4 text-white" />
                   <span>
-                    Message {isClient ? (professional || "Professional") : (client || "Client")}
+                    Message {isClient ? professional || "Professional" : client || "Client"}
                   </span>
                 </Link>
               )}
@@ -640,34 +653,7 @@ export default function SharedProjectTrackingPage() {
                     completed.
                   </p>
                 </div>
-              ) : (
-                <div className="rounded-2xl bg-muted p-4 shadow-2xs">
-                  <div className="flex items-center justify-between text-sm font-medium">
-                    <span className="font-semibold text-foreground">Overall progress</span>
-                    <span className="font-bold text-primary">{autoProgressPercentage}%</span>
-                  </div>
-                  <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-background">
-                    <div
-                      className="h-full rounded-full bg-[linear-gradient(90deg,var(--color-primary),var(--color-cta))] transition-all duration-700"
-                      style={{ width: `${Math.min(Math.max(autoProgressPercentage, 0), 100)}%` }}
-                    />
-                  </div>
-                  <div className="mt-2.5 flex items-center justify-between text-xs text-muted-foreground">
-                    <span>
-                      {
-                        data.milestones.filter(
-                          (m) => m.status === "APPROVED" || m.payment?.status === "COMPLETED",
-                        ).length
-                      }{" "}
-                      of {data.milestones.length} milestones approved &amp; paid
-                    </span>
-                    <span className="font-medium text-foreground">
-                      ₹{approvedMilestonesTotal.toLocaleString("en-IN")} of ₹
-                      {totalAgreed.toLocaleString("en-IN")} (Auto-calculated)
-                    </span>
-                  </div>
-                </div>
-              )}
+              ) : null}
               <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 <Info icon={Clock3} label="Started" value={date(data.project.startedAt)} />
                 <Info icon={CalendarDays} label="Deadline" value={date(data.job?.deadline)} />
@@ -722,6 +708,58 @@ export default function SharedProjectTrackingPage() {
                     <MapPin className="h-5 w-5 text-primary" />
                     <div>
                       <h2 className="text-base font-semibold">Project location</h2>
+
+                      <section className="rounded-2xl border bg-card p-5 shadow-soft">
+                        <div className="rounded-2xl bg-muted p-4 shadow-2xs">
+                          <div className="flex items-center justify-between text-sm font-medium">
+                            <span className="font-semibold text-foreground">Overall progress</span>
+                            <span className="font-bold text-primary">
+                              {autoProgressPercentage}%
+                            </span>
+                          </div>
+                          <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-background">
+                            <div
+                              className="h-full rounded-full bg-[linear-gradient(90deg,var(--color-primary),var(--color-cta))] transition-all duration-700"
+                              style={{
+                                width: `${Math.min(Math.max(autoProgressPercentage, 0), 100)}%`,
+                              }}
+                            />
+                          </div>
+                          <div className="mt-2.5 flex items-center justify-between text-xs text-muted-foreground">
+                            <span>
+                              {completedMilestones.length} of {data.milestones.length} milestones
+                              completed
+                            </span>
+                            <span className="font-medium text-foreground">
+                              Milestone-wise (Auto-calculated)
+                            </span>
+                          </div>
+                          <div className="mt-3 space-y-1.5 border-t border-border/60 pt-3">
+                            {data.milestones.map((milestone, index) => {
+                              const isCompleted = completedMilestones.some(
+                                ({ id }) => id === milestone.id,
+                              );
+                              return (
+                                <div key={milestone.id} className="flex items-center gap-2 text-xs">
+                                  <span
+                                    className={`h-2 w-2 shrink-0 rounded-full ${
+                                      isCompleted ? "bg-emerald-500" : "bg-muted-foreground/30"
+                                    }`}
+                                  />
+                                  <span className="min-w-0 flex-1 truncate">
+                                    {index + 1}. {milestone.title}
+                                  </span>
+                                  <span className="text-muted-foreground">
+                                    {isCompleted
+                                      ? "Completed"
+                                      : milestone.status.replaceAll("_", " ")}
+                                  </span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </section>
                       <p className="text-sm text-muted-foreground">
                         {isClient
                           ? "Where you asked the professional to work"

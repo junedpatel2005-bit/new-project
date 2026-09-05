@@ -29,6 +29,7 @@ import type {
   MarketingPageId,
   MarketingItem,
 } from "@/lib/marketing-cms-shared";
+import type { MarketplaceCategory } from "@/lib/types/marketplace";
 import { getAllStates, getDistrictsByState } from "@/lib/india-locations";
 
 type ServiceJob = {
@@ -191,9 +192,13 @@ function ServicesJobsSection({ cmsMode }: { cmsMode: boolean }) {
   const [state, setState] = useState("");
   const [district, setDistrict] = useState("");
   const [segment, setSegment] = useState("");
+  const [parentCategoryId, setParentCategoryId] = useState<number | null>(null);
+  const [subCategoryId, setSubCategoryId] = useState<number | null>(null);
+  const [subSubCategoryId, setSubSubCategoryId] = useState<number | null>(null);
   const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [loading, setLoading] = useState(!cmsMode);
   const [isAuthenticated, setIsAuthenticated] = useState(cmsMode);
+  const [allCategories, setAllCategories] = useState<MarketplaceCategory[]>([]);
 
   useEffect(() => {
     if (cmsMode) return;
@@ -205,11 +210,50 @@ function ServicesJobsSection({ cmsMode }: { cmsMode: boolean }) {
 
   useEffect(() => {
     if (cmsMode) return;
+    void fetch("/api/v1/marketplace/categories", { cache: "no-store" })
+      .then((response) => (response.ok ? response.json() : Promise.reject()))
+      .then((data: MarketplaceCategory[]) => setAllCategories(Array.isArray(data) ? data : []))
+      .catch(() => setAllCategories([]));
+  }, [cmsMode]);
+
+  useEffect(() => {
+    if (cmsMode) return;
     void fetch("/api/marketplace/jobs", { cache: "no-store" })
       .then((response) => (response.ok ? response.json() : Promise.reject()))
       .then((data: ServiceJob[]) => setJobs(Array.isArray(data) ? data : []))
       .finally(() => setLoading(false));
   }, [cmsMode]);
+
+  const parentCategories = allCategories.filter((item) => item.parentId === null);
+  const midCategories =
+    parentCategoryId === null
+      ? []
+      : allCategories.filter((item) => item.parentId === parentCategoryId);
+  const selectedParent = parentCategories.find((item) => item.id === parentCategoryId) ?? null;
+  const subCategories =
+    subCategoryId === null ? [] : allCategories.filter((item) => item.parentId === subCategoryId);
+  const selectedSubCategory = allCategories.find((item) => item.id === subCategoryId) ?? null;
+
+  const selectedSubSubCategory = allCategories.find((item) => item.id === subSubCategoryId) ?? null;
+
+  const parentMatchNames = new Set<string>();
+  if (selectedParent) {
+    parentMatchNames.add(selectedParent.name);
+    allCategories
+      .filter((item) => item.parentId === selectedParent.id)
+      .forEach((item) => parentMatchNames.add(item.name));
+  }
+
+  const subMatchNames = new Set<string>();
+  if (selectedSubCategory) {
+    subMatchNames.add(selectedSubCategory.name);
+    allCategories
+      .filter((item) => item.parentId === selectedSubCategory.id)
+      .forEach((item) => subMatchNames.add(item.name));
+  }
+
+  const subSubMatchNames = new Set<string>();
+  if (selectedSubSubCategory) subSubMatchNames.add(selectedSubSubCategory.name);
 
   const categories = [...new Set(jobs.map((job) => job.category).filter(Boolean))] as string[];
   const filteredJobs = cmsMode
@@ -217,13 +261,21 @@ function ServicesJobsSection({ cmsMode }: { cmsMode: boolean }) {
     : jobs.filter((job) => {
         const searchable =
           `${job.title ?? ""} ${job.description ?? ""} ${job.category ?? ""} ${job.locationLabel ?? ""} ${job.locationAddress ?? ""}`.toLowerCase();
+        const jobCategory = job.category ?? "";
+        const segmentMatch = segment
+          ? subSubCategoryId !== null
+            ? subSubMatchNames.has(jobCategory)
+            : subCategoryId !== null
+              ? subMatchNames.has(jobCategory)
+              : parentMatchNames.has(jobCategory)
+          : true;
         return (
           (!query || searchable.includes(query.toLowerCase())) &&
           (!category || job.category === category) &&
           (!location || searchable.includes(location.toLowerCase())) &&
           (!state || job.locationState === state) &&
           (!district || job.locationDistrict === district) &&
-          (!segment || (job.category ?? "").toLowerCase().includes(segment.toLowerCase())) &&
+          segmentMatch &&
           (!verifiedOnly || job.clientVerified)
         );
       });
@@ -251,6 +303,9 @@ function ServicesJobsSection({ cmsMode }: { cmsMode: boolean }) {
                     setState("");
                     setDistrict("");
                     setSegment("");
+                    setParentCategoryId(null);
+                    setSubCategoryId(null);
+                    setSubSubCategoryId(null);
                     setVerifiedOnly(false);
                   }}
                   className="text-xs text-primary hover:underline"
@@ -294,21 +349,120 @@ function ServicesJobsSection({ cmsMode }: { cmsMode: boolean }) {
                   <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
                     Category
                   </p>
-                  <div className="flex flex-wrap gap-2">
-                    {["Residential", "Commercial", "Industrial"].map((item) => (
-                      <button
-                        key={item}
-                        type="button"
-                        onClick={() => setSegment(segment === item ? "" : item)}
-                        className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${segment === item ? "border-primary bg-primary text-primary-foreground" : "border-border text-muted-foreground hover:border-primary/40"}`}
+                  {parentCategories.length > 0 ? (
+                    <>
+                      <select
+                        value={parentCategoryId ?? ""}
+                        onChange={(event) => {
+                          const next = event.target.value ? Number(event.target.value) : null;
+                          if (next === null) {
+                            setParentCategoryId(null);
+                            setSubCategoryId(null);
+                            setSubSubCategoryId(null);
+                            setSegment("");
+                          } else {
+                            const parent = parentCategories.find((item) => item.id === next);
+                            setParentCategoryId(next);
+                            setSubCategoryId(null);
+                            setSubSubCategoryId(null);
+                            setSegment(parent?.name ?? "");
+                          }
+                        }}
+                        className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm"
                       >
-                        {item}
-                      </button>
-                    ))}
-                  </div>
-                  <p className="mt-2 text-xs text-muted-foreground">
-                    Select a service type to narrow the jobs.
-                  </p>
+                        <option value="">All service types</option>
+                        {parentCategories.map((item) => (
+                          <option key={item.id} value={item.id}>
+                            {item.name.replace(" Services", "")}
+                          </option>
+                        ))}
+                      </select>
+                      {parentCategoryId === null ? (
+                        <p className="mt-2 text-xs text-muted-foreground">
+                          Select a service type to narrow the jobs.
+                        </p>
+                      ) : midCategories.length > 0 ? (
+                        <div className="mt-4 space-y-3 border-t border-border pt-3">
+                          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                            {selectedParent?.name.replace(" Services", "") ?? "Categories"}
+                          </p>
+                          <div className="max-h-44 space-y-1 overflow-y-auto pr-1">
+                            {midCategories.map((item) => {
+                              const isActive = subCategoryId === item.id;
+                              return (
+                                <button
+                                  key={item.id}
+                                  type="button"
+                                  onClick={() => {
+                                    if (isActive) {
+                                      setSubCategoryId(null);
+                                      setSubSubCategoryId(null);
+                                    } else {
+                                      setSubCategoryId(item.id);
+                                      setSubSubCategoryId(null);
+                                    }
+                                  }}
+                                  className={`flex w-full items-center justify-between rounded-lg border px-3 py-2 text-left text-xs font-medium transition ${
+                                    isActive
+                                      ? "border-primary bg-primary/10 text-primary"
+                                      : "border-border text-foreground hover:border-primary/40"
+                                  }`}
+                                >
+                                  <span>{item.name}</span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                          {subCategoryId !== null && subCategories.length > 0 && (
+                            <div className="mt-3 space-y-2 border-t border-border pt-3">
+                              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                                Sub-categories
+                              </p>
+                              <div className="max-h-40 space-y-1 overflow-y-auto pr-1">
+                                {subCategories.map((item) => {
+                                  const isActive = subSubCategoryId === item.id;
+                                  return (
+                                    <button
+                                      key={item.id}
+                                      type="button"
+                                      onClick={() =>
+                                        setSubSubCategoryId(isActive ? null : item.id)
+                                      }
+                                      className={`flex w-full items-center justify-between rounded-md border px-2.5 py-1.5 text-left text-[11px] font-medium transition ${
+                                        isActive
+                                          ? "border-primary bg-primary/10 text-primary"
+                                          : "border-border text-muted-foreground hover:border-primary/40"
+                                      }`}
+                                    >
+                                      <span>{item.name}</span>
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ) : null}
+                    </>
+                  ) : (
+                    <>
+                      <select
+                        value={segment}
+                        onChange={(event) => setSegment(event.target.value)}
+                        className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm"
+                      >
+                        <option value="">All service types</option>
+                        {["Residential", "Commercial", "Industrial"].map((item) => (
+                          <option key={item} value={item}>
+                            {item}
+                          </option>
+                        ))}
+                      </select>
+                      <p className="mt-2 text-xs text-muted-foreground">
+                        Select a service type to narrow the jobs.
+                      </p>
+                    </>
+                  )}
                 </div>
                 <div>
                   <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
