@@ -39,7 +39,6 @@ export async function GET(request: NextRequest) {
         db.userNotification.findMany({
           where: { userId, clearedAt: null },
           orderBy: { createdAt: "desc" },
-          take: 4,
         }),
         db.projectTransaction.aggregate({
           where: {

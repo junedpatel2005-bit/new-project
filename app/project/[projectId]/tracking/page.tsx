@@ -13,6 +13,7 @@ import {
   History,
   LayoutGrid,
   MapPin,
+  MessageSquare,
   SlidersHorizontal,
   Sparkles,
   Upload,
@@ -72,6 +73,8 @@ type Upload = {
 type Data = {
   project: {
     id: number;
+    clientId?: number;
+    professionalId?: number;
     status: string;
     progress: number;
     currentStage: string | null;
@@ -544,6 +547,21 @@ export default function SharedProjectTrackingPage() {
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
+              {(isClient ? data.project.professionalId : data.project.clientId) && (
+                <Link
+                  href={
+                    isClient
+                      ? `/messages?recipientId=${data.project.professionalId}&projectId=${data.project.id}`
+                      : `/professional/messages?recipientId=${data.project.clientId}&projectId=${data.project.id}`
+                  }
+                  className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white/10 px-4 py-2.5 text-xs font-semibold text-white hover:bg-white/20 transition backdrop-blur-sm shadow-xs"
+                >
+                  <MessageSquare className="h-4 w-4 text-white" />
+                  <span>
+                    Message {isClient ? (professional || "Professional") : (client || "Client")}
+                  </span>
+                </Link>
+              )}
               <Badge className="h-fit border-white/25 bg-white/15 px-3 py-1.5 text-white hover:bg-white/15">
                 {label(data.project.status)}
               </Badge>

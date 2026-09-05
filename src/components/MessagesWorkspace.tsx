@@ -1,10 +1,33 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { FormEvent, Suspense, useEffect, useMemo, useState } from "react";
 import { io } from "socket.io-client";
-import { CheckCheck, MessageCircle, Send, Search, ShieldCheck } from "lucide-react";
+import {
+  Briefcase,
+  CheckCheck,
+  ExternalLink,
+  MessageCircle,
+  Search,
+  Send,
+  ShieldCheck,
+} from "lucide-react";
 
-type Contact = {
+export type ContactProject = {
+  id: number;
+  jobId: number;
+  title: string;
+  category: string | null;
+  status: string;
+  progress: number;
+  completedMilestones: number;
+  totalMilestones: number;
+  isCompleted: boolean;
+  updatedAt: string;
+};
+
+export type Contact = {
   id: number;
   name: string;
   firstName: string;
@@ -14,7 +37,10 @@ type Contact = {
   conversationId: string | null;
   lastMessage: { body: string; createdAt: string } | null;
   unreadCount: number;
+  projects?: ContactProject[];
+  activeProject?: ContactProject | null;
 };
+
 type ChatMessage = {
   id: string;
   conversationId: string;
@@ -34,9 +60,67 @@ function initials(name: string) {
     .toUpperCase();
 }
 
-export function MessagesWorkspace({ admin = false }: { admin?: boolean }) {
+function formatProjectStatus(status: string) {
+  switch (status) {
+    case "READY_TO_START":
+      return "Ready to Start";
+    case "IN_PROGRESS":
+      return "In Progress";
+    case "AWAITING_CLIENT_REVIEW":
+      return "In Review";
+    case "REVISION_REQUESTED":
+      return "Revision Requested";
+    case "FINAL_WORK_SUBMITTED":
+      return "Work Submitted";
+    case "AWAITING_PROFESSIONAL_CONFIRMATION":
+      return "Awaiting Confirmation";
+    case "COMPLETED":
+      return "Completed";
+    case "CLOSED":
+      return "Closed";
+    default:
+      return status.replace(/_/g, " ");
+  }
+}
+
+function projectStatusColor(status: string, admin = false) {
+  if (admin) {
+    return "bg-indigo-500/20 text-indigo-300 border-indigo-400/30";
+  }
+  switch (status) {
+    case "IN_PROGRESS":
+      return "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20";
+    case "READY_TO_START":
+      return "bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20";
+    case "AWAITING_CLIENT_REVIEW":
+    case "REVISION_REQUESTED":
+    case "FINAL_WORK_SUBMITTED":
+    case "AWAITING_PROFESSIONAL_CONFIRMATION":
+      return "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20";
+    case "COMPLETED":
+      return "bg-slate-500/10 text-slate-700 dark:text-slate-400 border-slate-500/20";
+    default:
+      return "bg-primary/10 text-primary border-primary/20";
+  }
+}
+
+function MessagesWorkspaceInner({ admin = false }: { admin?: boolean }) {
+  const searchParams = useSearchParams();
+  const queryUserId =
+    searchParams.get("recipientId") ||
+    searchParams.get("user") ||
+    searchParams.get("userId");
+  const queryProjectId = searchParams.get("projectId") || searchParams.get("project");
+
   const [contacts, setContacts] = useState<Contact[]>([]);
-  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [selectedId, setSelectedId] = useState<number | null>(
+    queryUserId && Number.isSafeInteger(Number(queryUserId)) ? Number(queryUserId) : null,
+  );
+  const [selectedProjectId, setSelectedProjectId] = useState<number | null>(
+    queryProjectId && Number.isSafeInteger(Number(queryProjectId))
+      ? Number(queryProjectId)
+      : null,
+  );
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [text, setText] = useState("");
   const [search, setSearch] = useState("");
@@ -51,7 +135,14 @@ export function MessagesWorkspace({ admin = false }: { admin?: boolean }) {
     if (!response.ok) throw new Error("Unable to load messages.");
     const data = (await response.json()) as { contacts: Contact[] };
     setContacts(data.contacts);
-    setSelectedId((current) => current ?? data.contacts[0]?.id ?? null);
+    setSelectedId((current) => {
+      if (current) return current;
+      if (queryUserId && Number.isSafeInteger(Number(queryUserId))) {
+        const matching = data.contacts.find((c) => c.id === Number(queryUserId));
+        if (matching) return matching.id;
+      }
+      return data.contacts[0]?.id ?? null;
+    });
   };
 
   useEffect(() => {
@@ -77,13 +168,16 @@ export function MessagesWorkspace({ admin = false }: { admin?: boolean }) {
           window.dispatchEvent(new CustomEvent("servio:message-read"));
         });
       });
+
     const socket = io({ path: "/api/realtime", withCredentials: true });
+
     socket.on("message:new", (message: ChatMessage) => {
       setMessages((current) =>
         current.some((item) => item.id === message.id) ? current : [...current, message],
       );
       void loadContacts().catch(() => undefined);
     });
+
     socket.on(
       "message:read",
       (receipt: { conversationId: string; messageIds: string[]; readAt: string }) => {
@@ -97,8 +191,17 @@ export function MessagesWorkspace({ admin = false }: { admin?: boolean }) {
         );
       },
     );
+
+    // Refresh contacts automatically when a new project starts or changes status
+    const onProjectUpdate = () => {
+      void loadContacts().catch(() => undefined);
+    };
+    socket.on("project:updated", onProjectUpdate);
+    window.addEventListener("servio:project-update", onProjectUpdate);
+
     return () => {
       socket.disconnect();
+      window.removeEventListener("servio:project-update", onProjectUpdate);
     };
   }, []);
 
@@ -111,7 +214,18 @@ export function MessagesWorkspace({ admin = false }: { admin?: boolean }) {
       ),
     [admin, adminTab, contacts, search],
   );
+
   const selected = contacts.find((contact) => contact.id === selectedId) ?? null;
+
+  // Compute the current active project for the selected contact
+  const currentProject = useMemo(() => {
+    if (!selected) return null;
+    if (selectedProjectId && selected.projects?.length) {
+      const match = selected.projects.find((project) => project.id === selectedProjectId);
+      if (match) return match;
+    }
+    return selected.activeProject ?? selected.projects?.[0] ?? null;
+  }, [selected, selectedProjectId]);
 
   useEffect(() => {
     if (admin && selected && selected.role !== adminTab) {
@@ -153,7 +267,12 @@ export function MessagesWorkspace({ admin = false }: { admin?: boolean }) {
       const response = await fetch("/api/v1/messages", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ recipientId: selected.id, text }),
+        body: JSON.stringify({
+          recipientId: selected.id,
+          text,
+          projectId: currentProject?.id,
+          job: currentProject?.title,
+        }),
       });
       const data = (await response.json()) as { message?: ChatMessage; error?: string };
       if (!response.ok || !data.message)
@@ -196,7 +315,7 @@ export function MessagesWorkspace({ admin = false }: { admin?: boolean }) {
           </div>
         </div>
       </div>
-      <div className="grid min-h-[620px] lg:grid-cols-[320px_1fr]">
+      <div className="grid min-h-[620px] lg:grid-cols-[330px_1fr]">
         <aside
           className={`border-b lg:border-b-0 lg:border-r ${admin ? "border-white/10 bg-[#0d1426]" : "border-border"}`}
         >
@@ -237,8 +356,13 @@ export function MessagesWorkspace({ admin = false }: { admin?: boolean }) {
                 <button
                   type="button"
                   key={contact.id}
-                  onClick={() => setSelectedId(contact.id)}
-                  className={`flex w-full items-center gap-3 rounded-2xl p-3 text-left transition ${selectedId === contact.id ? (admin ? "bg-indigo-500/20" : "bg-primary/10") : admin ? "hover:bg-white/5" : "hover:bg-muted"}`}
+                  onClick={() => {
+                    setSelectedId(contact.id);
+                    if (contact.activeProject) {
+                      setSelectedProjectId(contact.activeProject.id);
+                    }
+                  }}
+                  className={`flex w-full items-start gap-3 rounded-2xl p-3 text-left transition ${selectedId === contact.id ? (admin ? "bg-indigo-500/20" : "bg-primary/10") : admin ? "hover:bg-white/5" : "hover:bg-muted"}`}
                 >
                   <div
                     className={`relative grid h-11 w-11 shrink-0 place-items-center rounded-full font-semibold ${admin ? "bg-indigo-400/20 text-indigo-200" : contact.role === "ADMIN" ? "bg-red-500/15 text-red-500" : "bg-primary/15 text-primary"}`}
@@ -255,12 +379,23 @@ export function MessagesWorkspace({ admin = false }: { admin?: boolean }) {
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2">
-                      <p
-                        className={`truncate text-sm font-semibold ${!admin && contact.role === "ADMIN" ? "text-red-500" : ""}`}
-                      >
-                        {contact.name}
-                      </p>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <p
+                          className={`shrink-0 text-sm font-semibold ${!admin && contact.role === "ADMIN" ? "text-red-500" : ""}`}
+                        >
+                          {contact.name}
+                        </p>
+                        {/* Show project name in bracket next to the contact name */}
+                        {contact.activeProject && (
+                          <span
+                            className="truncate text-xs font-normal text-muted-foreground"
+                            title={contact.activeProject.title}
+                          >
+                            ({contact.activeProject.title})
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
                         {contact.lastMessage && (
                           <span
                             className={`text-[10px] ${admin ? "text-slate-500" : "text-muted-foreground"}`}
@@ -277,6 +412,40 @@ export function MessagesWorkspace({ admin = false }: { admin?: boolean }) {
                         )}
                       </div>
                     </div>
+
+                    {/* Milestone & Completion Status Badge on Sidebar */}
+                    {contact.activeProject && (
+                      <div className="my-1 flex items-center gap-1.5 overflow-hidden">
+                        {contact.activeProject.isCompleted ? (
+                          <span className="inline-flex items-center gap-1 rounded-md border border-emerald-500/20 bg-emerald-500/10 px-1.5 py-0.5 text-[11px] font-semibold text-emerald-700 dark:text-emerald-400">
+                            <CheckCheck className="h-3 w-3 stroke-[3]" />
+                            Project Completed
+                          </span>
+                        ) : (
+                          <span
+                            className={`inline-flex max-w-full items-center gap-1 truncate rounded-md border px-1.5 py-0.5 text-[11px] font-medium ${projectStatusColor(contact.activeProject.status, admin)}`}
+                            title={`${contact.activeProject.progress}% • ${contact.activeProject.totalMilestones > 0 ? `${contact.activeProject.completedMilestones}/${contact.activeProject.totalMilestones} milestones completed` : formatProjectStatus(contact.activeProject.status)}`}
+                          >
+                            <Briefcase className="h-3 w-3 shrink-0" />
+                            <span className="truncate">
+                              {contact.activeProject.progress}%
+                              {contact.activeProject.totalMilestones > 0
+                                ? ` • ${contact.activeProject.completedMilestones}/${contact.activeProject.totalMilestones} milestones`
+                                : ` • ${formatProjectStatus(contact.activeProject.status)}`}
+                            </span>
+                          </span>
+                        )}
+                        {contact.projects && contact.projects.length > 1 && (
+                          <span
+                            className="shrink-0 rounded bg-muted px-1.5 py-0.5 text-[10px] font-semibold text-muted-foreground"
+                            title={`${contact.projects.length} connected projects`}
+                          >
+                            +{contact.projects.length - 1}
+                          </span>
+                        )}
+                      </div>
+                    )}
+
                     <p
                       className={`truncate text-xs ${admin ? "text-slate-400" : "text-muted-foreground"}`}
                     >
@@ -296,29 +465,171 @@ export function MessagesWorkspace({ admin = false }: { admin?: boolean }) {
           {selected ? (
             <>
               <header
-                className={`flex items-center gap-3 border-b p-4 ${admin ? "border-white/10" : "border-border"}`}
+                className={`flex flex-wrap items-center justify-between gap-3 border-b p-4 ${admin ? "border-white/10" : "border-border"}`}
               >
-                <div
-                  className={`grid h-11 w-11 place-items-center rounded-full font-semibold ${admin ? "bg-indigo-400/20 text-indigo-200" : selected.role === "ADMIN" ? "bg-red-500/15 text-red-500" : "bg-primary/15 text-primary"}`}
-                >
-                  {initials(selected.name)}
-                </div>
-                <div>
-                  <p
-                    className={`font-semibold ${!admin && selected.role === "ADMIN" ? "text-red-500" : ""}`}
+                <div className="flex items-center gap-3 min-w-0">
+                  <div
+                    className={`grid h-11 w-11 shrink-0 place-items-center rounded-full font-semibold ${admin ? "bg-indigo-400/20 text-indigo-200" : selected.role === "ADMIN" ? "bg-red-500/15 text-red-500" : "bg-primary/15 text-primary"}`}
                   >
-                    {selected.name}
-                  </p>
-                  <p className={`text-xs ${admin ? "text-slate-400" : "text-muted-foreground"}`}>
-                    {selected.role === "ADMIN"
-                      ? "Admin support"
-                      : selected.role === "PROFESSIONAL"
-                        ? "Professional"
-                        : "Client"}
-                  </p>
+                    {initials(selected.name)}
+                    {selected.avatarUrl && (
+                      <img
+                        src={selected.avatarUrl}
+                        alt=""
+                        className="h-full w-full rounded-full object-cover"
+                        onError={(event) => event.currentTarget.remove()}
+                      />
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <p
+                        className={`truncate font-semibold ${!admin && selected.role === "ADMIN" ? "text-red-500" : ""}`}
+                      >
+                        {selected.name}
+                      </p>
+                      {currentProject && (
+                        <span
+                          className="truncate text-xs font-normal text-muted-foreground hidden sm:inline"
+                          title={currentProject.title}
+                        >
+                          ({currentProject.title})
+                        </span>
+                      )}
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${admin ? "bg-white/10 text-slate-300" : "bg-muted text-muted-foreground"}`}
+                      >
+                        {selected.role === "ADMIN"
+                          ? "Admin support"
+                          : selected.role === "PROFESSIONAL"
+                            ? "Professional"
+                            : "Client"}
+                      </span>
+                    </div>
+
+                    {currentProject && (
+                      <div className="mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground sm:hidden truncate">
+                        <Briefcase className="h-3 w-3 shrink-0 text-primary" />
+                        <span className="truncate font-medium">{currentProject.title}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
-                {admin && <ShieldCheck className="ml-auto h-5 w-5 text-indigo-300" />}
+
+                {/* Right Area of Header: Percentage, Milestones, or Project Completed */}
+                {currentProject ? (
+                  <div className="flex items-center gap-3 ml-auto flex-wrap">
+                    {currentProject.isCompleted ? (
+                      <div className="flex items-center gap-2 rounded-2xl border border-emerald-500/30 bg-emerald-500/15 px-3.5 py-1.5 text-emerald-800 dark:text-emerald-300 shadow-2xs">
+                        <div className="grid h-5 w-5 place-items-center rounded-full bg-emerald-500 text-white">
+                          <CheckCheck className="h-3 w-3 stroke-[3]" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold leading-tight">Project Completed</p>
+                          <p className="text-[10px] opacity-80 mt-0.5">
+                            {currentProject.totalMilestones > 0
+                              ? `${currentProject.totalMilestones}/${currentProject.totalMilestones} milestones completed`
+                              : "100% completed"}
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div
+                        className={`flex items-center gap-3 rounded-2xl border px-3.5 py-1.5 shadow-2xs ${
+                          admin
+                            ? "border-white/10 bg-white/5 text-slate-200"
+                            : "border-border bg-muted/40 text-foreground"
+                        }`}
+                      >
+                        {/* Progress percentage & visual bar */}
+                        <div className="flex flex-col justify-center">
+                          <div className="flex items-center justify-between gap-3 text-xs font-semibold leading-tight">
+                            <span className="text-[11px] text-muted-foreground">Progress</span>
+                            <span className="text-primary font-bold">{currentProject.progress}%</span>
+                          </div>
+                          <div className="mt-1 h-1.5 w-24 sm:w-28 overflow-hidden rounded-full bg-background border border-border/40">
+                            <div
+                              className="h-full rounded-full bg-primary transition-all duration-500"
+                              style={{ width: `${Math.min(Math.max(currentProject.progress, 0), 100)}%` }}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Divider */}
+                        <div className="h-6 w-px bg-border shrink-0" />
+
+                        {/* Milestone completion count */}
+                        <div className="flex flex-col justify-center text-left">
+                          <p className="text-xs font-semibold leading-tight">
+                            {currentProject.totalMilestones > 0
+                              ? `${currentProject.completedMilestones} of ${currentProject.totalMilestones} milestones completed`
+                              : "No milestones yet"}
+                          </p>
+                          <p className="text-[10px] text-muted-foreground mt-0.5">
+                            Status: <span className="font-medium text-foreground">{formatProjectStatus(currentProject.status)}</span>
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    <Link
+                      href={`/project/${currentProject.id}/tracking`}
+                      className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-semibold transition ${
+                        admin
+                          ? "border-white/10 bg-white/5 text-slate-200 hover:bg-white/10"
+                          : "border-border bg-card text-foreground hover:bg-muted hover:border-primary/40 shadow-xs"
+                      }`}
+                    >
+                      <ExternalLink className="h-3.5 w-3.5 text-primary" />
+                      <span className="hidden sm:inline">View Tracking</span>
+                      <span className="sm:hidden">Tracking</span>
+                    </Link>
+                    {admin && <ShieldCheck className="h-5 w-5 text-indigo-300" />}
+                  </div>
+                ) : (
+                  admin && <ShieldCheck className="h-5 w-5 text-indigo-300 ml-auto" />
+                )}
               </header>
+
+              {/* Multi-Project Switcher Bar (when 2 or more projects exist with this contact) */}
+              {selected.projects && selected.projects.length > 1 && (
+                <div
+                  className={`flex items-center gap-2 border-b px-4 py-2 text-xs overflow-x-auto ${
+                    admin ? "border-white/10 bg-[#0d1426]" : "border-border bg-muted/30"
+                  }`}
+                >
+                  <span className="shrink-0 font-medium text-muted-foreground">
+                    Connected Projects ({selected.projects.length}):
+                  </span>
+                  <div className="flex items-center gap-1.5">
+                    {selected.projects.map((proj) => {
+                      const isCurrent = currentProject?.id === proj.id;
+                      return (
+                        <button
+                          key={proj.id}
+                          type="button"
+                          onClick={() => setSelectedProjectId(proj.id)}
+                          className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium transition ${
+                            isCurrent
+                              ? admin
+                                ? "border-indigo-400/40 bg-indigo-500/20 text-white"
+                                : "border-primary/30 bg-primary/10 text-primary shadow-xs"
+                              : admin
+                                ? "border-transparent bg-white/5 text-slate-400 hover:text-white"
+                                : "border-transparent bg-muted text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                          <span className="truncate max-w-[140px]">{proj.title}</span>
+                          <span className="text-[10px] opacity-75">
+                            • {proj.isCompleted ? "Completed" : `${proj.progress}%`}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               <div
                 className={`flex-1 space-y-3 overflow-y-auto p-4 sm:p-6 ${admin ? "bg-[#0b1020]" : "bg-muted/30"}`}
               >
@@ -355,10 +666,82 @@ export function MessagesWorkspace({ admin = false }: { admin?: boolean }) {
                   ))
                 ) : (
                   <div
-                    className={`grid h-full place-items-center text-center text-sm ${admin ? "text-slate-400" : "text-muted-foreground"}`}
+                    className={`mx-auto my-auto max-w-md p-6 text-center ${admin ? "text-slate-400" : "text-muted-foreground"}`}
                   >
-                    <MessageCircle className="mx-auto mb-3 h-10 w-10 text-primary/50" />
-                    No messages yet. Start the conversation.
+                    <div
+                      className={`mx-auto mb-4 grid h-14 w-14 place-items-center rounded-2xl ${
+                        admin ? "bg-indigo-500/20 text-indigo-300" : "bg-primary/10 text-primary"
+                      }`}
+                    >
+                      {currentProject ? (
+                        <Briefcase className="h-7 w-7" />
+                      ) : (
+                        <MessageCircle className="h-7 w-7" />
+                      )}
+                    </div>
+                    <h3
+                      className={`text-base font-semibold ${admin ? "text-white" : "text-foreground"}`}
+                    >
+                      Connected with {selected.name}
+                    </h3>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {currentProject
+                        ? "Collaborating on active project"
+                        : "Start the conversation"}
+                    </p>
+
+                    {/* Empty state project details card */}
+                    {currentProject && (
+                      <div
+                        className={`mt-4 rounded-2xl border p-4 text-left shadow-soft ${
+                          admin ? "border-white/10 bg-[#141d33]" : "border-border bg-card"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <span
+                            className={`text-[10px] font-bold uppercase tracking-wider ${
+                              admin ? "text-indigo-300" : "text-primary"
+                            }`}
+                          >
+                            Project Details
+                          </span>
+                          {currentProject.isCompleted ? (
+                            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:text-emerald-400">
+                              <CheckCheck className="h-3 w-3 stroke-[3]" />
+                              Project Completed
+                            </span>
+                          ) : (
+                            <span
+                              className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${projectStatusColor(currentProject.status, admin)}`}
+                            >
+                              {formatProjectStatus(currentProject.status)}
+                            </span>
+                          )}
+                        </div>
+                        <p
+                          className={`mt-1.5 font-semibold text-sm ${admin ? "text-white" : "text-foreground"}`}
+                        >
+                          {currentProject.title}
+                        </p>
+                        <div className="mt-3 flex items-center justify-between border-t border-border pt-2 text-xs">
+                          <span className="text-muted-foreground">
+                            Progress: {currentProject.progress}%{" "}
+                            {currentProject.totalMilestones > 0 &&
+                              `(${currentProject.completedMilestones}/${currentProject.totalMilestones} milestones completed)`}
+                          </span>
+                          <Link
+                            href={`/project/${currentProject.id}/tracking`}
+                            className="inline-flex items-center gap-1 font-medium text-primary hover:underline"
+                          >
+                            Open Tracking <ExternalLink className="h-3 w-3" />
+                          </Link>
+                        </div>
+                      </div>
+                    )}
+
+                    <p className="mt-4 text-xs text-muted-foreground">
+                      Send a message below to coordinate project deliverables, updates, or questions.
+                    </p>
                   </div>
                 )}
               </div>
@@ -398,5 +781,20 @@ export function MessagesWorkspace({ admin = false }: { admin?: boolean }) {
         </div>
       </div>
     </section>
+  );
+}
+
+export function MessagesWorkspace({ admin = false }: { admin?: boolean }) {
+  return (
+    <Suspense
+      fallback={
+        <section className="overflow-hidden rounded-3xl border border-border bg-card p-8 shadow-soft">
+          <div className="h-10 w-48 animate-pulse rounded-xl bg-muted" />
+          <div className="mt-4 h-64 animate-pulse rounded-2xl bg-muted/40" />
+        </section>
+      }
+    >
+      <MessagesWorkspaceInner admin={admin} />
+    </Suspense>
   );
 }

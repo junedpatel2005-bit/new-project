@@ -256,9 +256,7 @@ export function NotificationInbox({ admin: _isAdmin = false }: { admin?: boolean
 
     for (const item of items) {
       const hasEngagement = Boolean(
-        item.projectId ||
-        item.isProject ||
-        isEngagementType(item.type)
+        item.projectId || item.isProject || isEngagementType(item.type),
       );
       if (hasEngagement) {
         if (item.jobId) engagedJobIds.add(item.jobId);
@@ -278,7 +276,7 @@ export function NotificationInbox({ admin: _isAdmin = false }: { admin?: boolean
         item.isProject ||
         isEngagementType(item.type) ||
         (item.jobId && engagedJobIds.has(item.jobId)) ||
-        (t && engagedTitles.has(t) && (item.jobId || item.projectId))
+        (t && engagedTitles.has(t) && (item.jobId || item.projectId)),
       );
 
       if (belongsToActiveEngagement) {
@@ -290,6 +288,17 @@ export function NotificationInbox({ admin: _isAdmin = false }: { admin?: boolean
 
     return { projectItems: proj, otherItems: oth };
   }, [items]);
+
+  useEffect(() => {
+    if (
+      !loading &&
+      activeTab === "projects" &&
+      projectItems.length === 0 &&
+      otherItems.length > 0
+    ) {
+      setActiveTab("other");
+    }
+  }, [activeTab, loading, otherItems.length, projectItems.length]);
 
   // Group project items by project/job (unifying all updates for the same project/job into one card)
   const projectGroups = useMemo(() => {

@@ -69,7 +69,7 @@ export default function ProfessionalDashboard() {
       .catch(() => setError("Unable to load your professional dashboard."));
     void fetch("/api/portal/notifications")
       .then((response) => (response.ok ? response.json() : []))
-      .then((items: Notification[]) => setNotifications(items.slice(0, 4)))
+      .then((items: Notification[]) => setNotifications(items))
       .catch(() => setNotifications([]));
   }, []);
 
@@ -92,7 +92,7 @@ export default function ProfessionalDashboard() {
         .catch(() => undefined);
       void fetch("/api/portal/notifications", { cache: "no-store" })
         .then((response) => (response.ok ? response.json() : []))
-        .then((items: Notification[]) => setNotifications(items.slice(0, 4)))
+        .then((items: Notification[]) => setNotifications(items))
         .catch(() => setNotifications([]));
     };
     socket.on("notification:new", refreshDashboard);

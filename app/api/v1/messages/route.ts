@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ conversation });
   }
 
-  const activeProjects =
+  const allUserProjectsRaw =
     session.role === "ADMIN"
       ? []
       : await db.projectTracking.findMany({
@@ -53,17 +53,47 @@ export async function GET(request: NextRequest) {
             ...(session.role === "CLIENT"
               ? { clientId: session.userId }
               : { professionalId: session.userId }),
-            status: { not: "COMPLETED" },
           },
-          select: { clientId: true, professionalId: true },
+          include: {
+            job: { select: { id: true, title: true, category: true } },
+            milestones: {
+              select: {
+                id: true,
+                status: true,
+                payment: { select: { status: true } },
+              },
+            },
+          },
+          orderBy: { updatedAt: "desc" },
         });
+
+  const allUserProjects = allUserProjectsRaw.map((p) => {
+    const completedMilestones = p.milestones.filter(
+      (m) => m.status === "APPROVED" || m.payment?.status === "COMPLETED",
+    ).length;
+    const totalMilestones = p.milestones.length;
+    const isCompleted = p.status === "COMPLETED";
+    const calcProgress = isCompleted
+      ? 100
+      : totalMilestones > 0
+        ? Math.max(p.progress, Math.round((completedMilestones / totalMilestones) * 100))
+        : p.progress;
+
+    return {
+      ...p,
+      completedMilestones,
+      totalMilestones,
+      isCompleted,
+      calcProgress,
+    };
+  });
 
   const contactIds =
     session.role === "ADMIN"
       ? undefined
       : [
           ...new Set(
-            activeProjects.map((project) =>
+            allUserProjects.map((project) =>
               session.role === "CLIENT" ? project.professionalId : project.clientId,
             ),
           ),
@@ -86,7 +116,13 @@ export async function GET(request: NextRequest) {
           select: { id: true },
         });
   const adminConversationContactIds = adminConversationUsers.map((user) => user.id);
-  const allowedContactIds = [...new Set([...(contactIds ?? []), ...adminConversationContactIds])];
+  const allowedContactIds = [
+    ...new Set([
+      ...(contactIds ?? []),
+      ...adminConversationContactIds,
+      ...conversationPartnerIds,
+    ]),
+  ];
   const contacts = await db.user.findMany({
     where: {
       ...(session.role === "ADMIN"
@@ -118,12 +154,47 @@ export async function GET(request: NextRequest) {
         (item.userAId === session.userId && item.userBId === contact.id) ||
         (item.userAId === contact.id && item.userBId === session.userId),
     );
+    const userProjects = allUserProjects.filter((p) =>
+      session.role === "CLIENT" ? p.professionalId === contact.id : p.clientId === contact.id,
+    );
+    const runningProject =
+      userProjects.find((p) => p.status === "IN_PROGRESS") ??
+      userProjects.find((p) => !p.isCompleted && p.status !== "CLOSED") ??
+      userProjects[0] ??
+      null;
+
     return {
       ...contact,
       name: `${contact.firstName} ${contact.lastName}`.trim(),
       conversationId: conversation?.id ?? null,
       lastMessage: conversation?.messages[0] ?? null,
       unreadCount: unreadCounts.get(contact.id) ?? 0,
+      projects: userProjects.map((p) => ({
+        id: p.id,
+        jobId: p.jobId,
+        title: p.job?.title ?? `Project #${p.jobId}`,
+        category: p.job?.category ?? null,
+        status: p.status,
+        progress: p.calcProgress,
+        completedMilestones: p.completedMilestones,
+        totalMilestones: p.totalMilestones,
+        isCompleted: p.isCompleted,
+        updatedAt: p.updatedAt.toISOString(),
+      })),
+      activeProject: runningProject
+        ? {
+            id: runningProject.id,
+            jobId: runningProject.jobId,
+            title: runningProject.job?.title ?? `Project #${runningProject.jobId}`,
+            category: runningProject.job?.category ?? null,
+            status: runningProject.status,
+            progress: runningProject.calcProgress,
+            completedMilestones: runningProject.completedMilestones,
+            totalMilestones: runningProject.totalMilestones,
+            isCompleted: runningProject.isCompleted,
+            updatedAt: runningProject.updatedAt.toISOString(),
+          }
+        : null,
     };
   });
   contactRows.sort((first, second) => {
@@ -208,7 +279,12 @@ export async function PATCH(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const session = await getSession(request);
   if (!session) return NextResponse.json({ error: "Sign-in required." }, { status: 401 });
-  const body = (await request.json()) as { recipientId?: number; text?: string; job?: string };
+  const body = (await request.json()) as {
+    recipientId?: number;
+    text?: string;
+    job?: string;
+    projectId?: number;
+  };
   const recipientId = Number(body.recipientId);
   const text = body.text?.trim() ?? "";
   if (!Number.isSafeInteger(recipientId) || !text) {
@@ -221,14 +297,18 @@ export async function POST(request: NextRequest) {
   if (!recipient || (recipient.role === "ADMIN" && session.role === "ADMIN")) {
     return NextResponse.json({ error: "Recipient is unavailable." }, { status: 404 });
   }
+  let activeProject = null;
   if (session.role !== "ADMIN" && recipient.role !== "ADMIN") {
-    const activeProject = await db.projectTracking.findFirst({
+    activeProject = await db.projectTracking.findFirst({
       where: {
         status: { not: "COMPLETED" },
         ...(session.role === "CLIENT"
           ? { clientId: session.userId, professionalId: recipientId }
           : { professionalId: session.userId, clientId: recipientId }),
+        ...(body.projectId ? { id: Number(body.projectId) } : {}),
       },
+      include: { job: { select: { title: true } } },
+      orderBy: { updatedAt: "desc" },
     });
     if (!activeProject) {
       return NextResponse.json(
@@ -239,11 +319,13 @@ export async function POST(request: NextRequest) {
   }
   const sender = await db.user.findUnique({
     where: { id: session.userId },
-    select: { firstName: true, lastName: true },
+    select: { firstName: true, lastName: true, avatarUrl: true },
   });
   const existing = await db.socketConversation.findFirst({
     where: pairWhere(session.userId, recipientId),
   });
+  const resolvedJob =
+    body.job?.trim() || activeProject?.job?.title?.trim() || "Project conversation";
   const conversation =
     existing ??
     (await db.socketConversation.create({
@@ -251,10 +333,11 @@ export async function POST(request: NextRequest) {
         id: randomUUID(),
         userAId: session.userId,
         userBId: recipientId,
-        userAName: "User",
+        userAName: `${sender?.firstName ?? ""} ${sender?.lastName ?? ""}`.trim() || "User",
         userBName: `${recipient.firstName} ${recipient.lastName}`.trim(),
+        userAAvatarUrl: sender?.avatarUrl ?? null,
         userBAvatarUrl: recipient.avatarUrl,
-        job: body.job?.trim() || "Project conversation",
+        job: resolvedJob,
       },
     }));
   const message = await db.socketMessage.create({
@@ -268,7 +351,14 @@ export async function POST(request: NextRequest) {
   });
   await db.socketConversation.update({
     where: { id: conversation.id },
-    data: { updatedAt: new Date() },
+    data: {
+      updatedAt: new Date(),
+      ...(existing &&
+      resolvedJob &&
+      (existing.job === "Project conversation" || existing.job === "Direct message")
+        ? { job: resolvedJob }
+        : {}),
+    },
   });
   const senderName = `${sender?.firstName ?? ""} ${sender?.lastName ?? ""}`.trim() || "A user";
   const notification = {
