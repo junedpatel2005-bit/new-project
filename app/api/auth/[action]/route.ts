@@ -20,6 +20,7 @@ import { requestPhoneOtp, verifyPhoneOtp } from "@/lib/phone-otp-provider";
 import { clearRateLimit, rateLimit } from "@/lib/rate-limit";
 import { sendAuthEmail } from "@/lib/email";
 import { enqueueBackgroundJob } from "@/lib/background-jobs";
+import { enqueueBackgroundJob } from "@/lib/background-jobs";
 import { logServerError } from "@/lib/server-logger";
 import {
   notifyAdminsOfNewAccount,
@@ -713,7 +714,11 @@ export async function POST(
       const user = await db.user.findUniqueOrThrow({ where: { id: session.userId } });
       if (user.emailVerifiedAt) return NextResponse.json({ success: true });
       const raw = await createEmailVerificationToken(user.id);
-      await sendEmailVerificationLink(user.email, raw, publicAppOrigin(request));
+      enqueueBackgroundJob(
+        "email.verification.resend",
+        () => sendEmailVerificationLink(user.email, raw, publicAppOrigin(request)),
+        { userId: user.id },
+      );
       return NextResponse.json({ success: true });
     } catch {
       return safe("Unable to send a new verification code.", 500);
