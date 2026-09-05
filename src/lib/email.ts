@@ -19,10 +19,30 @@ function escapeHtml(value: string) {
   );
 }
 
+function publicAppOrigin() {
+  const configured = process.env.APP_URL?.trim();
+  if (!configured) return null;
+  try {
+    return new URL(configured).origin;
+  } catch {
+    return null;
+  }
+}
+
+function absoluteAppUrl(path: string | undefined, origin: string | null) {
+  if (!path || !origin) return path;
+  try {
+    return new URL(path, origin).toString();
+  } catch {
+    return path;
+  }
+}
+
 function renderNotificationEmailHtml(input: {
   title: string;
   description: string;
   href?: string;
+  websiteUrl?: string;
   detailsHtml: string;
 }) {
   const safeTitle = escapeHtml(input.title);
@@ -38,7 +58,7 @@ function renderNotificationEmailHtml(input: {
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f8fafc">
       <tr><td align="center" style="padding:40px 16px">
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:620px;background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden">
-          <tr><td style="padding:28px 32px;border-bottom:1px solid #eef2f7"><div style="font-size:24px;font-weight:700;color:#1748b5">Klick-Pro</div></td></tr>
+          <tr><td style="padding:28px 32px;border-bottom:1px solid #eef2f7"><a href="${escapeHtml(input.websiteUrl ?? "#")}" style="font-size:24px;font-weight:700;letter-spacing:-.4px;color:#1748b5;text-decoration:none">Klick-Pro</a></td></tr>
           <tr><td style="padding:48px 32px;text-align:left">
             <h1 style="margin:0;color:#0b1f4d;font-size:30px;line-height:1.2">${safeTitle}</h1>
             <p style="margin:20px 0 0;color:#334e68;font-size:16px;line-height:1.6;white-space:pre-line">${safeDescription}</p>
@@ -66,6 +86,7 @@ export async function sendAuthEmail(
     secure: Number(process.env.SMTP_PORT ?? 587) === 465,
     auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
   });
+  const websiteUrl = publicAppOrigin();
   const safeHeading = escapeHtml(heading);
   const safeAction = escapeHtml(action);
   const safeActionUrl = escapeHtml(actionUrl);
@@ -73,7 +94,7 @@ export async function sendAuthEmail(
   await transporter.sendMail({
     from: klickProSender(),
     to,
-    subject,
+    subject: `Klick-Pro | ${subject}`,
     text: `${heading}\n\nUse the secure link below. It expires in 24 hours.\n\n${action}: ${textActionUrl}\n\nIf you did not create this account, you can ignore this email.`,
     html: `<!doctype html>
 <html lang="en">
@@ -83,7 +104,7 @@ export async function sendAuthEmail(
       <tr><td align="center" style="padding:40px 16px">
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:620px;background:#ffffff;border:1px solid #e2e8f0;border-radius:16px">
           <tr><td style="padding:28px 32px;border-bottom:1px solid #eef2f7">
-            <div style="font-size:24px;font-weight:700;letter-spacing:-.4px;color:#1748b5">Klick-Pro</div>
+            <a href="${escapeHtml(websiteUrl ?? "#")}" style="font-size:24px;font-weight:700;letter-spacing:-.4px;color:#1748b5;text-decoration:none">Klick-Pro</a>
           </td></tr>
           <tr><td style="padding:56px 32px 48px;text-align:center">
             <h1 style="margin:0;color:#0b1f4d;font-size:32px;line-height:1.2">${safeHeading}</h1>
@@ -132,29 +153,33 @@ export async function sendNotificationEmail(input: {
     secure: Number(process.env.SMTP_PORT ?? 587) === 465,
     auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
   });
+  const origin = publicAppOrigin();
+  const websiteUrl = origin ?? undefined;
+  const actionUrl = absoluteAppUrl(input.href, origin);
   const details = input.details?.filter((detail) => detail.value.trim()) ?? [];
   const detailsHtml = details.length
-    ? `<div style="margin:24px 0 0;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden">${details
+    ? `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:24px 0 0;border:1px solid #e2e8f0;border-collapse:separate;border-spacing:0;overflow:hidden">${details
         .map(
           (detail) =>
-            `<div style="padding:12px 16px;border-bottom:1px solid #eef2f7"><div style="font-size:12px;color:#627d98;margin-bottom:4px">${escapeHtml(detail.label)}</div><div style="font-size:15px;color:#102a43;line-height:1.5;white-space:pre-line">${escapeHtml(detail.value)}</div></div>`,
+            `<tr><td style="width:34%;padding:13px 16px;border-bottom:1px solid #eef2f7;background:#f8fafc;vertical-align:top;font-size:12px;font-weight:700;color:#627d98">${escapeHtml(detail.label)}</td><td style="padding:13px 16px;border-bottom:1px solid #eef2f7;vertical-align:top;font-size:15px;color:#102a43;line-height:1.5;white-space:pre-line">${escapeHtml(detail.value)}</td></tr>`,
         )
-        .join("")}</div>`
+        .join("")}</table>`
     : "";
   const textDetails = details.length
     ? `\n\n${details.map((detail) => `${detail.label}: ${detail.value}`).join("\n")}`
     : "";
   const textDescription = `\n\n${input.description}`;
-  const actionText = input.href ? `\n\nView in Klick-Pro: ${input.href}` : "";
+  const actionText = actionUrl ? `\n\nView in Klick-Pro: ${actionUrl}` : "";
   await transporter.sendMail({
     from: klickProSender(),
     to: input.to,
-    subject: input.title,
+    subject: `Klick-Pro | ${input.title}`,
     text: `${input.title}${textDescription}${textDetails}${actionText}`,
     html: renderNotificationEmailHtml({
       title: input.title,
       description: input.description,
-      href: input.href,
+      href: actionUrl,
+      websiteUrl,
       detailsHtml,
     }),
   });
