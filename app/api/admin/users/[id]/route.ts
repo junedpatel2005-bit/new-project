@@ -102,8 +102,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         professionalLongitude: true,
         updatedAt: true,
         clientProfiles: {
-          orderBy: { updatedAt: "desc" },
-          take: 1,
           select: {
             fullName: true,
             email: true,
