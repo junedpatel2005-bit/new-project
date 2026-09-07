@@ -240,6 +240,7 @@ export type ProfessionalVerificationWhereInput = {
   selfieUrl?: Prisma.StringNullableFilter<"ProfessionalVerification"> | string | null
   status?: Prisma.StringFilter<"ProfessionalVerification"> | string
   updatedAt?: Prisma.DateTimeFilter<"ProfessionalVerification"> | Date | string
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
 export type ProfessionalVerificationOrderByWithRelationInput = {
@@ -251,6 +252,7 @@ export type ProfessionalVerificationOrderByWithRelationInput = {
   selfieUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  user?: Prisma.UserOrderByWithRelationInput
 }
 
 export type ProfessionalVerificationWhereUniqueInput = Prisma.AtLeast<{
@@ -265,6 +267,7 @@ export type ProfessionalVerificationWhereUniqueInput = Prisma.AtLeast<{
   selfieUrl?: Prisma.StringNullableFilter<"ProfessionalVerification"> | string | null
   status?: Prisma.StringFilter<"ProfessionalVerification"> | string
   updatedAt?: Prisma.DateTimeFilter<"ProfessionalVerification"> | Date | string
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "userId">
 
 export type ProfessionalVerificationOrderByWithAggregationInput = {
@@ -298,7 +301,6 @@ export type ProfessionalVerificationScalarWhereWithAggregatesInput = {
 }
 
 export type ProfessionalVerificationCreateInput = {
-  userId: number
   governmentIdUrl?: string | null
   licenseUrl?: string | null
   certificationsJson?: string | null
@@ -306,6 +308,7 @@ export type ProfessionalVerificationCreateInput = {
   selfieUrl?: string | null
   status?: string
   updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutVerificationInput
 }
 
 export type ProfessionalVerificationUncheckedCreateInput = {
@@ -320,7 +323,6 @@ export type ProfessionalVerificationUncheckedCreateInput = {
 }
 
 export type ProfessionalVerificationUpdateInput = {
-  userId?: Prisma.IntFieldUpdateOperationsInput | number
   governmentIdUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   licenseUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   certificationsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -328,6 +330,7 @@ export type ProfessionalVerificationUpdateInput = {
   selfieUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutVerificationNestedInput
 }
 
 export type ProfessionalVerificationUncheckedUpdateInput = {
@@ -353,7 +356,6 @@ export type ProfessionalVerificationCreateManyInput = {
 }
 
 export type ProfessionalVerificationUpdateManyMutationInput = {
-  userId?: Prisma.IntFieldUpdateOperationsInput | number
   governmentIdUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   licenseUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   certificationsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -372,6 +374,11 @@ export type ProfessionalVerificationUncheckedUpdateManyInput = {
   selfieUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ProfessionalVerificationNullableScalarRelationFilter = {
+  is?: Prisma.ProfessionalVerificationWhereInput | null
+  isNot?: Prisma.ProfessionalVerificationWhereInput | null
 }
 
 export type ProfessionalVerificationCountOrderByAggregateInput = {
@@ -415,6 +422,94 @@ export type ProfessionalVerificationSumOrderByAggregateInput = {
   userId?: Prisma.SortOrder
 }
 
+export type ProfessionalVerificationCreateNestedOneWithoutUserInput = {
+  create?: Prisma.XOR<Prisma.ProfessionalVerificationCreateWithoutUserInput, Prisma.ProfessionalVerificationUncheckedCreateWithoutUserInput>
+  connectOrCreate?: Prisma.ProfessionalVerificationCreateOrConnectWithoutUserInput
+  connect?: Prisma.ProfessionalVerificationWhereUniqueInput
+}
+
+export type ProfessionalVerificationUncheckedCreateNestedOneWithoutUserInput = {
+  create?: Prisma.XOR<Prisma.ProfessionalVerificationCreateWithoutUserInput, Prisma.ProfessionalVerificationUncheckedCreateWithoutUserInput>
+  connectOrCreate?: Prisma.ProfessionalVerificationCreateOrConnectWithoutUserInput
+  connect?: Prisma.ProfessionalVerificationWhereUniqueInput
+}
+
+export type ProfessionalVerificationUpdateOneWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.ProfessionalVerificationCreateWithoutUserInput, Prisma.ProfessionalVerificationUncheckedCreateWithoutUserInput>
+  connectOrCreate?: Prisma.ProfessionalVerificationCreateOrConnectWithoutUserInput
+  upsert?: Prisma.ProfessionalVerificationUpsertWithoutUserInput
+  disconnect?: Prisma.ProfessionalVerificationWhereInput | boolean
+  delete?: Prisma.ProfessionalVerificationWhereInput | boolean
+  connect?: Prisma.ProfessionalVerificationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProfessionalVerificationUpdateToOneWithWhereWithoutUserInput, Prisma.ProfessionalVerificationUpdateWithoutUserInput>, Prisma.ProfessionalVerificationUncheckedUpdateWithoutUserInput>
+}
+
+export type ProfessionalVerificationUncheckedUpdateOneWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.ProfessionalVerificationCreateWithoutUserInput, Prisma.ProfessionalVerificationUncheckedCreateWithoutUserInput>
+  connectOrCreate?: Prisma.ProfessionalVerificationCreateOrConnectWithoutUserInput
+  upsert?: Prisma.ProfessionalVerificationUpsertWithoutUserInput
+  disconnect?: Prisma.ProfessionalVerificationWhereInput | boolean
+  delete?: Prisma.ProfessionalVerificationWhereInput | boolean
+  connect?: Prisma.ProfessionalVerificationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProfessionalVerificationUpdateToOneWithWhereWithoutUserInput, Prisma.ProfessionalVerificationUpdateWithoutUserInput>, Prisma.ProfessionalVerificationUncheckedUpdateWithoutUserInput>
+}
+
+export type ProfessionalVerificationCreateWithoutUserInput = {
+  governmentIdUrl?: string | null
+  licenseUrl?: string | null
+  certificationsJson?: string | null
+  insuranceUrl?: string | null
+  selfieUrl?: string | null
+  status?: string
+  updatedAt?: Date | string
+}
+
+export type ProfessionalVerificationUncheckedCreateWithoutUserInput = {
+  governmentIdUrl?: string | null
+  licenseUrl?: string | null
+  certificationsJson?: string | null
+  insuranceUrl?: string | null
+  selfieUrl?: string | null
+  status?: string
+  updatedAt?: Date | string
+}
+
+export type ProfessionalVerificationCreateOrConnectWithoutUserInput = {
+  where: Prisma.ProfessionalVerificationWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProfessionalVerificationCreateWithoutUserInput, Prisma.ProfessionalVerificationUncheckedCreateWithoutUserInput>
+}
+
+export type ProfessionalVerificationUpsertWithoutUserInput = {
+  update: Prisma.XOR<Prisma.ProfessionalVerificationUpdateWithoutUserInput, Prisma.ProfessionalVerificationUncheckedUpdateWithoutUserInput>
+  create: Prisma.XOR<Prisma.ProfessionalVerificationCreateWithoutUserInput, Prisma.ProfessionalVerificationUncheckedCreateWithoutUserInput>
+  where?: Prisma.ProfessionalVerificationWhereInput
+}
+
+export type ProfessionalVerificationUpdateToOneWithWhereWithoutUserInput = {
+  where?: Prisma.ProfessionalVerificationWhereInput
+  data: Prisma.XOR<Prisma.ProfessionalVerificationUpdateWithoutUserInput, Prisma.ProfessionalVerificationUncheckedUpdateWithoutUserInput>
+}
+
+export type ProfessionalVerificationUpdateWithoutUserInput = {
+  governmentIdUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  licenseUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  certificationsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  insuranceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  selfieUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ProfessionalVerificationUncheckedUpdateWithoutUserInput = {
+  governmentIdUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  licenseUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  certificationsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  insuranceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  selfieUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 
 
 export type ProfessionalVerificationSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -426,6 +521,7 @@ export type ProfessionalVerificationSelect<ExtArgs extends runtime.Types.Extensi
   selfieUrl?: boolean
   status?: boolean
   updatedAt?: boolean
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["professionalVerification"]>
 
 export type ProfessionalVerificationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -437,6 +533,7 @@ export type ProfessionalVerificationSelectCreateManyAndReturn<ExtArgs extends ru
   selfieUrl?: boolean
   status?: boolean
   updatedAt?: boolean
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["professionalVerification"]>
 
 export type ProfessionalVerificationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -448,6 +545,7 @@ export type ProfessionalVerificationSelectUpdateManyAndReturn<ExtArgs extends ru
   selfieUrl?: boolean
   status?: boolean
   updatedAt?: boolean
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["professionalVerification"]>
 
 export type ProfessionalVerificationSelectScalar = {
@@ -462,10 +560,21 @@ export type ProfessionalVerificationSelectScalar = {
 }
 
 export type ProfessionalVerificationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"userId" | "governmentIdUrl" | "licenseUrl" | "certificationsJson" | "insuranceUrl" | "selfieUrl" | "status" | "updatedAt", ExtArgs["result"]["professionalVerification"]>
+export type ProfessionalVerificationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+}
+export type ProfessionalVerificationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+}
+export type ProfessionalVerificationIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+}
 
 export type $ProfessionalVerificationPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "ProfessionalVerification"
-  objects: {}
+  objects: {
+    user: Prisma.$UserPayload<ExtArgs>
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     userId: number
     governmentIdUrl: string | null
@@ -869,6 +978,7 @@ readonly fields: ProfessionalVerificationFieldRefs;
  */
 export interface Prisma__ProfessionalVerificationClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -923,6 +1033,10 @@ export type ProfessionalVerificationFindUniqueArgs<ExtArgs extends runtime.Types
    */
   omit?: Prisma.ProfessionalVerificationOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProfessionalVerificationInclude<ExtArgs> | null
+  /**
    * Filter, which ProfessionalVerification to fetch.
    */
   where: Prisma.ProfessionalVerificationWhereUniqueInput
@@ -941,6 +1055,10 @@ export type ProfessionalVerificationFindUniqueOrThrowArgs<ExtArgs extends runtim
    */
   omit?: Prisma.ProfessionalVerificationOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProfessionalVerificationInclude<ExtArgs> | null
+  /**
    * Filter, which ProfessionalVerification to fetch.
    */
   where: Prisma.ProfessionalVerificationWhereUniqueInput
@@ -958,6 +1076,10 @@ export type ProfessionalVerificationFindFirstArgs<ExtArgs extends runtime.Types.
    * Omit specific fields from the ProfessionalVerification
    */
   omit?: Prisma.ProfessionalVerificationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProfessionalVerificationInclude<ExtArgs> | null
   /**
    * Filter, which ProfessionalVerification to fetch.
    */
@@ -1007,6 +1129,10 @@ export type ProfessionalVerificationFindFirstOrThrowArgs<ExtArgs extends runtime
    */
   omit?: Prisma.ProfessionalVerificationOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProfessionalVerificationInclude<ExtArgs> | null
+  /**
    * Filter, which ProfessionalVerification to fetch.
    */
   where?: Prisma.ProfessionalVerificationWhereInput
@@ -1054,6 +1180,10 @@ export type ProfessionalVerificationFindManyArgs<ExtArgs extends runtime.Types.E
    * Omit specific fields from the ProfessionalVerification
    */
   omit?: Prisma.ProfessionalVerificationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProfessionalVerificationInclude<ExtArgs> | null
   /**
    * Filter, which ProfessionalVerifications to fetch.
    */
@@ -1103,6 +1233,10 @@ export type ProfessionalVerificationCreateArgs<ExtArgs extends runtime.Types.Ext
    */
   omit?: Prisma.ProfessionalVerificationOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProfessionalVerificationInclude<ExtArgs> | null
+  /**
    * The data needed to create a ProfessionalVerification.
    */
   data: Prisma.XOR<Prisma.ProfessionalVerificationCreateInput, Prisma.ProfessionalVerificationUncheckedCreateInput>
@@ -1136,6 +1270,10 @@ export type ProfessionalVerificationCreateManyAndReturnArgs<ExtArgs extends runt
    */
   data: Prisma.ProfessionalVerificationCreateManyInput | Prisma.ProfessionalVerificationCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProfessionalVerificationIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1150,6 +1288,10 @@ export type ProfessionalVerificationUpdateArgs<ExtArgs extends runtime.Types.Ext
    * Omit specific fields from the ProfessionalVerification
    */
   omit?: Prisma.ProfessionalVerificationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProfessionalVerificationInclude<ExtArgs> | null
   /**
    * The data needed to update a ProfessionalVerification.
    */
@@ -1202,6 +1344,10 @@ export type ProfessionalVerificationUpdateManyAndReturnArgs<ExtArgs extends runt
    * Limit how many ProfessionalVerifications to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProfessionalVerificationIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1216,6 +1362,10 @@ export type ProfessionalVerificationUpsertArgs<ExtArgs extends runtime.Types.Ext
    * Omit specific fields from the ProfessionalVerification
    */
   omit?: Prisma.ProfessionalVerificationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProfessionalVerificationInclude<ExtArgs> | null
   /**
    * The filter to search for the ProfessionalVerification to update in case it exists.
    */
@@ -1242,6 +1392,10 @@ export type ProfessionalVerificationDeleteArgs<ExtArgs extends runtime.Types.Ext
    * Omit specific fields from the ProfessionalVerification
    */
   omit?: Prisma.ProfessionalVerificationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProfessionalVerificationInclude<ExtArgs> | null
   /**
    * Filter which ProfessionalVerification to delete.
    */
@@ -1274,4 +1428,8 @@ export type ProfessionalVerificationDefaultArgs<ExtArgs extends runtime.Types.Ex
    * Omit specific fields from the ProfessionalVerification
    */
   omit?: Prisma.ProfessionalVerificationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProfessionalVerificationInclude<ExtArgs> | null
 }

@@ -171,6 +171,8 @@ model User {
   clientProjectTrackings              ProjectTracking[]     @relation("ProjectTrackingClient")
   professionalProjectTrackings        ProjectTracking[]     @relation("ProjectTrackingProfessional")
   professionalCategoryRecord          ServiceCategory?      @relation("ProfessionalPrimaryCategory", fields: [professionalCategoryId], references: [id])
+  services                            Service[]             @relation("ProfessionalServices")
+  verification                        ProfessionalVerification?
   auditLogs                           AuditLog[]            @relation("AuditActor")
   personaVerifications                PersonaVerification[]
   sessions                            Session[]
@@ -445,6 +447,7 @@ model ProjectMilestone {
   submittedAt    DateTime?
   approvedAt     DateTime?
   tracking       ProjectTracking     @relation(fields: [trackingId], references: [id])
+  payment        Payment?
   workUploads    ProjectWorkUpload[]
 
   @@index([trackingId])
@@ -692,6 +695,7 @@ model Payment {
   job                      ClientJob?       @relation("PaymentJob", fields: [jobId], references: [id], onDelete: Restrict)
   professional             User             @relation("PaymentProfessional", fields: [professionalId], references: [id])
   projectTracking          ProjectTracking? @relation("PaymentProjectTracking", fields: [projectTrackingId], references: [id], onDelete: Restrict, map: "Payment_projectTrackingId_fkey")
+  milestone                ProjectMilestone? @relation(fields: [milestoneId], references: [id])
 
   @@index([clientId])
   @@index([professionalId])
@@ -861,6 +865,7 @@ model ProfessionalVerification {
   selfieUrl          String?
   status             String   @default("PENDING")
   updatedAt          DateTime @updatedAt
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model VerificationDocumentReview {
@@ -1010,6 +1015,7 @@ model Service {
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
   category       ServiceCategory @relation(fields: [categoryId], references: [id])
+  professional   User            @relation("ProfessionalServices", fields: [professionalId], references: [id], onDelete: Cascade)
 
   @@index([professionalId])
 }

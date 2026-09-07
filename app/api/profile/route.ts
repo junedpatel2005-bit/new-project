@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
   const { user } = result;
   const profile = await db.clientProfile.findFirst({
     where: { userId: user.id },
-    include: { savedLocations: { orderBy: { createdAt: "desc" } } },
+    include: { savedLocations: true },
   });
   return NextResponse.json({
     account: {

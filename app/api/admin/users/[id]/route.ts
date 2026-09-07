@@ -116,7 +116,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
             address: true,
             savedLocations: {
               select: { label: true, address: true, isPrimary: true },
-              orderBy: { isPrimary: "desc" },
             },
           },
         },
