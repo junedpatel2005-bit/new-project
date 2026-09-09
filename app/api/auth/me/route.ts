@@ -3,9 +3,11 @@ import { sessionCookie, verifySession } from "@/lib/auth";
 import { db } from "@/lib/db";
 
 export async function GET(request: Request) {
+  const authHeader = request.headers.get("authorization");
+  const bearerToken = authHeader?.startsWith("Bearer ") ? authHeader.slice(7).trim() : null;
   const cookieHeader = request.headers.get("cookie") ?? "";
   const tokenMatch = cookieHeader.match(new RegExp(`${sessionCookie}=([^;]+)`));
-  const token = tokenMatch?.[1];
+  const token = bearerToken || tokenMatch?.[1];
   if (!token) {
     return NextResponse.json({ user: null });
   }

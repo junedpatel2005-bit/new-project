@@ -509,13 +509,22 @@ export async function POST(
     ]);
 
     clearRateLimit(rateLimitKey);
+    const sessionToken = await createSession({ userId: user.id, role: user.role });
     const response = NextResponse.json({
       success: true,
       redirect: nextRedirect,
+      token: sessionToken,
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+      },
     });
     response.cookies.set(
       sessionCookie,
-      await createSession({ userId: user.id, role: user.role }),
+      sessionToken,
       sessionOptions,
     );
     return response;
