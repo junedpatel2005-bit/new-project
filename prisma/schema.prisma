@@ -267,6 +267,7 @@ model ClientJob {
   payments         Payment[]             @relation("PaymentJob")
   projectRequests  ProjectRequest[]
   projectTrackings ProjectTracking[]
+  milestones       ClientJobMilestone[]
 
   @@index([userId])
   @@index([status])
@@ -297,6 +298,22 @@ model ClientJobAttachment {
   job        ClientJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
 
   @@index([jobId])
+}
+
+model ClientJobMilestone {
+  id          Int       @id @default(autoincrement())
+  jobId       Int
+  title       String
+  description String?
+  percentage  Int
+  amount      Int?
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  job         ClientJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@index([jobId])
+  @@map("ClientJobMilestone")
 }
 
 model ProjectTransaction {

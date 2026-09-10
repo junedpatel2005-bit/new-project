@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, Suspense, useEffect, useState } from "react";
 import { AuthLayout } from "@/components/AuthLayout";
+import { GoogleMark } from "@/components/GoogleMark";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -165,7 +166,7 @@ function SignupContent() {
         type="button"
         variant="outline"
         disabled={pending || googleLoading}
-        className="mb-5 h-11 w-full"
+        className="mb-5 h-11 w-full transition-transform hover:-translate-y-0.5"
         onClick={() => {
           setGoogleLoading(true);
           window.location.href = `/api/v1/auth/google?role=${role === "pro" ? "PROFESSIONAL" : "CLIENT"}`;
@@ -177,7 +178,10 @@ function SignupContent() {
             Connecting to Google…
           </span>
         ) : (
-          "Continue with Google"
+          <span className="inline-flex items-center gap-2">
+            <GoogleMark />
+            Continue with Google
+          </span>
         )}
       </Button>
 

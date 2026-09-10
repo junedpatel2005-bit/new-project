@@ -87,6 +87,15 @@ export type MarketplaceCategory = {
   professionalCount: number;
 };
 
+export type MarketplaceJobMilestone = {
+  id: number;
+  title: string;
+  description: string | null;
+  percentage: number;
+  amount: number | null;
+  sortOrder: number;
+};
+
 export type MarketplaceJob = {
   id: number;
   title: string;
@@ -115,4 +124,5 @@ export type MarketplaceJob = {
     fileSize: number | null;
     previewUrl: string | null;
   }[];
+  milestones?: MarketplaceJobMilestone[];
 };

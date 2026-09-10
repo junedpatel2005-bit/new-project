@@ -2,11 +2,19 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { AlertCircle, CheckCircle2, Plus, Trash2 } from "lucide-react";
 import { AddressMapPicker } from "@/components/AddressMapPicker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { MarketplaceCategory } from "@/lib/types/marketplace";
 import { getAllStates } from "@/lib/india-locations";
+
+export type JobFormMilestone = {
+  id?: number;
+  title: string;
+  percentage: number;
+  description?: string;
+};
 
 type Form = {
   title: string;
@@ -27,6 +35,7 @@ type Form = {
   locationDistrict: string;
   locationLat: number | null;
   locationLng: number | null;
+  milestones: JobFormMilestone[];
 };
 type PostingTiming = "TODAY" | "SCHEDULED";
 type SavedLocation = { id: number; label: string; address: string; isPrimary: boolean };
@@ -49,8 +58,9 @@ const empty: Form = {
   locationDistrict: "",
   locationLat: null,
   locationLng: null,
+  milestones: [],
 };
-const steps = ["Details", "Budget & schedule", "Job type", "Location", "Review"];
+const steps = ["Details", "Budget & schedule", "Milestones", "Job type", "Location", "Review"];
 const postJobDraftKey = "klick-pro:post-job-draft";
 const segmentOptions: [string, string][] = [
   ["RESIDENTIAL", "Residential"],
@@ -139,7 +149,11 @@ export default function PostJob() {
         const draft = JSON.parse(localStorage.getItem(postJobDraftKey) ?? "null");
         if (draft?.form) {
           const draftForm = { ...empty, ...draft.form } as Form;
-          setForm({ ...draftForm, jobDate: draftForm.jobDate || today });
+          setForm({
+            ...draftForm,
+            jobDate: draftForm.jobDate || today,
+            milestones: Array.isArray(draftForm.milestones) ? draftForm.milestones : [],
+          });
           setPostingTiming(draftForm.jobDate && draftForm.jobDate > today ? "SCHEDULED" : "TODAY");
         } else {
           setForm((current) => ({ ...current, jobDate: today }));
@@ -156,7 +170,7 @@ export default function PostJob() {
         .then((r) => (r.ok ? r.json() : Promise.reject()))
         .then(({ job }) => {
           setId(job.id);
-          setMaxStep(4);
+          setMaxStep(5);
           setForm({
             title: job.title ?? "",
             category: job.category ?? "",
@@ -176,6 +190,14 @@ export default function PostJob() {
             locationDistrict: job.locationDistrict ?? "",
             locationLat: job.locationLat,
             locationLng: job.locationLng,
+            milestones: Array.isArray(job.milestones)
+              ? job.milestones.map((m: { id?: number; title?: string; percentage?: number; description?: string }) => ({
+                  id: m.id,
+                  title: m.title ?? "",
+                  percentage: m.percentage ?? 100,
+                  description: m.description ?? "",
+                }))
+              : [],
           });
           setPostingTiming(job.jobDate && asDate(job.jobDate) > today ? "SCHEDULED" : "TODAY");
         })
@@ -186,6 +208,70 @@ export default function PostJob() {
     if (!hydrated || editJobId) return;
     localStorage.setItem(postJobDraftKey, JSON.stringify({ form, step, maxStep }));
   }, [editJobId, form, hydrated, maxStep, step]);
+
+  const addMilestone = () => {
+    const currentSum = form.milestones.reduce((acc, m) => acc + (Number(m.percentage) || 0), 0);
+    const remaining = Math.max(0, 100 - currentSum);
+    const newPercentage = remaining > 0 ? (remaining >= 25 ? 25 : remaining) : 10;
+    const nextIndex = form.milestones.length + 1;
+    update("milestones", [
+      ...form.milestones,
+      {
+        title: `Milestone ${nextIndex}`,
+        percentage: newPercentage,
+        description: "",
+      },
+    ]);
+  };
+
+  const removeMilestone = (index: number) => {
+    const next = form.milestones.filter((_, i) => i !== index);
+    update("milestones", next);
+  };
+
+  const updateMilestone = <K extends keyof JobFormMilestone>(
+    index: number,
+    field: K,
+    val: JobFormMilestone[K],
+  ) => {
+    const next = form.milestones.map((m, i) => (i === index ? { ...m, [field]: val } : m));
+    update("milestones", next);
+  };
+
+  const autoFillRemaining = () => {
+    const currentSum = form.milestones.reduce((acc, m) => acc + (Number(m.percentage) || 0), 0);
+    const remaining = 100 - currentSum;
+    if (remaining <= 0) return;
+    if (form.milestones.length === 0) {
+      update("milestones", [{ title: "Milestone 1", percentage: 100, description: "" }]);
+    } else {
+      const lastIndex = form.milestones.length - 1;
+      const last = form.milestones[lastIndex];
+      if (last) {
+        updateMilestone(lastIndex, "percentage", (last.percentage || 0) + remaining);
+      }
+    }
+  };
+
+  const splitMilestonesEvenly = () => {
+    const count = form.milestones.length;
+    if (count === 0) return;
+    const base = Math.floor(100 / count);
+    const remainder = 100 % count;
+    const next = form.milestones.map((m, i) => ({
+      ...m,
+      percentage: i === 0 ? base + remainder : base,
+    }));
+    update("milestones", next);
+  };
+
+  const totalMilestonePercentage = useMemo(
+    () => form.milestones.reduce((acc, m) => acc + (Number(m.percentage) || 0), 0),
+    [form.milestones],
+  );
+  const remainingMilestonePercentage = Math.max(0, 100 - totalMilestonePercentage);
+  const isMilestoneExceeded = totalMilestonePercentage > 100;
+
   const payload = (mode: "draft" | "publish") => ({
     ...form,
     budgetMin: form.budgetMin === "" ? null : Number(form.budgetMin),
@@ -195,6 +281,13 @@ export default function PostJob() {
     deadline: form.deadline || null,
     locationLabel: form.locationLabel || null,
     locationAddress: form.locationAddress || null,
+    milestones: form.milestones
+      .filter((m) => m.title.trim())
+      .map((m) => ({
+        title: m.title.trim(),
+        percentage: Number(m.percentage) || 100,
+        description: m.description?.trim() || null,
+      })),
     mode,
   });
   const clientCheck = () => {
@@ -216,7 +309,23 @@ export default function PostJob() {
       if (form.jobDate && form.deadline && form.deadline < form.jobDate)
         e.deadline = "Deadline cannot be before the preferred job date.";
     }
-    if (step === 3 && form.workMode !== "REMOTE") {
+    if (step === 2) {
+      if (form.milestones.length > 0) {
+        const total = form.milestones.reduce((acc, m) => acc + (Number(m.percentage) || 0), 0);
+        if (total > 100) {
+          e.milestones = `Total percentage of all milestones must not exceed 100% (currently ${total}%).`;
+        }
+        form.milestones.forEach((m, i) => {
+          if (!m.title.trim()) {
+            e[`milestone_${i}_title`] = "Enter a title for this milestone.";
+          }
+          if (!m.percentage || m.percentage <= 0 || m.percentage > 100) {
+            e[`milestone_${i}_percentage`] = "Percentage must be between 1% and 100%.";
+          }
+        });
+      }
+    }
+    if (step === 4 && form.workMode !== "REMOTE") {
       if (!form.locationAddress.trim()) e.locationAddress = "Choose a job location.";
       else if (form.locationLat === null || form.locationLng === null)
         e.locationAddress =
@@ -245,9 +354,13 @@ export default function PostJob() {
             ? 0
             : focus && ["budgetMin", "budgetMax", "hourlyRate", "deadline"].includes(focus)
               ? 1
-              : focus === "locationAddress"
-                ? 3
-                : null;
+              : focus && ["milestones"].includes(focus)
+                ? 2
+                : focus === "workMode"
+                  ? 3
+                  : focus === "locationAddress"
+                    ? 4
+                    : null;
         if (focusStep !== null) {
           setStep(focusStep);
           setMaxStep((prev) => Math.max(prev, focusStep));
@@ -327,7 +440,7 @@ export default function PostJob() {
     <div className="max-w-3xl">
       <h1 className="text-3xl font-bold">Create a job</h1>
       <p className="mt-1 text-muted-foreground">Tell qualified professionals what you need.</p>
-      <ol className="mt-7 grid grid-cols-5 gap-1" aria-label="Job posting steps">
+      <ol className="mt-7 grid grid-cols-6 gap-1" aria-label="Job posting steps">
         {steps.map((label, index) => {
           const reachable = index <= maxStep;
           const stepLabel = (
@@ -551,6 +664,233 @@ export default function PostJob() {
           </div>
         )}
         {step === 2 && (
+          <div className="space-y-6">
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="text-xl font-semibold">Project Milestones</h2>
+                <p className="text-sm text-muted-foreground">
+                  Divide your project into payment milestones, or skip to use a single 100% completion milestone.
+                </p>
+              </div>
+              {form.milestones.length > 0 && (
+                <div className="flex items-center gap-2 text-sm">
+                  <span
+                    className={`font-semibold px-2.5 py-1 rounded-full text-xs ${
+                      isMilestoneExceeded
+                        ? "bg-destructive/10 text-destructive border border-destructive/20"
+                        : totalMilestonePercentage === 100
+                          ? "bg-green-500/10 text-green-700 dark:text-green-400 border border-green-500/20"
+                          : "bg-primary/10 text-primary border border-primary/20"
+                    }`}
+                  >
+                    {isMilestoneExceeded
+                      ? `Total: ${totalMilestonePercentage}% (Exceeds by ${totalMilestonePercentage - 100}%)`
+                      : totalMilestonePercentage === 100
+                        ? "100% Allocated"
+                        : `${totalMilestonePercentage}% Allocated (${remainingMilestonePercentage}% unallocated)`}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {form.milestones.length > 0 && (
+              <div className="space-y-1.5">
+                <div className="h-2.5 w-full overflow-hidden rounded-full bg-muted">
+                  <div
+                    className={`h-full transition-all duration-300 ${
+                      isMilestoneExceeded
+                        ? "bg-destructive"
+                        : totalMilestonePercentage === 100
+                          ? "bg-green-600"
+                          : "bg-primary"
+                    }`}
+                    style={{ width: `${Math.min(100, totalMilestonePercentage)}%` }}
+                  />
+                </div>
+                {errors.milestones && (
+                  <p className="text-xs text-destructive flex items-center gap-1 mt-1">
+                    <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                    {errors.milestones}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {form.milestones.length === 0 ? (
+              <div className="rounded-2xl border-2 border-dashed border-muted-foreground/20 p-6 text-center sm:p-8 bg-muted/30">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary mb-3">
+                  <CheckCircle2 className="h-6 w-6" />
+                </div>
+                <h3 className="text-base font-semibold">Default 100% Milestone on Completion</h3>
+                <p className="mt-1.5 text-sm text-muted-foreground max-w-md mx-auto">
+                  If you don't need to split this job into multiple milestones, you can skip this step. The platform will automatically create a single milestone of <strong>100%</strong> released upon full project completion.
+                </p>
+                <div className="mt-5 flex flex-wrap justify-center gap-3">
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      update("milestones", [
+                        {
+                          title: "Milestone 1: Project Kickoff & Initial Deliverable",
+                          percentage: 50,
+                          description: "",
+                        },
+                        {
+                          title: "Milestone 2: Final Delivery & Handover",
+                          percentage: 50,
+                          description: "",
+                        },
+                      ]);
+                    }}
+                    variant="outline"
+                    className="gap-2"
+                  >
+                    <Plus className="h-4 w-4" /> Add Custom Milestones
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {form.milestones.map((milestone, index) => {
+                  const estAmount =
+                    form.budgetMax || form.budgetMin
+                      ? Math.round(
+                          (Number(form.budgetMax || form.budgetMin) * (milestone.percentage || 0)) / 100,
+                        )
+                      : null;
+                  return (
+                    <div
+                      key={index}
+                      className="relative rounded-xl border bg-card p-4 sm:p-5 shadow-xs transition hover:border-muted-foreground/40 space-y-4"
+                    >
+                      <div className="flex items-center justify-between gap-3 border-b pb-3">
+                        <div className="flex items-center gap-2">
+                          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                            {index + 1}
+                          </span>
+                          <span className="text-sm font-semibold">Milestone {index + 1}</span>
+                          {estAmount !== null && (
+                            <span className="rounded bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                              ≈ ₹{estAmount.toLocaleString("en-IN")}
+                            </span>
+                          )}
+                        </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeMilestone(index)}
+                          className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
+                          title="Remove milestone"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+
+                      <div className="grid gap-4 sm:grid-cols-3">
+                        <div className="sm:col-span-2">
+                          <Field
+                            label="Milestone Title"
+                            error={errors[`milestone_${index}_title`]}
+                          >
+                            <Input
+                              value={milestone.title}
+                              onChange={(e) => updateMilestone(index, "title", e.target.value)}
+                              placeholder="e.g. Design & Planning Phase"
+                              maxLength={160}
+                            />
+                          </Field>
+                        </div>
+                        <div>
+                          <Field
+                            label="Percentage (%)"
+                            error={errors[`milestone_${index}_percentage`]}
+                          >
+                            <div className="relative">
+                              <Input
+                                type="number"
+                                min="1"
+                                max="100"
+                                value={milestone.percentage || ""}
+                                onChange={(e) => {
+                                  const val =
+                                    e.target.value === ""
+                                      ? 0
+                                      : Math.min(100, Math.max(0, parseInt(e.target.value, 10) || 0));
+                                  updateMilestone(index, "percentage", val);
+                                }}
+                                placeholder="0"
+                                className="pr-8"
+                              />
+                              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium pointer-events-none">
+                                %
+                              </span>
+                            </div>
+                          </Field>
+                        </div>
+                      </div>
+
+                      <Field label="Deliverables / Description (Optional)">
+                        <Input
+                          value={milestone.description || ""}
+                          onChange={(e) => updateMilestone(index, "description", e.target.value)}
+                          placeholder="Brief summary of deliverables for this milestone"
+                          maxLength={500}
+                        />
+                      </Field>
+                    </div>
+                  );
+                })}
+
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={addMilestone}
+                      className="gap-1.5"
+                    >
+                      <Plus className="h-4 w-4" /> Add Milestone
+                    </Button>
+                    {remainingMilestonePercentage > 0 && form.milestones.length > 0 && (
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={autoFillRemaining}
+                        className="text-xs"
+                      >
+                        Auto-fill remaining ({remainingMilestonePercentage}%)
+                      </Button>
+                    )}
+                    {form.milestones.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={splitMilestonesEvenly}
+                        className="text-xs"
+                      >
+                        Split evenly
+                      </Button>
+                    )}
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => update("milestones", [])}
+                    className="text-xs text-muted-foreground hover:text-destructive"
+                  >
+                    Reset to single 100% default
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+        {step === 3 && (
           <div className="space-y-5">
             <h2 className="text-xl font-semibold">What type of job is this?</h2>
             <div className="grid gap-3 sm:grid-cols-3">
@@ -575,7 +915,7 @@ export default function PostJob() {
             </div>
           </div>
         )}
-        {step === 3 && (
+        {step === 4 && (
           <div className="space-y-5">
             <h2 className="text-xl font-semibold">Where will the job take place?</h2>
             {form.workMode === "REMOTE" ? (
@@ -690,7 +1030,7 @@ export default function PostJob() {
             )}
           </div>
         )}
-        {step === 4 && (
+        {step === 5 && (
           <div className="space-y-5">
             <h2 className="text-xl font-semibold">Review your job</h2>
             <Review label="Title" value={form.title || "Not set"} onEdit={() => setStep(0)} />
@@ -725,20 +1065,38 @@ export default function PostJob() {
               onEdit={() => setStep(1)}
             />
             <Review
-              label="Job type"
-              value={{ ON_SITE: "On-site", REMOTE: "Remote", BOTH: "Hybrid" }[form.workMode]}
-              onEdit={() => setStep(2)}
-            />
-            <Review
               label="Posting date"
               value={postingTiming === "TODAY" ? "Today" : form.jobDate || "Not set"}
               onEdit={() => setStep(1)}
+            />
+            <Review
+              label="Milestones"
+              value={
+                form.milestones.length > 0
+                  ? form.milestones
+                      .map(
+                        (m, idx) =>
+                          `${idx + 1}. ${m.title} (${m.percentage}%${
+                            form.budgetMax
+                              ? ` • ₹${Math.round((Number(form.budgetMax) * m.percentage) / 100).toLocaleString("en-IN")}`
+                              : ""
+                          })${m.description ? `\n   ${m.description}` : ""}`,
+                      )
+                      .join("\n")
+                  : "Default: 100% on Project Completion"
+              }
+              onEdit={() => setStep(2)}
+            />
+            <Review
+              label="Job type"
+              value={{ ON_SITE: "On-site", REMOTE: "Remote", BOTH: "Hybrid" }[form.workMode]}
+              onEdit={() => setStep(3)}
             />
             {form.workMode !== "REMOTE" && (
               <Review
                 label="Location"
                 value={form.locationAddress || "Not set"}
-                onEdit={() => setStep(3)}
+                onEdit={() => setStep(4)}
               />
             )}
           </div>
@@ -768,7 +1126,7 @@ export default function PostJob() {
             >
               {saving ? "Saving..." : "Save draft"}
             </Button>
-            {step < 4 ? (
+            {step < 5 ? (
               <Button
                 type="button"
                 onClick={() => {

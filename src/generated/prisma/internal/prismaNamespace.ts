@@ -413,6 +413,7 @@ export const ModelName = {
   ClientJob: 'ClientJob',
   FavoriteJob: 'FavoriteJob',
   ClientJobAttachment: 'ClientJobAttachment',
+  ClientJobMilestone: 'ClientJobMilestone',
   ProjectTransaction: 'ProjectTransaction',
   ProjectNegotiation: 'ProjectNegotiation',
   ProjectReview: 'ProjectReview',
@@ -480,7 +481,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "cmsPage" | "cmsPageVersion" | "cmsMedia" | "sQLiteMigrationTableArchive" | "sQLiteMigrationAudit" | "websitePage" | "legalPage" | "serviceCategory" | "user" | "session" | "clientProfile" | "clientSavedLocation" | "clientHiringNeed" | "clientJob" | "favoriteJob" | "clientJobAttachment" | "projectTransaction" | "projectNegotiation" | "projectReview" | "projectRequest" | "projectTracking" | "projectTimelineEvent" | "projectMilestone" | "projectWorkUpload" | "hireJob" | "hireContract" | "hireAttachment" | "hireMilestone" | "directHireNegotiation" | "socketConversation" | "socketMessage" | "socketConversationClear" | "callSession" | "messageConversation" | "message" | "userNotification" | "userNotificationState" | "payment" | "razorpayWebhookEvent" | "wallet" | "walletTransaction" | "projectWithdrawal" | "invoice" | "projectDispute" | "projectDisputeMessage" | "projectCompletionRequest" | "projectRevisionRequest" | "projectReviewRequest" | "professionalVerification" | "verificationDocumentReview" | "personaVerification" | "personaWebhookEvent" | "storedFile" | "auditLog" | "apiToken" | "otpCode" | "browserSubscription" | "faq" | "contactRequest" | "service" | "pageConfiguration" | "websitePageOverride" | "pageTextOverride" | "legacyUser" | "legacyUserProfile" | "legacyProfessionalDetail" | "legacyLocation" | "legacyVerification"
+    modelProps: "cmsPage" | "cmsPageVersion" | "cmsMedia" | "sQLiteMigrationTableArchive" | "sQLiteMigrationAudit" | "websitePage" | "legalPage" | "serviceCategory" | "user" | "session" | "clientProfile" | "clientSavedLocation" | "clientHiringNeed" | "clientJob" | "favoriteJob" | "clientJobAttachment" | "clientJobMilestone" | "projectTransaction" | "projectNegotiation" | "projectReview" | "projectRequest" | "projectTracking" | "projectTimelineEvent" | "projectMilestone" | "projectWorkUpload" | "hireJob" | "hireContract" | "hireAttachment" | "hireMilestone" | "directHireNegotiation" | "socketConversation" | "socketMessage" | "socketConversationClear" | "callSession" | "messageConversation" | "message" | "userNotification" | "userNotificationState" | "payment" | "razorpayWebhookEvent" | "wallet" | "walletTransaction" | "projectWithdrawal" | "invoice" | "projectDispute" | "projectDisputeMessage" | "projectCompletionRequest" | "projectRevisionRequest" | "projectReviewRequest" | "professionalVerification" | "verificationDocumentReview" | "personaVerification" | "personaWebhookEvent" | "storedFile" | "auditLog" | "apiToken" | "otpCode" | "browserSubscription" | "faq" | "contactRequest" | "service" | "pageConfiguration" | "websitePageOverride" | "pageTextOverride" | "legacyUser" | "legacyUserProfile" | "legacyProfessionalDetail" | "legacyLocation" | "legacyVerification"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1665,6 +1666,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.ClientJobAttachmentCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.ClientJobAttachmentCountAggregateOutputType> | number
+        }
+      }
+    }
+    ClientJobMilestone: {
+      payload: Prisma.$ClientJobMilestonePayload<ExtArgs>
+      fields: Prisma.ClientJobMilestoneFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ClientJobMilestoneFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClientJobMilestonePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ClientJobMilestoneFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClientJobMilestonePayload>
+        }
+        findFirst: {
+          args: Prisma.ClientJobMilestoneFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClientJobMilestonePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ClientJobMilestoneFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClientJobMilestonePayload>
+        }
+        findMany: {
+          args: Prisma.ClientJobMilestoneFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClientJobMilestonePayload>[]
+        }
+        create: {
+          args: Prisma.ClientJobMilestoneCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClientJobMilestonePayload>
+        }
+        createMany: {
+          args: Prisma.ClientJobMilestoneCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ClientJobMilestoneCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClientJobMilestonePayload>[]
+        }
+        delete: {
+          args: Prisma.ClientJobMilestoneDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClientJobMilestonePayload>
+        }
+        update: {
+          args: Prisma.ClientJobMilestoneUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClientJobMilestonePayload>
+        }
+        deleteMany: {
+          args: Prisma.ClientJobMilestoneDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ClientJobMilestoneUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ClientJobMilestoneUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClientJobMilestonePayload>[]
+        }
+        upsert: {
+          args: Prisma.ClientJobMilestoneUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClientJobMilestonePayload>
+        }
+        aggregate: {
+          args: Prisma.ClientJobMilestoneAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateClientJobMilestone>
+        }
+        groupBy: {
+          args: Prisma.ClientJobMilestoneGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ClientJobMilestoneGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ClientJobMilestoneCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ClientJobMilestoneCountAggregateOutputType> | number
         }
       }
     }
@@ -5825,6 +5900,21 @@ export const ClientJobAttachmentScalarFieldEnum = {
 export type ClientJobAttachmentScalarFieldEnum = (typeof ClientJobAttachmentScalarFieldEnum)[keyof typeof ClientJobAttachmentScalarFieldEnum]
 
 
+export const ClientJobMilestoneScalarFieldEnum = {
+  id: 'id',
+  jobId: 'jobId',
+  title: 'title',
+  description: 'description',
+  percentage: 'percentage',
+  amount: 'amount',
+  sortOrder: 'sortOrder',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ClientJobMilestoneScalarFieldEnum = (typeof ClientJobMilestoneScalarFieldEnum)[keyof typeof ClientJobMilestoneScalarFieldEnum]
+
+
 export const ProjectTransactionScalarFieldEnum = {
   id: 'id',
   trackingId: 'trackingId',
@@ -6993,6 +7083,7 @@ export type GlobalOmitConfig = {
   clientJob?: Prisma.ClientJobOmit
   favoriteJob?: Prisma.FavoriteJobOmit
   clientJobAttachment?: Prisma.ClientJobAttachmentOmit
+  clientJobMilestone?: Prisma.ClientJobMilestoneOmit
   projectTransaction?: Prisma.ProjectTransactionOmit
   projectNegotiation?: Prisma.ProjectNegotiationOmit
   projectReview?: Prisma.ProjectReviewOmit

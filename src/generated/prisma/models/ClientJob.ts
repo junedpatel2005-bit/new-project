@@ -390,6 +390,7 @@ export type ClientJobWhereInput = {
   payments?: Prisma.PaymentListRelationFilter
   projectRequests?: Prisma.ProjectRequestListRelationFilter
   projectTrackings?: Prisma.ProjectTrackingListRelationFilter
+  milestones?: Prisma.ClientJobMilestoneListRelationFilter
 }
 
 export type ClientJobOrderByWithRelationInput = {
@@ -422,6 +423,7 @@ export type ClientJobOrderByWithRelationInput = {
   payments?: Prisma.PaymentOrderByRelationAggregateInput
   projectRequests?: Prisma.ProjectRequestOrderByRelationAggregateInput
   projectTrackings?: Prisma.ProjectTrackingOrderByRelationAggregateInput
+  milestones?: Prisma.ClientJobMilestoneOrderByRelationAggregateInput
 }
 
 export type ClientJobWhereUniqueInput = Prisma.AtLeast<{
@@ -457,6 +459,7 @@ export type ClientJobWhereUniqueInput = Prisma.AtLeast<{
   payments?: Prisma.PaymentListRelationFilter
   projectRequests?: Prisma.ProjectRequestListRelationFilter
   projectTrackings?: Prisma.ProjectTrackingListRelationFilter
+  milestones?: Prisma.ClientJobMilestoneListRelationFilter
 }, "id">
 
 export type ClientJobOrderByWithAggregationInput = {
@@ -547,6 +550,7 @@ export type ClientJobCreateInput = {
   payments?: Prisma.PaymentCreateNestedManyWithoutJobInput
   projectRequests?: Prisma.ProjectRequestCreateNestedManyWithoutJobInput
   projectTrackings?: Prisma.ProjectTrackingCreateNestedManyWithoutJobInput
+  milestones?: Prisma.ClientJobMilestoneCreateNestedManyWithoutJobInput
 }
 
 export type ClientJobUncheckedCreateInput = {
@@ -578,6 +582,7 @@ export type ClientJobUncheckedCreateInput = {
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutJobInput
   projectRequests?: Prisma.ProjectRequestUncheckedCreateNestedManyWithoutJobInput
   projectTrackings?: Prisma.ProjectTrackingUncheckedCreateNestedManyWithoutJobInput
+  milestones?: Prisma.ClientJobMilestoneUncheckedCreateNestedManyWithoutJobInput
 }
 
 export type ClientJobUpdateInput = {
@@ -608,6 +613,7 @@ export type ClientJobUpdateInput = {
   payments?: Prisma.PaymentUpdateManyWithoutJobNestedInput
   projectRequests?: Prisma.ProjectRequestUpdateManyWithoutJobNestedInput
   projectTrackings?: Prisma.ProjectTrackingUpdateManyWithoutJobNestedInput
+  milestones?: Prisma.ClientJobMilestoneUpdateManyWithoutJobNestedInput
 }
 
 export type ClientJobUncheckedUpdateInput = {
@@ -639,6 +645,7 @@ export type ClientJobUncheckedUpdateInput = {
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutJobNestedInput
   projectRequests?: Prisma.ProjectRequestUncheckedUpdateManyWithoutJobNestedInput
   projectTrackings?: Prisma.ProjectTrackingUncheckedUpdateManyWithoutJobNestedInput
+  milestones?: Prisma.ClientJobMilestoneUncheckedUpdateManyWithoutJobNestedInput
 }
 
 export type ClientJobCreateManyInput = {
@@ -917,6 +924,20 @@ export type ClientJobUpdateOneRequiredWithoutAttachmentsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ClientJobUpdateToOneWithWhereWithoutAttachmentsInput, Prisma.ClientJobUpdateWithoutAttachmentsInput>, Prisma.ClientJobUncheckedUpdateWithoutAttachmentsInput>
 }
 
+export type ClientJobCreateNestedOneWithoutMilestonesInput = {
+  create?: Prisma.XOR<Prisma.ClientJobCreateWithoutMilestonesInput, Prisma.ClientJobUncheckedCreateWithoutMilestonesInput>
+  connectOrCreate?: Prisma.ClientJobCreateOrConnectWithoutMilestonesInput
+  connect?: Prisma.ClientJobWhereUniqueInput
+}
+
+export type ClientJobUpdateOneRequiredWithoutMilestonesNestedInput = {
+  create?: Prisma.XOR<Prisma.ClientJobCreateWithoutMilestonesInput, Prisma.ClientJobUncheckedCreateWithoutMilestonesInput>
+  connectOrCreate?: Prisma.ClientJobCreateOrConnectWithoutMilestonesInput
+  upsert?: Prisma.ClientJobUpsertWithoutMilestonesInput
+  connect?: Prisma.ClientJobWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ClientJobUpdateToOneWithWhereWithoutMilestonesInput, Prisma.ClientJobUpdateWithoutMilestonesInput>, Prisma.ClientJobUncheckedUpdateWithoutMilestonesInput>
+}
+
 export type ClientJobCreateNestedOneWithoutProjectRequestsInput = {
   create?: Prisma.XOR<Prisma.ClientJobCreateWithoutProjectRequestsInput, Prisma.ClientJobUncheckedCreateWithoutProjectRequestsInput>
   connectOrCreate?: Prisma.ClientJobCreateOrConnectWithoutProjectRequestsInput
@@ -988,6 +1009,7 @@ export type ClientJobCreateWithoutUserInput = {
   payments?: Prisma.PaymentCreateNestedManyWithoutJobInput
   projectRequests?: Prisma.ProjectRequestCreateNestedManyWithoutJobInput
   projectTrackings?: Prisma.ProjectTrackingCreateNestedManyWithoutJobInput
+  milestones?: Prisma.ClientJobMilestoneCreateNestedManyWithoutJobInput
 }
 
 export type ClientJobUncheckedCreateWithoutUserInput = {
@@ -1018,6 +1040,7 @@ export type ClientJobUncheckedCreateWithoutUserInput = {
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutJobInput
   projectRequests?: Prisma.ProjectRequestUncheckedCreateNestedManyWithoutJobInput
   projectTrackings?: Prisma.ProjectTrackingUncheckedCreateNestedManyWithoutJobInput
+  milestones?: Prisma.ClientJobMilestoneUncheckedCreateNestedManyWithoutJobInput
 }
 
 export type ClientJobCreateOrConnectWithoutUserInput = {
@@ -1102,6 +1125,7 @@ export type ClientJobCreateWithoutFavoriteJobsInput = {
   payments?: Prisma.PaymentCreateNestedManyWithoutJobInput
   projectRequests?: Prisma.ProjectRequestCreateNestedManyWithoutJobInput
   projectTrackings?: Prisma.ProjectTrackingCreateNestedManyWithoutJobInput
+  milestones?: Prisma.ClientJobMilestoneCreateNestedManyWithoutJobInput
 }
 
 export type ClientJobUncheckedCreateWithoutFavoriteJobsInput = {
@@ -1132,6 +1156,7 @@ export type ClientJobUncheckedCreateWithoutFavoriteJobsInput = {
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutJobInput
   projectRequests?: Prisma.ProjectRequestUncheckedCreateNestedManyWithoutJobInput
   projectTrackings?: Prisma.ProjectTrackingUncheckedCreateNestedManyWithoutJobInput
+  milestones?: Prisma.ClientJobMilestoneUncheckedCreateNestedManyWithoutJobInput
 }
 
 export type ClientJobCreateOrConnectWithoutFavoriteJobsInput = {
@@ -1177,6 +1202,7 @@ export type ClientJobUpdateWithoutFavoriteJobsInput = {
   payments?: Prisma.PaymentUpdateManyWithoutJobNestedInput
   projectRequests?: Prisma.ProjectRequestUpdateManyWithoutJobNestedInput
   projectTrackings?: Prisma.ProjectTrackingUpdateManyWithoutJobNestedInput
+  milestones?: Prisma.ClientJobMilestoneUpdateManyWithoutJobNestedInput
 }
 
 export type ClientJobUncheckedUpdateWithoutFavoriteJobsInput = {
@@ -1207,6 +1233,7 @@ export type ClientJobUncheckedUpdateWithoutFavoriteJobsInput = {
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutJobNestedInput
   projectRequests?: Prisma.ProjectRequestUncheckedUpdateManyWithoutJobNestedInput
   projectTrackings?: Prisma.ProjectTrackingUncheckedUpdateManyWithoutJobNestedInput
+  milestones?: Prisma.ClientJobMilestoneUncheckedUpdateManyWithoutJobNestedInput
 }
 
 export type ClientJobCreateWithoutAttachmentsInput = {
@@ -1236,6 +1263,7 @@ export type ClientJobCreateWithoutAttachmentsInput = {
   payments?: Prisma.PaymentCreateNestedManyWithoutJobInput
   projectRequests?: Prisma.ProjectRequestCreateNestedManyWithoutJobInput
   projectTrackings?: Prisma.ProjectTrackingCreateNestedManyWithoutJobInput
+  milestones?: Prisma.ClientJobMilestoneCreateNestedManyWithoutJobInput
 }
 
 export type ClientJobUncheckedCreateWithoutAttachmentsInput = {
@@ -1266,6 +1294,7 @@ export type ClientJobUncheckedCreateWithoutAttachmentsInput = {
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutJobInput
   projectRequests?: Prisma.ProjectRequestUncheckedCreateNestedManyWithoutJobInput
   projectTrackings?: Prisma.ProjectTrackingUncheckedCreateNestedManyWithoutJobInput
+  milestones?: Prisma.ClientJobMilestoneUncheckedCreateNestedManyWithoutJobInput
 }
 
 export type ClientJobCreateOrConnectWithoutAttachmentsInput = {
@@ -1311,6 +1340,7 @@ export type ClientJobUpdateWithoutAttachmentsInput = {
   payments?: Prisma.PaymentUpdateManyWithoutJobNestedInput
   projectRequests?: Prisma.ProjectRequestUpdateManyWithoutJobNestedInput
   projectTrackings?: Prisma.ProjectTrackingUpdateManyWithoutJobNestedInput
+  milestones?: Prisma.ClientJobMilestoneUpdateManyWithoutJobNestedInput
 }
 
 export type ClientJobUncheckedUpdateWithoutAttachmentsInput = {
@@ -1337,6 +1367,145 @@ export type ClientJobUncheckedUpdateWithoutAttachmentsInput = {
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   locationState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  favoriteJobs?: Prisma.FavoriteJobUncheckedUpdateManyWithoutJobNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutJobNestedInput
+  projectRequests?: Prisma.ProjectRequestUncheckedUpdateManyWithoutJobNestedInput
+  projectTrackings?: Prisma.ProjectTrackingUncheckedUpdateManyWithoutJobNestedInput
+  milestones?: Prisma.ClientJobMilestoneUncheckedUpdateManyWithoutJobNestedInput
+}
+
+export type ClientJobCreateWithoutMilestonesInput = {
+  category?: string | null
+  title?: string | null
+  description?: string | null
+  budgetMin?: number | null
+  budgetMax?: number | null
+  urgency?: $Enums.JobUrgency
+  jobDate?: Date | string | null
+  deadline?: Date | string | null
+  workMode?: $Enums.JobWorkMode
+  locationLabel?: string | null
+  locationAddress?: string | null
+  locationLat?: number | null
+  locationLng?: number | null
+  status?: $Enums.JobStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  hourlyRate?: number | null
+  timingType?: string
+  paymentMethod?: string
+  locationState?: string | null
+  locationDistrict?: string | null
+  user: Prisma.UserCreateNestedOneWithoutClientJobsInput
+  attachments?: Prisma.ClientJobAttachmentCreateNestedManyWithoutJobInput
+  favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutJobInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutJobInput
+  projectRequests?: Prisma.ProjectRequestCreateNestedManyWithoutJobInput
+  projectTrackings?: Prisma.ProjectTrackingCreateNestedManyWithoutJobInput
+}
+
+export type ClientJobUncheckedCreateWithoutMilestonesInput = {
+  id?: number
+  userId: number
+  category?: string | null
+  title?: string | null
+  description?: string | null
+  budgetMin?: number | null
+  budgetMax?: number | null
+  urgency?: $Enums.JobUrgency
+  jobDate?: Date | string | null
+  deadline?: Date | string | null
+  workMode?: $Enums.JobWorkMode
+  locationLabel?: string | null
+  locationAddress?: string | null
+  locationLat?: number | null
+  locationLng?: number | null
+  status?: $Enums.JobStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  hourlyRate?: number | null
+  timingType?: string
+  paymentMethod?: string
+  locationState?: string | null
+  locationDistrict?: string | null
+  attachments?: Prisma.ClientJobAttachmentUncheckedCreateNestedManyWithoutJobInput
+  favoriteJobs?: Prisma.FavoriteJobUncheckedCreateNestedManyWithoutJobInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutJobInput
+  projectRequests?: Prisma.ProjectRequestUncheckedCreateNestedManyWithoutJobInput
+  projectTrackings?: Prisma.ProjectTrackingUncheckedCreateNestedManyWithoutJobInput
+}
+
+export type ClientJobCreateOrConnectWithoutMilestonesInput = {
+  where: Prisma.ClientJobWhereUniqueInput
+  create: Prisma.XOR<Prisma.ClientJobCreateWithoutMilestonesInput, Prisma.ClientJobUncheckedCreateWithoutMilestonesInput>
+}
+
+export type ClientJobUpsertWithoutMilestonesInput = {
+  update: Prisma.XOR<Prisma.ClientJobUpdateWithoutMilestonesInput, Prisma.ClientJobUncheckedUpdateWithoutMilestonesInput>
+  create: Prisma.XOR<Prisma.ClientJobCreateWithoutMilestonesInput, Prisma.ClientJobUncheckedCreateWithoutMilestonesInput>
+  where?: Prisma.ClientJobWhereInput
+}
+
+export type ClientJobUpdateToOneWithWhereWithoutMilestonesInput = {
+  where?: Prisma.ClientJobWhereInput
+  data: Prisma.XOR<Prisma.ClientJobUpdateWithoutMilestonesInput, Prisma.ClientJobUncheckedUpdateWithoutMilestonesInput>
+}
+
+export type ClientJobUpdateWithoutMilestonesInput = {
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  budgetMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  budgetMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  urgency?: Prisma.EnumJobUrgencyFieldUpdateOperationsInput | $Enums.JobUrgency
+  jobDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
+  locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  locationLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  timingType?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
+  locationState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  user?: Prisma.UserUpdateOneRequiredWithoutClientJobsNestedInput
+  attachments?: Prisma.ClientJobAttachmentUpdateManyWithoutJobNestedInput
+  favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutJobNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutJobNestedInput
+  projectRequests?: Prisma.ProjectRequestUpdateManyWithoutJobNestedInput
+  projectTrackings?: Prisma.ProjectTrackingUpdateManyWithoutJobNestedInput
+}
+
+export type ClientJobUncheckedUpdateWithoutMilestonesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  userId?: Prisma.IntFieldUpdateOperationsInput | number
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  budgetMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  budgetMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  urgency?: Prisma.EnumJobUrgencyFieldUpdateOperationsInput | $Enums.JobUrgency
+  jobDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  workMode?: Prisma.EnumJobWorkModeFieldUpdateOperationsInput | $Enums.JobWorkMode
+  locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  locationLng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hourlyRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  timingType?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
+  locationState?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationDistrict?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attachments?: Prisma.ClientJobAttachmentUncheckedUpdateManyWithoutJobNestedInput
   favoriteJobs?: Prisma.FavoriteJobUncheckedUpdateManyWithoutJobNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutJobNestedInput
   projectRequests?: Prisma.ProjectRequestUncheckedUpdateManyWithoutJobNestedInput
@@ -1370,6 +1539,7 @@ export type ClientJobCreateWithoutProjectRequestsInput = {
   favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutJobInput
   payments?: Prisma.PaymentCreateNestedManyWithoutJobInput
   projectTrackings?: Prisma.ProjectTrackingCreateNestedManyWithoutJobInput
+  milestones?: Prisma.ClientJobMilestoneCreateNestedManyWithoutJobInput
 }
 
 export type ClientJobUncheckedCreateWithoutProjectRequestsInput = {
@@ -1400,6 +1570,7 @@ export type ClientJobUncheckedCreateWithoutProjectRequestsInput = {
   favoriteJobs?: Prisma.FavoriteJobUncheckedCreateNestedManyWithoutJobInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutJobInput
   projectTrackings?: Prisma.ProjectTrackingUncheckedCreateNestedManyWithoutJobInput
+  milestones?: Prisma.ClientJobMilestoneUncheckedCreateNestedManyWithoutJobInput
 }
 
 export type ClientJobCreateOrConnectWithoutProjectRequestsInput = {
@@ -1445,6 +1616,7 @@ export type ClientJobUpdateWithoutProjectRequestsInput = {
   favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutJobNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutJobNestedInput
   projectTrackings?: Prisma.ProjectTrackingUpdateManyWithoutJobNestedInput
+  milestones?: Prisma.ClientJobMilestoneUpdateManyWithoutJobNestedInput
 }
 
 export type ClientJobUncheckedUpdateWithoutProjectRequestsInput = {
@@ -1475,6 +1647,7 @@ export type ClientJobUncheckedUpdateWithoutProjectRequestsInput = {
   favoriteJobs?: Prisma.FavoriteJobUncheckedUpdateManyWithoutJobNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutJobNestedInput
   projectTrackings?: Prisma.ProjectTrackingUncheckedUpdateManyWithoutJobNestedInput
+  milestones?: Prisma.ClientJobMilestoneUncheckedUpdateManyWithoutJobNestedInput
 }
 
 export type ClientJobCreateWithoutProjectTrackingsInput = {
@@ -1504,6 +1677,7 @@ export type ClientJobCreateWithoutProjectTrackingsInput = {
   favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutJobInput
   payments?: Prisma.PaymentCreateNestedManyWithoutJobInput
   projectRequests?: Prisma.ProjectRequestCreateNestedManyWithoutJobInput
+  milestones?: Prisma.ClientJobMilestoneCreateNestedManyWithoutJobInput
 }
 
 export type ClientJobUncheckedCreateWithoutProjectTrackingsInput = {
@@ -1534,6 +1708,7 @@ export type ClientJobUncheckedCreateWithoutProjectTrackingsInput = {
   favoriteJobs?: Prisma.FavoriteJobUncheckedCreateNestedManyWithoutJobInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutJobInput
   projectRequests?: Prisma.ProjectRequestUncheckedCreateNestedManyWithoutJobInput
+  milestones?: Prisma.ClientJobMilestoneUncheckedCreateNestedManyWithoutJobInput
 }
 
 export type ClientJobCreateOrConnectWithoutProjectTrackingsInput = {
@@ -1579,6 +1754,7 @@ export type ClientJobUpdateWithoutProjectTrackingsInput = {
   favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutJobNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutJobNestedInput
   projectRequests?: Prisma.ProjectRequestUpdateManyWithoutJobNestedInput
+  milestones?: Prisma.ClientJobMilestoneUpdateManyWithoutJobNestedInput
 }
 
 export type ClientJobUncheckedUpdateWithoutProjectTrackingsInput = {
@@ -1609,6 +1785,7 @@ export type ClientJobUncheckedUpdateWithoutProjectTrackingsInput = {
   favoriteJobs?: Prisma.FavoriteJobUncheckedUpdateManyWithoutJobNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutJobNestedInput
   projectRequests?: Prisma.ProjectRequestUncheckedUpdateManyWithoutJobNestedInput
+  milestones?: Prisma.ClientJobMilestoneUncheckedUpdateManyWithoutJobNestedInput
 }
 
 export type ClientJobCreateWithoutPaymentsInput = {
@@ -1638,6 +1815,7 @@ export type ClientJobCreateWithoutPaymentsInput = {
   favoriteJobs?: Prisma.FavoriteJobCreateNestedManyWithoutJobInput
   projectRequests?: Prisma.ProjectRequestCreateNestedManyWithoutJobInput
   projectTrackings?: Prisma.ProjectTrackingCreateNestedManyWithoutJobInput
+  milestones?: Prisma.ClientJobMilestoneCreateNestedManyWithoutJobInput
 }
 
 export type ClientJobUncheckedCreateWithoutPaymentsInput = {
@@ -1668,6 +1846,7 @@ export type ClientJobUncheckedCreateWithoutPaymentsInput = {
   favoriteJobs?: Prisma.FavoriteJobUncheckedCreateNestedManyWithoutJobInput
   projectRequests?: Prisma.ProjectRequestUncheckedCreateNestedManyWithoutJobInput
   projectTrackings?: Prisma.ProjectTrackingUncheckedCreateNestedManyWithoutJobInput
+  milestones?: Prisma.ClientJobMilestoneUncheckedCreateNestedManyWithoutJobInput
 }
 
 export type ClientJobCreateOrConnectWithoutPaymentsInput = {
@@ -1713,6 +1892,7 @@ export type ClientJobUpdateWithoutPaymentsInput = {
   favoriteJobs?: Prisma.FavoriteJobUpdateManyWithoutJobNestedInput
   projectRequests?: Prisma.ProjectRequestUpdateManyWithoutJobNestedInput
   projectTrackings?: Prisma.ProjectTrackingUpdateManyWithoutJobNestedInput
+  milestones?: Prisma.ClientJobMilestoneUpdateManyWithoutJobNestedInput
 }
 
 export type ClientJobUncheckedUpdateWithoutPaymentsInput = {
@@ -1743,6 +1923,7 @@ export type ClientJobUncheckedUpdateWithoutPaymentsInput = {
   favoriteJobs?: Prisma.FavoriteJobUncheckedUpdateManyWithoutJobNestedInput
   projectRequests?: Prisma.ProjectRequestUncheckedUpdateManyWithoutJobNestedInput
   projectTrackings?: Prisma.ProjectTrackingUncheckedUpdateManyWithoutJobNestedInput
+  milestones?: Prisma.ClientJobMilestoneUncheckedUpdateManyWithoutJobNestedInput
 }
 
 export type ClientJobCreateManyUserInput = {
@@ -1797,6 +1978,7 @@ export type ClientJobUpdateWithoutUserInput = {
   payments?: Prisma.PaymentUpdateManyWithoutJobNestedInput
   projectRequests?: Prisma.ProjectRequestUpdateManyWithoutJobNestedInput
   projectTrackings?: Prisma.ProjectTrackingUpdateManyWithoutJobNestedInput
+  milestones?: Prisma.ClientJobMilestoneUpdateManyWithoutJobNestedInput
 }
 
 export type ClientJobUncheckedUpdateWithoutUserInput = {
@@ -1827,6 +2009,7 @@ export type ClientJobUncheckedUpdateWithoutUserInput = {
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutJobNestedInput
   projectRequests?: Prisma.ProjectRequestUncheckedUpdateManyWithoutJobNestedInput
   projectTrackings?: Prisma.ProjectTrackingUncheckedUpdateManyWithoutJobNestedInput
+  milestones?: Prisma.ClientJobMilestoneUncheckedUpdateManyWithoutJobNestedInput
 }
 
 export type ClientJobUncheckedUpdateManyWithoutUserInput = {
@@ -1865,6 +2048,7 @@ export type ClientJobCountOutputType = {
   payments: number
   projectRequests: number
   projectTrackings: number
+  milestones: number
 }
 
 export type ClientJobCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1873,6 +2057,7 @@ export type ClientJobCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensi
   payments?: boolean | ClientJobCountOutputTypeCountPaymentsArgs
   projectRequests?: boolean | ClientJobCountOutputTypeCountProjectRequestsArgs
   projectTrackings?: boolean | ClientJobCountOutputTypeCountProjectTrackingsArgs
+  milestones?: boolean | ClientJobCountOutputTypeCountMilestonesArgs
 }
 
 /**
@@ -1920,6 +2105,13 @@ export type ClientJobCountOutputTypeCountProjectTrackingsArgs<ExtArgs extends ru
   where?: Prisma.ProjectTrackingWhereInput
 }
 
+/**
+ * ClientJobCountOutputType without action
+ */
+export type ClientJobCountOutputTypeCountMilestonesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ClientJobMilestoneWhereInput
+}
+
 
 export type ClientJobSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1951,6 +2143,7 @@ export type ClientJobSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   payments?: boolean | Prisma.ClientJob$paymentsArgs<ExtArgs>
   projectRequests?: boolean | Prisma.ClientJob$projectRequestsArgs<ExtArgs>
   projectTrackings?: boolean | Prisma.ClientJob$projectTrackingsArgs<ExtArgs>
+  milestones?: boolean | Prisma.ClientJob$milestonesArgs<ExtArgs>
   _count?: boolean | Prisma.ClientJobCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["clientJob"]>
 
@@ -2042,6 +2235,7 @@ export type ClientJobInclude<ExtArgs extends runtime.Types.Extensions.InternalAr
   payments?: boolean | Prisma.ClientJob$paymentsArgs<ExtArgs>
   projectRequests?: boolean | Prisma.ClientJob$projectRequestsArgs<ExtArgs>
   projectTrackings?: boolean | Prisma.ClientJob$projectTrackingsArgs<ExtArgs>
+  milestones?: boolean | Prisma.ClientJob$milestonesArgs<ExtArgs>
   _count?: boolean | Prisma.ClientJobCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ClientJobIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2060,6 +2254,7 @@ export type $ClientJobPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     payments: Prisma.$PaymentPayload<ExtArgs>[]
     projectRequests: Prisma.$ProjectRequestPayload<ExtArgs>[]
     projectTrackings: Prisma.$ProjectTrackingPayload<ExtArgs>[]
+    milestones: Prisma.$ClientJobMilestonePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -2485,6 +2680,7 @@ export interface Prisma__ClientJobClient<T, Null = never, ExtArgs extends runtim
   payments<T extends Prisma.ClientJob$paymentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ClientJob$paymentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   projectRequests<T extends Prisma.ClientJob$projectRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ClientJob$projectRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProjectRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   projectTrackings<T extends Prisma.ClientJob$projectTrackingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ClientJob$projectTrackingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProjectTrackingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  milestones<T extends Prisma.ClientJob$milestonesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ClientJob$milestonesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClientJobMilestonePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3055,6 +3251,30 @@ export type ClientJob$projectTrackingsArgs<ExtArgs extends runtime.Types.Extensi
   take?: number
   skip?: number
   distinct?: Prisma.ProjectTrackingScalarFieldEnum | Prisma.ProjectTrackingScalarFieldEnum[]
+}
+
+/**
+ * ClientJob.milestones
+ */
+export type ClientJob$milestonesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ClientJobMilestone
+   */
+  select?: Prisma.ClientJobMilestoneSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ClientJobMilestone
+   */
+  omit?: Prisma.ClientJobMilestoneOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ClientJobMilestoneInclude<ExtArgs> | null
+  where?: Prisma.ClientJobMilestoneWhereInput
+  orderBy?: Prisma.ClientJobMilestoneOrderByWithRelationInput | Prisma.ClientJobMilestoneOrderByWithRelationInput[]
+  cursor?: Prisma.ClientJobMilestoneWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ClientJobMilestoneScalarFieldEnum | Prisma.ClientJobMilestoneScalarFieldEnum[]
 }
 
 /**

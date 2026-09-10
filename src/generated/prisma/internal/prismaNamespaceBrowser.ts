@@ -67,6 +67,7 @@ export const ModelName = {
   ClientJob: 'ClientJob',
   FavoriteJob: 'FavoriteJob',
   ClientJobAttachment: 'ClientJobAttachment',
+  ClientJobMilestone: 'ClientJobMilestone',
   ProjectTransaction: 'ProjectTransaction',
   ProjectNegotiation: 'ProjectNegotiation',
   ProjectReview: 'ProjectReview',
@@ -405,6 +406,21 @@ export const ClientJobAttachmentScalarFieldEnum = {
 } as const
 
 export type ClientJobAttachmentScalarFieldEnum = (typeof ClientJobAttachmentScalarFieldEnum)[keyof typeof ClientJobAttachmentScalarFieldEnum]
+
+
+export const ClientJobMilestoneScalarFieldEnum = {
+  id: 'id',
+  jobId: 'jobId',
+  title: 'title',
+  description: 'description',
+  percentage: 'percentage',
+  amount: 'amount',
+  sortOrder: 'sortOrder',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ClientJobMilestoneScalarFieldEnum = (typeof ClientJobMilestoneScalarFieldEnum)[keyof typeof ClientJobMilestoneScalarFieldEnum]
 
 
 export const ProjectTransactionScalarFieldEnum = {

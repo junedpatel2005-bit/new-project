@@ -4,6 +4,12 @@ import { db } from "@/lib/db";
 import { sessionCookie, verifySession } from "@/lib/auth";
 import { notifyAdminsOfNewJob, notifyProfessionalsOfNewJob } from "@/lib/marketplace-notifications";
 
+const milestoneInput = z.object({
+  title: z.string().trim().min(1, "Enter a milestone title.").max(160),
+  description: z.string().trim().max(1000).optional().nullable(),
+  percentage: z.coerce.number().int().min(1, "Percentage must be at least 1%.").max(100, "Percentage cannot exceed 100%."),
+});
+
 const jobInput = z.object({
   title: z.string().trim().max(160).optional().or(z.literal("")),
   category: z.string().trim().max(100).optional().or(z.literal("")),
@@ -23,11 +29,14 @@ const jobInput = z.object({
   locationDistrict: z.string().trim().max(100).nullable().optional(),
   locationLat: z.coerce.number().min(-90).max(90).nullable().optional(),
   locationLng: z.coerce.number().min(-180).max(180).nullable().optional(),
+  milestones: z.array(milestoneInput).optional().default([]),
   mode: z.enum(["draft", "publish"]),
 });
 
 async function getClient(request: NextRequest) {
-  const token = request.cookies.get(sessionCookie)?.value;
+  const authHeader = request.headers.get("authorization");
+  const bearerToken = authHeader?.startsWith("Bearer ") ? authHeader.slice(7).trim() : null;
+  const token = bearerToken || request.cookies.get(sessionCookie)?.value;
   if (!token) return null;
   try {
     const session = await verifySession(token);
@@ -91,6 +100,16 @@ async function publishErrors(data: z.infer<typeof jobInput>) {
     });
     if (!exists) fields.category = "Choose a valid category.";
   }
+  if (data.milestones && data.milestones.length > 0) {
+    const totalPercentage = data.milestones.reduce((acc, m) => acc + (m.percentage || 0), 0);
+    if (totalPercentage > 100) {
+      fields.milestones = `Total percentage of all milestones must not exceed 100% (currently ${totalPercentage}%).`;
+    }
+    const hasEmpty = data.milestones.some((m) => !m.title?.trim());
+    if (hasEmpty) {
+      fields.milestones = "All milestones must have a title.";
+    }
+  }
   return fields;
 }
 
@@ -99,6 +118,11 @@ export async function GET(request: NextRequest) {
   if (!user) return NextResponse.json({ error: "Client sign-in is required." }, { status: 401 });
   const jobs = await db.clientJob.findMany({
     where: { userId: user.id },
+    include: {
+      milestones: {
+        orderBy: { sortOrder: "asc" },
+      },
+    },
     orderBy: { updatedAt: "desc" },
   });
   const tracking = await db.projectTracking.findMany({
@@ -146,11 +170,39 @@ export async function POST(request: NextRequest) {
       { error: "Please correct the highlighted fields.", fields },
       { status: 400 },
     );
+
+  let rawMilestones = (parsed.data.milestones || []).filter((m) => m.title?.trim());
+  if (rawMilestones.length === 0) {
+    rawMilestones = [
+      {
+        title: "Project Completion",
+        description: "Full project delivery and completion",
+        percentage: 100,
+      },
+    ];
+  }
+  const budgetRef = parsed.data.budgetMax ?? parsed.data.budgetMin ?? null;
+  const preparedMilestones = rawMilestones.map((m, index) => ({
+    title: m.title.trim(),
+    description: m.description?.trim() || null,
+    percentage: m.percentage,
+    amount: budgetRef ? Math.round((budgetRef * m.percentage) / 100) : null,
+    sortOrder: index,
+  }));
+
   const job = await db.clientJob.create({
     data: {
       userId: user.id,
       ...normalized(parsed.data),
       status: parsed.data.mode === "publish" ? "OPEN" : "DRAFT",
+      milestones: {
+        create: preparedMilestones,
+      },
+    },
+    include: {
+      milestones: {
+        orderBy: { sortOrder: "asc" },
+      },
     },
   });
   if (job.status === "OPEN" && (!job.jobDate || job.jobDate <= new Date())) {

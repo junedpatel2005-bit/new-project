@@ -4,6 +4,12 @@ import { sessionCookie, verifySession } from "@/lib/auth";
 import { attachLastActorRole } from "@/lib/project-request-actions";
 import { z } from "zod";
 
+const milestoneInput = z.object({
+  title: z.string().trim().min(1, "Enter a milestone title.").max(160),
+  description: z.string().trim().max(1000).optional().nullable(),
+  percentage: z.coerce.number().int().min(1, "Percentage must be at least 1%.").max(100, "Percentage cannot exceed 100%."),
+});
+
 const bodySchema = z.object({
   title: z.string().trim().max(160).optional().or(z.literal("")),
   category: z.string().trim().max(100).optional().or(z.literal("")),
@@ -24,6 +30,7 @@ const bodySchema = z.object({
   locationLat: z.coerce.number().min(-90).max(90).nullable().optional(),
   locationLng: z.coerce.number().min(-180).max(180).nullable().optional(),
   status: z.enum(["OPEN", "CLOSED"]).optional(),
+  milestones: z.array(milestoneInput).optional(),
   mode: z.enum(["draft", "publish"]).optional(),
 });
 async function client(request: NextRequest) {
@@ -92,6 +99,16 @@ async function errors(d: z.infer<typeof bodySchema>) {
     }))
   )
     fields.category = "Choose a valid category.";
+  if (d.milestones && d.milestones.length > 0) {
+    const totalPercentage = d.milestones.reduce((sum, m) => sum + (m.percentage || 0), 0);
+    if (totalPercentage > 100) {
+      fields.milestones = `Total percentage of all milestones must not exceed 100% (currently ${totalPercentage}%).`;
+    }
+    const hasEmpty = d.milestones.some((m) => !m.title?.trim());
+    if (hasEmpty) {
+      fields.milestones = "All milestones must have a title.";
+    }
+  }
   return fields;
 }
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -103,6 +120,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     include: {
       attachments: {
         select: { id: true, fileName: true, fileType: true, fileSize: true, previewUrl: true },
+      },
+      milestones: {
+        orderBy: { sortOrder: "asc" },
       },
     },
   });
@@ -238,9 +258,50 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   if (parsed.data.mode === "publish" && !parsed.data.status) {
     updateData.status = "OPEN";
   }
+
+  if (parsed.data.milestones !== undefined || parsed.data.mode === "publish") {
+    let rawMilestones = (parsed.data.milestones || []).filter((m) => m.title?.trim());
+    if (rawMilestones.length === 0 && parsed.data.mode === "publish") {
+      rawMilestones = [
+        {
+          title: "Project Completion",
+          description: "Full project delivery and completion",
+          percentage: 100,
+        },
+      ];
+    }
+    const budgetRef =
+      (parsed.data.budgetMax !== undefined && parsed.data.budgetMax !== null
+        ? parsed.data.budgetMax
+        : current.budgetMax) ??
+      (parsed.data.budgetMin !== undefined && parsed.data.budgetMin !== null
+        ? parsed.data.budgetMin
+        : current.budgetMin) ??
+      null;
+
+    const preparedMilestones = rawMilestones.map((m, index) => ({
+      jobId: id,
+      title: m.title.trim(),
+      description: m.description?.trim() || null,
+      percentage: m.percentage,
+      amount: budgetRef ? Math.round((budgetRef * m.percentage) / 100) : null,
+      sortOrder: index,
+    }));
+
+    await db.clientJobMilestone.deleteMany({ where: { jobId: id } });
+    if (preparedMilestones.length > 0) {
+      await db.clientJobMilestone.createMany({ data: preparedMilestones });
+    }
+  }
+
   const job = await db.clientJob.update({
     where: { id },
     data: updateData,
+    include: {
+      milestones: {
+        orderBy: { sortOrder: "asc" },
+      },
+    },
   });
   return NextResponse.json({ job });
 }

@@ -512,6 +512,10 @@ export async function getOpenJob(id: number): Promise<MarketplaceJob | null> {
       attachments: {
         select: { id: true, fileName: true, fileType: true, fileSize: true, previewUrl: true },
       },
+      milestones: {
+        select: { id: true, title: true, description: true, percentage: true, amount: true, sortOrder: true },
+        orderBy: { sortOrder: "asc" },
+      },
     },
   });
   if (!job || !job.title || !job.description || !job.category) return null;
@@ -545,5 +549,6 @@ export async function getOpenJob(id: number): Promise<MarketplaceJob | null> {
       rating: job.user.averageRating,
     },
     attachments: job.attachments,
+    milestones: job.milestones,
   };
 }

@@ -98,6 +98,11 @@ export type FavoriteJob = Prisma.FavoriteJobModel
  */
 export type ClientJobAttachment = Prisma.ClientJobAttachmentModel
 /**
+ * Model ClientJobMilestone
+ * 
+ */
+export type ClientJobMilestone = Prisma.ClientJobMilestoneModel
+/**
  * Model ProjectTransaction
  * 
  */

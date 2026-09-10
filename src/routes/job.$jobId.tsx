@@ -14,6 +14,7 @@ import {
   AlertTriangle,
   Search,
   Star,
+  CheckCircle2,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { usePortalTitle } from "@/components/PortalShell";
@@ -32,6 +33,14 @@ import type {
   ProfessionalDiscoveryResponse,
   ProfessionalDiscoveryResult,
 } from "@/lib/types/professional-discovery";
+
+export type JobMilestoneView = {
+  id?: number;
+  title: string;
+  percentage: number;
+  amount?: number | null;
+  description?: string | null;
+};
 
 type OwnerJob = {
   id: number;
@@ -62,6 +71,7 @@ type OwnerJob = {
     fileSize: number | null;
     previewUrl: string | null;
   }[];
+  milestones?: JobMilestoneView[];
 };
 
 type ViewJob = {
@@ -94,6 +104,7 @@ type ViewJob = {
     fileSize: number | null;
     previewUrl: string | null;
   }[];
+  milestones?: JobMilestoneView[];
 };
 type JobProposal = {
   id: number;
@@ -152,6 +163,7 @@ function fromMarketplace(job: MarketplaceJob): ViewJob {
     proposalCount: job.proposalCount,
     client: job.client,
     attachments: job.attachments,
+    milestones: job.milestones,
   };
 }
 
@@ -178,6 +190,7 @@ function fromOwner(job: OwnerJob): ViewJob {
     createdAt: job.createdAt,
     status: job.status,
     attachments: job.attachments,
+    milestones: job.milestones,
   };
 }
 
@@ -823,6 +836,51 @@ export default function JobDetails({
             {job.description}
           </p>
         </section>
+
+        {/* Milestones */}
+        {job.milestones && job.milestones.length > 0 && (
+          <section className="mt-8">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="h-5 w-5 text-primary" />
+              <h2 className="text-lg font-semibold">Project Milestones ({job.milestones.length})</h2>
+            </div>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Payment milestones defined by the client for this project
+            </p>
+            <div className="mt-4 space-y-3">
+              {job.milestones.map((milestone, idx) => (
+                <div
+                  key={milestone.id ?? idx}
+                  className="rounded-xl border border-border bg-card/60 p-4 transition-colors"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                        {idx + 1}
+                      </span>
+                      <h3 className="font-semibold text-sm sm:text-base">{milestone.title}</h3>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
+                        {milestone.percentage}%
+                      </span>
+                      {milestone.amount != null && (
+                        <span className="text-xs font-medium text-muted-foreground">
+                          ≈ ₹{milestone.amount.toLocaleString("en-IN")}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  {milestone.description && (
+                    <p className="mt-2 text-sm text-muted-foreground pl-8">
+                      {milestone.description}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
         {isOwner && (
           <section className="mt-8 border-t border-border pt-6">
             <div className="flex items-center gap-2 mb-4">

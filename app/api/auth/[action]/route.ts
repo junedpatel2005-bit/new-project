@@ -111,15 +111,17 @@ export async function GET(
     if (!code) {
       const role =
         request.nextUrl.searchParams.get("role") === "PROFESSIONAL" ? "PROFESSIONAL" : "CLIENT";
+      const nextPath = request.nextUrl.searchParams.get("next");
       const state = randomBytes(24).toString("hex");
       const url = new URL("https://accounts.google.com/o/oauth2/v2/auth");
       url.searchParams.set("client_id", clientId);
       url.searchParams.set("redirect_uri", callbackUrl);
       url.searchParams.set("response_type", "code");
       url.searchParams.set("scope", "openid email profile");
+      url.searchParams.set("prompt", "select_account");
       url.searchParams.set("state", state);
       const response = NextResponse.redirect(url);
-      response.cookies.set("servio_google_oauth", JSON.stringify({ state, role }), {
+      response.cookies.set("servio_google_oauth", JSON.stringify({ state, role, nextPath }), {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
@@ -133,6 +135,7 @@ export async function GET(
       const saved = JSON.parse(request.cookies.get("servio_google_oauth")?.value ?? "{}") as {
         state?: string;
         role?: "CLIENT" | "PROFESSIONAL";
+        nextPath?: string | null;
       };
       if (!saved.state || saved.state !== request.nextUrl.searchParams.get("state"))
         throw new Error("Invalid OAuth state");
@@ -159,8 +162,9 @@ export async function GET(
         given_name?: string;
         family_name?: string;
         name?: string;
+        email_verified?: boolean;
       };
-      if (!profileResponse.ok || !profile.sub || !profile.email)
+      if (!profileResponse.ok || !profile.sub || !profile.email || profile.email_verified !== true)
         throw new Error("Could not read Google profile");
       let user = await db.user.findFirst({
         where: { OR: [{ googleId: profile.sub }, { email: profile.email }] },
@@ -193,11 +197,13 @@ export async function GET(
         ]);
       }
       const redirect =
-        user.role === "CLIENT"
-          ? "/client-profile"
-          : user.role === "PROFESSIONAL"
-            ? "/professional-home"
-            : "/admin";
+        saved.nextPath?.startsWith("/") && !saved.nextPath.startsWith("//")
+          ? saved.nextPath
+          : user.role === "CLIENT"
+            ? "/client-profile"
+            : user.role === "PROFESSIONAL"
+              ? "/professional-home"
+              : "/admin";
       const response = NextResponse.redirect(new URL(redirect, request.url));
       response.cookies.set(
         sessionCookie,
@@ -522,11 +528,7 @@ export async function POST(
         role: user.role,
       },
     });
-    response.cookies.set(
-      sessionCookie,
-      sessionToken,
-      sessionOptions,
-    );
+    response.cookies.set(sessionCookie, sessionToken, sessionOptions);
     return response;
   }
   if (action === "send-phone-login-otp") {
