@@ -135,3 +135,4 @@ flutter run
 ```
 
 Configure the API base URL according to the device or emulator being used; `localhost` from a physical device refers to the device itself, not the development computer.
+
