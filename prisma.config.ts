@@ -7,7 +7,7 @@ export default defineConfig({
     path: "prisma/migrations",
     seed: "npx tsx ./prisma/seed.ts",
   },
-  // Prisma CLI commands such as migrate deploy need a session-capable connection.
-  // The web application continues to use DATABASE_URL (Supavisor transaction pooler).
-  datasource: { url: env("DIRECT_URL") },
+  // Prisma CLI commands such as migrate deploy need a session-capable connection (DIRECT_URL).
+  // Falls back to DATABASE_URL if DIRECT_URL is not set.
+  datasource: { url: process.env.DIRECT_URL || process.env.DATABASE_URL || env("DATABASE_URL") },
 });

@@ -39,6 +39,7 @@ function toProfessional(professional: {
   avatarUrl: string | null;
   professionalCategory: string | null;
   professionalCity: string | null;
+  professionalState?: string | null;
   hourlyRate: number | null;
   averageRating: number;
   reviewCount: number;
@@ -47,6 +48,7 @@ function toProfessional(professional: {
   professionalSkillsJson: string | null;
   companyDescription: string | null;
 }): MarketplaceProfessional {
+  const locParts = [professional.professionalCity, professional.professionalState].filter(Boolean);
   return {
     id: String(professional.id),
     name: `${professional.firstName} ${professional.lastName}`.trim(),
@@ -55,7 +57,7 @@ function toProfessional(professional: {
     rating: professional.averageRating,
     reviews: professional.reviewCount,
     hourlyRate: professional.hourlyRate,
-    location: professional.professionalCity,
+    location: locParts.length > 0 ? locParts.join(", ") : (professional.professionalCity ?? null),
     availability: professional.availabilityStatus,
     verified: professional.isVerified,
     skills: parseSkills(professional.professionalSkillsJson),
@@ -78,6 +80,8 @@ function toDetailedProfessional(professional: {
   address: string | null;
   professionalCategory: string | null;
   professionalCity: string | null;
+  professionalState: string | null;
+  professionalDistrict: string | null;
   professionalSkillsJson: string | null;
   experienceYears: number | null;
   hourlyRate: number | null;
@@ -122,6 +126,7 @@ function toDetailedProfessional(professional: {
     avatarUrl: professional.avatarUrl,
     professionalCategory: professional.professionalCategory,
     professionalCity: professional.professionalCity,
+    professionalState: professional.professionalState,
     hourlyRate: professional.hourlyRate,
     averageRating: professional.averageRating,
     reviewCount: professional.reviewCount,
@@ -411,6 +416,8 @@ export async function getDetailedProfessional(id: number): Promise<DetailedProfe
       address: true,
       professionalCategory: true,
       professionalCity: true,
+      professionalState: true,
+      professionalDistrict: true,
       professionalSkillsJson: true,
       experienceYears: true,
       hourlyRate: true,

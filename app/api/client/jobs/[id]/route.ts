@@ -112,11 +112,14 @@ async function errors(d: z.infer<typeof bodySchema>) {
   return fields;
 }
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const userId = await client(request);
-  const id = idOf((await params).id);
-  if (!userId || !id) return NextResponse.json({ error: "Not found." }, { status: 404 });
+  try {
+    const userId = await client(request);
+    const id = idOf((await params).id);
+    if (!userId || !id) return NextResponse.json({ error: "Not found." }, { status: 404 });
   const job = await db.clientJob.findFirst({
     where: { id, userId },
+
+    
     include: {
       attachments: {
         select: { id: true, fileName: true, fileType: true, fileSize: true, previewUrl: true },
@@ -221,101 +224,124 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       professional: professionalById.get(hireRequest.professionalId) ?? null,
     })),
   });
+} catch (error) {
+  console.error("Failed to load job details:", error);
+  return NextResponse.json(
+    { error: error instanceof Error ? error.message : "Failed to load job." },
+    { status: 500 },
+  );
+}
 }
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const userId = await client(request);
-  const id = idOf((await params).id);
-  if (!userId || !id) return NextResponse.json({ error: "Not found." }, { status: 404 });
-  const current = await db.clientJob.findFirst({ where: { id, userId } });
-  if (!current) return NextResponse.json({ error: "Not found." }, { status: 404 });
-  const parsed = bodySchema.safeParse(await request.json().catch(() => null));
-  if (!parsed.success)
-    return NextResponse.json({ error: "Please review the job details." }, { status: 400 });
-  if (current.status === "CLOSED" && parsed.data.status !== "OPEN")
-    return NextResponse.json({ error: "Closed jobs cannot be changed." }, { status: 409 });
-
-  // A status-only transition (no `mode`, e.g. Close/Reopen from the job detail page) must only
-  // touch `status` — rebuilding the full record from `dataOf()` would null out every field the
-  // caller didn't send.
-  const isStatusOnly =
-    !parsed.data.mode && Object.keys(parsed.data).every((key) => key === "status");
-  if (isStatusOnly) {
-    if (!parsed.data.status)
+  try {
+    const userId = await client(request);
+    const id = idOf((await params).id);
+    if (!userId || !id) return NextResponse.json({ error: "Not found." }, { status: 404 });
+    const current = await db.clientJob.findFirst({ where: { id, userId } });
+    if (!current) return NextResponse.json({ error: "Not found." }, { status: 404 });
+    const parsed = bodySchema.safeParse(await request.json().catch(() => null));
+    if (!parsed.success)
       return NextResponse.json({ error: "Please review the job details." }, { status: 400 });
-    const job = await db.clientJob.update({ where: { id }, data: { status: parsed.data.status } });
-    return NextResponse.json({ job });
-  }
+    if (current.status === "CLOSED" && parsed.data.status !== "OPEN")
+      return NextResponse.json({ error: "Closed jobs cannot be changed." }, { status: 409 });
 
-  if (current.status === "CLOSED")
-    return NextResponse.json({ error: "Closed jobs cannot be changed." }, { status: 409 });
-  const fields = parsed.data.mode === "publish" ? await errors(parsed.data) : {};
-  if (Object.keys(fields).length)
-    return NextResponse.json(
-      { error: "Please correct the highlighted fields.", fields },
-      { status: 400 },
-    );
-  const updateData = dataOf(parsed.data);
-  if (parsed.data.mode === "publish" && !parsed.data.status) {
-    updateData.status = "OPEN";
-  }
+    // A status-only transition (no `mode`, e.g. Close/Reopen from the job detail page) must only
+    // touch `status` — rebuilding the full record from `dataOf()` would null out every field the
+    // caller didn't send.
+    const isStatusOnly =
+      !parsed.data.mode && Object.keys(parsed.data).every((key) => key === "status");
+    if (isStatusOnly) {
+      if (!parsed.data.status)
+        return NextResponse.json({ error: "Please review the job details." }, { status: 400 });
+      const job = await db.clientJob.update({ where: { id }, data: { status: parsed.data.status } });
+      return NextResponse.json({ job });
+    }
 
-  if (parsed.data.milestones !== undefined || parsed.data.mode === "publish") {
-    let rawMilestones = (parsed.data.milestones || []).filter((m) => m.title?.trim());
-    if (rawMilestones.length === 0 && parsed.data.mode === "publish") {
-      rawMilestones = [
-        {
-          title: "Project Completion",
-          description: "Full project delivery and completion",
-          percentage: 100,
+    if (current.status === "CLOSED")
+      return NextResponse.json({ error: "Closed jobs cannot be changed." }, { status: 409 });
+    const fields = parsed.data.mode === "publish" ? await errors(parsed.data) : {};
+    if (Object.keys(fields).length)
+      return NextResponse.json(
+        { error: "Please correct the highlighted fields.", fields },
+        { status: 400 },
+      );
+    const updateData = dataOf(parsed.data);
+    if (parsed.data.mode === "publish" && !parsed.data.status) {
+      updateData.status = "OPEN";
+    }
+
+    if (parsed.data.milestones !== undefined || parsed.data.mode === "publish") {
+      let rawMilestones = (parsed.data.milestones || []).filter((m) => m.title?.trim());
+      if (rawMilestones.length === 0 && parsed.data.mode === "publish") {
+        rawMilestones = [
+          {
+            title: "Project Completion",
+            description: "Full project delivery and completion",
+            percentage: 100,
+          },
+        ];
+      }
+      const budgetRef =
+        (parsed.data.budgetMax !== undefined && parsed.data.budgetMax !== null
+          ? parsed.data.budgetMax
+          : current.budgetMax) ??
+        (parsed.data.budgetMin !== undefined && parsed.data.budgetMin !== null
+          ? parsed.data.budgetMin
+          : current.budgetMin) ??
+        null;
+
+      const preparedMilestones = rawMilestones.map((m, index) => ({
+        jobId: id,
+        title: m.title.trim(),
+        description: m.description?.trim() || null,
+        percentage: m.percentage,
+        amount: budgetRef ? Math.round((budgetRef * m.percentage) / 100) : null,
+        sortOrder: index,
+      }));
+
+      await db.clientJobMilestone.deleteMany({ where: { jobId: id } });
+      if (preparedMilestones.length > 0) {
+        await db.clientJobMilestone.createMany({ data: preparedMilestones });
+      }
+    }
+
+    const job = await db.clientJob.update({
+      where: { id },
+      data: updateData,
+      include: {
+        milestones: {
+          orderBy: { sortOrder: "asc" },
         },
-      ];
-    }
-    const budgetRef =
-      (parsed.data.budgetMax !== undefined && parsed.data.budgetMax !== null
-        ? parsed.data.budgetMax
-        : current.budgetMax) ??
-      (parsed.data.budgetMin !== undefined && parsed.data.budgetMin !== null
-        ? parsed.data.budgetMin
-        : current.budgetMin) ??
-      null;
-
-    const preparedMilestones = rawMilestones.map((m, index) => ({
-      jobId: id,
-      title: m.title.trim(),
-      description: m.description?.trim() || null,
-      percentage: m.percentage,
-      amount: budgetRef ? Math.round((budgetRef * m.percentage) / 100) : null,
-      sortOrder: index,
-    }));
-
-    await db.clientJobMilestone.deleteMany({ where: { jobId: id } });
-    if (preparedMilestones.length > 0) {
-      await db.clientJobMilestone.createMany({ data: preparedMilestones });
-    }
-  }
-
-  const job = await db.clientJob.update({
-    where: { id },
-    data: updateData,
-    include: {
-      milestones: {
-        orderBy: { sortOrder: "asc" },
       },
-    },
-  });
-  return NextResponse.json({ job });
+    });
+    return NextResponse.json({ job });
+  } catch (error) {
+    console.error("Failed to update job:", error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Failed to update job." },
+      { status: 500 },
+    );
+  }
 }
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const userId = await client(request);
-  const id = idOf((await params).id);
-  if (!userId || !id) return NextResponse.json({ error: "Not found." }, { status: 404 });
-  const job = await db.clientJob.findFirst({ where: { id, userId }, select: { status: true } });
-  if (!job) return NextResponse.json({ error: "Not found." }, { status: 404 });
-  if (job.status !== "DRAFT")
-    return NextResponse.json({ error: "Only drafts can be deleted." }, { status: 409 });
-  await db.clientJob.delete({ where: { id } });
-  return NextResponse.json({ ok: true });
+  try {
+    const userId = await client(request);
+    const id = idOf((await params).id);
+    if (!userId || !id) return NextResponse.json({ error: "Not found." }, { status: 404 });
+    const job = await db.clientJob.findFirst({ where: { id, userId }, select: { status: true } });
+    if (!job) return NextResponse.json({ error: "Not found." }, { status: 404 });
+    if (job.status !== "DRAFT")
+      return NextResponse.json({ error: "Only drafts can be deleted." }, { status: 409 });
+    await db.clientJob.delete({ where: { id } });
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    console.error("Failed to delete job:", error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Failed to delete job." },
+      { status: 500 },
+    );
+  }
 }

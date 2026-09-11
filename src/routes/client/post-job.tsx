@@ -344,11 +344,16 @@ export default function PostJob() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify(payload(mode)),
       });
-      const data = await r.json();
+      const data = await r.json().catch(() => null);
       if (!r.ok) {
-        setErrors(data.fields ?? {});
-        setMessage(data.error ?? "Could not save the job.");
-        const focus = Object.keys(data.fields ?? {})[0];
+        setErrors(data?.fields ?? {});
+        setMessage(
+          data?.error ??
+            (r.status >= 500
+              ? `Server error (${r.status}). Please try again or check database migrations.`
+              : "Could not save the job."),
+        );
+        const focus = Object.keys(data?.fields ?? {})[0];
         const focusStep =
           focus && ["title", "category", "description"].includes(focus)
             ? 0
@@ -367,7 +372,9 @@ export default function PostJob() {
         }
         return;
       }
-      setId(data.job.id);
+      if (data?.job) {
+        setId(data.job.id);
+      }
       if (mode === "publish") {
         localStorage.removeItem(postJobDraftKey);
         router.push("/my-jobs?posted=1");

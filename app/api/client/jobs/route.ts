@@ -114,99 +114,119 @@ async function publishErrors(data: z.infer<typeof jobInput>) {
 }
 
 export async function GET(request: NextRequest) {
-  const user = await getClient(request);
-  if (!user) return NextResponse.json({ error: "Client sign-in is required." }, { status: 401 });
-  const jobs = await db.clientJob.findMany({
-    where: { userId: user.id },
-    include: {
-      milestones: {
-        orderBy: { sortOrder: "asc" },
+  try {
+    const user = await getClient(request);
+    if (!user) return NextResponse.json({ error: "Client sign-in is required." }, { status: 401 });
+    const jobs = await db.clientJob.findMany({
+      where: { userId: user.id },
+      include: {
+        milestones: {
+          orderBy: { sortOrder: "asc" },
+        },
       },
-    },
-    orderBy: { updatedAt: "desc" },
-  });
-  const tracking = await db.projectTracking.findMany({
-    where: {
-      clientId: user.id,
-      jobId: { in: jobs.map((job) => job.id) },
-      status: { not: "COMPLETED" },
-    },
-    select: { id: true, jobId: true, status: true },
-  });
-  const proposalCounts = await db.projectRequest.groupBy({
-    by: ["jobId"],
-    where: { clientId: user.id, origin: "PROFESSIONAL_PROPOSAL" },
-    _count: { id: true },
-  });
-  const trackingByJob = new Map(tracking.map((project) => [project.jobId, project]));
-  const proposalCountByJob = new Map(proposalCounts.map((item) => [item.jobId, item._count.id]));
+      orderBy: { updatedAt: "desc" },
+    });
+    const tracking = await db.projectTracking.findMany({
+      where: {
+        clientId: user.id,
+        jobId: { in: jobs.map((job) => job.id) },
+        status: { not: "COMPLETED" },
+      },
+      select: { id: true, jobId: true, status: true },
+    });
+    const proposalCounts = await db.projectRequest.groupBy({
+      by: ["jobId"],
+      where: { clientId: user.id, origin: "PROFESSIONAL_PROPOSAL" },
+      _count: { id: true },
+    });
+    const trackingByJob = new Map(tracking.map((project) => [project.jobId, project]));
+    const proposalCountByJob = new Map(proposalCounts.map((item) => [item.jobId, item._count.id]));
 
-  return NextResponse.json({
-    jobs: jobs.map((job) => {
-      const project = trackingByJob.get(job.id);
-      const status = project ? (project.status === "COMPLETED" ? "CLOSED" : "RUNNING") : job.status;
-      return {
-        ...job,
-        status,
-        projectId: project?.id ?? null,
-        proposalCount: status === "RUNNING" ? 0 : (proposalCountByJob.get(job.id) ?? 0),
-      };
-    }),
-  });
+    return NextResponse.json({
+      jobs: jobs.map((job) => {
+        const project = trackingByJob.get(job.id);
+        const status = project ? (project.status === "COMPLETED" ? "CLOSED" : "RUNNING") : job.status;
+        return {
+          ...job,
+          status,
+          projectId: project?.id ?? null,
+          proposalCount: status === "RUNNING" ? 0 : (proposalCountByJob.get(job.id) ?? 0),
+        };
+      }),
+    });
+  } catch (error) {
+    console.error("Failed to load client jobs:", error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Failed to load jobs." },
+      { status: 500 },
+    );
+  }
 }
 
 export async function POST(request: NextRequest) {
-  const user = await getClient(request);
-  if (!user) return NextResponse.json({ error: "Client sign-in is required." }, { status: 401 });
-  const parsed = jobInput.safeParse(await request.json().catch(() => null));
-  if (!parsed.success)
-    return NextResponse.json(
-      { error: "Please review the job details.", fields: parsed.error.flatten().fieldErrors },
-      { status: 400 },
-    );
-  const fields = parsed.data.mode === "publish" ? await publishErrors(parsed.data) : {};
-  if (Object.keys(fields).length)
-    return NextResponse.json(
-      { error: "Please correct the highlighted fields.", fields },
-      { status: 400 },
-    );
+  try {
+    const user = await getClient(request);
+    if (!user) return NextResponse.json({ error: "Client sign-in is required." }, { status: 401 });
+    const parsed = jobInput.safeParse(await request.json().catch(() => null));
+    if (!parsed.success)
+      return NextResponse.json(
+        { error: "Please review the job details.", fields: parsed.error.flatten().fieldErrors },
+        { status: 400 },
+      );
+    const fields = parsed.data.mode === "publish" ? await publishErrors(parsed.data) : {};
+    if (Object.keys(fields).length)
+      return NextResponse.json(
+        { error: "Please correct the highlighted fields.", fields },
+        { status: 400 },
+      );
 
-  let rawMilestones = (parsed.data.milestones || []).filter((m) => m.title?.trim());
-  if (rawMilestones.length === 0) {
-    rawMilestones = [
-      {
-        title: "Project Completion",
-        description: "Full project delivery and completion",
-        percentage: 100,
-      },
-    ];
-  }
-  const budgetRef = parsed.data.budgetMax ?? parsed.data.budgetMin ?? null;
-  const preparedMilestones = rawMilestones.map((m, index) => ({
-    title: m.title.trim(),
-    description: m.description?.trim() || null,
-    percentage: m.percentage,
-    amount: budgetRef ? Math.round((budgetRef * m.percentage) / 100) : null,
-    sortOrder: index,
-  }));
+    let rawMilestones = (parsed.data.milestones || []).filter((m) => m.title?.trim());
+    if (rawMilestones.length === 0) {
+      rawMilestones = [
+        {
+          title: "Project Completion",
+          description: "Full project delivery and completion",
+          percentage: 100,
+        },
+      ];
+    }
+    const budgetRef = parsed.data.budgetMax ?? parsed.data.budgetMin ?? null;
+    const preparedMilestones = rawMilestones.map((m, index) => ({
+      title: m.title.trim(),
+      description: m.description?.trim() || null,
+      percentage: m.percentage,
+      amount: budgetRef ? Math.round((budgetRef * m.percentage) / 100) : null,
+      sortOrder: index,
+    }));
 
-  const job = await db.clientJob.create({
-    data: {
-      userId: user.id,
-      ...normalized(parsed.data),
-      status: parsed.data.mode === "publish" ? "OPEN" : "DRAFT",
-      milestones: {
-        create: preparedMilestones,
+    const job = await db.clientJob.create({
+      data: {
+        userId: user.id,
+        ...normalized(parsed.data),
+        status: parsed.data.mode === "publish" ? "OPEN" : "DRAFT",
+        milestones: {
+          create: preparedMilestones,
+        },
       },
-    },
-    include: {
-      milestones: {
-        orderBy: { sortOrder: "asc" },
+      include: {
+        milestones: {
+          orderBy: { sortOrder: "asc" },
+        },
       },
-    },
-  });
-  if (job.status === "OPEN" && (!job.jobDate || job.jobDate <= new Date())) {
-    await Promise.all([notifyProfessionalsOfNewJob(job), notifyAdminsOfNewJob(job)]);
+    });
+    if (job.status === "OPEN" && (!job.jobDate || job.jobDate <= new Date())) {
+      try {
+        await Promise.all([notifyProfessionalsOfNewJob(job), notifyAdminsOfNewJob(job)]);
+      } catch (notifyErr) {
+        console.error("Job notification error:", notifyErr);
+      }
+    }
+    return NextResponse.json({ job }, { status: 201 });
+  } catch (error) {
+    console.error("Failed to create job:", error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Failed to post job." },
+      { status: 500 },
+    );
   }
-  return NextResponse.json({ job }, { status: 201 });
 }

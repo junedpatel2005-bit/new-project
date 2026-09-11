@@ -6,18 +6,13 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, CheckCircle2, Plus, ShieldCheck, X } from "lucide-react";
 import { Logo } from "@/components/Logo";
+import { AddressMapPicker } from "@/components/AddressMapPicker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PhoneVerification } from "@/components/PhoneVerification";
 import { Textarea } from "@/components/ui/textarea";
-import type { MarketplaceCategory } from "@/lib/types/marketplace";
-import { getAllStates, getDistrictsByState } from "@/lib/india-locations";
-
-const GoogleMapView = dynamic(() => import("@/components/GoogleAddressMap"), {
-  ssr: false,
-  loading: () => <div className="h-64 animate-pulse rounded-lg bg-muted" />,
-});
+import { getAllStates } from "@/lib/india-locations";
 
 const serviceOptions = [
   ["RESIDENTIAL", "Residential"],
@@ -51,6 +46,8 @@ type Profile = {
   professionalLongitude: number | null;
   professionalState: string | null;
   professionalDistrict: string | null;
+  professionalCity?: string | null;
+  address?: string | null;
   workMode: string;
   companyDescription: string | null;
   professionalSkillsJson: string | null;
@@ -67,6 +64,7 @@ export function ProfessionalProfileSetup() {
   const [skillDraft, setSkillDraft] = useState("");
   const [location, setLocation] = useState<[number, number]>([20.5937, 78.9629]);
   const [serviceRadiusKm, setServiceRadiusKm] = useState<string>("25");
+  const [address, setAddress] = useState("");
   const [state, setState] = useState("");
   const [district, setDistrict] = useState("");
   const [categories, setCategories] = useState<MarketplaceCategory[]>([]);
@@ -165,7 +163,8 @@ export function ProfessionalProfileSetup() {
         setProfile(data.profile);
         setCategory(data.profile.professionalCategory ?? "");
         setState(data.profile.professionalState ?? "");
-        setDistrict(data.profile.professionalDistrict ?? "");
+        setDistrict(data.profile.professionalCity ?? data.profile.professionalDistrict ?? "");
+        setAddress(data.profile.address ?? "");
         const savedWorkMode = data.profile.workMode?.toLowerCase();
         setWorkMode(
           savedWorkMode === "remote" || savedWorkMode === "on_site" ? savedWorkMode : "both",
@@ -234,6 +233,14 @@ export function ProfessionalProfileSetup() {
       setError("Choose a service category.");
       return;
     }
+    if (!state) {
+      setError("Please choose your state.");
+      return;
+    }
+    if (!district.trim()) {
+      setError("Please enter your city.");
+      return;
+    }
     setError(null);
     setPending(true);
     const chosenCategory = availableCategories.find((item) => item.name === category);
@@ -246,6 +253,8 @@ export function ProfessionalProfileSetup() {
         categoryId: chosenCategory?.id,
         state,
         district,
+        city: district,
+        address,
         experienceYears: form.get("experienceYears") ? Number(form.get("experienceYears")) : null,
         hourlyRate: form.get("hourlyRate") ? Number(form.get("hourlyRate")) : null,
         serviceRadiusKm:
@@ -393,7 +402,34 @@ export function ProfessionalProfileSetup() {
                 defaultValue={profile?.hourlyRate?.toString()}
               />
             </div>
-            <div className="space-y-3">
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <Label>Service location & address</Label>
+                <p className="text-sm text-muted-foreground">
+                  Search your address or drag the pin on the map to set your service location.
+                </p>
+              </div>
+
+              <div className="overflow-hidden rounded-xl border border-border p-3 bg-muted/20">
+                <AddressMapPicker
+                  id="professional-location"
+                  value={address}
+                  coordinates={
+                    location[0] !== null && location[1] !== null
+                      ? [location[0], location[1]]
+                      : null
+                  }
+                  onChange={(value) => setAddress(value)}
+                  onCoordinatesChange={(lat, lng) => {
+                    setLocation([lat, lng]);
+                  }}
+                  onLocationChange={(newState, newCity) => {
+                    if (newState) setState(newState);
+                    if (newCity) setDistrict(newCity);
+                  }}
+                />
+              </div>
+
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-1.5">
                   <Label htmlFor="professional-state">State</Label>
@@ -416,58 +452,28 @@ export function ProfessionalProfileSetup() {
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="professional-district">District</Label>
-                  <select
-                    id="professional-district"
+                  <Label htmlFor="professional-city">City</Label>
+                  <Input
+                    id="professional-city"
                     value={district}
                     onChange={(event) => setDistrict(event.target.value)}
-                    className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm shadow-sm outline-none transition focus:border-ring focus:ring-1 focus:ring-ring"
+                    placeholder="City will be detected from address"
                     required
-                    disabled={!state}
-                  >
-                    <option value="">
-                      {state ? "Select district..." : "Select a state first"}
-                    </option>
-                    {(getDistrictsByState(state) ?? []).map((item) => (
-                      <option key={item} value={item}>
-                        {item}
-                      </option>
-                    ))}
-                  </select>
+                    className="h-11"
+                  />
                 </div>
               </div>
+
               <div className="space-y-1.5">
-                <Label>Service location</Label>
-                <p className="text-sm text-muted-foreground">
-                  Click the map or drag the pin to choose where you provide services.
-                </p>
-              </div>
-              <div className="overflow-hidden rounded-xl border border-border shadow-sm">
-                <GoogleMapView
-                  point={location}
-                  onPointChange={(latitude, longitude) => {
-                    setLocation([latitude, longitude]);
-                    void fillAreaFromLocation(latitude, longitude);
-                  }}
+                <Label htmlFor="manual-address">Enter address manually</Label>
+                <Input
+                  id="manual-address"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  placeholder="Enter complete address: house/flat no., street, area, city, state and PIN code"
+                  className="h-11"
                 />
               </div>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  if (!navigator.geolocation) return;
-                  navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                      const { latitude, longitude } = position.coords;
-                      setLocation([latitude, longitude]);
-                      void fillAreaFromLocation(latitude, longitude);
-                    },
-                    () => setError("Location permission was not granted."),
-                  );
-                }}
-              >
-                Use my current location
-              </Button>
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="workMode">Work mode</Label>
