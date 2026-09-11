@@ -10,7 +10,7 @@ export default function ProfessionalsPreviewMap({
 }: {
   professionals: ProfessionalDiscoveryResult[];
 }) {
-  const { isLoaded, isConfigured } = useGoogleMaps();
+  const { isLoaded, isConfigured, hasError } = useGoogleMaps();
   const pinned = useMemo(
     () =>
       professionals
@@ -46,7 +46,7 @@ export default function ProfessionalsPreviewMap({
     if (mapRef.current) applyView(mapRef.current);
   }, [applyView]);
 
-  if (!isConfigured) {
+  if (!isConfigured || hasError) {
     return (
       <div className="pointer-events-none flex h-full w-full items-center justify-center overflow-hidden rounded-xl bg-muted text-sm text-muted-foreground">
         Map preview is unavailable.

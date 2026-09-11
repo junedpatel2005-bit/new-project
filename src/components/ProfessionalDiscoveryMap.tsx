@@ -14,7 +14,7 @@ export default function ProfessionalDiscoveryMap({
   professionals: ProfessionalDiscoveryResult[];
   selectedPoint?: { lat: number; lng: number };
 }) {
-  const { isLoaded, isConfigured } = useGoogleMaps();
+  const { isLoaded, isConfigured, hasError } = useGoogleMaps();
   const router = useRouter();
   const points = professionals
     .map((professional) => professional.displayPoint)
@@ -48,7 +48,7 @@ export default function ProfessionalDiscoveryMap({
     if (mapRef.current) applyView(mapRef.current);
   }, [applyView]);
 
-  if (!isConfigured) {
+  if (!isConfigured || hasError) {
     return (
       <div className="flex h-[520px] w-full items-center justify-center overflow-hidden rounded-2xl border bg-muted text-sm text-muted-foreground">
         Map preview is unavailable.

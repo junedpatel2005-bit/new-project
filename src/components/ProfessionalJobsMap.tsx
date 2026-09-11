@@ -39,7 +39,7 @@ export default function ProfessionalJobsMap({
   jobs: MapJob[];
   onSelectJob: (id: number) => void;
 }) {
-  const { isLoaded, isConfigured } = useGoogleMaps();
+  const { isLoaded, isConfigured, hasError } = useGoogleMaps();
   const [centerLat, centerLng] = center;
   const mapCenter = useMemo(() => ({ lat: centerLat, lng: centerLng }), [centerLat, centerLng]);
   const [activeJobId, setActiveJobId] = useState<number | null>(() =>
@@ -62,7 +62,7 @@ export default function ProfessionalJobsMap({
     }
   }, [mapCenter, jobs.length]);
 
-  if (!isConfigured) {
+  if (!isConfigured || hasError) {
     return (
       <div className="flex h-full w-full items-center justify-center rounded-xl bg-muted text-sm text-muted-foreground">
         Map preview is unavailable.

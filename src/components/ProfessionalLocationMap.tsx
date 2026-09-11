@@ -9,10 +9,10 @@ export default function ProfessionalLocationMap({
 }: {
   point: { lat: number; lng: number };
 }) {
-  const { isLoaded, isConfigured } = useGoogleMaps();
+  const { isLoaded, isConfigured, hasError } = useGoogleMaps();
   const center = useMemo(() => ({ lat: point.lat, lng: point.lng }), [point.lat, point.lng]);
 
-  if (!isConfigured) {
+  if (!isConfigured || hasError) {
     return (
       <div className="flex h-64 w-full items-center justify-center rounded-xl border border-border bg-muted text-sm text-muted-foreground">
         Map preview is unavailable.

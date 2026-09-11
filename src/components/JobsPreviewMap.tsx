@@ -13,7 +13,7 @@ export default function JobsPreviewMap({
   points: [number, number][];
   fallbackCenter?: [number, number];
 }) {
-  const { isLoaded, isConfigured } = useGoogleMaps();
+  const { isLoaded, isConfigured, hasError } = useGoogleMaps();
   const center = useMemo(() => {
     if (fallbackCenter) return { lat: fallbackCenter[0], lng: fallbackCenter[1] };
     if (points[0]) return { lat: points[0][0], lng: points[0][1] };
@@ -48,7 +48,7 @@ export default function JobsPreviewMap({
     if (mapRef.current) applyView(mapRef.current);
   }, [applyView]);
 
-  if (!isConfigured) {
+  if (!isConfigured || hasError) {
     return (
       <div className="pointer-events-none flex h-full w-full items-center justify-center overflow-hidden rounded-xl bg-muted text-sm text-muted-foreground">
         Map preview is unavailable.

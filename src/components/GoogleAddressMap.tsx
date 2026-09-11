@@ -16,17 +16,23 @@ export default function GoogleAddressMap({
   point: [number, number];
   onPointChange: (lat: number, lon: number) => void;
 }) {
-  const { isLoaded, isConfigured } = useGoogleMaps();
+  const { isLoaded, isConfigured, hasError } = useGoogleMaps();
   const pointChangeRef = useRef(onPointChange);
 
   useEffect(() => {
     pointChangeRef.current = onPointChange;
   }, [onPointChange]);
 
-  if (!isConfigured) {
+  if (!isConfigured || hasError) {
     return (
-      <div className="flex h-64 w-full items-center justify-center rounded-lg border bg-muted text-sm text-muted-foreground">
-        Map preview is unavailable because Google Maps is not configured.
+      <div className="flex h-64 w-full flex-col items-center justify-center rounded-lg border bg-muted/50 p-4 text-center text-sm text-muted-foreground">
+        <p className="font-medium text-foreground">Interactive map preview is unavailable</p>
+        <p className="mt-1 text-xs">
+          {hasError
+            ? "Google Maps billing or project activation required."
+            : "Google Maps is not configured."}{" "}
+          You can still enter your address manually.
+        </p>
       </div>
     );
   }
