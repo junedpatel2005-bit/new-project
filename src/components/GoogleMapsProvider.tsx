@@ -31,7 +31,8 @@ function GoogleMapsScriptLoader({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const originalAuthFailure = (window as unknown as { gm_authFailure?: () => void }).gm_authFailure;
+    const originalAuthFailure = (window as unknown as { gm_authFailure?: () => void })
+      .gm_authFailure;
     (window as unknown as { gm_authFailure?: () => void }).gm_authFailure = () => {
       console.warn(
         "Google Maps authentication/billing error detected (BillingNotEnabledMapError or key restriction).",

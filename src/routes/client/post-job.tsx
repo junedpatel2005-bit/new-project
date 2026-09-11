@@ -191,12 +191,19 @@ export default function PostJob() {
             locationLat: job.locationLat,
             locationLng: job.locationLng,
             milestones: Array.isArray(job.milestones)
-              ? job.milestones.map((m: { id?: number; title?: string; percentage?: number; description?: string }) => ({
-                  id: m.id,
-                  title: m.title ?? "",
-                  percentage: m.percentage ?? 100,
-                  description: m.description ?? "",
-                }))
+              ? job.milestones.map(
+                  (m: {
+                    id?: number;
+                    title?: string;
+                    percentage?: number;
+                    description?: string;
+                  }) => ({
+                    id: m.id,
+                    title: m.title ?? "",
+                    percentage: m.percentage ?? 100,
+                    description: m.description ?? "",
+                  }),
+                )
               : [],
           });
           setPostingTiming(job.jobDate && asDate(job.jobDate) > today ? "SCHEDULED" : "TODAY");
@@ -676,7 +683,8 @@ export default function PostJob() {
               <div>
                 <h2 className="text-xl font-semibold">Project Milestones</h2>
                 <p className="text-sm text-muted-foreground">
-                  Divide your project into payment milestones, or skip to use a single 100% completion milestone.
+                  Divide your project into payment milestones, or skip to use a single 100%
+                  completion milestone.
                 </p>
               </div>
               {form.milestones.length > 0 && (
@@ -730,7 +738,9 @@ export default function PostJob() {
                 </div>
                 <h3 className="text-base font-semibold">Default 100% Milestone on Completion</h3>
                 <p className="mt-1.5 text-sm text-muted-foreground max-w-md mx-auto">
-                  If you don't need to split this job into multiple milestones, you can skip this step. The platform will automatically create a single milestone of <strong>100%</strong> released upon full project completion.
+                  If you don't need to split this job into multiple milestones, you can skip this
+                  step. The platform will automatically create a single milestone of{" "}
+                  <strong>100%</strong> released upon full project completion.
                 </p>
                 <div className="mt-5 flex flex-wrap justify-center gap-3">
                   <Button
@@ -762,7 +772,8 @@ export default function PostJob() {
                   const estAmount =
                     form.budgetMax || form.budgetMin
                       ? Math.round(
-                          (Number(form.budgetMax || form.budgetMin) * (milestone.percentage || 0)) / 100,
+                          (Number(form.budgetMax || form.budgetMin) * (milestone.percentage || 0)) /
+                            100,
                         )
                       : null;
                   return (
@@ -796,10 +807,7 @@ export default function PostJob() {
 
                       <div className="grid gap-4 sm:grid-cols-3">
                         <div className="sm:col-span-2">
-                          <Field
-                            label="Milestone Title"
-                            error={errors[`milestone_${index}_title`]}
-                          >
+                          <Field label="Milestone Title" error={errors[`milestone_${index}_title`]}>
                             <Input
                               value={milestone.title}
                               onChange={(e) => updateMilestone(index, "title", e.target.value)}
@@ -823,7 +831,10 @@ export default function PostJob() {
                                   const val =
                                     e.target.value === ""
                                       ? 0
-                                      : Math.min(100, Math.max(0, parseInt(e.target.value, 10) || 0));
+                                      : Math.min(
+                                          100,
+                                          Math.max(0, parseInt(e.target.value, 10) || 0),
+                                        );
                                   updateMilestone(index, "percentage", val);
                                 }}
                                 placeholder="0"

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { FormEvent, Suspense, useEffect, useMemo, useState } from "react";
+import { FormEvent, Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { io } from "socket.io-client";
 import {
   Briefcase,
@@ -107,9 +107,7 @@ function projectStatusColor(status: string, admin = false) {
 function MessagesWorkspaceInner({ admin = false }: { admin?: boolean }) {
   const searchParams = useSearchParams();
   const queryUserId =
-    searchParams.get("recipientId") ||
-    searchParams.get("user") ||
-    searchParams.get("userId");
+    searchParams.get("recipientId") || searchParams.get("user") || searchParams.get("userId");
   const queryProjectId = searchParams.get("projectId") || searchParams.get("project");
 
   const [contacts, setContacts] = useState<Contact[]>([]);
@@ -117,9 +115,7 @@ function MessagesWorkspaceInner({ admin = false }: { admin?: boolean }) {
     queryUserId && Number.isSafeInteger(Number(queryUserId)) ? Number(queryUserId) : null,
   );
   const [selectedProjectId, setSelectedProjectId] = useState<number | null>(
-    queryProjectId && Number.isSafeInteger(Number(queryProjectId))
-      ? Number(queryProjectId)
-      : null,
+    queryProjectId && Number.isSafeInteger(Number(queryProjectId)) ? Number(queryProjectId) : null,
   );
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [text, setText] = useState("");
@@ -130,7 +126,7 @@ function MessagesWorkspaceInner({ admin = false }: { admin?: boolean }) {
   const [error, setError] = useState("");
   const [myUserId, setMyUserId] = useState<number | null>(null);
 
-  const loadContacts = async () => {
+  const loadContacts = useCallback(async () => {
     const response = await fetch("/api/v1/messages", { cache: "no-store" });
     if (!response.ok) throw new Error("Unable to load messages.");
     const data = (await response.json()) as { contacts: Contact[] };
@@ -143,7 +139,7 @@ function MessagesWorkspaceInner({ admin = false }: { admin?: boolean }) {
       }
       return data.contacts[0]?.id ?? null;
     });
-  };
+  }, [queryUserId]);
 
   useEffect(() => {
     void Promise.all([
@@ -203,7 +199,7 @@ function MessagesWorkspaceInner({ admin = false }: { admin?: boolean }) {
       socket.disconnect();
       window.removeEventListener("servio:project-update", onProjectUpdate);
     };
-  }, []);
+  }, [loadContacts]);
 
   const visibleContacts = useMemo(
     () =>
@@ -545,12 +541,16 @@ function MessagesWorkspaceInner({ admin = false }: { admin?: boolean }) {
                         <div className="flex flex-col justify-center">
                           <div className="flex items-center justify-between gap-3 text-xs font-semibold leading-tight">
                             <span className="text-[11px] text-muted-foreground">Progress</span>
-                            <span className="text-primary font-bold">{currentProject.progress}%</span>
+                            <span className="text-primary font-bold">
+                              {currentProject.progress}%
+                            </span>
                           </div>
                           <div className="mt-1 h-1.5 w-24 sm:w-28 overflow-hidden rounded-full bg-background border border-border/40">
                             <div
                               className="h-full rounded-full bg-primary transition-all duration-500"
-                              style={{ width: `${Math.min(Math.max(currentProject.progress, 0), 100)}%` }}
+                              style={{
+                                width: `${Math.min(Math.max(currentProject.progress, 0), 100)}%`,
+                              }}
                             />
                           </div>
                         </div>
@@ -566,7 +566,10 @@ function MessagesWorkspaceInner({ admin = false }: { admin?: boolean }) {
                               : "No milestones yet"}
                           </p>
                           <p className="text-[10px] text-muted-foreground mt-0.5">
-                            Status: <span className="font-medium text-foreground">{formatProjectStatus(currentProject.status)}</span>
+                            Status:{" "}
+                            <span className="font-medium text-foreground">
+                              {formatProjectStatus(currentProject.status)}
+                            </span>
                           </p>
                         </div>
                       </div>
@@ -740,7 +743,8 @@ function MessagesWorkspaceInner({ admin = false }: { admin?: boolean }) {
                     )}
 
                     <p className="mt-4 text-xs text-muted-foreground">
-                      Send a message below to coordinate project deliverables, updates, or questions.
+                      Send a message below to coordinate project deliverables, updates, or
+                      questions.
                     </p>
                   </div>
                 )}

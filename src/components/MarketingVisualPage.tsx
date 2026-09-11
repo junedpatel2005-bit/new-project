@@ -425,9 +425,7 @@ function ServicesJobsSection({ cmsMode }: { cmsMode: boolean }) {
                                     <button
                                       key={item.id}
                                       type="button"
-                                      onClick={() =>
-                                        setSubSubCategoryId(isActive ? null : item.id)
-                                      }
+                                      onClick={() => setSubSubCategoryId(isActive ? null : item.id)}
                                       className={`flex w-full items-center justify-between rounded-md border px-2.5 py-1.5 text-left text-[11px] font-medium transition ${
                                         isActive
                                           ? "border-primary bg-primary/10 text-primary"

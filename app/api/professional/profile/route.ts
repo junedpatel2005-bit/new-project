@@ -92,7 +92,9 @@ export async function POST(request: NextRequest) {
     if (!validCategory)
       return NextResponse.json({ error: "Choose a valid service category." }, { status: 400 });
 
-    const cityOrDistrict = (parsed.data.city?.trim() || parsed.data.district?.trim() || "") as string;
+    const cityOrDistrict = (parsed.data.city?.trim() ||
+      parsed.data.district?.trim() ||
+      "") as string;
     const profile = await db.user.update({
       where: { id: userId },
       data: {

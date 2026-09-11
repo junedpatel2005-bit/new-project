@@ -219,27 +219,37 @@ export function ServicesCatalog({ data }: { data: CompleteCategoryHierarchy }) {
 
           {/* Headline */}
           <h1 className="mt-6 text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
-            Explore All <span className="bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-800 bg-clip-text text-transparent">Categories & Services</span>
+            Explore All{" "}
+            <span className="bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-800 bg-clip-text text-transparent">
+              Categories & Services
+            </span>
           </h1>
 
           {/* Subtitle */}
           <p className="mx-auto mt-4 max-w-2xl text-base text-slate-600 sm:text-lg">
-            Seamlessly navigate through parent domains, main service categories, and hundreds of specialized tasks delivered by verified professionals.
+            Seamlessly navigate through parent domains, main service categories, and hundreds of
+            specialized tasks delivered by verified professionals.
           </p>
 
           {/* Quick Metrics Ribbon */}
           <div className="mt-8 flex flex-wrap items-center justify-center gap-2.5 text-xs sm:gap-4 sm:text-sm">
             <div className="inline-flex items-center gap-2 rounded-xl border border-slate-200/80 bg-white px-4 py-2 font-medium text-slate-700 shadow-2xs">
               <Layers3 className="h-4 w-4 text-indigo-600" />
-              <span><strong>{data.totalCounts.parents}</strong> Parent Domains</span>
+              <span>
+                <strong>{data.totalCounts.parents}</strong> Parent Domains
+              </span>
             </div>
             <div className="inline-flex items-center gap-2 rounded-xl border border-slate-200/80 bg-white px-4 py-2 font-medium text-slate-700 shadow-2xs">
               <FolderTree className="h-4 w-4 text-blue-600" />
-              <span><strong>{data.totalCounts.categories}</strong> Categories</span>
+              <span>
+                <strong>{data.totalCounts.categories}</strong> Categories
+              </span>
             </div>
             <div className="inline-flex items-center gap-2 rounded-xl border border-slate-200/80 bg-white px-4 py-2 font-medium text-slate-700 shadow-2xs">
               <Sparkles className="h-4 w-4 text-amber-600" />
-              <span><strong>{data.totalCounts.subcategories}</strong> Sub-Categories</span>
+              <span>
+                <strong>{data.totalCounts.subcategories}</strong> Sub-Categories
+              </span>
             </div>
           </div>
 
@@ -270,7 +280,10 @@ export function ServicesCatalog({ data }: { data: CompleteCategoryHierarchy }) {
       </header>
 
       {/* Sticky Tab Navigation Bar */}
-      <nav aria-label="Category levels" className="sticky top-16 z-30 border-y border-slate-200/80 bg-white/95 px-4 py-3 shadow-xs backdrop-blur-md">
+      <nav
+        aria-label="Category levels"
+        className="sticky top-16 z-30 border-y border-slate-200/80 bg-white/95 px-4 py-3 shadow-xs backdrop-blur-md"
+      >
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 sm:flex-row sm:px-6 lg:px-8">
           {/* THE 3 TABS */}
           <div className="inline-flex w-full items-center rounded-2xl border border-slate-200/80 bg-slate-100/90 p-1.5 shadow-inner sm:w-auto">
@@ -362,7 +375,9 @@ export function ServicesCatalog({ data }: { data: CompleteCategoryHierarchy }) {
                       : "bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900"
                   }`}
                 >
-                  {segment === "ALL" ? "All Domains" : segment.charAt(0) + segment.slice(1).toLowerCase()}
+                  {segment === "ALL"
+                    ? "All Domains"
+                    : segment.charAt(0) + segment.slice(1).toLowerCase()}
                 </button>
               );
             })}
@@ -407,7 +422,11 @@ export function ServicesCatalog({ data }: { data: CompleteCategoryHierarchy }) {
               {searchQuery && (
                 <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-0.5 font-medium text-slate-700">
                   &ldquo;{searchQuery}&rdquo;
-                  <button type="button" onClick={() => setSearchQuery("")} className="hover:text-black">
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery("")}
+                    className="hover:text-black"
+                  >
                     <X className="h-3 w-3" />
                   </button>
                 </span>
@@ -437,7 +456,8 @@ export function ServicesCatalog({ data }: { data: CompleteCategoryHierarchy }) {
                   Parent Service Domains
                 </h2>
                 <p className="text-xs text-slate-500 sm:text-sm">
-                  Top-level service domains dividing residential, commercial, and industrial operations.
+                  Top-level service domains dividing residential, commercial, and industrial
+                  operations.
                 </p>
               </div>
               <span className="text-xs font-semibold text-slate-400">
@@ -489,14 +509,18 @@ export function ServicesCatalog({ data }: { data: CompleteCategoryHierarchy }) {
                         {/* Counters ribbon */}
                         <div className="relative mt-6 flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50/80 p-3 text-xs">
                           <div className="flex-1">
-                            <span className="text-[11px] text-slate-400 block font-medium">Categories</span>
+                            <span className="text-[11px] text-slate-400 block font-medium">
+                              Categories
+                            </span>
                             <span className="text-base font-extrabold text-slate-900">
                               {parent.categoryCount}
                             </span>
                           </div>
                           <div className="h-7 w-px bg-slate-200" />
                           <div className="flex-1">
-                            <span className="text-[11px] text-slate-400 block font-medium">Sub-Services</span>
+                            <span className="text-[11px] text-slate-400 block font-medium">
+                              Sub-Services
+                            </span>
                             <span className="text-base font-extrabold text-slate-900">
                               {parent.subcategoryCount}
                             </span>
@@ -521,7 +545,9 @@ export function ServicesCatalog({ data }: { data: CompleteCategoryHierarchy }) {
                                   className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 hover:border-indigo-300 hover:bg-indigo-50/70 hover:text-indigo-700 transition cursor-pointer"
                                 >
                                   <span>{cat.name}</span>
-                                  <span className="text-[10px] text-slate-400">({cat.subcategoryCount})</span>
+                                  <span className="text-[10px] text-slate-400">
+                                    ({cat.subcategoryCount})
+                                  </span>
                                 </button>
                               ))}
                             </div>
@@ -770,4 +796,3 @@ function EmptyState({ onReset }: { onReset: () => void }) {
     </div>
   );
 }
-

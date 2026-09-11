@@ -117,11 +117,7 @@ export async function GET(request: NextRequest) {
         });
   const adminConversationContactIds = adminConversationUsers.map((user) => user.id);
   const allowedContactIds = [
-    ...new Set([
-      ...(contactIds ?? []),
-      ...adminConversationContactIds,
-      ...conversationPartnerIds,
-    ]),
+    ...new Set([...(contactIds ?? []), ...adminConversationContactIds, ...conversationPartnerIds]),
   ];
   const contacts = await db.user.findMany({
     where: {

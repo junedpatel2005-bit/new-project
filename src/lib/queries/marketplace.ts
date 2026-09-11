@@ -530,7 +530,14 @@ export async function getOpenJob(id: number): Promise<MarketplaceJob | null> {
         select: { id: true, fileName: true, fileType: true, fileSize: true, previewUrl: true },
       },
       milestones: {
-        select: { id: true, title: true, description: true, percentage: true, amount: true, sortOrder: true },
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          percentage: true,
+          amount: true,
+          sortOrder: true,
+        },
         orderBy: { sortOrder: "asc" },
       },
     },

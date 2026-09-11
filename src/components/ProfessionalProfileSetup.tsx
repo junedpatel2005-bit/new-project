@@ -416,9 +416,7 @@ export function ProfessionalProfileSetup() {
                   id="professional-location"
                   value={address}
                   coordinates={
-                    location[0] !== null && location[1] !== null
-                      ? [location[0], location[1]]
-                      : null
+                    location[0] !== null && location[1] !== null ? [location[0], location[1]] : null
                   }
                   onChange={(value) => setAddress(value)}
                   onCoordinatesChange={(lat, lng) => {

@@ -843,7 +843,9 @@ export default function JobDetails({
           <section className="mt-8">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="h-5 w-5 text-primary" />
-              <h2 className="text-lg font-semibold">Project Milestones ({job.milestones.length})</h2>
+              <h2 className="text-lg font-semibold">
+                Project Milestones ({job.milestones.length})
+              </h2>
             </div>
             <p className="mt-1 text-sm text-muted-foreground">
               Payment milestones defined by the client for this project

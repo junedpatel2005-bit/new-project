@@ -7,7 +7,11 @@ import { notifyAdminsOfNewJob, notifyProfessionalsOfNewJob } from "@/lib/marketp
 const milestoneInput = z.object({
   title: z.string().trim().min(1, "Enter a milestone title.").max(160),
   description: z.string().trim().max(1000).optional().nullable(),
-  percentage: z.coerce.number().int().min(1, "Percentage must be at least 1%.").max(100, "Percentage cannot exceed 100%."),
+  percentage: z.coerce
+    .number()
+    .int()
+    .min(1, "Percentage must be at least 1%.")
+    .max(100, "Percentage cannot exceed 100%."),
 });
 
 const jobInput = z.object({
@@ -145,7 +149,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       jobs: jobs.map((job) => {
         const project = trackingByJob.get(job.id);
-        const status = project ? (project.status === "COMPLETED" ? "CLOSED" : "RUNNING") : job.status;
+        const status = project
+          ? project.status === "COMPLETED"
+            ? "CLOSED"
+            : "RUNNING"
+          : job.status;
         return {
           ...job,
           status,

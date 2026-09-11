@@ -253,9 +253,7 @@ export function AdminNotificationCenter() {
 
     for (const item of items) {
       const hasEngagement = Boolean(
-        item.projectId ||
-        item.isProject ||
-        isEngagementType(item.type)
+        item.projectId || item.isProject || isEngagementType(item.type),
       );
       if (hasEngagement) {
         if (item.jobId) engagedJobIds.add(item.jobId);
@@ -275,7 +273,7 @@ export function AdminNotificationCenter() {
         item.isProject ||
         isEngagementType(item.type) ||
         (item.jobId && engagedJobIds.has(item.jobId)) ||
-        (t && engagedTitles.has(t) && (item.jobId || item.projectId))
+        (t && engagedTitles.has(t) && (item.jobId || item.projectId)),
       );
 
       if (belongsToActiveEngagement) {

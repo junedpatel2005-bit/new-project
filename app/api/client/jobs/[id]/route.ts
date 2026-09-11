@@ -7,7 +7,11 @@ import { z } from "zod";
 const milestoneInput = z.object({
   title: z.string().trim().min(1, "Enter a milestone title.").max(160),
   description: z.string().trim().max(1000).optional().nullable(),
-  percentage: z.coerce.number().int().min(1, "Percentage must be at least 1%.").max(100, "Percentage cannot exceed 100%."),
+  percentage: z.coerce
+    .number()
+    .int()
+    .min(1, "Percentage must be at least 1%.")
+    .max(100, "Percentage cannot exceed 100%."),
 });
 
 const bodySchema = z.object({
@@ -116,121 +120,120 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const userId = await client(request);
     const id = idOf((await params).id);
     if (!userId || !id) return NextResponse.json({ error: "Not found." }, { status: 404 });
-  const job = await db.clientJob.findFirst({
-    where: { id, userId },
+    const job = await db.clientJob.findFirst({
+      where: { id, userId },
 
-    
-    include: {
-      attachments: {
-        select: { id: true, fileName: true, fileType: true, fileSize: true, previewUrl: true },
+      include: {
+        attachments: {
+          select: { id: true, fileName: true, fileType: true, fileSize: true, previewUrl: true },
+        },
+        milestones: {
+          orderBy: { sortOrder: "asc" },
+        },
       },
-      milestones: {
-        orderBy: { sortOrder: "asc" },
-      },
-    },
-  });
-  if (!job) return NextResponse.json({ error: "Not found." }, { status: 404 });
+    });
+    if (!job) return NextResponse.json({ error: "Not found." }, { status: 404 });
 
-  const category = job.category
-    ? await db.serviceCategory.findFirst({
-        where: { name: job.category },
-        select: { segment: true, parent: { select: { name: true } } },
-      })
-    : null;
+    const category = job.category
+      ? await db.serviceCategory.findFirst({
+          where: { name: job.category },
+          select: { segment: true, parent: { select: { name: true } } },
+        })
+      : null;
 
-  const project = await db.projectTracking.findFirst({
-    where: { jobId: id, clientId: userId },
-    select: { id: true },
-  });
-  const proposalSelect = {
-    id: true,
-    professionalId: true,
-    bidAmount: true,
-    duration: true,
-    coverLetter: true,
-    status: true,
-    origin: true,
-    createdAt: true,
-  } as const;
-  const [proposals, hireRequests] = await Promise.all([
-    db.projectRequest.findMany({
-      where: { jobId: id, clientId: userId, origin: "PROFESSIONAL_PROPOSAL" },
-      orderBy: { createdAt: "desc" },
-      select: proposalSelect,
-    }),
-    db.projectRequest.findMany({
-      where: { jobId: id, clientId: userId, origin: "CLIENT_HIRE" },
-      orderBy: { createdAt: "desc" },
-      select: proposalSelect,
-    }),
-  ]);
-  const professionals = await db.user.findMany({
-    where: {
-      id: { in: [...proposals, ...hireRequests].map((item) => item.professionalId) },
-    },
-    select: {
+    const project = await db.projectTracking.findFirst({
+      where: { jobId: id, clientId: userId },
+      select: { id: true },
+    });
+    const proposalSelect = {
       id: true,
-      firstName: true,
-      lastName: true,
-      professionalCategory: true,
-      professionalCity: true,
-      averageRating: true,
-      reviewCount: true,
-      isVerified: true,
-    },
-  });
-  const professionalById = new Map(
-    professionals.map((professional) => [professional.id, professional]),
-  );
-  const [proposalsWithActor, hireRequestsWithActor] = await Promise.all([
-    attachLastActorRole(proposals),
-    attachLastActorRole(hireRequests),
-  ]);
-  const negotiations = await db.projectNegotiation.findMany({
-    where: { requestId: { in: proposals.map((proposal) => proposal.id) } },
-    orderBy: { createdAt: "desc" },
-    select: {
-      requestId: true,
-      previousBidAmount: true,
-      previousDuration: true,
-      previousMessage: true,
-    },
-  });
-  const latestNegotiationByRequest = new Map<number, (typeof negotiations)[number]>();
-  for (const negotiation of negotiations) {
-    if (!latestNegotiationByRequest.has(negotiation.requestId))
-      latestNegotiationByRequest.set(negotiation.requestId, negotiation);
+      professionalId: true,
+      bidAmount: true,
+      duration: true,
+      coverLetter: true,
+      status: true,
+      origin: true,
+      createdAt: true,
+    } as const;
+    const [proposals, hireRequests] = await Promise.all([
+      db.projectRequest.findMany({
+        where: { jobId: id, clientId: userId, origin: "PROFESSIONAL_PROPOSAL" },
+        orderBy: { createdAt: "desc" },
+        select: proposalSelect,
+      }),
+      db.projectRequest.findMany({
+        where: { jobId: id, clientId: userId, origin: "CLIENT_HIRE" },
+        orderBy: { createdAt: "desc" },
+        select: proposalSelect,
+      }),
+    ]);
+    const professionals = await db.user.findMany({
+      where: {
+        id: { in: [...proposals, ...hireRequests].map((item) => item.professionalId) },
+      },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        professionalCategory: true,
+        professionalCity: true,
+        averageRating: true,
+        reviewCount: true,
+        isVerified: true,
+      },
+    });
+    const professionalById = new Map(
+      professionals.map((professional) => [professional.id, professional]),
+    );
+    const [proposalsWithActor, hireRequestsWithActor] = await Promise.all([
+      attachLastActorRole(proposals),
+      attachLastActorRole(hireRequests),
+    ]);
+    const negotiations = await db.projectNegotiation.findMany({
+      where: { requestId: { in: proposals.map((proposal) => proposal.id) } },
+      orderBy: { createdAt: "desc" },
+      select: {
+        requestId: true,
+        previousBidAmount: true,
+        previousDuration: true,
+        previousMessage: true,
+      },
+    });
+    const latestNegotiationByRequest = new Map<number, (typeof negotiations)[number]>();
+    for (const negotiation of negotiations) {
+      if (!latestNegotiationByRequest.has(negotiation.requestId))
+        latestNegotiationByRequest.set(negotiation.requestId, negotiation);
+    }
+    return NextResponse.json({
+      job: {
+        ...job,
+        projectId: project?.id ?? null,
+        mainCategory: category?.parent?.name ?? null,
+        categorySegment: category?.segment ?? null,
+      },
+      proposals: proposalsWithActor.map((proposal) => ({
+        ...proposal,
+        previous: latestNegotiationByRequest.get(proposal.id)
+          ? {
+              bidAmount: latestNegotiationByRequest.get(proposal.id)!.previousBidAmount,
+              duration: latestNegotiationByRequest.get(proposal.id)!.previousDuration,
+              message: latestNegotiationByRequest.get(proposal.id)!.previousMessage,
+            }
+          : null,
+        professional: professionalById.get(proposal.professionalId) ?? null,
+      })),
+      hireRequests: hireRequestsWithActor.map((hireRequest) => ({
+        ...hireRequest,
+        professional: professionalById.get(hireRequest.professionalId) ?? null,
+      })),
+    });
+  } catch (error) {
+    console.error("Failed to load job details:", error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Failed to load job." },
+      { status: 500 },
+    );
   }
-  return NextResponse.json({
-    job: {
-      ...job,
-      projectId: project?.id ?? null,
-      mainCategory: category?.parent?.name ?? null,
-      categorySegment: category?.segment ?? null,
-    },
-    proposals: proposalsWithActor.map((proposal) => ({
-      ...proposal,
-      previous: latestNegotiationByRequest.get(proposal.id)
-        ? {
-            bidAmount: latestNegotiationByRequest.get(proposal.id)!.previousBidAmount,
-            duration: latestNegotiationByRequest.get(proposal.id)!.previousDuration,
-            message: latestNegotiationByRequest.get(proposal.id)!.previousMessage,
-          }
-        : null,
-      professional: professionalById.get(proposal.professionalId) ?? null,
-    })),
-    hireRequests: hireRequestsWithActor.map((hireRequest) => ({
-      ...hireRequest,
-      professional: professionalById.get(hireRequest.professionalId) ?? null,
-    })),
-  });
-} catch (error) {
-  console.error("Failed to load job details:", error);
-  return NextResponse.json(
-    { error: error instanceof Error ? error.message : "Failed to load job." },
-    { status: 500 },
-  );
-}
 }
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -253,7 +256,10 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     if (isStatusOnly) {
       if (!parsed.data.status)
         return NextResponse.json({ error: "Please review the job details." }, { status: 400 });
-      const job = await db.clientJob.update({ where: { id }, data: { status: parsed.data.status } });
+      const job = await db.clientJob.update({
+        where: { id },
+        data: { status: parsed.data.status },
+      });
       return NextResponse.json({ job });
     }
 

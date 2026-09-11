@@ -282,14 +282,17 @@ export function ClientProfilePage() {
           <div className="mt-5 space-y-2">
             <div className="flex flex-wrap items-center gap-2.5">
               <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
-                {form.firstName || form.lastName ? `${form.firstName} ${form.lastName}`.trim() : "My Profile"}
+                {form.firstName || form.lastName
+                  ? `${form.firstName} ${form.lastName}`.trim()
+                  : "My Profile"}
               </h1>
               <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary border border-primary/20">
                 Client account
               </span>
             </div>
             <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">
-              Keep your details and service locations up to date so professionals can help you faster.
+              Keep your details and service locations up to date so professionals can help you
+              faster.
             </p>
           </div>
         </div>

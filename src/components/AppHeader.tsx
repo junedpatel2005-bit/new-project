@@ -195,9 +195,7 @@ export function AppHeader({ role }: { role?: string }) {
                   type="button"
                   onClick={() => {
                     const jobUrl =
-                      role === "PROFESSIONAL"
-                        ? `/professional/job/${job.id}`
-                        : `/job/${job.id}`;
+                      role === "PROFESSIONAL" ? `/professional/job/${job.id}` : `/job/${job.id}`;
                     router.push(jobUrl);
                     setSearchOpen(false);
                   }}

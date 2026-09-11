@@ -263,275 +263,275 @@ function ProProfileContent() {
                     Hire {professional.name.split(" ")[0]}
                   </Button>
                 </DialogTrigger>
-              <DialogContent className="max-w-2xl">
-                <DialogHeader>
-                  <DialogTitle>Hire {professional.name}</DialogTitle>
-                  <DialogDescription>
-                    Confirm the job, agree on budget and timeline, then review your request.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="grid grid-cols-3 gap-2 text-xs font-medium">
-                  {["Job details", "Budget & timeline", "Review"].map((label, index) => (
-                    <div
-                      key={label}
-                      className={`rounded-lg px-3 py-2 text-center ${hireStep === index + 1 ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}
-                    >
-                      {index + 1}. {label}
-                    </div>
-                  ))}
-                </div>
-                <div className="space-y-4 pt-2">
-                  {jobsStatus === "loading" && (
-                    <p className="text-sm text-muted-foreground">Loading your jobs...</p>
-                  )}
-                  {jobsStatus === "error" && (
-                    <p className="text-sm text-destructive">
-                      Your jobs could not be loaded. Sign in and reload the page.
-                    </p>
-                  )}
-                  {jobsStatus === "ready" && (
-                    <div className="space-y-4">
-                      {hireStep === 1 && (
-                        <div>
-                          <Label htmlFor="selectedJob">Select your job</Label>
-                          <Select
-                            value={selectedJobId?.toString() ?? ""}
-                            onValueChange={(value) => setSelectedJobId(Number(value))}
-                          >
-                            <SelectTrigger id="selectedJob" className="mt-2">
-                              <SelectValue placeholder="Choose a job" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {jobs.map((job) => (
-                                <SelectItem
-                                  key={job.id}
-                                  value={job.id.toString()}
-                                  disabled={job.status !== "OPEN"}
-                                >
-                                  {jobLabel(job)}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      )}
-                      {hireStep === 1 && selectedJob && (
-                        <div className="rounded-2xl border border-border bg-muted p-4">
-                          <p className="text-sm font-medium text-foreground">Selected job</p>
-                          <p className="mt-1 text-sm text-muted-foreground">
-                            {selectedJob.title ?? `Job #${selectedJob.id}`}
-                          </p>
-                          <p className="mt-2 text-sm">
-                            {selectedJob.timingType === "HOURLY"
-                              ? `${formatCurrency(selectedJob.hourlyRate)}/hr`
-                              : `${formatCurrency(selectedJob.budgetMin)} – ${formatCurrency(selectedJob.budgetMax)}`}
-                          </p>
-                          <p className="mt-1 text-sm text-muted-foreground">
-                            Status: {selectedJob.status}
-                          </p>
-                        </div>
-                      )}
-                      {hireStep === 2 && (
-                        <div>
-                          <Label htmlFor="bidAmount">
-                            {isHourlyJob ? "Your hourly rate" : "Your budget"}
-                          </Label>
-                          <Input
-                            id="bidAmount"
-                            type="number"
-                            min={bidMin}
-                            max={bidMax}
-                            step="1"
-                            value={bidAmount}
-                            onChange={(event) => setBidAmount(event.target.value)}
-                            placeholder={
-                              isHourlyJob
-                                ? "Enter your proposed hourly rate"
-                                : "Enter your proposed bid"
-                            }
-                            className="mt-2"
-                          />
-                          <p className="mt-2 text-xs text-muted-foreground">
-                            {isHourlyJob && selectedJob?.hourlyRate !== null
-                              ? `This job's rate: ₹${selectedJob?.hourlyRate?.toLocaleString()}/hr. We've pre-filled it for you.`
-                              : jobBudgetMin !== null && jobBudgetMax !== null
-                                ? `This job's budget: ₹${jobBudgetMin.toLocaleString()} – ₹${jobBudgetMax.toLocaleString()}. We've pre-filled the average.`
-                                : `Enter a bid amount up to ₹${bidMax.toLocaleString()}.`}
-                          </p>
-                        </div>
-                      )}
-                      {hireStep === 2 && (
-                        <div>
-                          <Label htmlFor="duration">Estimated duration</Label>
-                          <Select value={duration} onValueChange={setDuration}>
-                            <SelectTrigger id="duration" className="mt-2">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {["1 week", "2 weeks", "1 month", "2 months", "3+ months"].map(
-                                (option) => (
-                                  <SelectItem key={option} value={option}>
-                                    {option}
+                <DialogContent className="max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle>Hire {professional.name}</DialogTitle>
+                    <DialogDescription>
+                      Confirm the job, agree on budget and timeline, then review your request.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="grid grid-cols-3 gap-2 text-xs font-medium">
+                    {["Job details", "Budget & timeline", "Review"].map((label, index) => (
+                      <div
+                        key={label}
+                        className={`rounded-lg px-3 py-2 text-center ${hireStep === index + 1 ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}
+                      >
+                        {index + 1}. {label}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="space-y-4 pt-2">
+                    {jobsStatus === "loading" && (
+                      <p className="text-sm text-muted-foreground">Loading your jobs...</p>
+                    )}
+                    {jobsStatus === "error" && (
+                      <p className="text-sm text-destructive">
+                        Your jobs could not be loaded. Sign in and reload the page.
+                      </p>
+                    )}
+                    {jobsStatus === "ready" && (
+                      <div className="space-y-4">
+                        {hireStep === 1 && (
+                          <div>
+                            <Label htmlFor="selectedJob">Select your job</Label>
+                            <Select
+                              value={selectedJobId?.toString() ?? ""}
+                              onValueChange={(value) => setSelectedJobId(Number(value))}
+                            >
+                              <SelectTrigger id="selectedJob" className="mt-2">
+                                <SelectValue placeholder="Choose a job" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {jobs.map((job) => (
+                                  <SelectItem
+                                    key={job.id}
+                                    value={job.id.toString()}
+                                    disabled={job.status !== "OPEN"}
+                                  >
+                                    {jobLabel(job)}
                                   </SelectItem>
-                                ),
-                              )}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      )}
-                      {hireStep === 2 && (
-                        <div>
-                          <Label htmlFor="coverLetter">Message to professional</Label>
-                          <Textarea
-                            id="coverLetter"
-                            value={coverLetter}
-                            onChange={(event) => setCoverLetter(event.target.value)}
-                            placeholder="Briefly describe the work or requirements"
-                            className="mt-2"
-                            rows={4}
-                          />
-                        </div>
-                      )}
-                      {hireStep === 3 && selectedJob && (
-                        <div className="space-y-3 rounded-2xl border border-border bg-muted/40 p-4 text-sm">
-                          <p className="font-semibold">Confirm hire request</p>
-                          <p>
-                            <span className="text-muted-foreground">Job:</span>{" "}
-                            {selectedJob.title ?? `Job #${selectedJob.id}`}
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        )}
+                        {hireStep === 1 && selectedJob && (
+                          <div className="rounded-2xl border border-border bg-muted p-4">
+                            <p className="text-sm font-medium text-foreground">Selected job</p>
+                            <p className="mt-1 text-sm text-muted-foreground">
+                              {selectedJob.title ?? `Job #${selectedJob.id}`}
+                            </p>
+                            <p className="mt-2 text-sm">
+                              {selectedJob.timingType === "HOURLY"
+                                ? `${formatCurrency(selectedJob.hourlyRate)}/hr`
+                                : `${formatCurrency(selectedJob.budgetMin)} – ${formatCurrency(selectedJob.budgetMax)}`}
+                            </p>
+                            <p className="mt-1 text-sm text-muted-foreground">
+                              Status: {selectedJob.status}
+                            </p>
+                          </div>
+                        )}
+                        {hireStep === 2 && (
+                          <div>
+                            <Label htmlFor="bidAmount">
+                              {isHourlyJob ? "Your hourly rate" : "Your budget"}
+                            </Label>
+                            <Input
+                              id="bidAmount"
+                              type="number"
+                              min={bidMin}
+                              max={bidMax}
+                              step="1"
+                              value={bidAmount}
+                              onChange={(event) => setBidAmount(event.target.value)}
+                              placeholder={
+                                isHourlyJob
+                                  ? "Enter your proposed hourly rate"
+                                  : "Enter your proposed bid"
+                              }
+                              className="mt-2"
+                            />
+                            <p className="mt-2 text-xs text-muted-foreground">
+                              {isHourlyJob && selectedJob?.hourlyRate !== null
+                                ? `This job's rate: ₹${selectedJob?.hourlyRate?.toLocaleString()}/hr. We've pre-filled it for you.`
+                                : jobBudgetMin !== null && jobBudgetMax !== null
+                                  ? `This job's budget: ₹${jobBudgetMin.toLocaleString()} – ₹${jobBudgetMax.toLocaleString()}. We've pre-filled the average.`
+                                  : `Enter a bid amount up to ₹${bidMax.toLocaleString()}.`}
+                            </p>
+                          </div>
+                        )}
+                        {hireStep === 2 && (
+                          <div>
+                            <Label htmlFor="duration">Estimated duration</Label>
+                            <Select value={duration} onValueChange={setDuration}>
+                              <SelectTrigger id="duration" className="mt-2">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {["1 week", "2 weeks", "1 month", "2 months", "3+ months"].map(
+                                  (option) => (
+                                    <SelectItem key={option} value={option}>
+                                      {option}
+                                    </SelectItem>
+                                  ),
+                                )}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        )}
+                        {hireStep === 2 && (
+                          <div>
+                            <Label htmlFor="coverLetter">Message to professional</Label>
+                            <Textarea
+                              id="coverLetter"
+                              value={coverLetter}
+                              onChange={(event) => setCoverLetter(event.target.value)}
+                              placeholder="Briefly describe the work or requirements"
+                              className="mt-2"
+                              rows={4}
+                            />
+                          </div>
+                        )}
+                        {hireStep === 3 && selectedJob && (
+                          <div className="space-y-3 rounded-2xl border border-border bg-muted/40 p-4 text-sm">
+                            <p className="font-semibold">Confirm hire request</p>
+                            <p>
+                              <span className="text-muted-foreground">Job:</span>{" "}
+                              {selectedJob.title ?? `Job #${selectedJob.id}`}
+                            </p>
+                            <p>
+                              <span className="text-muted-foreground">Professional:</span>{" "}
+                              {professional.name}
+                            </p>
+                            <p>
+                              <span className="text-muted-foreground">
+                                {isHourlyJob ? "Hourly rate:" : "Budget:"}
+                              </span>{" "}
+                              ₹{Number(bidAmount || 0).toLocaleString()}
+                              {isHourlyJob ? "/hr" : ""}
+                            </p>
+                            <p>
+                              <span className="text-muted-foreground">Timeline:</span> {duration}
+                            </p>
+                            {coverLetter && <p className="text-muted-foreground">{coverLetter}</p>}
+                          </div>
+                        )}
+                        {requestMessage && (
+                          <p
+                            className={`text-sm ${
+                              requestStatus === "success" ? "text-emerald-600" : "text-destructive"
+                            }`}
+                          >
+                            {requestMessage}
                           </p>
-                          <p>
-                            <span className="text-muted-foreground">Professional:</span>{" "}
-                            {professional.name}
-                          </p>
-                          <p>
-                            <span className="text-muted-foreground">
-                              {isHourlyJob ? "Hourly rate:" : "Budget:"}
-                            </span>{" "}
-                            ₹{Number(bidAmount || 0).toLocaleString()}
-                            {isHourlyJob ? "/hr" : ""}
-                          </p>
-                          <p>
-                            <span className="text-muted-foreground">Timeline:</span> {duration}
-                          </p>
-                          {coverLetter && <p className="text-muted-foreground">{coverLetter}</p>}
-                        </div>
-                      )}
-                      {requestMessage && (
-                        <p
-                          className={`text-sm ${
-                            requestStatus === "success" ? "text-emerald-600" : "text-destructive"
-                          }`}
-                        >
-                          {requestMessage}
-                        </p>
-                      )}
-                    </div>
-                  )}
-                </div>
-                <DialogFooter className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-end">
-                  <DialogClose asChild>
-                    <Button variant="outline">Cancel</Button>
-                  </DialogClose>
-                  {hireStep > 1 && (
-                    <Button
-                      variant="outline"
-                      onClick={() => setHireStep((step) => (step - 1) as 1 | 2)}
-                    >
-                      Back
-                    </Button>
-                  )}
-                  {hireStep < 3 ? (
-                    <Button
-                      onClick={() => setHireStep((step) => (step + 1) as 2 | 3)}
-                      disabled={
-                        hireStep === 1
-                          ? !selectedJob || selectedJob.status !== "OPEN"
-                          : !bidAmount.trim() ||
-                            Number(bidAmount) < bidMin ||
-                            Number(bidAmount) > bidMax
-                      }
-                      className="w-full sm:w-auto"
-                    >
-                      Continue
-                    </Button>
-                  ) : (
-                    <Button
-                      onClick={submitRequest}
-                      disabled={!canSubmitRequest}
-                      className="w-full sm:w-auto"
-                    >
-                      {requestStatus === "loading" ? "Sending..." : "Send hire request"}
-                    </Button>
-                  )}
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  <DialogFooter className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-end">
+                    <DialogClose asChild>
+                      <Button variant="outline">Cancel</Button>
+                    </DialogClose>
+                    {hireStep > 1 && (
+                      <Button
+                        variant="outline"
+                        onClick={() => setHireStep((step) => (step - 1) as 1 | 2)}
+                      >
+                        Back
+                      </Button>
+                    )}
+                    {hireStep < 3 ? (
+                      <Button
+                        onClick={() => setHireStep((step) => (step + 1) as 2 | 3)}
+                        disabled={
+                          hireStep === 1
+                            ? !selectedJob || selectedJob.status !== "OPEN"
+                            : !bidAmount.trim() ||
+                              Number(bidAmount) < bidMin ||
+                              Number(bidAmount) > bidMax
+                        }
+                        className="w-full sm:w-auto"
+                      >
+                        Continue
+                      </Button>
+                    ) : (
+                      <Button
+                        onClick={submitRequest}
+                        disabled={!canSubmitRequest}
+                        className="w-full sm:w-auto"
+                      >
+                        {requestStatus === "loading" ? "Sending..." : "Send hire request"}
+                      </Button>
+                    )}
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
           </div>
-        </div>
 
-        {/* Profile Identity Details (Guaranteed clean position below banner) */}
-        <div className="mt-5 space-y-4">
-          <div>
-            <div className="flex flex-wrap items-center gap-2.5">
-              <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
-                {professional.name}
-              </h1>
-              {professional.verified && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary border border-primary/20">
-                  <BadgeCheck className="h-3.5 w-3.5 text-primary" />
-                  Verified Pro
+          {/* Profile Identity Details (Guaranteed clean position below banner) */}
+          <div className="mt-5 space-y-4">
+            <div>
+              <div className="flex flex-wrap items-center gap-2.5">
+                <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+                  {professional.name}
+                </h1>
+                {professional.verified && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary border border-primary/20">
+                    <BadgeCheck className="h-3.5 w-3.5 text-primary" />
+                    Verified Pro
+                  </span>
+                )}
+                {(professional.companyName || professional.industry) && (
+                  <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground border border-border">
+                    {professional.companyName || professional.industry}
+                  </span>
+                )}
+              </div>
+              <p className="mt-1 text-base font-medium text-muted-foreground">
+                {professional.title}
+              </p>
+            </div>
+
+            {/* Structured Metadata & Trust Badges Strip */}
+            <div className="flex flex-wrap items-center gap-2.5 pt-1">
+              {/* Rating */}
+              <div className="inline-flex items-center gap-1.5 rounded-xl border border-amber-500/20 bg-amber-500/10 px-3 py-1.5 text-xs font-semibold text-amber-800 dark:text-amber-300">
+                <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                <span>{professional.rating.toFixed(1)}</span>
+                <span className="font-normal opacity-80">({professional.reviews} reviews)</span>
+              </div>
+
+              {/* Location */}
+              <div className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-muted/50 px-3 py-1.5 text-xs font-medium text-foreground">
+                <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
+                <span>{professional.location ?? "Remote"}</span>
+              </div>
+
+              {/* Availability */}
+              <span className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-800 dark:text-emerald-300">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
                 </span>
-              )}
-              {(professional.companyName || professional.industry) && (
-                <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground border border-border">
-                  {professional.companyName || professional.industry}
+                {professional.availability.replace("_", " ")}
+              </span>
+
+              {/* Rate */}
+              {professional.hourlyRate ? (
+                <span className="inline-flex items-center gap-1.5 rounded-xl border border-primary/20 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary">
+                  ₹{professional.hourlyRate.toLocaleString()}/hr
                 </span>
-              )}
+              ) : null}
+
+              {/* Work Mode */}
+              {professional.workMode ? (
+                <span className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-muted/40 px-3 py-1.5 text-xs font-medium text-foreground capitalize">
+                  {professional.workMode.replace("_", " ")}
+                </span>
+              ) : null}
             </div>
-            <p className="mt-1 text-base font-medium text-muted-foreground">
-              {professional.title}
-            </p>
           </div>
-
-          {/* Structured Metadata & Trust Badges Strip */}
-          <div className="flex flex-wrap items-center gap-2.5 pt-1">
-            {/* Rating */}
-            <div className="inline-flex items-center gap-1.5 rounded-xl border border-amber-500/20 bg-amber-500/10 px-3 py-1.5 text-xs font-semibold text-amber-800 dark:text-amber-300">
-              <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-              <span>{professional.rating.toFixed(1)}</span>
-              <span className="font-normal opacity-80">({professional.reviews} reviews)</span>
-            </div>
-
-            {/* Location */}
-            <div className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-muted/50 px-3 py-1.5 text-xs font-medium text-foreground">
-              <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
-              <span>{professional.location ?? "Remote"}</span>
-            </div>
-
-            {/* Availability */}
-            <span className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-800 dark:text-emerald-300">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-              </span>
-              {professional.availability.replace("_", " ")}
-            </span>
-
-            {/* Rate */}
-            {professional.hourlyRate ? (
-              <span className="inline-flex items-center gap-1.5 rounded-xl border border-primary/20 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary">
-                ₹{professional.hourlyRate.toLocaleString()}/hr
-              </span>
-            ) : null}
-
-            {/* Work Mode */}
-            {professional.workMode ? (
-              <span className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-muted/40 px-3 py-1.5 text-xs font-medium text-foreground capitalize">
-                {professional.workMode.replace("_", " ")}
-              </span>
-            ) : null}
-          </div>
-        </div>
           <section className="mt-8 grid gap-6 sm:grid-cols-2">
             <div>
               <h2 className="text-lg font-semibold">About</h2>

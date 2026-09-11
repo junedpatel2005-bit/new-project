@@ -3,11 +3,7 @@ import { redirect } from "next/navigation";
 import { sessionCookie, verifySession } from "@/lib/auth";
 import JobDetails from "@/routes/job.$jobId";
 
-export default async function JobPage({
-  params,
-}: {
-  params: Promise<{ jobId: string }>;
-}) {
+export default async function JobPage({ params }: { params: Promise<{ jobId: string }> }) {
   const { jobId } = await params;
   const cookieStore = await cookies();
   const token = cookieStore.get(sessionCookie)?.value;

@@ -161,9 +161,7 @@ function DiscoverContent() {
       .then((r) => (r.ok ? r.json() : null))
       .then((job: { category?: string | null } | null) => {
         if (!job?.category) return;
-        const target = categories.find(
-          (c) => c.name.toLowerCase() === job.category!.toLowerCase(),
-        );
+        const target = categories.find((c) => c.name.toLowerCase() === job.category!.toLowerCase());
         if (!target) return;
         setSegment(target.segment);
         const segmentRoot = categories.find(
