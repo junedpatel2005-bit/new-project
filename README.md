@@ -88,11 +88,11 @@ The checked-in `docker-compose.test.yml` is for integration tests and uses a sep
 ## Useful commands
 
 ```bash
-npm run lint       # ESLint
-npm run typecheck  # TypeScript checks
-npm test           # Unit tests
-npm run build      # Production build and migration deploy
-npm start          # Run the production build
+npm run lint
+npm run typecheck
+npm test
+npm run build
+npm start
 ```
 
 ## Optional integrations
@@ -101,26 +101,17 @@ Email, Google OAuth, Google Maps, Sentry, Persona, Twilio, Razorpay, and S3-comp
 
 ### Google Maps
 
-In Google Cloud Console, enable billing and enable **Maps JavaScript API**, **Places API**, and **Geocoding API** for the project. A browser key is used by the interactive map and `GOOGLE_MAPS_SERVER_KEY` is used by `/api/geocode`. Restrict the browser key to `http://localhost:3000/*` during local development; restrict the server key by server IP in production.
-
-Without billing, Google returns `REQUEST_DENIED` and the map/address search will not work.
+Enable billing plus the Maps JavaScript API, Places API, and Geocoding API in Google Cloud. Use a browser key for the interactive map and `GOOGLE_MAPS_SERVER_KEY` for `/api/geocode`. Do not commit either key.
 
 ### Google login
 
-Create a Google OAuth 2.0 **Web application** client and set both values in `.env`:
-
-```dotenv
-GOOGLE_CLIENT_ID="...apps.googleusercontent.com"
-GOOGLE_CLIENT_SECRET="..."
-```
-
-Add this exact authorized redirect URI to the Google client:
+Set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in `.env`, then add this exact local redirect URI to the Google OAuth client:
 
 ```text
 http://localhost:3000/api/v1/auth/google
 ```
 
-The application starts OAuth at `/api/v1/auth/google`, and its rewrite maps that path to the route implementation. For production, add the matching HTTPS URL for that deployment, for example `https://your-domain.example/api/v1/auth/google`. The host and protocol must match exactly; a mismatch causes Google to reject the login with `redirect_uri_mismatch`.
+For production, add the matching HTTPS callback URL for the deployed domain.
 
 To create the first administrator in a new database, set `ADMIN_BOOTSTRAP_USERNAME` and `ADMIN_BOOTSTRAP_PASSWORD` in `.env` before using the admin bootstrap flow.
 
@@ -135,4 +126,3 @@ flutter run
 ```
 
 Configure the API base URL according to the device or emulator being used; `localhost` from a physical device refers to the device itself, not the development computer.
-
