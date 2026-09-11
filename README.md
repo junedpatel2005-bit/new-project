@@ -41,6 +41,8 @@ Servio is a Next.js application with a custom Node.js/Socket.IO server, PostgreS
    REALTIME_ALLOWED_ORIGIN="http://localhost:3000"
    AUTH_SECRET="replace-with-a-long-random-secret"
    FILE_STORAGE_PROVIDER="local"
+   NEXT_PUBLIC_GOOGLE_MAPS_API_KEY="your-browser-maps-key"
+   GOOGLE_MAPS_SERVER_KEY="your-server-geocoding-key"
    ```
 
    Keep `.env` private. Do not commit database passwords, API keys, or auth secrets.
@@ -96,6 +98,29 @@ npm start          # Run the production build
 ## Optional integrations
 
 Email, Google OAuth, Google Maps, Sentry, Persona, Twilio, Razorpay, and S3-compatible storage are configured through `.env`. Leave them disabled or blank for basic local development. Keep `PHONE_OTP_PROVIDER=development` unless Twilio is configured.
+
+### Google Maps
+
+In Google Cloud Console, enable billing and enable **Maps JavaScript API**, **Places API**, and **Geocoding API** for the project. A browser key is used by the interactive map and `GOOGLE_MAPS_SERVER_KEY` is used by `/api/geocode`. Restrict the browser key to `http://localhost:3000/*` during local development; restrict the server key by server IP in production.
+
+Without billing, Google returns `REQUEST_DENIED` and the map/address search will not work.
+
+### Google login
+
+Create a Google OAuth 2.0 **Web application** client and set both values in `.env`:
+
+```dotenv
+GOOGLE_CLIENT_ID="...apps.googleusercontent.com"
+GOOGLE_CLIENT_SECRET="..."
+```
+
+Add this exact authorized redirect URI to the Google client:
+
+```text
+http://localhost:3000/api/v1/auth/google
+```
+
+The application starts OAuth at `/api/v1/auth/google`, and its rewrite maps that path to the route implementation. For production, add the matching HTTPS URL for that deployment, for example `https://your-domain.example/api/v1/auth/google`. The host and protocol must match exactly; a mismatch causes Google to reject the login with `redirect_uri_mismatch`.
 
 To create the first administrator in a new database, set `ADMIN_BOOTSTRAP_USERNAME` and `ADMIN_BOOTSTRAP_PASSWORD` in `.env` before using the admin bootstrap flow.
 

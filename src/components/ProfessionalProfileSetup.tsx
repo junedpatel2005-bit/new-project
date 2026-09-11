@@ -12,7 +12,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PhoneVerification } from "@/components/PhoneVerification";
 import { Textarea } from "@/components/ui/textarea";
-import { getAllStates } from "@/lib/india-locations";
+import { getAllStates, getDistrictsByState } from "@/lib/india-locations";
+import type { MarketplaceCategory } from "@/lib/types/marketplace";
 
 const serviceOptions = [
   ["RESIDENTIAL", "Residential"],
