@@ -153,6 +153,36 @@ function DiscoverContent() {
   }, []);
 
   useEffect(() => {
+    if (!jobId || categories.length === 0) return;
+    const controller = new AbortController();
+    void fetch(`/api/v1/marketplace/job?id=${encodeURIComponent(jobId)}`, {
+      signal: controller.signal,
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((job: { category?: string | null } | null) => {
+        if (!job?.category) return;
+        const target = categories.find(
+          (c) => c.name.toLowerCase() === job.category!.toLowerCase(),
+        );
+        if (!target) return;
+        setSegment(target.segment);
+        const segmentRoot = categories.find(
+          (c) => c.parentId === null && c.segment === target.segment,
+        );
+        setParentCategoryId(segmentRoot?.id ?? null);
+        if (target.parentId === null || target.parentId === segmentRoot?.id) {
+          setCategoryId(target.id);
+          setSubcategoryId(null);
+        } else {
+          setCategoryId(target.parentId);
+          setSubcategoryId(target.id);
+        }
+      })
+      .catch(() => {});
+    return () => controller.abort();
+  }, [jobId, categories]);
+
+  useEffect(() => {
     const controller = new AbortController();
     setStatus("loading");
 

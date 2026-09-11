@@ -391,7 +391,8 @@ export default function JobDetails({
       // the job's main segment (Residential, Commercial, or Industrial).
       if (job?.categorySegment) {
         params.set("segment", job.categorySegment);
-      } else if (job?.category && job.category !== "Uncategorized") {
+      }
+      if (job?.category && job.category !== "Uncategorized") {
         params.set("category", job.category);
       }
       if (query.trim()) params.set("query", query.trim());

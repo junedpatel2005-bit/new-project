@@ -210,8 +210,10 @@ export async function listCategories(): Promise<MarketplaceCategory[]> {
   ]);
   const categoryByName = new Map<string, number>();
   const childrenByParent = new Map<number, number[]>();
+  const parentById = new Map<number, number | null>();
   for (const category of categories) {
     categoryByName.set(category.name.toLowerCase(), category.id);
+    parentById.set(category.id, category.parentId);
     if (category.parentId === null) continue;
     const children = childrenByParent.get(category.parentId) ?? [];
     children.push(category.id);
@@ -227,6 +229,14 @@ export async function listCategories(): Promise<MarketplaceCategory[]> {
   const counts = new Map<number, number>();
   for (const category of categories) {
     const branchIds = new Set(categoryIdsForBranch(category.id));
+    let currParent = parentById.get(category.id);
+    while (currParent != null) {
+      const grandParent = parentById.get(currParent);
+      if (grandParent !== undefined && grandParent !== null) {
+        branchIds.add(currParent);
+      }
+      currParent = grandParent;
+    }
     const count = professionals.filter((professional) => {
       const catId =
         professional.professionalCategoryId ??

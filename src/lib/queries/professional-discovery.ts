@@ -47,6 +47,58 @@ const STATE_COORDINATE_BOUNDS: Record<
   Gujarat: { minLat: 20.0, maxLat: 24.8, minLng: 68.0, maxLng: 74.5 },
 };
 
+async function getCategoryHierarchyMaps() {
+  const hierarchy = await db.serviceCategory.findMany({
+    select: { id: true, parentId: true, name: true },
+  });
+  const childrenByParent = new Map<number, number[]>();
+  const parentById = new Map<number, number | null>();
+  const nameById = new Map<number, string>();
+  for (const item of hierarchy) {
+    nameById.set(item.id, item.name);
+    parentById.set(item.id, item.parentId);
+    if (item.parentId !== null) {
+      const children = childrenByParent.get(item.parentId) ?? [];
+      children.push(item.id);
+      childrenByParent.set(item.parentId, children);
+    }
+  }
+  return { hierarchy, childrenByParent, parentById, nameById };
+}
+
+function resolveEligibleCategoryBranch(
+  selectedId: number,
+  childrenByParent: Map<number, number[]>,
+  parentById: Map<number, number | null>,
+  nameById: Map<number, string>,
+) {
+  const branchIds: number[] = [];
+  const collectBranch = (id: number) => {
+    branchIds.push(id);
+    for (const childId of childrenByParent.get(id) ?? []) collectBranch(childId);
+  };
+  collectBranch(selectedId);
+
+  // If selectedId is a sub-category, professionals who selected its parent category
+  // (or any ancestor below the root segment) are also eligible for this sub-category.
+  const ancestorIds: number[] = [];
+  let currentParentId = parentById.get(selectedId);
+  while (currentParentId != null) {
+    const grandParent = parentById.get(currentParentId);
+    if (grandParent !== undefined && grandParent !== null) {
+      ancestorIds.push(currentParentId);
+    }
+    currentParentId = grandParent;
+  }
+
+  const allEligibleIds = Array.from(new Set([...branchIds, ...ancestorIds]));
+  const allEligibleNames = allEligibleIds
+    .map((id) => nameById.get(id))
+    .filter((name): name is string => Boolean(name));
+
+  return { eligibleIds: allEligibleIds, eligibleNames: allEligibleNames };
+}
+
 async function buildSearchWhere(filter: ProfessionalDiscoveryFilter) {
   const where: Prisma.UserWhereInput = {
     role: "PROFESSIONAL",
@@ -89,34 +141,49 @@ async function buildSearchWhere(filter: ProfessionalDiscoveryFilter) {
       where.AND = [{ id: -1 }];
     } else {
       const selectedId = subcategory?.id ?? category?.id ?? parent.id;
-      const hierarchy = await db.serviceCategory.findMany({ select: { id: true, parentId: true } });
-      const childrenByParent = new Map<number, number[]>();
-      for (const item of hierarchy) {
-        if (item.parentId === null) continue;
-        const children = childrenByParent.get(item.parentId) ?? [];
-        children.push(item.id);
-        childrenByParent.set(item.parentId, children);
-      }
-      const branchIds: number[] = [];
-      const collectBranch = (id: number) => {
-        branchIds.push(id);
-        for (const childId of childrenByParent.get(id) ?? []) collectBranch(childId);
-      };
-      collectBranch(selectedId);
+      const { childrenByParent, parentById, nameById } = await getCategoryHierarchyMaps();
+      const { eligibleIds, eligibleNames } = resolveEligibleCategoryBranch(
+        selectedId,
+        childrenByParent,
+        parentById,
+        nameById,
+      );
       where.AND = [
         ...(Array.isArray(where.AND) ? where.AND : []),
         {
           OR: [
-            { professionalCategoryId: { in: branchIds } },
-            { services: { some: { isActive: true, categoryId: { in: branchIds } } } },
+            { professionalCategoryId: { in: eligibleIds } },
+            { professionalCategory: { in: eligibleNames } },
+            { services: { some: { isActive: true, categoryId: { in: eligibleIds } } } },
           ],
         },
       ];
     }
   } else if (filter.category) {
-    // Backward-compatible name filtering for older API consumers. New clients
-    // should use parentCategoryId/categoryId/subcategoryId.
-    where.professionalCategory = filter.category;
+    const { hierarchy, childrenByParent, parentById, nameById } = await getCategoryHierarchyMaps();
+    const matched = hierarchy.find(
+      (c) => c.name.toLowerCase() === filter.category!.trim().toLowerCase(),
+    );
+    if (matched) {
+      const { eligibleIds, eligibleNames } = resolveEligibleCategoryBranch(
+        matched.id,
+        childrenByParent,
+        parentById,
+        nameById,
+      );
+      where.AND = [
+        ...(Array.isArray(where.AND) ? where.AND : []),
+        {
+          OR: [
+            { professionalCategoryId: { in: eligibleIds } },
+            { professionalCategory: { in: eligibleNames } },
+            { services: { some: { isActive: true, categoryId: { in: eligibleIds } } } },
+          ],
+        },
+      ];
+    } else {
+      where.professionalCategory = filter.category;
+    }
   }
 
   if (filter.city) {

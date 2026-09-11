@@ -43,6 +43,7 @@ function getRecommendedSkills(category: string) {
 
 type Profile = {
   professionalCategory: string | null;
+  professionalCategoryId?: number | null;
   experienceYears: number | null;
   hourlyRate: number | null;
   serviceRadiusKm: number | null;
@@ -77,11 +78,16 @@ export function ProfessionalProfileSetup() {
   const [avatarUploading, setAvatarUploading] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const isEdit = Boolean(profile?.professionalCategory);
-  const availableCategories = categories.filter(
-    (item) =>
-      item.segment === segment &&
-      (item.parentId !== null || !categories.some((child) => child.parentId === item.id)),
+  const segmentRootCategory = categories.find(
+    (item) => item.parentId === null && item.segment === segment,
   );
+  const availableCategories = categories.filter((item) => {
+    if (item.segment !== segment) return false;
+    if (segmentRootCategory) {
+      return item.parentId === segmentRootCategory.id;
+    }
+    return item.parentId === null;
+  });
 
   async function fillAreaFromLocation(latitude: number, longitude: number) {
     try {
@@ -187,9 +193,25 @@ export function ProfessionalProfileSetup() {
   }, []);
 
   useEffect(() => {
-    if (!profile?.professionalCategory || !categories.length) return;
-    const savedCategory = categories.find((item) => item.name === profile.professionalCategory);
-    if (savedCategory) setSegment(savedCategory.segment);
+    if (!profile || !categories.length) return;
+    const catId = profile.professionalCategoryId;
+    const catName = profile.professionalCategory;
+    if (!catId && !catName) return;
+    const savedCategory =
+      (catId ? categories.find((item) => item.id === catId) : null) ??
+      (catName
+        ? categories.find((item) => item.name.toLowerCase() === catName.toLowerCase())
+        : null);
+
+    if (savedCategory) {
+      setSegment(savedCategory.segment);
+      const parent = categories.find((item) => item.id === savedCategory.parentId);
+      if (parent && parent.parentId !== null) {
+        setCategory(parent.name);
+      } else {
+        setCategory(savedCategory.name);
+      }
+    }
   }, [categories, profile]);
 
   function addSkill(value: string) {
@@ -214,12 +236,14 @@ export function ProfessionalProfileSetup() {
     }
     setError(null);
     setPending(true);
+    const chosenCategory = availableCategories.find((item) => item.name === category);
     const form = new FormData(event.currentTarget);
     const response = await fetch("/api/v1/professional/profile", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
         category,
+        categoryId: chosenCategory?.id,
         state,
         district,
         experienceYears: form.get("experienceYears") ? Number(form.get("experienceYears")) : null,
