@@ -1148,7 +1148,11 @@ export default function SharedProjectTrackingPage() {
                         <div>
                           <p className="font-semibold">{m.title}</p>
                           <p className="mt-1 text-sm text-muted-foreground">
-                            {m.description || "No description"} · ₹{m.amount.toLocaleString()}
+                            {m.description || "No description"} · ₹{m.amount.toLocaleString()} ·{" "}
+                            {totalMilestoneValue > 0
+                              ? Math.round((m.amount / totalMilestoneValue) * 100)
+                              : 0}
+                            %
                           </p>
                           <p className="mt-1 text-xs text-muted-foreground">
                             {m.dueDate

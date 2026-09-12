@@ -230,6 +230,21 @@ export async function POST(request: NextRequest) {
           { error: "This project changed before it could be started." },
           { status: 409 },
         );
+      const firstMilestone = await db.projectMilestone.findFirst({
+        where: { trackingId: project.id, status: "UPCOMING" },
+        orderBy: { createdAt: "asc" },
+        select: { id: true, title: true },
+      });
+      if (firstMilestone) {
+        await db.projectMilestone.update({
+          where: { id: firstMilestone.id },
+          data: { status: "IN_PROGRESS" },
+        });
+        await db.projectTracking.update({
+          where: { id: project.id },
+          data: { currentStage: firstMilestone.title },
+        });
+      }
       await event("WORK_STARTED", "Work started", "The client started work on this project.");
     }
     if (input.action === "update-progress") {
